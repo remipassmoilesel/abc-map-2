@@ -57,7 +57,7 @@ public class ConfigurationConstants {
             .getDefaultDirectory().getAbsolutePath();
     public static final String SYMBOLS_DIR_PATH = "./symbols/";
     public static final String PROFILE_ROOT_PATH = "./profiles/";
-    public static final String LOG_DIR_PATH = "./log/";
+    public static final String LOG_DIRECTORY = "./log/";
     public static final String HELP_DIR = "./help/";
 
     /*

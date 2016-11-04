@@ -1,6 +1,8 @@
 package org.abcmap.core.managers;
 
-import org.abcmap.core.log.Logger;
+import org.abcmap.core.log.CustomLogger;
+
+import java.io.IOException;
 
 /**
  * Main manager.
@@ -9,25 +11,40 @@ import org.abcmap.core.log.Logger;
  */
 public class MainManager {
 
-    private static final Logger log = Logger.getLogger(MainManager.class);
+    private static final boolean DEBUG_MODE = true;
+
+    // here it is the only logger directly instantiated
+    private static final CustomLogger log = new CustomLogger(MainManager.class);
     private static ConfigurationManager configurationManager = null;
+    private static LogManager logManager;
 
     /**
      * Initialize all managers
      */
-    public static void init() {
+    public static void init() throws IOException {
 
-        if (configurationManager != null) {
+        if (logManager != null) {
             log.warning("Main manager already initialized");
             return;
         }
+
+
+        logManager = LogManager.initialize();
 
         configurationManager = new ConfigurationManager();
 
     }
 
+    public static boolean isDebugMode() {
+        return DEBUG_MODE;
+    }
+
     public static ConfigurationManager getConfigurationManager() {
         return configurationManager;
+    }
+
+    public static LogManager getLogManager() {
+        return logManager;
     }
 
 }
