@@ -1,0 +1,56 @@
+package org.abcmap.core.managers;
+
+import com.thoughtworks.xstream.XStream;
+import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.configuration.ConfigurationContainer;
+
+import java.beans.XMLDecoder;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+/**
+ * Manage configuration of software. Here you can store and use settings.
+ */
+public class ConfigurationManager {
+
+    private final XStream xmlSerializer;
+    private ConfigurationContainer currentConfiguration;
+
+    public ConfigurationManager() {
+        // load default configuration
+        this.currentConfiguration = new ConfigurationContainer();
+        this.xmlSerializer = new XStream();
+    }
+
+    /**
+     * Save a configuration container to the specified location.
+     *
+     * @param container
+     * @param destination
+     * @throws IOException
+     */
+    public void saveConfiguration(ConfigurationContainer container, Path destination) throws IOException {
+
+        try (BufferedWriter writer = Files.newBufferedWriter(destination, ConfigurationConstants.DEFAULT_CHARSET)) {
+            writer.write(xmlSerializer.toXML(container));
+            writer.flush();
+            writer.close();
+        }
+
+    }
+
+    /**
+     * Load and return a configuration container from the specified source.
+     *
+     * @param source
+     * @return
+     * @throws IOException
+     */
+    public ConfigurationContainer loadConfiguration(Path source) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(source, ConfigurationConstants.DEFAULT_CHARSET)) {
+            this.currentConfiguration = (ConfigurationContainer) xmlSerializer.fromXML(reader);
+            return currentConfiguration;
+        }
+    }
+}
