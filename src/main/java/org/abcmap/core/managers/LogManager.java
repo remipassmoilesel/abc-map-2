@@ -4,6 +4,7 @@ import org.abcmap.LaunchError;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.*;
 
@@ -57,7 +58,7 @@ public class LogManager {
         rootLogger.setLevel(DEFAULT_LOG_LEVEL);
 
         // add file logging
-        FileHandler fileTxt = new FileHandler(ConfigurationConstants.LOG_DIRECTORY + "log_%g.txt", 2097152, 5, true);
+        FileHandler fileTxt = new FileHandler(ConfigurationConstants.LOG_DIRECTORY + File.separator + "log_%g.txt", 2097152, 5, true);
         SimpleFormatter formatterTxt = new SimpleFormatter();
         fileTxt.setFormatter(formatterTxt);
         rootLogger.addHandler(fileTxt);

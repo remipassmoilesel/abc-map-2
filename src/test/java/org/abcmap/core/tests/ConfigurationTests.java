@@ -18,10 +18,10 @@ import static junit.framework.Assert.assertTrue;
 /**
  *
  */
-public class ConfigurationTest {
+public class ConfigurationTests {
 
     @BeforeClass
-    public static void beforeTests(){
+    public static void beforeTests() throws IOException {
         MainManager.init();
     }
 

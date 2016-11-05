@@ -3,7 +3,7 @@
   <HOME>/home/remipassmoilesel</HOME>
   <PROFILE__TITLE>New configuration profile</PROFILE__TITLE>
   <PROFILE__COMMENT>Comments</PROFILE__COMMENT>
-  <PROFILE__PATH>./profiles/default.prf</PROFILE__PATH>
+  <PROFILE__PATH>./profiles/default.xml</PROFILE__PATH>
   <SAVE__PROFILE__WHEN__LEAVE>true</SAVE__PROFILE__WHEN__LEAVE>
   <IMPORT__ENABLE__CROPPING>true</IMPORT__ENABLE__CROPPING>
   <IMPORT__CROP__AREA__SELECTION__X>50</IMPORT__CROP__AREA__SELECTION__X>
