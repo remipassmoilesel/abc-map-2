@@ -4,6 +4,8 @@ import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Misc configuration constants
@@ -55,10 +57,10 @@ public class ConfigurationConstants {
      */
     public static String SYSTEM_HOME_PATH = FileSystemView.getFileSystemView()
             .getDefaultDirectory().getAbsolutePath();
-    public static final String SYMBOLS_DIR_PATH = "./symbols/";
-    public static final String PROFILE_ROOT_PATH = "./profiles/";
-    public static final String LOG_DIRECTORY = "./log/";
-    public static final String HELP_DIR = "./help/";
+    public static final Path SYMBOLS_DIR_PATH = Paths.get("./symbols");
+    public static final Path PROFILE_ROOT_PATH = Paths.get("./profiles");
+    public static final Path LOG_DIRECTORY = Paths.get("./log");
+    public static final Path HELP_DIR = Paths.get("./help");
 
     /*
      *
@@ -75,11 +77,9 @@ public class ConfigurationConstants {
      * Configuration profiles settings
      */
 
-    public static final String PROFILE_EXTENSION = "prf";
-    public static final String DEFAULT_PROFILE_PATH = ConfigurationConstants.PROFILE_ROOT_PATH
-            + "default." + PROFILE_EXTENSION;
-    public static final String SYSTEM_PROFILE_PATH = ConfigurationConstants.PROFILE_ROOT_PATH
-            + "system";
+    public static final String PROFILE_EXTENSION = "xml";
+    public static final Path DEFAULT_PROFILE_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), "default." + PROFILE_EXTENSION);
+    public static final Path CURRENT_PROFILE_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), ".current");
 
     public static final String XML_PARAMETER_TAG = "parameter";
     public static final String XML_ROOT_NAME = "parameters";
