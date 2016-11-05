@@ -66,8 +66,7 @@ public class ThreadManager {
     }
 
     /**
-     * Executer une tache dans un thread séparé, à la suite d'éventuelles tâche
-     * en cours.
+     * Execute a task in a separated thread, eventually on EDT
      *
      * @param runnable
      */

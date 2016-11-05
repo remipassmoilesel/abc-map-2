@@ -1,6 +1,7 @@
 package org.abcmap.core.managers;
 
 import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.threads.ThreadManager;
 
 import java.io.IOException;
 
@@ -28,6 +29,7 @@ public class MainManager {
             return;
         }
 
+        ThreadManager.init();
         configurationManager = new ConfigurationManager();
 
     }
