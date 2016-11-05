@@ -7,7 +7,7 @@ import java.io.Serializable;
  * <p>
  * Only use serializable objects.
  */
-public class ConfigurationContainer implements Serializable{
+public class ConfigurationContainer implements Serializable {
 
 
 	/*
@@ -22,20 +22,19 @@ public class ConfigurationContainer implements Serializable{
      * Profile settings
      */
 
-
     public String PROFILE_TITLE = "New configuration profile";
 
     public String PROFILE_COMMENT = "Comments";
 
-    public String PROFILE_PATH = ConfigurationConstants.DEFAULT_PROFILE_PATH;
+    public String PROFILE_PATH = ConfigurationConstants.DEFAULT_PROFILE_PATH.toString();
 
     public Boolean SAVE_PROFILE_WHEN_LEAVE = true;
+
 
     /*
      * Import settings
      */
-
-
+    
     public Boolean IMPORT_ENABLE_CROPPING = true;
 
     public Integer IMPORT_CROP_AREA_SELECTION_X = 50;

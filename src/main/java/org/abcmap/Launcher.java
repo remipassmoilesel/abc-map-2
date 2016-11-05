@@ -13,10 +13,10 @@ public class Launcher {
     public static void main(String[] args) throws IOException {
 
         System.out.println("Initializing Abc-Map, please wait ...");
+        System.out.println("Lancement d'Abc-Map, veuillez patienter...");
 
         try{
-            throw new Exception();
-//            MainManager.init();
+            MainManager.init();
         } catch (Exception e){
             LaunchError.showErrorAndDie();
         }
