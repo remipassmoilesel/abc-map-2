@@ -23,13 +23,10 @@ public class MainManager {
      */
     public static void init() throws IOException {
 
-        if (logManager != null) {
+        if (configurationManager != null) {
             log.warning("Main manager already initialized");
             return;
         }
-
-
-        logManager = LogManager.initialize();
 
         configurationManager = new ConfigurationManager();
 
@@ -41,10 +38,6 @@ public class MainManager {
 
     public static ConfigurationManager getConfigurationManager() {
         return configurationManager;
-    }
-
-    public static LogManager getLogManager() {
-        return logManager;
     }
 
 }

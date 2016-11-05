@@ -1,5 +1,6 @@
 package org.abcmap.core.managers;
 
+import org.abcmap.LaunchError;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
 
@@ -7,19 +8,39 @@ import java.io.IOException;
 import java.util.logging.*;
 
 /**
- * Log utility wrapper
+ * Log utility wrapper.
+ * <p>
+ * LogManager is the only anager that have to be called without use MainManager
  */
 public class LogManager {
 
+    public static boolean loggersAreInitialized = false;
     public static final Level DEFAULT_LOG_LEVEL = Level.INFO;
+
+    /**
+     * Return a logger instance
+     *
+     * @param owner
+     * @return
+     */
+    public static CustomLogger getLogger(Class<?> owner) {
+        if (loggersAreInitialized == false) {
+            try {
+                initializeLoggers();
+            } catch (IOException e) {
+                LaunchError.showErrorAndDie(e);
+            }
+            loggersAreInitialized = true;
+        }
+        return new CustomLogger(owner);
+    }
 
     /**
      * Initialize and setup loggers: console logging, file logging, ...
      *
      * @throws IOException
      */
-
-    public static LogManager initialize() throws IOException {
+    private static LogManager initializeLoggers() throws IOException {
 
         // get the root logger
         java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
@@ -42,16 +63,6 @@ public class LogManager {
         rootLogger.addHandler(fileTxt);
 
         return new LogManager();
-    }
-
-    /**
-     * Return a logger instance
-     *
-     * @param owner
-     * @return
-     */
-    public CustomLogger getLogger(Class<?> owner) {
-        return new CustomLogger(owner);
     }
 
 }

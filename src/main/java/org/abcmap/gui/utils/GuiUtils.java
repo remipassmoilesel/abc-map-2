@@ -2,6 +2,7 @@ package org.abcmap.gui.utils;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.util.Utils;
 import org.abcmap.gui.GuiStyle;
@@ -26,7 +27,7 @@ import java.util.*;
 
 public class GuiUtils {
 
-    private static final CustomLogger logger = MainManager.getLogManager().getLogger(GuiUtils.class);
+    private static final CustomLogger logger = LogManager.getLogger(GuiUtils.class);
 
     /**
      * Configure default look and feel

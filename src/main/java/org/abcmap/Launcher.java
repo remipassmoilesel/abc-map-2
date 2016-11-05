@@ -14,7 +14,13 @@ public class Launcher {
 
         System.out.println("Initializing Abc-Map, please wait ...");
 
-        MainManager.init();
+        try{
+            throw new Exception();
+//            MainManager.init();
+        } catch (Exception e){
+            LaunchError.showErrorAndDie();
+        }
+
 
     }
 

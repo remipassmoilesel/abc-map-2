@@ -1,6 +1,7 @@
 package org.abcmap.core.util;
 
 import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.gui.utils.GuiUtils;
 import org.jdom.Element;
@@ -29,7 +30,7 @@ import java.util.List;
 
 public class Utils {
 
-    private static final CustomLogger logger = MainManager.getLogManager().getLogger(Utils.class);
+    private static final CustomLogger logger = LogManager.getLogger(Utils.class);
 
     /**
      * Memory check utility
