@@ -15,8 +15,8 @@ import java.util.logging.*;
  */
 public class LogManager {
 
-    public static boolean loggersAreInitialized = false;
-    public static final Level DEFAULT_LOG_LEVEL = Level.INFO;
+    private static LogManager instance;
+    private static final Level DEFAULT_LOG_LEVEL = Level.INFO;
 
     /**
      * Return a logger instance
@@ -25,15 +25,14 @@ public class LogManager {
      * @return
      */
     public static CustomLogger getLogger(Class<?> owner) {
-        if (loggersAreInitialized == false) {
+        if (instance == null) {
             try {
-                initializeLoggers();
+                instance = initializeLoggers();
             } catch (IOException e) {
                 LaunchError.showErrorAndDie(e);
             }
-            loggersAreInitialized = true;
         }
-        return new CustomLogger(owner);
+        return instance.createLogger(owner);
     }
 
     /**
@@ -64,6 +63,13 @@ public class LogManager {
         rootLogger.addHandler(fileTxt);
 
         return new LogManager();
+    }
+
+    LogManager() {
+    }
+
+    private CustomLogger createLogger(Class<?> owner) {
+        return new CustomLogger(owner);
     }
 
 }
