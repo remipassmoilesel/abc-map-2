@@ -27,14 +27,33 @@
 
         .content {
             width: 70%;
-            background: #E9E9E9;
+            background: #f4f4f4;
             padding: 20px;
             margin: auto;
             min-height: 500px;
+            border: solid 2px #e6e6e6;
+        }
+
+        pre {
+            width: 100%;
+            background: white;
+            font-family: monospace;
+            width: 80%;
+            padding: 10px;
         }
 
         code {
             white-space: pre;
+        }
+
+        .footer{
+            text-align: right;
+            width: 70%;
+            background: #f4f4f4;
+            padding: 20px;
+            margin: auto;
+            margin-top: 5px;
+            border: solid 2px #e6e6e6;
         }
     </style>
     $if(quotes)$
@@ -87,6 +106,10 @@
     $for(include-after)$
     $include-after$
     $endfor$
+
+
 </div>
+<div class="footer"><a href="index.html">Go to index</a></div>
+
 </body>
 </html>
