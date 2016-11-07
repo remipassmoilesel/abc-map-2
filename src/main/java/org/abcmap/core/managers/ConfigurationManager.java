@@ -16,7 +16,7 @@ public class ConfigurationManager {
     private final XStream xmlSerializer;
     private ConfigurationContainer currentConfiguration;
 
-    public ConfigurationManager() throws IOException {
+    ConfigurationManager() throws IOException {
         // load default configuration
         this.currentConfiguration = new ConfigurationContainer();
         this.xmlSerializer = new XStream();
