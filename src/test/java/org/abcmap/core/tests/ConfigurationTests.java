@@ -15,9 +15,6 @@ import java.nio.file.Paths;
 
 import static junit.framework.Assert.assertTrue;
 
-/**
- *
- */
 public class ConfigurationTests {
 
     @BeforeClass
