@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 
 import static junit.framework.Assert.assertTrue;
 
-public class ConfigurationTests {
+public class ConfigurationTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {

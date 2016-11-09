@@ -11,7 +11,7 @@ import java.nio.file.Path;
 
 import static junit.framework.Assert.assertTrue;
 
-public class TempFilesManagerTests {
+public class TempFilesManagerTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
