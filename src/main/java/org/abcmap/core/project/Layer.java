@@ -9,6 +9,7 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
@@ -120,7 +121,7 @@ public class Layer {
         this.indexEntry = indexEntry;
     }
 
-    protected SimpleFeatureSource getFeatureSource() {
+    public SimpleFeatureSource getFeatureSource() {
         return featureSource;
     }
 
@@ -142,6 +143,20 @@ public class Layer {
 
     public void setCrs(CoordinateReferenceSystem crs) {
         this.crs = crs;
+    }
+
+    /**
+     * Return calculated bounds of layer, or null if an IO error occur
+     *
+     * @return
+     */
+    public ReferencedEnvelope getBounds() {
+        try {
+            return featureSource.getFeatures().getBounds();
+        } catch (IOException e) {
+            logger.error(e);
+            return null;
+        }
     }
 
     @Override
