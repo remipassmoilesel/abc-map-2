@@ -22,7 +22,7 @@ import java.util.Map;
 
 import static junit.framework.TestCase.assertTrue;
 
-public class ProjectMetadataTest {
+public class ProjectMetadataDAOTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
@@ -38,7 +38,7 @@ public class ProjectMetadataTest {
 
         assertTrue("Constant name test", PMConstants.safeValueOf("SOMETHING_NEVER_FOUND_#######") == null);
 
-        Path db = Paths.get(TestConstants.PLAYGROUND, "metadatas.db");
+        Path db = TestConstants.PLAYGROUND_DIRECTORY.resolve("metadatas.db");
 
         // clean previous db if necessary
         if(Files.exists(db)){

@@ -3,11 +3,9 @@ package org.abcmap.core.tests;
 import org.abcmap.TestConstants;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.LayerIndexEntry;
-import org.abcmap.core.project.PMConstants;
-import org.abcmap.core.project.ProjectMetadata;
+import org.abcmap.core.project.LayerType;
 import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
-import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.Transaction;
 import org.geotools.jdbc.JDBCDataStore;
@@ -38,12 +36,12 @@ public class LayerIndexDAOTest {
         // create layer index entries
         ArrayList<LayerIndexEntry> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            list.add(new LayerIndexEntry(null, "Layer " + i, true, i));
+            list.add(new LayerIndexEntry(null, "Layer " + i, true, i, LayerType.FEATURES));
         }
 
         assertTrue("Creation test", list.equals(list));
 
-        Path db = Paths.get(TestConstants.PLAYGROUND, "layer_index.db");
+        Path db = TestConstants.PLAYGROUND_DIRECTORY.resolve("layer_index.db");
 
         // clean previous db if necessary
         if(Files.exists(db)){

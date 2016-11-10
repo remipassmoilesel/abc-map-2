@@ -4,7 +4,6 @@ import org.abcmap.TestConstants;
 import org.abcmap.core.configuration.ConfigurationContainer;
 import org.abcmap.core.managers.ConfigurationManager;
 import org.abcmap.core.managers.MainManager;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,7 +32,7 @@ public class ConfigurationTest {
          * Save configuration
          */
 
-        Path configurationPath = Paths.get(TestConstants.PLAYGROUND, "configuration.xml");
+        Path configurationPath = TestConstants.PLAYGROUND_DIRECTORY.resolve("configuration.xml");
 
         ConfigurationContainer defaultConfiguration = new ConfigurationContainer();
 
