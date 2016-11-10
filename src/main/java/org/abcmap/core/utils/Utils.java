@@ -373,6 +373,8 @@ public class Utils {
         }
     }
 
+
+
     /**
      * Write a jpeg picture with maximum quality
      *
