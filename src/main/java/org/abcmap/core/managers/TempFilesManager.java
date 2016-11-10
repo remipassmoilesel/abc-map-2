@@ -11,7 +11,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import static org.apache.commons.io.FileUtils.getTempDirectoryPath;
-import static sun.management.Agent.error;
 
 /**
  * Manage temporary files and folders

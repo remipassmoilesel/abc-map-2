@@ -60,6 +60,7 @@ public class ConfigurationConstants {
     public static final Path SYMBOLS_DIR_PATH = Paths.get("./symbols");
     public static final Path PROFILE_ROOT_PATH = Paths.get("./profiles");
     public static final Path LOG_DIRECTORY = Paths.get("./log");
+    public static final Path TEMP_FOLDER = Paths.get("./tmp");
     public static final Path HELP_DIR = Paths.get("./help");
 
     /*
