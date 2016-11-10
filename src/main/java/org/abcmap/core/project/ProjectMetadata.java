@@ -41,6 +41,10 @@ public class ProjectMetadata {
         metadatas.put(name, value);
     }
 
+    public String getValue(PMConstants name) {
+        return metadatas.get(name);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

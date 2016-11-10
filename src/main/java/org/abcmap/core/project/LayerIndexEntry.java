@@ -4,28 +4,39 @@ package org.abcmap.core.project;
  * Layers metadata are stored in a separate table
  */
 public class LayerIndexEntry {
-    private String id;
+
+    private LayerType type;
+    private String layerId;
     private String name;
     private boolean visible;
     private int zindex;
 
-    public LayerIndexEntry(String id, String name, boolean visible, int zindex) {
-        if (id == null) {
+    public LayerIndexEntry(String layerId, String name, boolean visible, int zindex, LayerType type) {
+        if (layerId == null) {
             generateNewIndex();
         } else {
-            this.id = id;
+            this.layerId = layerId;
         }
         this.name = name;
         this.visible = visible;
         this.zindex = zindex;
+        this.type = type;
     }
 
-    public String getId() {
-        return id;
+    public LayerType getType() {
+        return type;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setType(LayerType type) {
+        this.type = type;
+    }
+
+    public String getLayerId() {
+        return layerId;
+    }
+
+    public void setLayerId(String layerId) {
+        this.layerId = layerId;
     }
 
     public String getName() {
@@ -53,12 +64,11 @@ public class LayerIndexEntry {
     }
 
     public void generateNewIndex() {
-        this.setId(generateId());
+        this.setLayerId(generateId());
     }
 
     public static final String generateId() {
-        int hash = String.valueOf(System.nanoTime()).hashCode();
-        return "layer_" + hash;
+        return "abcmap_layerid_" + System.nanoTime();
     }
 
     @Override
@@ -70,14 +80,16 @@ public class LayerIndexEntry {
 
         if (visible != that.visible) return false;
         if (zindex != that.zindex) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (type != that.type) return false;
+        if (layerId != null ? !layerId.equals(that.layerId) : that.layerId != null) return false;
         return name != null ? name.equals(that.name) : that.name == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
+        int result = type != null ? type.hashCode() : 0;
+        result = 31 * result + (layerId != null ? layerId.hashCode() : 0);
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (visible ? 1 : 0);
         result = 31 * result + zindex;

@@ -13,9 +13,10 @@ public abstract class AbstractDAO {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        if(connection != null){
-            connection.close();
-        }
+        // Do not close connection here
+//        if(connection != null){
+//            connection.close();
+//        }
     }
 
 }

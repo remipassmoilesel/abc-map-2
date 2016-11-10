@@ -4,7 +4,7 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.PMConstants;
 import org.abcmap.core.project.ProjectMetadata;
-import org.abcmap.gui.utils.SqliteUtils;
+import org.abcmap.core.utils.SqliteUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

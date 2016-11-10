@@ -3,19 +3,14 @@ package org.abcmap.core.project.dao;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.LayerIndexEntry;
-import org.abcmap.core.project.PMConstants;
-import org.abcmap.core.project.ProjectMetadata;
-import org.abcmap.gui.utils.SqliteUtils;
+import org.abcmap.core.project.LayerType;
+import org.abcmap.core.utils.SqliteUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-
-import static com.sun.corba.se.spi.activation.IIOP_CLEAR_TEXT.value;
 
 
 /**
@@ -23,6 +18,7 @@ import static com.sun.corba.se.spi.activation.IIOP_CLEAR_TEXT.value;
  */
 public class LayerIndexDAO extends AbstractDAO {
 
+    private static final CustomLogger logger = LogManager.getLogger(LayerIndexDAO.class);
     private static final String TABLE_NAME = "abcmap_layer_index";
 
     public LayerIndexDAO(Connection connection) throws DAOException {
@@ -58,7 +54,7 @@ public class LayerIndexDAO extends AbstractDAO {
         PreparedStatement prepare = null;
         try {
 
-            prepare = connection.prepareStatement("SELECT ly_id, ly_name, ly_visible, ly_zindex  FROM " + TABLE_NAME + ";");
+            prepare = connection.prepareStatement("SELECT ly_id, ly_name, ly_visible, ly_zindex, ly_type  FROM " + TABLE_NAME + ";");
             ResultSet rs = prepare.executeQuery();
 
             while (rs.next()) {
@@ -66,8 +62,14 @@ public class LayerIndexDAO extends AbstractDAO {
                 String name = rs.getString(2);
                 boolean visible = rs.getBoolean(3);
                 int zindex = rs.getInt(4);
+                LayerType type = LayerType.safeValueOf(rs.getString(5));
 
-                layers.add(new LayerIndexEntry(id, name, visible, zindex));
+                if(type == null){
+                    logger.warning("Unknown type of layer: " + rs.getString(5));
+                    continue;
+                }
+
+                layers.add(new LayerIndexEntry(id, name, visible, zindex, type));
             }
 
         } catch (Exception e) {
@@ -91,13 +93,14 @@ public class LayerIndexDAO extends AbstractDAO {
             for(LayerIndexEntry entry : list) {
 
                 prepare = connection.prepareStatement("INSERT INTO " + TABLE_NAME +
-                        " (ly_id, ly_name, ly_visible, ly_zindex) " +
-                        "VALUES (?,?,?,?);");
+                        " (ly_id, ly_name, ly_visible, ly_zindex, ly_type) " +
+                        "VALUES (?, ?, ?, ?, ?);");
 
-                prepare.setString(1, entry.getId());
+                prepare.setString(1, entry.getLayerId());
                 prepare.setString(2, entry.getName());
                 prepare.setBoolean(3, entry.isVisible());
                 prepare.setInt(4, entry.getZindex());
+                prepare.setString(5, entry.getType().toString());
 
                 prepare.executeUpdate();
             }
