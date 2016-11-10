@@ -2,6 +2,8 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.project.dao.LayerIndexDAO;
+import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.utils.CRSUtils;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.data.DataStoreFinder;
@@ -24,6 +26,8 @@ import java.util.Map;
 /**
  * Represent a serializable project. Projects are stored in Geopakages, some kind of sqlite
  * database. All layers are read directly on the database.
+ * <p>
+ * Project are strongly dependant of database because layers read data directly in database
  */
 public class Project {
 
@@ -46,13 +50,14 @@ public class Project {
 
         // create database
         tempDatabasePath = p;
-        geopkg = new GeoPackage(p.toFile());
-        geopkg.init();
 
         metadata = new ProjectMetadata();
         layers = new ArrayList();
         mainMapContent = new MapContent();
         crs = CRSUtils.GENERIC_2D;
+
+        // project database is initialized by writer
+        this.geopkg = new ProjectWriter().write(this, p);
 
     }
 

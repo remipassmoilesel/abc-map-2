@@ -38,6 +38,7 @@ public class ProjectWriter {
         }
 
         // create a new project
+        // project database is initialized by writer
         Project project = new Project(tempfolder.resolve(TEMPORARY_NAME));
 
         // create the first layer
@@ -50,11 +51,13 @@ public class ProjectWriter {
      * Write a project at specified destination. If specified destination is already a file,
      * it will be overwrite
      *
+     * This method do not close geopackage after writing, so you have to close it manually
+     *
      * @param project
      * @param destination
      * @throws IOException
      */
-    public void write(Project project, Path destination) throws IOException {
+    public GeoPackage write(Project project, Path destination) throws IOException {
 
         // delete eventual previous file
         if (Files.exists(destination)) {
@@ -96,12 +99,7 @@ public class ProjectWriter {
             throw new IOException("Error while writing project", e);
         }
 
-        // close geopackage
-        finally {
-            if (geopkg != null) {
-                geopkg.close();
-            }
-        }
+       return geopkg;
 
     }
 
