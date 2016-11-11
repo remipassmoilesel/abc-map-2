@@ -37,6 +37,11 @@ public class Project {
     private final Path tempDirectory;
 
     /**
+     * Only one layer is alterable at a time, the active layer
+     */
+    private Layer activeLayer;
+
+    /**
      * Final path of the project, where the user want to save it.
      * <p>
      * This location is used only to save project.
@@ -96,6 +101,11 @@ public class Project {
 
         // project database is initialized by writer
         this.geopkg = new ProjectWriter().write(this, projectFile);
+
+        // add the first layer
+        addNewLayer("First layer", true, 0, LayerType.FEATURES);
+
+        activeLayer = layers.get(0);
 
     }
 
@@ -308,4 +318,27 @@ public class Project {
         return tempDirectory;
     }
 
+    /**
+     * Set the active layer, the only layer alterable
+     * @param index
+     */
+    public void setActiveLayer(int index) {
+        this.activeLayer = layers.get(index);
+    }
+
+    /**
+     * Set the active layer, the only layer alterable
+     * @param activeLayer
+     */
+    public void setActiveLayer(Layer activeLayer) {
+        this.activeLayer = activeLayer;
+    }
+
+    /**
+     * Get the active layer, the only layer alterable
+     * @return
+     */
+    public Layer getActiveLayer() {
+        return activeLayer;
+    }
 }
