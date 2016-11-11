@@ -33,9 +33,11 @@ public class ProjectManagerTest {
 
         // create a new project
         boolean created = false;
+        Project newproj = null;
         try {
             pman.createNewProject();
-            created = true;
+            newproj = pman.getProject();
+            created = Files.exists(newproj.getDatabasePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -43,10 +45,10 @@ public class ProjectManagerTest {
 
         // save the project at another location
         boolean saved = false;
-        pman.getProject().setFinalPath(savedPath);
+        newproj.setFinalPath(savedPath);
         try {
             pman.saveProject();
-            saved = true;
+            saved = Files.exists(newproj.getFinalPath());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -56,7 +58,7 @@ public class ProjectManagerTest {
         boolean closed = false;
         try {
             pman.closeProjet();
-            closed = true;
+            closed = Files.exists(newproj.getDatabasePath()) == false;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -64,20 +66,22 @@ public class ProjectManagerTest {
 
         // open the project
         boolean opened = false;
+        Project openedProj = null;
         try {
             pman.openProject(savedPath);
-            opened = true;
+            openedProj = pman.getProject();
+            opened = Files.exists(openedProj.getDatabasePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
         assertTrue("Open test", opened);
 
-        // last close
-        try {
-            pman.closeProjet();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        // last close, optionnal
+//        try {
+//            pman.closeProjet();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
     }
 }
