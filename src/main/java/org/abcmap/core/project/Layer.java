@@ -7,16 +7,18 @@ import org.abcmap.core.utils.CRSUtils;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
-import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.FilterFactory;
+import org.opengis.filter.identity.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 /**
  * This object is just a wrapper of Geotools layer
@@ -25,6 +27,7 @@ public class Layer {
 
     private static final CustomLogger logger = LogManager.getLogger(Layer.class);
     private final static StyleFactory sf = FeatureUtils.getStyleFactory();
+    private final static FilterFactory ff = FeatureUtils.getFilterFactory();
 
     private CoordinateReferenceSystem crs;
     private SimpleFeatureBuilder featureBuilder;
@@ -87,20 +90,22 @@ public class Layer {
 
     /**
      * Wrap and add a geometry to this layer
+     * <p>
+     * Return the feature added or null if there was a problem while adding feature
      *
      * @param geom
      */
-    public synchronized boolean addGeometry(Geometry geom) {
+    public synchronized SimpleFeature addShape(Geometry geom) {
 
         featureBuilder.add(geom);
         SimpleFeature feature = featureBuilder.buildFeature(null);
 
         try {
             featureStore.addFeatures(FeatureUtils.asList(feature));
-            return true;
+            return feature;
         } catch (IOException e) {
             logger.error(e);
-            return false;
+            return null;
         }
 
     }
@@ -174,4 +179,23 @@ public class Layer {
     public int hashCode() {
         return indexEntry != null ? indexEntry.hashCode() : 0;
     }
+
+    public boolean removeFeature(SimpleFeature... features) {
+
+        // create a set
+        HashSet<Identifier> ids = new HashSet<>();
+        for (SimpleFeature feature : features) {
+            ids.add(feature.getIdentifier());
+        }
+
+        // try to remove
+        try {
+            featureStore.removeFeatures(ff.id(ids));
+            return true;
+        } catch (IOException e) {
+            logger.error(e);
+            return false;
+        }
+    }
+
 }
