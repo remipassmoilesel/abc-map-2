@@ -90,4 +90,6 @@ public class ConfigurationConstants {
 
     public static final String DEFAULT_LANGUAGE = "fr_FR";
 
+    public static final int BACKUP_INTERVAL = 2000 * 60;
+
 }

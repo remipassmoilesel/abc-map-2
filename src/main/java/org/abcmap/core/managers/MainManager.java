@@ -35,6 +35,7 @@ public class MainManager {
         }
 
         ThreadManager.init();
+
         configurationManager = new ConfigurationManager();
         tempFilesManager = new TempFilesManager();
         projectManager = new ProjectManager();

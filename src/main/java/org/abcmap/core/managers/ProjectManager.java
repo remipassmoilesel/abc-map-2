@@ -1,7 +1,9 @@
 package org.abcmap.core.managers;
 
+import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.project.Project;
+import org.abcmap.core.project.ProjectBackupInterval;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
 
@@ -14,12 +16,16 @@ import java.nio.file.Path;
 public class ProjectManager {
 
     private static final CustomLogger logger = LogManager.getLogger(ProjectManager.class);
+    private final ProjectBackupInterval backupTimer;
     private Project currentProject;
     private final TempFilesManager tempMan;
 
     public ProjectManager() {
+
         this.currentProject = null;
         tempMan = MainManager.getTempFilesManager();
+
+        backupTimer = new ProjectBackupInterval(ConfigurationConstants.BACKUP_INTERVAL);
     }
 
     /**
@@ -55,6 +61,17 @@ public class ProjectManager {
             throw new IOException("Error while creating project", e);
         }
 
+        startBackupInterval();
+
+    }
+
+    private void startBackupInterval() {
+        backupTimer.stop();
+        backupTimer.start();
+    }
+
+    private void stopBackupInterval() {
+        backupTimer.stop();
     }
 
     /**
@@ -66,6 +83,8 @@ public class ProjectManager {
             logger.debug("Cannot close project, it was not initialized.");
             return;
         }
+
+        stopBackupInterval();
 
         // close database
         currentProject.close();
@@ -100,6 +119,8 @@ public class ProjectManager {
         } catch (IOException e) {
             throw new IOException("Error while reading project", e);
         }
+
+        startBackupInterval();
     }
 
     /**
