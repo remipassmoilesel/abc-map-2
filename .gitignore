@@ -2,4 +2,5 @@
 *.iml
 target/*
 log/*
+tmp/*
 tests-playground/*
