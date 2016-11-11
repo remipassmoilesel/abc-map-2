@@ -7,6 +7,7 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.styling.StyleFactory;
+import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -56,6 +57,10 @@ public class FeatureUtils {
 
     public static StyleFactory getStyleFactory(){
         return CommonFactoryFinder.getStyleFactory();
+    }
+
+    public static FilterFactory getFilterFactory(){
+        return CommonFactoryFinder.getFilterFactory();
     }
 
 }

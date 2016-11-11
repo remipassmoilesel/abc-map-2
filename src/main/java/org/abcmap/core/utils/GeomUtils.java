@@ -8,7 +8,7 @@ import org.geotools.geometry.jts.JTSFactoryFinder;
  */
 public class GeomUtils {
 
-    public GeometryFactory getGeometryFactory(){
+    public static GeometryFactory getGeometryFactory(){
         return JTSFactoryFinder.getGeometryFactory();
     }
 
