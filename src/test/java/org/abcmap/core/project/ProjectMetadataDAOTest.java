@@ -1,4 +1,4 @@
-package org.abcmap.core.tests;
+package org.abcmap.core.project;
 
 import org.abcmap.TestConstants;
 import org.abcmap.core.managers.MainManager;
@@ -15,7 +15,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,13 +31,16 @@ public class ProjectMetadataDAOTest {
     @Test
     public void tests() throws IOException, DAOException {
 
+        Path tempfolder =TestConstants.PLAYGROUND_DIRECTORY.resolve("layerIndexTest");
+        Files.createDirectories(tempfolder);
+
+        Path db = tempfolder.resolve("metadatas.db");
+
         ProjectMetadata defaultMts = new ProjectMetadata();
 
         assertTrue("Equality test", defaultMts.equals(defaultMts));
 
         assertTrue("Constant name test", PMConstants.safeValueOf("SOMETHING_NEVER_FOUND_#######") == null);
-
-        Path db = TestConstants.PLAYGROUND_DIRECTORY.resolve("metadatas.db");
 
         // clean previous db if necessary
         if(Files.exists(db)){

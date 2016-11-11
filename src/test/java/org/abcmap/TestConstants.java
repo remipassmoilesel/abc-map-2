@@ -4,7 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * Misc constants used in tests cases
+ * Misc constants used in configuration cases
  */
 public class TestConstants {
 

@@ -1,4 +1,4 @@
-package org.abcmap.core.tests;
+package org.abcmap.core.project;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -10,12 +10,9 @@ import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Date;
-import java.util.HashMap;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -37,7 +34,7 @@ public class ProjectReaderWriterTest {
     public void tests() {
 
         try {
-            Path tempDirectory = TestConstants.PLAYGROUND_DIRECTORY.resolve("readWriteTest");
+            Path tempDirectory = TestConstants.PLAYGROUND_DIRECTORY.resolve("projectIoTest");
 
             // clean previous directories
             if (Files.isDirectory(tempDirectory)) {

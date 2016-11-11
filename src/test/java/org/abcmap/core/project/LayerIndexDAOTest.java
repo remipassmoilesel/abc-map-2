@@ -1,4 +1,4 @@
-package org.abcmap.core.tests;
+package org.abcmap.core.project;
 
 import org.abcmap.TestConstants;
 import org.abcmap.core.managers.MainManager;
@@ -15,13 +15,13 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.apache.batik.gvt.font.FontFamilyResolver.resolve;
 
 public class LayerIndexDAOTest {
 
@@ -33,6 +33,11 @@ public class LayerIndexDAOTest {
     @Test
     public void tests() throws IOException, DAOException {
 
+        Path tempfolder =TestConstants.PLAYGROUND_DIRECTORY.resolve("layerIndexTest");
+        Files.createDirectories(tempfolder);
+
+        Path db = tempfolder.resolve("layer_index.db");
+
         // create layer index entries
         ArrayList<LayerIndexEntry> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -40,8 +45,6 @@ public class LayerIndexDAOTest {
         }
 
         assertTrue("Creation test", list.equals(list));
-
-        Path db = TestConstants.PLAYGROUND_DIRECTORY.resolve("layer_index.db");
 
         // clean previous db if necessary
         if(Files.exists(db)){

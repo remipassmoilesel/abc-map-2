@@ -1,7 +1,6 @@
-package org.abcmap.core.tests;
+package org.abcmap.core.configuration;
 
 import org.abcmap.TestConstants;
-import org.abcmap.core.configuration.ConfigurationContainer;
 import org.abcmap.core.managers.ConfigurationManager;
 import org.abcmap.core.managers.MainManager;
 import org.junit.BeforeClass;
@@ -10,7 +9,6 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static junit.framework.Assert.assertTrue;
 
@@ -32,7 +30,10 @@ public class ConfigurationTest {
          * Save configuration
          */
 
-        Path configurationPath = TestConstants.PLAYGROUND_DIRECTORY.resolve("configuration.xml");
+        Path configurationDir = TestConstants.PLAYGROUND_DIRECTORY.resolve("configurationTests");
+        Files.createDirectories(configurationDir);
+
+        Path configurationPath = configurationDir.resolve("configuration.xml");
 
         ConfigurationContainer defaultConfiguration = new ConfigurationContainer();
 

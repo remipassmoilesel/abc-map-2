@@ -1,4 +1,4 @@
-package org.abcmap.core.tests;
+package org.abcmap.core.project;
 
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.TempFilesManager;
