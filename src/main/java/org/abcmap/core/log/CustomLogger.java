@@ -11,6 +11,10 @@ public class CustomLogger {
 
     private final java.util.logging.Logger logger;
 
+    /**
+     * Use LogManager.getLogger() instead.
+     */
+    @Deprecated
     public CustomLogger(Class<?> owner) {
         this.logger = java.util.logging.Logger.getLogger(owner.getName());
     }

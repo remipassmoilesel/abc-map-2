@@ -13,32 +13,33 @@ import java.io.IOException;
 public class MainManager {
 
     private static final boolean DEBUG_MODE = true;
-    private static MainManager instance;
+    private static boolean initialized = false;
 
-    // here it is the only logger directly instantiated
+    /**
+     * Here it is the only logger directly instantiated
+     * Use LogManager.getLogger() instead.
+     */
     private static final CustomLogger log = new CustomLogger(MainManager.class);
-    private ConfigurationManager configurationManager;
-    private LogManager logManager;
-    private TempFilesManager tempFilesManager;
+    private static ConfigurationManager configurationManager;
+    private static TempFilesManager tempFilesManager;
+    private static ProjectManager projectManager;
 
     /**
      * Initialize all managers
      */
     public static void init() throws IOException {
-        if (instance != null) {
+
+        if (initialized != false) {
             log.warning("Main manager already initialized");
             return;
         }
 
-        instance = new MainManager();
-    }
-
-    private MainManager() throws IOException {
-
         ThreadManager.init();
         configurationManager = new ConfigurationManager();
         tempFilesManager = new TempFilesManager();
+        projectManager = new ProjectManager();
 
+        initialized = true;
     }
 
     public static boolean isDebugMode() {
@@ -46,12 +47,14 @@ public class MainManager {
     }
 
     public static ConfigurationManager getConfigurationManager() {
-        return instance.configurationManager;
+        return configurationManager;
     }
 
     public static TempFilesManager getTempFilesManager() {
-        return instance.tempFilesManager;
+        return tempFilesManager;
     }
 
-
+    public static ProjectManager getProjectManager() {
+        return projectManager;
+    }
 }
