@@ -2,6 +2,7 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.utils.Utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -94,4 +95,13 @@ public class TempFilesManager {
         return finalPath;
     }
 
+    /**
+     * Delete a temp file recursively
+     *
+     * @param tempPath
+     * @throws IOException
+     */
+    public void deleteTempFile(Path tempPath) throws IOException {
+        Utils.deleteRecursively(tempPath.toFile());
+    }
 }
