@@ -24,6 +24,16 @@ public class ProjectReader {
 
     private static final CustomLogger logger = LogManager.getLogger(ProjectReader.class);
 
+    /**
+     * Read the specified project file and return a Project object.
+     * <p>
+     * A copy of the project file is created in the specified temp directory.
+     *
+     * @param tempfolder
+     * @param projectFile
+     * @return
+     * @throws IOException
+     */
     public Project read(Path tempfolder, Path projectFile) throws IOException {
 
         // copy file in temp directory

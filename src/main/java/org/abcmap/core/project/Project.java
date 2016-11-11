@@ -2,8 +2,6 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.project.dao.LayerIndexDAO;
-import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.utils.CRSUtils;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.data.DataStoreFinder;
@@ -33,31 +31,71 @@ public class Project {
 
     private static final CustomLogger logger = LogManager.getLogger(Project.class);
 
+    /**
+     * Temp directory, where is located database
+     */
+    private final Path tempDirectory;
+
+    /**
+     * Final path of the project, where the user want to save it.
+     * <p>
+     * This location is used only to save project.
+     */
+    private Path finalPath;
+
+    /**
+     * Database associated with project
+     */
     private GeoPackage geopkg;
+
+    /**
+     * The path of the database
+     */
+    private Path databasePath;
+
+    /**
+     * List of layers. Layers wrap Geotools layers.
+     */
     private ArrayList<Layer> layers;
+
+    /**
+     * Geotools map content used to render and display map
+     */
     private MapContent mainMapContent;
+
+    /**
+     * Metadata about project
+     */
     private ProjectMetadata metadata;
-    private Path tempDatabasePath;
+
+    /**
+     * CRS of the whole project
+     * <p>
+     * TODO: to remove ?
+     */
     private CoordinateReferenceSystem crs;
 
     /**
-     * Create a new project associated with the database at specifed location
+     * Create a new project associated with the database at specified location.
+     * <p>
+     * Project file must be a temporary project file.
      *
-     * @param p
+     * @param projectFile
      * @throws IOException
      */
-    public Project(Path p) throws IOException {
+    public Project(Path projectFile) throws IOException {
 
-        // create database
-        tempDatabasePath = p;
-
+        databasePath = projectFile;
+        tempDirectory = projectFile.getParent();
         metadata = new ProjectMetadata();
         layers = new ArrayList();
         mainMapContent = new MapContent();
         crs = CRSUtils.GENERIC_2D;
 
+        finalPath = null;
+
         // project database is initialized by writer
-        this.geopkg = new ProjectWriter().write(this, p);
+        this.geopkg = new ProjectWriter().write(this, projectFile);
 
     }
 
@@ -70,17 +108,17 @@ public class Project {
      *
      * @return
      */
-    public Path getTempDatabasePath() {
-        return tempDatabasePath;
+    public Path getDatabasePath() {
+        return databasePath;
     }
 
     /**
      * Set the path of the temporary database
      *
-     * @param tempDatabasePath
+     * @param databasePath
      */
-    protected void setTempDatabasePath(Path tempDatabasePath) {
-        this.tempDatabasePath = tempDatabasePath;
+    protected void setDatabasePath(Path databasePath) {
+        this.databasePath = databasePath;
     }
 
     /**
@@ -160,7 +198,7 @@ public class Project {
         // get feature source from geopackage
         Map<String, String> params = new HashMap();
         params.put("dbtype", "geopkg");
-        params.put("database", tempDatabasePath.toString());
+        params.put("database", databasePath.toString());
 
         JDBCDataStore datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
         return datastore.getFeatureSource(layerid);
@@ -180,26 +218,42 @@ public class Project {
         return crs;
     }
 
-    public void addNewLayout() {
-
+    /**
+     * Return the background color of this project
+     *
+     * @return
+     */
+    public String getBackgroundColor() {
+        return metadata.getMetadatas().get(PMConstants.BG_COLOR);
     }
 
-    public void getMetatdatas() {
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
 
+        if (geopkg != null) {
+            logger.warning("Project geopackage have not been closed, closing " + this + " / " + geopkg + " / " + geopkg.getFile().toString());
+            geopkg.close();
+        }
     }
 
-    public void saveMetadatas() {
-
+    /**
+     * Close the database associated with this project.
+     * <p>
+     * Temporary files are not deleted
+     */
+    public void close() {
+        geopkg.close();
+        geopkg = null;
     }
 
-    public void getBackgroundColor() {
 
-    }
-
-    public void getLayouts() {
-
-    }
-
+    /**
+     * Data used: layers, metadata, finalpath, crs
+     *
+     * @param o
+     * @return
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -207,15 +261,51 @@ public class Project {
 
         Project project = (Project) o;
 
+        if (finalPath != null ? !finalPath.equals(project.finalPath) : project.finalPath != null) return false;
         if (layers != null ? !layers.equals(project.layers) : project.layers != null) return false;
-        return metadata != null ? metadata.equals(project.metadata) : project.metadata == null;
+        if (metadata != null ? !metadata.equals(project.metadata) : project.metadata != null) return false;
+        return crs != null ? crs.equals(project.crs) : project.crs == null;
 
     }
 
+    /**
+     * Data used: layers, metadata, finalpath, crs
+     *
+     * @return
+     */
     @Override
     public int hashCode() {
-        int result = layers != null ? layers.hashCode() : 0;
+        int result = finalPath != null ? finalPath.hashCode() : 0;
+        result = 31 * result + (layers != null ? layers.hashCode() : 0);
         result = 31 * result + (metadata != null ? metadata.hashCode() : 0);
+        result = 31 * result + (crs != null ? crs.hashCode() : 0);
         return result;
     }
+
+    /**
+     * Final path of the project, where the user want to save it.
+     * <p>
+     * This location is used only to save project.
+     */
+    public Path getFinalPath() {
+        return finalPath;
+    }
+
+    /**
+     * Final path of the project, where the user want to save it.
+     * <p>
+     * This location is used only to save project.
+     */
+    public void setFinalPath(Path finalPath) {
+        this.finalPath = finalPath;
+    }
+
+    /**
+     * Path of temporary directory with databases and misc files
+     * @return
+     */
+    public Path getTempDirectory() {
+        return tempDirectory;
+    }
+
 }
