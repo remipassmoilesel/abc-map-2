@@ -30,7 +30,7 @@ public class ConfigurationTest {
          * Save configuration
          */
 
-        Path configurationDir = TestConstants.PLAYGROUND_DIRECTORY.resolve("configurationTests");
+        Path configurationDir = TestConstants.PLAYGROUND_DIRECTORY.resolve("configurationTest");
         Files.createDirectories(configurationDir);
 
         Path configurationPath = configurationDir.resolve("configuration.xml");
