@@ -41,9 +41,6 @@ public class ProjectWriter {
         // project database is initialized by writer
         Project project = new Project(tempfolder.resolve(TEMPORARY_NAME));
 
-        // create the first layer
-        project.addNewLayer("Layer 1", true, 0, LayerType.FEATURES);
-
         return project;
     }
 
@@ -73,7 +70,7 @@ public class ProjectWriter {
 
             // write metadata
             ProjectMetadataDAO mtdao = new ProjectMetadataDAO(connection);
-            mtdao.writeMetadata(project.getMetadata());
+            mtdao.writeMetadata(project.getMetadataContainer());
 
             // write layer indexes
             LayerIndexDAO lidao = new LayerIndexDAO(connection);

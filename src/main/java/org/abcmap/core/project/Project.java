@@ -16,6 +16,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +72,7 @@ public class Project {
     /**
      * Metadata about project
      */
-    private ProjectMetadata metadata;
+    private ProjectMetadata metadataContainer;
 
     /**
      * CRS of the whole project
@@ -92,20 +93,29 @@ public class Project {
 
         databasePath = projectFile;
         tempDirectory = projectFile.getParent();
-        metadata = new ProjectMetadata();
+        metadataContainer = new ProjectMetadata();
         layers = new ArrayList();
         mainMapContent = new MapContent();
         crs = CRSUtils.GENERIC_2D;
 
         finalPath = null;
 
-        // project database is initialized by writer
-        this.geopkg = new ProjectWriter().write(this, projectFile);
+        // project is a new one, create the database
+        if(Files.exists(projectFile) == false){
 
-        // add the first layer
-        addNewLayer("First layer", true, 0, LayerType.FEATURES);
+            // project database is initialized by writer
+            this.geopkg = new ProjectWriter().write(this, projectFile);
 
-        activeLayer = layers.get(0);
+            // add the first layer
+            addNewLayer("First layer", true, 0, LayerType.FEATURES);
+
+            activeLayer = layers.get(0);
+        }
+
+        // project already exist
+        else {
+            this.geopkg = new GeoPackage(databasePath.toFile());
+        }
 
     }
 
@@ -132,21 +142,21 @@ public class Project {
     }
 
     /**
-     * Get metadata associated with project: title, comments, ...
+     * Get metadataContainer associated with project: title, comments, ...
      *
      * @return
      */
-    public ProjectMetadata getMetadata() {
-        return metadata;
+    public ProjectMetadata getMetadataContainer() {
+        return metadataContainer;
     }
 
     /**
-     * Set metadata associated with project: title, comments, ...
+     * Set metadataContainer associated with project: title, comments, ...
      *
      * @return
      */
-    public void setMetadata(ProjectMetadata metadata) {
-        this.metadata = metadata;
+    public void setMetadataContainer(ProjectMetadata metadata) {
+        this.metadataContainer = metadata;
     }
 
     /**
@@ -234,7 +244,7 @@ public class Project {
      * @return
      */
     public String getBackgroundColor() {
-        return metadata.getMetadatas().get(PMConstants.BG_COLOR);
+        return metadataContainer.getMetadata().get(PMConstants.BG_COLOR);
     }
 
     @Override
@@ -259,7 +269,7 @@ public class Project {
 
 
     /**
-     * Data used: layers, metadata, finalpath, crs
+     * Data used: layers, metadataContainer, finalpath, crs
      *
      * @param o
      * @return
@@ -273,13 +283,13 @@ public class Project {
 
         if (finalPath != null ? !finalPath.equals(project.finalPath) : project.finalPath != null) return false;
         if (layers != null ? !layers.equals(project.layers) : project.layers != null) return false;
-        if (metadata != null ? !metadata.equals(project.metadata) : project.metadata != null) return false;
+        if (metadataContainer != null ? !metadataContainer.equals(project.metadataContainer) : project.metadataContainer != null) return false;
         return crs != null ? crs.equals(project.crs) : project.crs == null;
 
     }
 
     /**
-     * Data used: layers, metadata, finalpath, crs
+     * Data used: layers, metadataContainer, finalpath, crs
      *
      * @return
      */
@@ -287,7 +297,7 @@ public class Project {
     public int hashCode() {
         int result = finalPath != null ? finalPath.hashCode() : 0;
         result = 31 * result + (layers != null ? layers.hashCode() : 0);
-        result = 31 * result + (metadata != null ? metadata.hashCode() : 0);
+        result = 31 * result + (metadataContainer != null ? metadataContainer.hashCode() : 0);
         result = 31 * result + (crs != null ? crs.hashCode() : 0);
         return result;
     }

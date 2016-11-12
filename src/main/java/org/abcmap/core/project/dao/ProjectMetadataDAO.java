@@ -52,10 +52,9 @@ public class ProjectMetadataDAO extends AbstractDAO {
     public ProjectMetadata readMetadata() throws DAOException {
 
         ProjectMetadata data = new ProjectMetadata();
-        PreparedStatement prepare = null;
         try {
 
-            prepare = connection.prepareStatement("SELECT md_key, md_value FROM " + TABLE_NAME + ";");
+            PreparedStatement prepare = connection.prepareStatement("SELECT md_key, md_value FROM " + TABLE_NAME + ";");
             ResultSet rs = prepare.executeQuery();
 
             while (rs.next()) {
@@ -82,16 +81,14 @@ public class ProjectMetadataDAO extends AbstractDAO {
      */
     public void writeMetadata(ProjectMetadata pm) throws DAOException {
 
-        ProjectMetadata data = new ProjectMetadata();
-        PreparedStatement prepare = null;
         try {
 
             // delete all previous metadata
-            prepare = connection.prepareStatement("DELETE FROM " + TABLE_NAME + ";");
+            PreparedStatement prepare = connection.prepareStatement("DELETE FROM " + TABLE_NAME + ";");
             prepare.execute();
 
             // insert metadata
-            HashMap<PMConstants, String> mts = pm.getMetadatas();
+            HashMap<PMConstants, String> mts = pm.getMetadata();
             Iterator<PMConstants> it = mts.keySet().iterator();
             while(it.hasNext()){
 

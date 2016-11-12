@@ -71,11 +71,16 @@ public class ProjectReader {
 
             }
 
-            //TODO create layouts
+            // set the first layer active
+            project.setActiveLayer(0);
+
+            //TODO read layouts
 
             // get metadata
             ProjectMetadataDAO mtdao = new ProjectMetadataDAO(connection);
-            project.setMetadata(mtdao.readMetadata());
+            ProjectMetadata readedMtd = mtdao.readMetadata();
+
+            project.setMetadataContainer(readedMtd);
 
         } catch (SQLException | IOException | DAOException e) {
             throw new IOException("Error while reading file", e);

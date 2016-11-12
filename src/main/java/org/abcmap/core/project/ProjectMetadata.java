@@ -12,37 +12,37 @@ import java.util.HashMap;
  */
 public class ProjectMetadata {
 
-    private HashMap<PMConstants, String> metadatas;
+    private HashMap<PMConstants, String> metadataList;
 
     public ProjectMetadata() {
-        metadatas = new HashMap<>();
+        metadataList = new HashMap<>();
 
-        // default metadatas
-        metadatas.put(PMConstants.TITLE, "Project title");
-        metadatas.put(PMConstants.COMMENT, "Project comment");
-        metadatas.put(PMConstants.CREATED, (new Date()).toString());
-        metadatas.put(PMConstants.BG_COLOR, Utils.colorToString(Color.white));
-        metadatas.put(PMConstants.LAYOUT_FRAME_OPACITY, String.valueOf(0.6f));
-        metadatas.put(PMConstants.LAYOUT_FRAME_THICKNESS, String.valueOf(20));
-        metadatas.put(PMConstants.LAYOUT_FRAME_COLOR_1, Utils.colorToString(Color.blue));
-        metadatas.put(PMConstants.LAYOUT_FRAME_COLOR_2, Utils.colorToString(Color.red));
+        // default metadataList
+        metadataList.put(PMConstants.TITLE, "Project title");
+        metadataList.put(PMConstants.COMMENT, "Project comment");
+        metadataList.put(PMConstants.CREATED, (new Date()).toString());
+        metadataList.put(PMConstants.BG_COLOR, Utils.colorToString(Color.white));
+        metadataList.put(PMConstants.LAYOUT_FRAME_OPACITY, String.valueOf(0.6f));
+        metadataList.put(PMConstants.LAYOUT_FRAME_THICKNESS, String.valueOf(20));
+        metadataList.put(PMConstants.LAYOUT_FRAME_COLOR_1, Utils.colorToString(Color.blue));
+        metadataList.put(PMConstants.LAYOUT_FRAME_COLOR_2, Utils.colorToString(Color.red));
 
     }
 
-    public HashMap<PMConstants, String> getMetadatas() {
-        return metadatas;
+    public HashMap<PMConstants, String> getMetadata() {
+        return metadataList;
     }
 
-    public void setMetadatas(HashMap<PMConstants, String> metadatas) {
-        this.metadatas = metadatas;
+    public void setMetadataList(HashMap<PMConstants, String> metadataList) {
+        this.metadataList = metadataList;
     }
 
     public void updateValue(PMConstants name, String value) {
-        metadatas.put(name, value);
+        metadataList.put(name, value);
     }
 
     public String getValue(PMConstants name) {
-        return metadatas.get(name);
+        return metadataList.get(name);
     }
 
     @Override
@@ -52,18 +52,18 @@ public class ProjectMetadata {
 
         ProjectMetadata that = (ProjectMetadata) o;
 
-        return metadatas != null ? metadatas.equals(that.metadatas) : that.metadatas == null;
+        return metadataList != null ? metadataList.equals(that.metadataList) : that.metadataList == null;
     }
 
     @Override
     public int hashCode() {
-        return metadatas != null ? metadatas.hashCode() : 0;
+        return metadataList != null ? metadataList.hashCode() : 0;
     }
 
     @Override
     public String toString() {
         return "ProjectMetadata{" +
-                "metadatas=" + metadatas +
+                "metadataList=" + metadataList +
                 '}';
     }
 }
