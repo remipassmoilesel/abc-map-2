@@ -8,6 +8,7 @@ import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentFeatureSource;
+import org.geotools.geopkg.GeoPackage;
 import org.geotools.jdbc.JDBCDataStore;
 
 import java.io.IOException;
@@ -40,7 +41,9 @@ public class ProjectReader {
         Path tempProject = tempfolder.resolve(ProjectWriter.TEMPORARY_NAME);
         Files.copy(projectFile, tempProject);
 
+        // create project
         Project project = new Project(tempProject);
+        project.initializeGeopackage();
 
         // get database connection with project
         Map<String, String> params = new HashMap();

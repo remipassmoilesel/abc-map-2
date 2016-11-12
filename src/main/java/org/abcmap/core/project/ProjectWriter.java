@@ -38,8 +38,18 @@ public class ProjectWriter {
         }
 
         // create a new project
-        // project database is initialized by writer
-        Project project = new Project(tempfolder.resolve(TEMPORARY_NAME));
+        Path path = tempfolder.resolve(TEMPORARY_NAME);
+
+        // create a new project and initialize it
+        Project project = new Project(path);
+        new ProjectWriter().write(project, path);
+        project.initializeGeopackage();
+
+        // add the first layer
+        project.addNewLayer("First layer", true, 0, LayerType.FEATURES);
+
+        // set the first layer active
+        project.setActiveLayer(0);
 
         return project;
     }
@@ -47,7 +57,7 @@ public class ProjectWriter {
     /**
      * Write a project at specified destination. If specified destination is already a file,
      * it will be overwrite
-     *
+     * <p>
      * This method do not close geopackage after writing, so you have to close it manually
      *
      * @param project
@@ -96,7 +106,7 @@ public class ProjectWriter {
             throw new IOException("Error while writing project", e);
         }
 
-       return geopkg;
+        return geopkg;
 
     }
 

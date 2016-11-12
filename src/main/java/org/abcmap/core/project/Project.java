@@ -6,6 +6,7 @@ import org.abcmap.core.utils.CRSUtils;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
+import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.geopkg.FeatureEntry;
@@ -18,6 +19,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,37 +88,29 @@ public class Project {
      * <p>
      * Project file must be a temporary project file.
      *
-     * @param projectFile
+     * @param databasePath
      * @throws IOException
      */
-    public Project(Path projectFile) throws IOException {
+    public Project(Path databasePath) throws IOException {
 
-        databasePath = projectFile;
-        tempDirectory = projectFile.getParent();
-        metadataContainer = new ProjectMetadata();
-        layers = new ArrayList();
-        mainMapContent = new MapContent();
-        crs = CRSUtils.GENERIC_2D;
+        this.databasePath = databasePath;
 
-        finalPath = null;
+        this.tempDirectory = databasePath.getParent();
+        this.metadataContainer = new ProjectMetadata();
+        this.layers = new ArrayList();
+        this.mainMapContent = new MapContent();
+        this.crs = CRSUtils.GENERIC_2D;
+        this.finalPath = null;
 
-        // project is a new one, create the database
-        if(Files.exists(projectFile) == false){
+    }
 
-            // project database is initialized by writer
-            this.geopkg = new ProjectWriter().write(this, projectFile);
-
-            // add the first layer
-            addNewLayer("First layer", true, 0, LayerType.FEATURES);
-
-            activeLayer = layers.get(0);
-        }
-
-        // project already exist
-        else {
-            this.geopkg = new GeoPackage(databasePath.toFile());
-        }
-
+    /**
+     * Initialize geopackage object when database file is ready
+     *
+     * @throws IOException
+     */
+    protected void initializeGeopackage() throws IOException {
+        this.geopkg = new GeoPackage(databasePath.toFile());
     }
 
     public MapContent getMainMapContent() {
@@ -283,7 +277,8 @@ public class Project {
 
         if (finalPath != null ? !finalPath.equals(project.finalPath) : project.finalPath != null) return false;
         if (layers != null ? !layers.equals(project.layers) : project.layers != null) return false;
-        if (metadataContainer != null ? !metadataContainer.equals(project.metadataContainer) : project.metadataContainer != null) return false;
+        if (metadataContainer != null ? !metadataContainer.equals(project.metadataContainer) : project.metadataContainer != null)
+            return false;
         return crs != null ? crs.equals(project.crs) : project.crs == null;
 
     }
@@ -322,6 +317,7 @@ public class Project {
 
     /**
      * Path of temporary directory with databases and misc files
+     *
      * @return
      */
     public Path getTempDirectory() {
@@ -330,6 +326,7 @@ public class Project {
 
     /**
      * Set the active layer, the only layer alterable
+     *
      * @param index
      */
     public void setActiveLayer(int index) {
@@ -338,6 +335,7 @@ public class Project {
 
     /**
      * Set the active layer, the only layer alterable
+     *
      * @param activeLayer
      */
     public void setActiveLayer(Layer activeLayer) {
@@ -346,9 +344,28 @@ public class Project {
 
     /**
      * Get the active layer, the only layer alterable
+     *
      * @return
      */
     public Layer getActiveLayer() {
         return activeLayer;
+    }
+
+    /**
+     * Return a new database connection with project geopackage
+     *
+     * @return
+     * @throws IOException
+     */
+    public Connection getDatabaseConnection() throws IOException {
+
+        Map<String, String> params = new HashMap();
+        params.put("dbtype", "geopkg");
+        params.put("database", databasePath.toString());
+
+        JDBCDataStore datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
+
+        return datastore.getConnection(Transaction.AUTO_COMMIT);
+
     }
 }
