@@ -1,6 +1,6 @@
 package org.abcmap.core.threads;
 
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.TestUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class ThreadTest {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        MainManager.init();
+        TestUtils.mainManagerInit();
     }
 
     @Test

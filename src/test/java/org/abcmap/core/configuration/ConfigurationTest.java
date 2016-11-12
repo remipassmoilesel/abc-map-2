@@ -1,6 +1,6 @@
 package org.abcmap.core.configuration;
 
-import org.abcmap.TestConstants;
+import org.abcmap.TestUtils;
 import org.abcmap.core.managers.ConfigurationManager;
 import org.abcmap.core.managers.MainManager;
 import org.junit.BeforeClass;
@@ -16,7 +16,7 @@ public class ConfigurationTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
-        MainManager.init();
+        TestUtils.mainManagerInit();
     }
 
     @Test
@@ -30,7 +30,7 @@ public class ConfigurationTest {
          * Save configuration
          */
 
-        Path configurationDir = TestConstants.PLAYGROUND_DIRECTORY.resolve("configurationTest");
+        Path configurationDir = TestUtils.PLAYGROUND_DIRECTORY.resolve("configurationTest");
         Files.createDirectories(configurationDir);
 
         Path configurationPath = configurationDir.resolve("configuration.xml");
