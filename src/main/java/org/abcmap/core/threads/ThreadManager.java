@@ -34,8 +34,18 @@ public class ThreadManager {
      *
      * @param run
      */
-    public static void runLater(Runnable run) {
-        runLater(run, false);
+    public static ManagedTask runLater(Runnable run) {
+        return runLater(run, false);
+    }
+
+    /**
+     * Wait specified time before run task. Task may be runned little after waiting time.
+     *
+     * @param run
+     * @param timeMilliSec
+     */
+    public static ManagedTask runLater(Runnable run, int timeMilliSec) {
+        return runLater(run, false, timeMilliSec);
     }
 
     /**
@@ -44,25 +54,21 @@ public class ThreadManager {
      * @param timeMilliSec
      * @param run
      */
-    public static void runLater(int timeMilliSec, Runnable run) {
-        runLater(timeMilliSec, run, false);
-    }
+    public static ManagedTask runLater(Runnable run, boolean onEdt, int timeMilliSec) {
 
-    /**
-     * Wait specified time before run task. Task may be runned little after waiting time.
-     *
-     * @param timeMilliSec
-     * @param run
-     */
-    public static void runLater(int timeMilliSec, Runnable run, boolean onEdt) {
+        ManagedTask task = new ManagedTask(run);
 
-        try {
-            Thread.sleep(timeMilliSec);
-        } catch (InterruptedException e) {
-            logger.error(e);
-        }
+        ThreadManager.runLater(() -> {
+            try {
+                Thread.sleep(timeMilliSec);
+            } catch (InterruptedException e) {
+                logger.error(e);
+            }
 
-        runLater(run, onEdt);
+            runLater(task, onEdt);
+        });
+
+        return task;
     }
 
     /**
@@ -70,13 +76,21 @@ public class ThreadManager {
      *
      * @param runnable
      */
-    public static void runLater(Runnable runnable, boolean onEDT) {
+    public static ManagedTask runLater(Runnable runnable, boolean onEDT) {
 
-        if (onEDT) {
-            SwingUtilities.invokeLater(runnable);
+        ManagedTask task = null;
+        if (runnable instanceof ManagedTask) {
+            task = (ManagedTask) runnable;
         } else {
-            executor.execute(runnable);
+            task = new ManagedTask(runnable);
         }
 
+        if (onEDT) {
+            SwingUtilities.invokeLater(task);
+        } else {
+            executor.execute(task);
+        }
+
+        return task;
     }
 }
