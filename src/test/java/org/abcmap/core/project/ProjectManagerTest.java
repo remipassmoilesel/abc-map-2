@@ -1,6 +1,6 @@
 package org.abcmap.core.project;
 
-import org.abcmap.TestConstants;
+import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.junit.BeforeClass;
@@ -19,13 +19,13 @@ public class ProjectManagerTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
-        MainManager.init();
+        TestUtils.mainManagerInit();
     }
 
     @Test
     public void tests() throws IOException {
 
-        Path tempDir = TestConstants.PLAYGROUND_DIRECTORY.resolve("projectManagerTest");
+        Path tempDir = TestUtils.PLAYGROUND_DIRECTORY.resolve("projectManagerTest");
         Files.createDirectories(tempDir);
 
         Path savedPath = tempDir.resolve("saved.abm");

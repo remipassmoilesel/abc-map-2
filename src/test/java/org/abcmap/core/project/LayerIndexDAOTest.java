@@ -1,9 +1,6 @@
 package org.abcmap.core.project;
 
-import org.abcmap.TestConstants;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.project.LayerIndexEntry;
-import org.abcmap.core.project.LayerType;
+import org.abcmap.TestUtils;
 import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.geotools.data.DataStoreFinder;
@@ -27,13 +24,13 @@ public class LayerIndexDAOTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
-        MainManager.init();
+        TestUtils.mainManagerInit();
     }
 
     @Test
     public void tests() throws IOException, DAOException {
 
-        Path tempfolder =TestConstants.PLAYGROUND_DIRECTORY.resolve("layerIndexTest");
+        Path tempfolder = TestUtils.PLAYGROUND_DIRECTORY.resolve("layerIndexTest");
         Files.createDirectories(tempfolder);
 
         Path db = tempfolder.resolve("layer_index.db");

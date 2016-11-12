@@ -1,5 +1,6 @@
 package org.abcmap.core.project;
 
+import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.TempFilesManager;
 import org.junit.BeforeClass;
@@ -15,7 +16,7 @@ public class TempFilesManagerTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
-        MainManager.init();
+        TestUtils.mainManagerInit();
     }
 
     @Test

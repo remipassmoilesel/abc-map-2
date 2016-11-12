@@ -2,9 +2,7 @@ package org.abcmap.core.project;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import org.abcmap.TestConstants;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.project.*;
+import org.abcmap.TestUtils;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.junit.BeforeClass;
@@ -16,6 +14,7 @@ import java.nio.file.Path;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Created by remipassmoilesel on 10/11/16.
@@ -27,14 +26,14 @@ public class ProjectReaderWriterTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
-        MainManager.init();
+        TestUtils.mainManagerInit();
     }
 
     @Test
     public void tests() {
 
         try {
-            Path tempDirectory = TestConstants.PLAYGROUND_DIRECTORY.resolve("projectIoTest");
+            Path tempDirectory = TestUtils.PLAYGROUND_DIRECTORY.resolve("projectIoTest");
 
             // clean previous directories
             if (Files.isDirectory(tempDirectory)) {
@@ -51,18 +50,21 @@ public class ProjectReaderWriterTest {
 
             // test creation
             Project newProject = writer.createNew(newProjectTempDirectory);
+            newProject.getMetadataContainer().updateValue(PMConstants.TITLE, "New title of the death");
+
             assertTrue("Creation test",
                     Files.isRegularFile(newProjectTempDirectory.resolve(ProjectWriter.TEMPORARY_NAME)));
 
             Layer l = newProject.getLayers().get(0);
 
             for (int i = 0; i < 100; i++) {
-                l.addGeometry(geom.createPoint(new Coordinate(i, i)));
+                l.addShape(geom.createPoint(new Coordinate(i, i)));
             }
 
             // Writing test
-            Path writedProject = tempDirectory.resolve("writingProject.abm");
+            Path writedProject = tempDirectory.resolve("writedProject.abm");
             writer.write(newProject, writedProject);
+
             assertTrue("Writing test", Files.isRegularFile(writedProject));
 
             // Basic project equality test
@@ -77,9 +79,15 @@ public class ProjectReaderWriterTest {
             Project p1 = reader.read(openProjectTempDirectory1, writedProject);
             Project p2 = reader.read(openProjectTempDirectory2, writedProject);
 
-            assertTrue("Layers reading test", p1.getLayers().equals(p2.getLayers()));
-            assertTrue("Metadata reading test", p1.getMetadata().equals(p2.getMetadata()));
-            assertTrue("Reading test", p1.equals(p2));
+            assertTrue("Metadata reading test 1", newProject.getMetadataContainer().equals(p1.getMetadataContainer()));
+            assertTrue("Metadata reading test 2", p1.getMetadataContainer().equals(p2.getMetadataContainer()));
+
+            assertTrue("Layers reading test 1", newProject.getLayers().equals(p1.getLayers()));
+            assertTrue("Layers reading test 2", p1.getLayers().equals(p2.getLayers()));
+
+            assertTrue("Project reading test 1", newProject.equals(p1));
+            assertTrue("Project reading test 2", p1.equals(p2));
+
 
         } catch (Exception e) {
             e.printStackTrace();

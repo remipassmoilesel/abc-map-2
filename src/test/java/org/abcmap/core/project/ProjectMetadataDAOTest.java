@@ -1,9 +1,6 @@
 package org.abcmap.core.project;
 
-import org.abcmap.TestConstants;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.project.ProjectMetadata;
-import org.abcmap.core.project.PMConstants;
+import org.abcmap.TestUtils;
 import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.geotools.data.DataStoreFinder;
@@ -25,27 +22,27 @@ public class ProjectMetadataDAOTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
-        MainManager.init();
+        TestUtils.mainManagerInit();
     }
 
     @Test
     public void tests() throws IOException, DAOException {
 
-        Path tempfolder =TestConstants.PLAYGROUND_DIRECTORY.resolve("layerIndexTest");
+        Path tempfolder = TestUtils.PLAYGROUND_DIRECTORY.resolve("layerIndexTest");
         Files.createDirectories(tempfolder);
 
         Path db = tempfolder.resolve("metadatas.db");
-
-        ProjectMetadata defaultMts = new ProjectMetadata();
-
-        assertTrue("Equality test", defaultMts.equals(defaultMts));
-
-        assertTrue("Constant name test", PMConstants.safeValueOf("SOMETHING_NEVER_FOUND_#######") == null);
 
         // clean previous db if necessary
         if(Files.exists(db)){
             Files.delete(db);
         }
+
+        ProjectMetadata originalMtd = new ProjectMetadata();
+        originalMtd.updateValue(PMConstants.CREATED, "NEW VALUE");
+
+        assertTrue("Equality test", originalMtd.equals(originalMtd));
+        assertTrue("Constant name test", PMConstants.safeValueOf("SOMETHING_NEVER_FOUND_#######") == null);
 
         // open connection to db
         Map params = new HashMap();
@@ -59,11 +56,16 @@ public class ProjectMetadataDAOTest {
         ProjectMetadataDAO dao = new ProjectMetadataDAO(connection);
 
         // writing test
-        dao.writeMetadata(defaultMts);
+        dao.writeMetadata(originalMtd);
 
         // reading test
-        ProjectMetadata mtsR = dao.readMetadata();
-        assertTrue("Reading test", mtsR.equals(defaultMts));
+        ProjectMetadata readMtd = dao.readMetadata();
+
+        // Critical values
+        //System.out.println(readMtd.getValue(PMConstants.CREATED));
+        //System.out.println(originalMtd.getValue(PMConstants.CREATED));
+
+        assertTrue("Reading test", readMtd.equals(originalMtd));
 
     }
 
