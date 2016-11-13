@@ -3,7 +3,7 @@ package org.abcmap.core.managers;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.ProjectBackupInterval;
+import org.abcmap.core.project.backup.ProjectBackupInterval;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
 
@@ -61,8 +61,6 @@ public class ProjectManager {
             throw new IOException("Error while creating project", e);
         }
 
-        startBackupInterval();
-
     }
 
     private void startBackupInterval() {
@@ -83,8 +81,6 @@ public class ProjectManager {
             logger.debug("Cannot close project, it was not initialized.");
             return;
         }
-
-        stopBackupInterval();
 
         // close database
         currentProject.close();
@@ -120,7 +116,6 @@ public class ProjectManager {
             throw new IOException("Error while reading project", e);
         }
 
-        startBackupInterval();
     }
 
     /**
@@ -150,6 +145,7 @@ public class ProjectManager {
         } catch (IOException e) {
             throw new IOException("Error while writing project", e);
         }
+
     }
 
     public Project getProject() {
