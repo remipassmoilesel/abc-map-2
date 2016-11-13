@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ public class ProjectMetadataDAOTest {
     }
 
     @Test
-    public void tests() throws IOException, DAOException {
+    public void tests() throws IOException, DAOException, SQLException {
 
         Path tempfolder = TestUtils.PLAYGROUND_DIRECTORY.resolve("layerIndexTest");
         Files.createDirectories(tempfolder);
@@ -66,6 +67,9 @@ public class ProjectMetadataDAOTest {
         //System.out.println(originalMtd.getValue(PMConstants.CREATED));
 
         assertTrue("Reading test", readMtd.equals(originalMtd));
+
+        connection.close();
+        datastore.dispose();
 
     }
 

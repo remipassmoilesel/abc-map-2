@@ -22,10 +22,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * Represent a serializable project. Projects are stored in Geopakages, some kind of sqlite
@@ -87,6 +89,11 @@ public class Project {
     private CoordinateReferenceSystem crs;
 
     /**
+     * Database object where are stored all data
+     */
+    private JDBCDataStore datastore;
+
+    /**
      * Create a new project associated with the database at specified location.
      * <p>
      * Project file must be a temporary project file.
@@ -113,7 +120,15 @@ public class Project {
      * @throws IOException
      */
     protected void initializeGeopackage() throws IOException {
+
         this.geopkg = new GeoPackage(databasePath.toFile());
+
+        // get feature source from geopackage
+        Map<String, String> params = new HashMap();
+        params.put("dbtype", "geopkg");
+        params.put("database", databasePath.toString());
+
+        this.datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
     }
 
     public MapContent getMainMapContent() {
@@ -210,12 +225,6 @@ public class Project {
         // create a geopackage entry
         geopkg.create(fe, type);
 
-        // get feature source from geopackage
-        Map<String, String> params = new HashMap();
-        params.put("dbtype", "geopkg");
-        params.put("database", databasePath.toString());
-
-        JDBCDataStore datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
         return datastore.getFeatureSource(layerid);
 
     }
@@ -231,13 +240,14 @@ public class Project {
         layers.add(layer);
         mainMapContent.addLayer(layer.getInternalLayer());
 
-        try {
-            ProjectWriter.writeLayerIndex(getDatabaseConnection(), this);
-            return layer;
-        } catch (IOException e) {
-            return null;
-        }
-
+        return (Layer) executeWithDatabaseConnection((connection) -> {
+            try {
+                ProjectWriter.writeLayerIndex(connection, this);
+                return layer;
+            } catch (IOException e) {
+                return null;
+            }
+        });
     }
 
     public void setCrs(CoordinateReferenceSystem crs) {
@@ -261,10 +271,16 @@ public class Project {
     protected void finalize() throws Throwable {
         super.finalize();
 
+        if (datastore != null) {
+            logger.warning("Closing datastore: " + datastore);
+            datastore.dispose();
+        }
+
         if (geopkg != null) {
-            logger.warning("Project geopackage have not been closed, closing " + this + " / " + geopkg + " / " + geopkg.getFile().toString());
+            logger.warning("Closing geopackage: " + geopkg.getFile().toString());
             geopkg.close();
         }
+
     }
 
     /**
@@ -273,6 +289,9 @@ public class Project {
      * Temporary files are not deleted
      */
     public void close() {
+        datastore.dispose();
+        datastore = null;
+
         geopkg.close();
         geopkg = null;
     }
@@ -368,25 +387,24 @@ public class Project {
     }
 
     /**
-     * Return a new database connection with project geopackage
+     * Execute an operation with database connection
+     *
+     * Execute an operation here avoid to have too many connections outside, maybe unclosed
      *
      * @return
-     * @throws IOException
      */
-    public Connection getDatabaseConnection() throws IOException {
+    public Object executeWithDatabaseConnection(Function<Connection, Object> function) {
 
-        Map<String, String> params = new HashMap();
-        params.put("dbtype", "geopkg");
-        params.put("database", databasePath.toString());
-
-        JDBCDataStore datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
-
-        return datastore.getConnection(Transaction.AUTO_COMMIT);
-
+        try (Connection connection = datastore.getConnection(Transaction.AUTO_COMMIT)) {
+            return function.apply(connection);
+        } catch (SQLException | IOException e) {
+            logger.error(e);
+            return null;
+        }
     }
 
     /**
-     * Return a list of layer index entries
+     * Return layer index entries list
      *
      * @return
      */
@@ -397,4 +415,5 @@ public class Project {
         }
         return indexes;
     }
+
 }

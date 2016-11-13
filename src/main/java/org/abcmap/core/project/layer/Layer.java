@@ -13,6 +13,7 @@ import org.geotools.map.FeatureLayer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -199,6 +200,17 @@ public class Layer {
             logger.error(e);
             return false;
         }
+    }
+
+    /**
+     * Execute a visit on this layer. Filter can be null.
+     *
+     * @param visitor
+     * @param filter
+     */
+    public void executeVisit(LayerVisitor visitor, Filter filter) {
+        LayerVisitExecutor executor = new LayerVisitExecutor(this);
+        executor.execute(visitor, filter);
     }
 
 }

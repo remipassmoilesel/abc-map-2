@@ -3,6 +3,10 @@ package org.abcmap.core.project;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
+import org.abcmap.core.project.dao.DAOException;
+import org.abcmap.core.project.dao.LayerIndexDAO;
+import org.abcmap.core.project.layer.Layer;
+import org.abcmap.core.project.layer.LayerType;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.junit.BeforeClass;
@@ -11,6 +15,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
@@ -55,8 +60,20 @@ public class ProjectReaderWriterTest {
             assertTrue("Creation test",
                     Files.isRegularFile(newProjectTempDirectory.resolve(ProjectWriter.TEMPORARY_NAME)));
 
-            Layer l = newProject.getLayers().get(0);
+            // layer index test
+            newProject.addNewLayer("Second layer", true, 1, LayerType.FEATURES);
+            newProject.executeWithDatabaseConnection((connection) -> {
+                LayerIndexDAO dao = null;
+                try {
+                    dao = new LayerIndexDAO(connection);
+                    assertTrue("Layer index test", dao.readLayerIndex().size() == 2);
+                } catch (DAOException e) {
+                    e.printStackTrace();
+                }
+                return null;
+            });
 
+            Layer l = newProject.getLayers().get(0);
             for (int i = 0; i < 100; i++) {
                 l.addShape(geom.createPoint(new Coordinate(i, i)));
             }
