@@ -32,15 +32,18 @@ public class TestUtils {
      *
      * @throws IOException
      */
-    public static void loadNewProject() throws IOException {
+    public static void createNewProject() throws IOException {
 
         mainManagerInit();
 
         ProjectManager pman = MainManager.getProjectManager();
+
+        // close previous project if necessary
         if (pman.isInitialized()) {
             pman.closeProjet();
         }
 
+        // create new project
         pman.createNewProject();
 
     }
