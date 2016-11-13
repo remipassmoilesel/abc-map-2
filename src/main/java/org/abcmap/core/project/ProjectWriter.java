@@ -3,8 +3,12 @@ package org.abcmap.core.project;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
+import org.abcmap.core.project.layer.Layer;
+import org.abcmap.core.project.layer.LayerIndexEntry;
+import org.abcmap.core.project.layer.LayerType;
 import org.geotools.geopkg.FeatureEntry;
 import org.geotools.geopkg.GeoPackage;
 
@@ -12,7 +16,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.util.ArrayList;
+import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Contain methods to write a project
@@ -83,13 +88,7 @@ public class ProjectWriter {
             mtdao.writeMetadata(project.getMetadataContainer());
 
             // write layer indexes
-            LayerIndexDAO lidao = new LayerIndexDAO(connection);
-            ArrayList<LayerIndexEntry> indexes = new ArrayList<LayerIndexEntry>();
-            for (Layer layer : project.getLayers()) {
-                indexes.add(layer.getIndexEntry());
-            }
-
-            lidao.writeLayerIndex(indexes);
+            writeLayerIndex(connection, project);
 
             // write layer contents
             for (Layer layer : project.getLayers()) {
@@ -108,6 +107,15 @@ public class ProjectWriter {
 
         return geopkg;
 
+    }
+
+    public static void writeLayerIndex(Connection connection, Project project) throws IOException {
+        try {
+            LayerIndexDAO dao = new LayerIndexDAO(connection);
+            dao.writeLayerIndex(project.getLayerIndexEntries());
+        } catch (DAOException e) {
+            throw new IOException(e);
+        }
     }
 
 }

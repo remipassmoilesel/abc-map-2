@@ -5,10 +5,12 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
+import org.abcmap.core.project.layer.Layer;
+import org.abcmap.core.project.layer.LayerIndexEntry;
+import org.abcmap.core.project.layer.LayerType;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentFeatureSource;
-import org.geotools.geopkg.GeoPackage;
 import org.geotools.jdbc.JDBCDataStore;
 
 import java.io.IOException;

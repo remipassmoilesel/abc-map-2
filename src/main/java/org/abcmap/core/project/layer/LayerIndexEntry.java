@@ -1,7 +1,7 @@
-package org.abcmap.core.project;
+package org.abcmap.core.project.layer;
 
 /**
- * Layers metadata are stored in a separate table
+ * Object that represent layer metadata. They are stored separately in database.
  */
 public class LayerIndexEntry {
 

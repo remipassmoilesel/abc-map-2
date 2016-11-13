@@ -1,13 +1,13 @@
-package org.abcmap.core.project;
+package org.abcmap.core.project.layer;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.CRSUtils;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
-import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.styling.Style;
@@ -30,9 +30,9 @@ public class Layer {
     private final static FilterFactory ff = FeatureUtils.getFilterFactory();
 
     private CoordinateReferenceSystem crs;
-    private SimpleFeatureBuilder featureBuilder;
+    private DefaultFeatureBuilder featureBuilder;
     private SimpleFeatureSource featureSource;
-    private FeatureLayer geotoolsLayer;
+    private org.geotools.map.Layer internalLayer;
     private Style style;
     private LayerIndexEntry indexEntry;
     private SimpleFeatureStore featureStore;
@@ -49,27 +49,24 @@ public class Layer {
      * @param type
      * @param source
      */
-    protected Layer(String layerid, String name, boolean visible, int zindex, LayerType type, Object source) {
-        this(new LayerIndexEntry(layerid, name, true, zindex, type), source);
+    public Layer(String layerid, String name, boolean visible, int zindex, LayerType type, Object source) {
+        this(new LayerIndexEntry(layerid, name, visible, zindex, type), source);
     }
 
     /**
-     * Main constructor of a layer. This constructor is protected to avoid creation outside of
-     * this package.
-     * <p>
-     * To create a new layer, use Project.addNewLayer()
+     * Main constructor of a layer. Layers have to be created with Project.addNewLayer() instead of this constructor.
      *
      * @param entry
      * @param source optionnal, only needed if this is a read only feature layer
      */
-    protected Layer(LayerIndexEntry entry, Object source) {
+    public Layer(LayerIndexEntry entry, Object source) {
 
         this.indexEntry = entry;
         this.style = sf.createStyle();
         this.crs = CRSUtils.GENERIC_2D;
 
         // create a feature builder associated with the layer
-        this.featureBuilder = FeatureUtils.getSimpleFeatureBuilder(entry.getLayerId(), crs);
+        this.featureBuilder = FeatureUtils.getDefaultFeatureBuilder(entry.getLayerId(), crs);
 
         if (LayerType.FEATURES.equals(entry.getType())) {
 
@@ -79,7 +76,7 @@ public class Layer {
 
             this.featureSource = (SimpleFeatureSource) source;
             this.featureStore = (SimpleFeatureStore) featureSource;
-            this.geotoolsLayer = new FeatureLayer(featureSource, style);
+            this.internalLayer = new FeatureLayer(featureSource, style);
 
         } else {
             throw new IllegalArgumentException("Unknown type: " + entry.getType());
@@ -92,13 +89,14 @@ public class Layer {
      * Wrap and add a geometry to this layer
      * <p>
      * Return the feature added or null if there was a problem while adding feature
+     * <p>
+     * TODO: find a way to remove synchronize attribute ?
      *
      * @param geom
      */
     public synchronized SimpleFeature addShape(Geometry geom) {
 
-        featureBuilder.add(geom);
-        SimpleFeature feature = featureBuilder.buildFeature(null);
+        SimpleFeature feature = featureBuilder.build(geom, null);
 
         try {
             featureStore.addFeatures(FeatureUtils.asList(feature));
@@ -110,8 +108,13 @@ public class Layer {
 
     }
 
-    protected FeatureLayer getGeotoolsLayer() {
-        return geotoolsLayer;
+    /**
+     * Return the internal representation of layer
+     *
+     * @return
+     */
+    public org.geotools.map.Layer getInternalLayer() {
+        return internalLayer;
     }
 
     public Style getStyle() {
@@ -180,7 +183,7 @@ public class Layer {
         return indexEntry != null ? indexEntry.hashCode() : 0;
     }
 
-    public boolean removeFeature(SimpleFeature... features) {
+    public boolean removeFeatures(SimpleFeature... features) {
 
         // create a set
         HashSet<Identifier> ids = new HashSet<>();

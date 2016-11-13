@@ -2,8 +2,11 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.project.layer.Layer;
+import org.abcmap.core.project.layer.LayerIndexEntry;
+import org.abcmap.core.project.layer.LayerType;
 import org.abcmap.core.utils.CRSUtils;
-import org.abcmap.core.utils.FeatureUtils;
+import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Transaction;
@@ -17,11 +20,11 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -184,9 +187,7 @@ public class Project {
 
         // create a layer wrapper and store it
         Layer layer = new Layer(layerid, name, visible, zindex, type, source);
-        addLayer(layer);
-
-        return layer;
+        return addLayer(layer);
     }
 
     /**
@@ -201,7 +202,7 @@ public class Project {
         // create a simple feature type
         // /!\ If DefaultEngineeringCRS.GENERIC2D is used, a lot of time is waste.
         // Prefer CRS.decode("EPSG:40400");
-        SimpleFeatureType type = FeatureUtils.getSimpleFeatureType(layerid, this.crs);
+        SimpleFeatureType type = DefaultFeatureBuilder.getDefaultFeatureType(layerid, this.crs);
         FeatureEntry fe = new FeatureEntry();
         fe.setBounds(new ReferencedEnvelope());
         fe.setSrid(null);
@@ -219,9 +220,24 @@ public class Project {
 
     }
 
-    protected void addLayer(Layer layer) {
+    /**
+     * Add specified layer to project and write the layer index. Return the layer or null if an error occur.
+     *
+     * @param layer
+     * @return
+     */
+    protected Layer addLayer(Layer layer) {
+
         layers.add(layer);
-        mainMapContent.addLayer(layer.getGeotoolsLayer());
+        mainMapContent.addLayer(layer.getInternalLayer());
+
+        try {
+            ProjectWriter.writeLayerIndex(getDatabaseConnection(), this);
+            return layer;
+        } catch (IOException e) {
+            return null;
+        }
+
     }
 
     public void setCrs(CoordinateReferenceSystem crs) {
@@ -367,5 +383,18 @@ public class Project {
 
         return datastore.getConnection(Transaction.AUTO_COMMIT);
 
+    }
+
+    /**
+     * Return a list of layer index entries
+     *
+     * @return
+     */
+    protected List<LayerIndexEntry> getLayerIndexEntries() {
+        ArrayList<LayerIndexEntry> indexes = new ArrayList<LayerIndexEntry>();
+        for (Layer layer : getLayers()) {
+            indexes.add(layer.getIndexEntry());
+        }
+        return indexes;
     }
 }

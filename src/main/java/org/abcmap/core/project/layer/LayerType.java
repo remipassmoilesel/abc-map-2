@@ -1,4 +1,4 @@
-package org.abcmap.core.project;
+package org.abcmap.core.project.layer;
 
 /**
  * Created by remipassmoilesel on 10/11/16.

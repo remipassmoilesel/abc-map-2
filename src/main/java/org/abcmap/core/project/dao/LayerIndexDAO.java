@@ -2,8 +2,8 @@ package org.abcmap.core.project.dao;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.project.LayerIndexEntry;
-import org.abcmap.core.project.LayerType;
+import org.abcmap.core.project.layer.LayerIndexEntry;
+import org.abcmap.core.project.layer.LayerType;
 import org.abcmap.core.utils.SqliteUtils;
 
 import java.sql.Connection;
