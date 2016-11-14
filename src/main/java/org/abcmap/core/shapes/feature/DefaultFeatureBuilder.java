@@ -4,7 +4,6 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -12,9 +11,12 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * Default feature builder, build features created by Abc-Map.
  * <p>
- * A secondary identifier is used as a workaround for the Geotools JDBC/Geopackage  id issue (see tests)
+ * Features building is synchronized.
  */
 public class DefaultFeatureBuilder {
+
+    public static final String GEOMETRY_ATTRIBUTE_NAME = "geometry";
+//    private static final String STYLE_ID_ATTRIBUTE_NAME = "style_id";
 
     private final SimpleFeatureBuilder builder;
 
@@ -22,11 +24,8 @@ public class DefaultFeatureBuilder {
         builder = new SimpleFeatureBuilder(getDefaultFeatureType(featureName, crs));
     }
 
-    public synchronized SimpleFeature build(Geometry geom, String styleId) {
+    public SimpleFeature build(Geometry geom) {
         builder.add(geom);
-        builder.add(FeatureUtils.generateFeatureId());
-        builder.add(styleId);
-
         return builder.buildFeature(null);
     }
 
@@ -43,9 +42,7 @@ public class DefaultFeatureBuilder {
         SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
         tbuilder.setName(name);
         tbuilder.setCRS(crs);
-        tbuilder.add("geometry", Geometry.class);
-        tbuilder.add("secondary_id", String.class);
-        tbuilder.add("style_id", String.class);
+        tbuilder.add(GEOMETRY_ATTRIBUTE_NAME, Geometry.class);
 
         return tbuilder.buildFeatureType();
     }
