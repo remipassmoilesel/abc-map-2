@@ -6,6 +6,7 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.CRSUtils;
 import org.abcmap.core.utils.FeatureUtils;
+import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -87,24 +88,33 @@ public class Layer {
     }
 
     /**
-     * Wrap and add a geometry to this layer
+     * Wrap a geometry in a DefaultSimpleFeature and add it to this layer
      * <p>
-     * Return the feature added or null if there was a problem while adding feature
+     * Return the feature added
      * <p>
      * TODO: find a way to remove synchronize attribute ?
      *
      * @param geom
      */
-    public synchronized SimpleFeature addShape(Geometry geom) {
+    public SimpleFeature addShape(Geometry geom) {
+        SimpleFeature feature = featureBuilder.build(geom);
+        return addFeature(feature);
+    }
 
-        SimpleFeature feature = featureBuilder.build(geom, null);
+    /**
+     * Add a feature to the layer. Can be used to write modifications on feature.
+     *
+     * @param feature
+     * @return
+     */
+    public SimpleFeature addFeature(SimpleFeature feature) {
 
         try {
             featureStore.addFeatures(FeatureUtils.asList(feature));
             return feature;
         } catch (IOException e) {
             logger.error(e);
-            return null;
+            throw new LayerIOException(e);
         }
 
     }
@@ -155,7 +165,7 @@ public class Layer {
     }
 
     /**
-     * Return calculated bounds of layer, or null if an IO error occur
+     * Return calculated bounds of layer
      *
      * @return
      */
@@ -164,7 +174,7 @@ public class Layer {
             return featureSource.getFeatures().getBounds();
         } catch (IOException e) {
             logger.error(e);
-            return null;
+            throw new LayerIOException(e);
         }
     }
 
@@ -184,7 +194,12 @@ public class Layer {
         return indexEntry != null ? indexEntry.hashCode() : 0;
     }
 
-    public boolean removeFeatures(SimpleFeature... features) {
+    /**
+     * Remove features from layer
+     *
+     * @param features
+     */
+    public void removeFeatures(SimpleFeature... features) {
 
         // create a set
         HashSet<Identifier> ids = new HashSet<>();
@@ -195,10 +210,9 @@ public class Layer {
         // try to remove
         try {
             featureStore.removeFeatures(ff.id(ids));
-            return true;
         } catch (IOException e) {
             logger.error(e);
-            return false;
+            throw new LayerIOException(e);
         }
     }
 
@@ -212,5 +226,37 @@ public class Layer {
         LayerVisitExecutor executor = new LayerVisitExecutor(this);
         executor.execute(visitor, filter);
     }
+
+    /**
+     * Return selected features or null if nothing found
+     */
+    public SimpleFeature getFeatureById(String id) {
+
+        Filter filter = FeatureUtils.getIdFilter(id);
+
+        try {
+            SimpleFeatureIterator features = featureSource.getFeatures(filter).features();
+
+            if (features.hasNext() == false) {
+                return null;
+            } else {
+
+                SimpleFeature feat = features.next();
+
+                while (features.hasNext()) {
+                    logger.warning("Double id value found: " + features.next());
+                }
+
+                features.close();
+
+                return feat;
+            }
+
+        } catch (IOException e) {
+            logger.error(e);
+            throw new LayerIOException(e);
+        }
+    }
+
 
 }
