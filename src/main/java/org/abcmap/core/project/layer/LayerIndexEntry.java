@@ -9,7 +9,7 @@ import org.abcmap.core.project.dao.DataModel;
  * Object that represent layer metadata. They are stored separately in database.
  */
 
-@DatabaseTable(tableName = AbstractOrmDAO.TABLE_PREFIX + "styles")
+@DatabaseTable(tableName = AbstractOrmDAO.TABLE_PREFIX + "layer_index")
 public class LayerIndexEntry implements DataModel{
 
     private static final String ID_FIELD_NAME = "id";

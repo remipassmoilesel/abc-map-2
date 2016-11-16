@@ -14,13 +14,17 @@ import org.geotools.map.FeatureLayer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This object is just a wrapper of Geotools layer
@@ -120,6 +124,27 @@ public class Layer {
     }
 
     /**
+     * Update specified feature
+     *
+     * @param feature
+     */
+    public SimpleFeature updateFeature(SimpleFeature feature) {
+
+        try {
+            HashMap<Name, Object> attributes = FeatureUtils.getAttributes(feature);
+            Set<Name> keyset = attributes.keySet();
+            Name[] names = keyset.toArray(new Name[keyset.size()]);
+            Object[] values = attributes.values().toArray();
+
+            featureStore.modifyFeatures(names, values, FeatureUtils.getIdFilter(feature.getID()));
+            return feature;
+        } catch (IOException e) {
+            logger.error(e);
+            throw new LayerIOException(e);
+        }
+    }
+
+    /**
      * Return the internal representation of layer
      *
      * @return
@@ -214,6 +239,16 @@ public class Layer {
             logger.error(e);
             throw new LayerIOException(e);
         }
+    }
+
+    /**
+     * Execute a visit on this layer.
+     *
+     * @param visitor
+     */
+    public void executeVisit(LayerVisitor visitor) {
+        LayerVisitExecutor executor = new LayerVisitExecutor(this);
+        executor.execute(visitor, null);
     }
 
     /**
