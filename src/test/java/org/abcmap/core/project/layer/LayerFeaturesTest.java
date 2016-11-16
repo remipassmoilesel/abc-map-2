@@ -6,6 +6,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
+import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
+import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeomUtils;
 import org.junit.Before;
@@ -37,25 +39,34 @@ public class LayerFeaturesTest {
         Project project = MainManager.getProjectManager().getProject();
         Layer activeLayer = project.getActiveLayer();
 
+        // add a feature and retrieve it
         SimpleFeature point1 = activeLayer.addShape(geom.createPoint(new Coordinate(25, 58)));
         SimpleFeature point2 = activeLayer.getFeatureById(point1.getID());
 
         assertTrue("Add and find in layer test 1", point1.getID().equals(point1.getID()));
         assertTrue("Add and find in layer test 2", point1.getID().equals(point2.getID()));
 
+        // add a feature and update it
         Geometry geomPoint = geom.createPoint(new Coordinate(2556, 548));
         SimpleFeature point3 = activeLayer.addShape(geomPoint);
-        SimpleFeature point4 = activeLayer.addFeature(point3);
-        SimpleFeature point5 = activeLayer.getFeatureById(point3.getID());
+        point3.setAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME, "arbitrary_value");
+        activeLayer.updateFeature(point3);
 
-        assertTrue("Overwrite feature test 1", point3.getID().equals(point3.getID()));
-        assertTrue("Overwrite feature test 2", point3.getID().equals(point4.getID()));
-        assertTrue("Overwrite feature test 3", point3.getID().equals(point5.getID()));
-        assertTrue("Overwrite feature test 4", point4.getID().equals(point5.getID()));
+        final int[] count = {0};
+        activeLayer.executeVisit((SimpleFeature f) -> {
 
-        Geometry geomPoint2 = (Geometry) point5.getDefaultGeometry();
-        assertTrue("Overwrite geometry test", geomPoint.equalsExact(geomPoint));
-        assertTrue("Overwrite geometry test 2", geomPoint.equalsExact(geomPoint2));
+            if (count[0] == 0) {
+                assertTrue("Update feature test 1", f.getAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME) == null);
+            } else if (count[0] == 1) {
+                assertTrue("Update feature test 2", f.getAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals("arbitrary_value"));
+            }
+
+            count[0]++;
+
+            return true;
+        });
+
+        assertTrue("Update feature test 3", count[0] == 2);
 
     }
 

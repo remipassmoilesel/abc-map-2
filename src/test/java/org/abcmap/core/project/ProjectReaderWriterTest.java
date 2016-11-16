@@ -60,6 +60,11 @@ public class ProjectReaderWriterTest {
             assertTrue("Creation test",
                     Files.isRegularFile(newProjectTempDirectory.resolve(ProjectWriter.TEMPORARY_NAME)));
 
+            // add styles
+            for (int i = 1; i < 10; i++) {
+                newProject.getStyle(TestUtils.getRandomColor(), TestUtils.getRandomColor(), i);
+            }
+
             // layer index test
             newProject.addNewLayer("Second layer", true, 1, LayerType.FEATURES);
 

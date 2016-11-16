@@ -40,9 +40,9 @@ public class StyleDAOTest {
         StyleDAO dao = new StyleDAO(db);
 
         ArrayList<StyleContainer> stylePatterns = new ArrayList<>();
-        stylePatterns.add(new StyleContainer(StyleType.LINE, Color.blue, Color.white, 5));
-        stylePatterns.add(new StyleContainer(StyleType.POINT, Color.red, Color.blue, 51));
-        stylePatterns.add(new StyleContainer(StyleType.POLYGON, Color.green, Color.white, 15));
+        stylePatterns.add(new StyleContainer(Color.blue, Color.white, 5));
+        stylePatterns.add(new StyleContainer(Color.red, Color.blue, 51));
+        stylePatterns.add(new StyleContainer(Color.green, Color.white, 15));
 
         ArrayList<StyleContainer> written = new ArrayList<>();
 
@@ -62,16 +62,7 @@ public class StyleDAOTest {
 
         assertTrue("Basic equality test", written.equals(written));
 
-        ArrayList<StyleContainer> read = new ArrayList<>();
-
-        dao.visit((Object o) -> {
-            StyleContainer s = (StyleContainer) o;
-            read.add(s);
-            return true;
-        });
-
-        System.out.println(written);
-        System.out.println(read);
+        ArrayList<StyleContainer> read = dao.readStyles();
 
         assertTrue("Read / write test", written.equals(read));
 
