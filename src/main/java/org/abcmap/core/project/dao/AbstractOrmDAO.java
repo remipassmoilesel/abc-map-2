@@ -22,6 +22,7 @@ public abstract class AbstractOrmDAO {
     protected final CustomLogger logger = LogManager.getLogger(AbstractOrmDAO.class);
     protected final JdbcPooledConnectionSource connectionSource;
     protected final Dao dao;
+    private final Class<? extends DataModel> dataModel;
 
     public AbstractOrmDAO(Path dbPath, Class<? extends DataModel> entity) throws DAOException {
 
@@ -34,17 +35,32 @@ public abstract class AbstractOrmDAO {
             connectionSource.setTestBeforeGet(true);
             connectionSource.initialize();
 
+            this.dataModel = entity;
+
             // create internal dao
             this.dao = DaoManager.createDao(connectionSource, entity);
 
             // create tables if needed
-            TableUtils.createTableIfNotExists(connectionSource, entity);
+            createTableIfNotExist();
 
         } catch (SQLException e) {
             throw new DAOException(e);
         }
 
 
+    }
+
+    /**
+     * Create table scheme if not existing
+     *
+     * @throws DAOException
+     */
+    public void createTableIfNotExist() throws DAOException {
+        try {
+            TableUtils.createTableIfNotExists(connectionSource, dataModel);
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
     }
 
     /**
@@ -173,6 +189,5 @@ public abstract class AbstractOrmDAO {
             connectionSource.close();
         }
     }
-
 
 }
