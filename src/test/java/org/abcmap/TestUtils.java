@@ -1,13 +1,15 @@
 package org.abcmap;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static org.abcmap.core.managers.MainManager.getProjectManager;
+import java.util.PrimitiveIterator;
+import java.util.Random;
 
 /**
  * Misc constants used in configuration cases
@@ -15,6 +17,15 @@ import static org.abcmap.core.managers.MainManager.getProjectManager;
 public class TestUtils {
 
     public static final Path PLAYGROUND_DIRECTORY = Paths.get("tests-playground");
+    private static final Color[] randomColors = new Color[]{
+            Color.red,
+            Color.blue,
+            Color.yellow,
+            Color.black,
+            Color.green,
+    };
+    private static final PrimitiveIterator.OfInt randomColorIndex = new Random().ints(0, randomColors.length).iterator();
+    private static final PrimitiveIterator.OfInt randPointGeneric2d = new Random().ints(500, 2000).iterator();
 
     /**
      * Init the main manager if necessary
@@ -46,6 +57,14 @@ public class TestUtils {
         // create new project
         pman.createNewProject();
 
+    }
+
+    public static Coordinate getRandomPoint() {
+        return new Coordinate(randPointGeneric2d.next(), randPointGeneric2d.next());
+    }
+
+    public static Color getRandomColor() {
+        return randomColors[randomColorIndex.next()];
     }
 
 }
