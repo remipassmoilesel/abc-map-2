@@ -82,7 +82,7 @@ public class ProjectManager {
             return;
         }
 
-        // close database
+        // close resources
         currentProject.close();
 
         // delete files
