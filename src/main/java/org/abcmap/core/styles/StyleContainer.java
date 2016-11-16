@@ -2,8 +2,15 @@ package org.abcmap.core.styles;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import org.abcmap.core.project.dao.AbstractOrmDAO;
 import org.abcmap.core.project.dao.DataModel;
+import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
+import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.Utils;
+import org.geotools.styling.*;
+import org.geotools.styling.Stroke;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory;
 
 import java.awt.*;
 import java.util.Objects;
@@ -11,20 +18,19 @@ import java.util.Objects;
 /**
  * Persistent style
  */
-@DatabaseTable(tableName = "styles")
+@DatabaseTable(tableName = AbstractOrmDAO.TABLE_PREFIX + "styles")
 public class StyleContainer implements DataModel {
 
+    private final static StyleFactory sf = FeatureUtils.getStyleFactory();
+    private final static FilterFactory ff = FeatureUtils.getFilterFactory();
+
     private static final String ID_FIELD_NAME = "id";
-    private static final String TYPE_FIELD_NAME = "type";
     private static final String FOREGROUND_FIELD_NAME = "foreground";
     private static final String BACKGROUND_FIELD_NAME = "background";
     private static final String THICK_FIELD_NAME = "thick";
 
     @DatabaseField(id = true, columnName = ID_FIELD_NAME)
     private String id;
-
-    @DatabaseField(columnName = TYPE_FIELD_NAME)
-    private StyleType type;
 
     @DatabaseField(columnName = FOREGROUND_FIELD_NAME)
     private String foreground;
@@ -35,12 +41,13 @@ public class StyleContainer implements DataModel {
     @DatabaseField(columnName = THICK_FIELD_NAME)
     private int thick;
 
+    private Rule rule;
+
     public StyleContainer() {
 
     }
 
-    public StyleContainer(StyleType type, Color foreground, Color background, int thick) {
-        this.type = type;
+    public StyleContainer(Color foreground, Color background, int thick) {
         this.foreground = Utils.colorToString(foreground);
         this.background = Utils.colorToString(background);
         this.thick = thick;
@@ -49,19 +56,18 @@ public class StyleContainer implements DataModel {
 
     public StyleContainer(StyleContainer other) {
         this.id = other.id;
-        this.type = other.type;
         this.foreground = other.foreground;
         this.background = other.background;
         this.thick = other.thick;
     }
 
-    /**
-     * Style type: line, point, ....
-     *
-     * @return
-     */
-    public StyleType getType() {
-        return type;
+    public Rule getRule() {
+
+        if (this.rule == null) {
+            rule = generateStyle(this);
+        }
+
+        return rule;
     }
 
     /**
@@ -101,40 +107,78 @@ public class StyleContainer implements DataModel {
     }
 
     public String generateId() {
-        this.id = getType().toString() + "_" + System.nanoTime();
+        this.id = "style_" + System.nanoTime();
         return this.id;
     }
 
-    /**
-     * Data used: type, foreground, background, thick
-     *
-     * @param o
-     * @return
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StyleContainer that = (StyleContainer) o;
         return thick == that.thick &&
-                type == that.type &&
                 Objects.equals(foreground, that.foreground) &&
                 Objects.equals(background, that.background);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, foreground, background, thick);
+        return Objects.hash(foreground, background, thick);
     }
 
     @Override
     public String toString() {
         return "StyleContainer{" +
                 "id='" + id + '\'' +
-                ", type=" + type +
                 ", foreground='" + foreground + '\'' +
                 ", background='" + background + '\'' +
                 ", thick=" + thick +
                 '}';
+    }
+
+    /**
+     * Generate a Geotools rule from a style container
+     * <p>
+     * This rule is a basic rule: it has all symbolizers (point, line, polygon), and is visible at all scales.
+     *
+     * @param container
+     * @return
+     */
+    public static Rule generateStyle(StyleContainer container) {
+
+        // create point symbolizer
+        Stroke stroke = sf.stroke(ff.literal(container.getForeground()), null, null, null, null, null, null);
+        Fill fill = sf.fill(null, ff.literal(container.getBackground()), ff.literal(1.0));
+
+        Mark mark = sf.getCircleMark();
+        mark.setFill(fill);
+        mark.setStroke(stroke);
+
+        Graphic graphic = sf.createDefaultGraphic();
+        graphic.graphicalSymbols().clear();
+        graphic.graphicalSymbols().add(mark);
+        graphic.setSize(ff.literal(container.getThick()));
+
+        // here we can specify name of geometry field. Set to null allow to not specify it
+        PointSymbolizer pointSym = sf.createPointSymbolizer(graphic, null);
+
+        // create line symbolizer
+        LineSymbolizer lineSym = sf.createLineSymbolizer(stroke, null);
+
+        // create polygon symbolizer
+        PolygonSymbolizer polygonSym = sf.createPolygonSymbolizer(stroke, fill, null);
+
+        // create rule
+        Rule r = sf.createRule();
+        r.symbolizers().add(pointSym);
+        r.symbolizers().add(lineSym);
+        r.symbolizers().add(polygonSym);
+
+        // apply on specified id
+        Filter filter = ff.equal(ff.property(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME), ff.literal(container.getId()), true);
+        r.setFilter(filter);
+
+        return r;
+
     }
 }

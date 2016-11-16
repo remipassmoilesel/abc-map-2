@@ -16,17 +16,15 @@ import org.opengis.filter.identity.Identifier;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * Store and create styles
  */
 public class StyleLibrary {
 
-    private final static StyleFactory sf = FeatureUtils.getStyleFactory();
-    private final static FilterFactory ff = FeatureUtils.getFilterFactory();
-
-    private final ArrayList<StyleContainer> styleCollection;
     private final ProjectManager projectMan;
+    private ArrayList<StyleContainer> styleCollection;
 
     public StyleLibrary() {
         projectMan = MainManager.getProjectManager();
@@ -36,15 +34,14 @@ public class StyleLibrary {
     /**
      * Return a style container corresponding to these characteristics
      *
-     * @param type
-     * @param line
-     * @param fill
+     * @param foreground
+     * @param background
      * @param thick
      * @return
      */
-    public StyleContainer getStyle(StyleType type, Color line, Color fill, int thick) {
+    public StyleContainer getStyle(Color foreground, Color background, int thick) {
 
-        StyleContainer container = new StyleContainer(type, line, fill, thick);
+        StyleContainer container = new StyleContainer(foreground, background, thick);
         int index = styleCollection.indexOf(container);
         if (index != -1) {
             return styleCollection.get(index);
@@ -56,96 +53,33 @@ public class StyleLibrary {
     }
 
     /**
-     * Apply a style to specified features
+     * Return the entire list of styles
      *
-     * @param features
-     * @param style
-     */
-    public void applyStyle(StyleContainer style, SimpleFeature... features) {
-
-        ArrayList<Layer> layers = projectMan.getProject().getLayers();
-        for (SimpleFeature simpleFeature : features) {
-            simpleFeature.setAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME, style.getId());
-        }
-
-    }
-
-    /**
-     * Apply a style to specified features
-     *
-     * @param featureIds
-     * @param style
-     */
-    public void applyStyle(StyleContainer style, String... featureIds) {
-
-        HashSet<Identifier> ids = new HashSet(featureIds.length);
-
-        for (String id : featureIds) {
-            ids.add(new FeatureIdImpl(id));
-        }
-
-        applyStyle(style, ids);
-    }
-
-    /**
-     * Apply a style to specified features
-     *
-     * @param featureIds
-     * @param style
-     */
-    public void applyStyle(StyleContainer style, HashSet<Identifier> featureIds) {
-
-        Id filter = ff.id(featureIds);
-
-        ArrayList<Layer> layers = projectMan.getProject().getLayers();
-        for (Layer lay : layers) {
-
-            lay.executeVisit((SimpleFeature feature) -> {
-                applyStyle(style, feature);
-                return true;
-            }, filter);
-
-        }
-
-    }
-
-    /**
-     * Build a Geotools rule with style container properties
-     *
-     * @param container
      * @return
      */
-    public Rule getRuleFromStyle(StyleContainer container){
-
-        if (StyleType.POINT == container.getType()) {
-
-            org.geotools.styling.Stroke stroke = sf.stroke(ff.literal(container.getForeground()), null, null, null, null, null, null);
-            Fill fill = sf.fill(null, ff.literal(container.getBackground()), ff.literal(1.0));
-
-            Mark mark = sf.getCircleMark();
-            mark.setFill(fill);
-            mark.setStroke(stroke);
-
-            Graphic graphic = sf.createDefaultGraphic();
-            graphic.graphicalSymbols().clear();
-            graphic.graphicalSymbols().add(mark);
-            graphic.setSize(ff.literal(container.getThick()));
-
-            // here we have to specify the name of the geometry field. Set to null allow to not specify it
-            PointSymbolizer symbolizer = sf.createPointSymbolizer(graphic, null);
-
-            Rule r = sf.createRule();
-            r.symbolizers().add(symbolizer);
-            Filter filter = ff.equal(ff.property(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME), ff.literal(container.getId()), true);
-            r.setFilter(filter);
-
-
-            return r;
-        } else {
-            throw new IllegalStateException("Unrecognized style type: " + container.getType());
-        }
-
+    public ArrayList<StyleContainer> getStyleCollection() {
+        return styleCollection;
     }
 
+    /**
+     * Replace the present list of styles
+     *
+     * @param styleCollection
+     */
+    public void setStyleCollection(ArrayList<StyleContainer> styleCollection) {
+        this.styleCollection = styleCollection;
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StyleLibrary that = (StyleLibrary) o;
+        return Objects.equals(styleCollection, that.styleCollection);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(styleCollection);
+    }
 }
