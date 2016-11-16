@@ -42,6 +42,8 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
         // store the current feature to change geometries later
         currentFeature = project.getActiveLayer().addShape(pointShape);
 
+        applyStyle();
+
         return currentFeature;
     }
 
@@ -60,7 +62,9 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
         // modify geometry
         currentFeature.setDefaultGeometry(getGeometry());
 
-        currentFeature = project.getActiveLayer().addFeature(currentFeature);
+        currentFeature = project.getActiveLayer().updateFeature(currentFeature);
+
+        applyStyle();
 
         return currentFeature;
     }
@@ -80,9 +84,12 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
         // modify geometry
         currentFeature.setDefaultGeometry(getGeometry());
 
-        currentFeature = project.getActiveLayer().addFeature(currentFeature);
+        applyStyle();
+
+        currentFeature = project.getActiveLayer().updateFeature(currentFeature);
 
         SimpleFeature returnVal = currentFeature;
+
         resetTool();
 
         return returnVal;
@@ -107,18 +114,6 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
         project.getActiveLayer().removeFeatures(currentFeature);
 
         resetTool();
-    }
-
-    protected void throwIfNotDrawing() {
-        if (isDrawing() == false) {
-            throw new DrawingException("Cannot perform this operation while not drawing");
-        }
-    }
-
-    protected void throwIfDrawing() {
-        if (isDrawing() == true) {
-            throw new DrawingException("Cannot perform this operation while drawing");
-        }
     }
 
 }

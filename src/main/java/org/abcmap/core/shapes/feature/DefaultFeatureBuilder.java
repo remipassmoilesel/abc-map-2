@@ -16,7 +16,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 public class DefaultFeatureBuilder {
 
     public static final String GEOMETRY_ATTRIBUTE_NAME = "geometry";
-//    private static final String STYLE_ID_ATTRIBUTE_NAME = "style_id";
+    public static final String STYLE_ID_ATTRIBUTE_NAME = "style_id";
 
     private final SimpleFeatureBuilder builder;
 
@@ -43,6 +43,7 @@ public class DefaultFeatureBuilder {
         tbuilder.setName(name);
         tbuilder.setCRS(crs);
         tbuilder.add(GEOMETRY_ATTRIBUTE_NAME, Geometry.class);
+        tbuilder.add(STYLE_ID_ATTRIBUTE_NAME, String.class);
 
         return tbuilder.buildFeatureType();
     }

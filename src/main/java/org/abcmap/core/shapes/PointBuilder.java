@@ -14,7 +14,9 @@ public class PointBuilder extends AbstractShapeBuilder {
      * @param coord
      */
     public SimpleFeature addPoint(Coordinate coord) {
-        return project.getActiveLayer().addShape(geometryFactory.createPoint(coord));
+        currentFeature = project.getActiveLayer().addShape(geometryFactory.createPoint(coord));
+        applyStyle();
+        return currentFeature;
     }
 
     @Override
