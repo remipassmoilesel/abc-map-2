@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This object is just a wrapper of Geotools layer
+ * This object is a wrapper of Geotools layer
  */
 public abstract class AbstractLayer {
 

@@ -1,33 +1,36 @@
 package org.abcmap.core.project;
 
+import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.project.layer.AbstractLayer;
-import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.project.layer.LayerIndexEntry;
-import org.abcmap.core.project.layer.LayerType;
+import org.abcmap.core.project.layer.*;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.utils.CRSUtils;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
+import org.abcmap.core.utils.SqliteUtils;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.geopkg.FeatureEntry;
-import org.geotools.geopkg.GeoPackage;
+import org.geotools.geopkg.*;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.MapContent;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -131,12 +134,8 @@ public class Project {
 
         this.geopkg = new GeoPackage(databasePath.toFile());
 
-        // get feature source from geopackage
-        Map<String, String> params = new HashMap();
-        params.put("dbtype", "geopkg");
-        params.put("database", databasePath.toString());
+        this.datastore = SqliteUtils.getDatastoreFromGeopackage(databasePath);
 
-        this.datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
     }
 
     public MapContent getMainMapContent() {
@@ -189,7 +188,7 @@ public class Project {
     }
 
     /**
-     * Method create and add a layer. This is the only way to create a layer.
+     * Add a new feature layer, where can be stored shapes
      *
      * @param name
      * @param visible
@@ -197,43 +196,35 @@ public class Project {
      */
     public AbstractLayer addNewFeatureLayer(String name, boolean visible, int zindex) {
 
-        // create a new feature source
-        String layerid = LayerIndexEntry.generateId();
-        FeatureSource source = null;
+        // create a layer wrapper and store it
+        AbstractLayer layer = null;
         try {
-            source = createNewFeatureSoure(layerid);
+            layer = new FeatureLayer(null, name, visible, zindex, geopkg, true);
         } catch (IOException e) {
             logger.error(e);
             return null;
         }
 
-        // create a layer wrapper and store it
-        AbstractLayer layer = new FeatureLayer(layerid, name, visible, zindex, source);
         return addLayer(layer);
     }
 
     /**
-     * Create a new table in associated geopackage, and return a feature source
+     * Add a new tile layer, where can be stored tiles
      *
-     * @param layerid
+     * @param name
+     * @param visible
+     * @param zindex
      * @return
-     * @throws IOException
      */
-    private ContentFeatureSource createNewFeatureSoure(String layerid) throws IOException {
-
-        // create a simple feature type
-        // /!\ If DefaultEngineeringCRS.GENERIC2D is used, a lot of time is waste.
-        // Prefer CRS.decode("EPSG:40400");
-        SimpleFeatureType type = DefaultFeatureBuilder.getDefaultFeatureType(layerid, this.crs);
-        FeatureEntry fe = new FeatureEntry();
-        fe.setBounds(new ReferencedEnvelope());
-        fe.setSrid(null);
-
-        // create a geopackage entry
-        geopkg.create(fe, type);
-
-        return datastore.getFeatureSource(layerid);
-
+    public AbstractLayer addNewTileLayer(String name, boolean visible, int zindex) {
+        TileLayer layer = null;
+        try {
+            layer = new TileLayer(null, name, visible, zindex, geopkg);
+        } catch (IOException e) {
+            logger.error(e);
+            return null;
+        }
+        return addLayer(layer);
     }
 
     /**
@@ -417,5 +408,13 @@ public class Project {
      */
     public StyleLibrary getStyleLibrary() {
         return styleLibrary;
+    }
+
+    /**
+     * Get the base geopackage
+     * @return
+     */
+    public GeoPackage getGeopkg() {
+        return geopkg;
     }
 }

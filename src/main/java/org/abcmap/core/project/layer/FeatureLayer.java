@@ -3,12 +3,18 @@ package org.abcmap.core.project.layer;
 import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
+import org.abcmap.core.utils.SqliteUtils;
+import org.geotools.data.DataStore;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.geopkg.FeatureEntry;
+import org.geotools.geopkg.GeoPackage;
+import org.geotools.jdbc.JDBCDataStore;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.identity.Identifier;
@@ -27,22 +33,33 @@ public class FeatureLayer extends AbstractLayer {
     protected DefaultFeatureBuilder featureBuilder;
     protected SimpleFeatureSource featureSource;
 
-    public FeatureLayer(String layerId, String title, boolean visible, int zindex, FeatureSource source) {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.FEATURES), source);
+    public FeatureLayer(String layerId, String title, boolean visible, int zindex, GeoPackage geopkg, boolean create) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.FEATURES), geopkg, create);
     }
 
-    public FeatureLayer(LayerIndexEntry entry, FeatureSource source) {
+    public FeatureLayer(LayerIndexEntry entry, GeoPackage geopkg, boolean create) throws IOException {
         super(entry);
+
+        // if true, create a new geopackage entry
+        if (create) {
+            // create a simple feature type
+            // /!\ If DefaultEngineeringCRS.GENERIC2D is used, a lot of time is waste.
+            // Prefer CRS.decode("EPSG:40400");
+            SimpleFeatureType type = DefaultFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), this.crs);
+            FeatureEntry fe = new FeatureEntry();
+            fe.setBounds(new ReferencedEnvelope());
+            fe.setSrid(null);
+
+            // create a geopackage entry
+            geopkg.create(fe, type);
+        }
+
+        JDBCDataStore datastore = SqliteUtils.getDatastoreFromGeopackage(geopkg.getFile().toPath());
+        this.featureSource = datastore.getFeatureSource(entry.getLayerId());
+        this.featureStore = (SimpleFeatureStore) featureSource;
 
         // create a feature builder associated with the layer
         this.featureBuilder = FeatureUtils.getDefaultFeatureBuilder(entry.getLayerId(), crs);
-
-        if (source == null) {
-            throw new NullPointerException("Feature source cannot be null");
-        }
-
-        this.featureSource = (SimpleFeatureSource) source;
-        this.featureStore = (SimpleFeatureStore) featureSource;
         this.internalLayer = new org.geotools.map.FeatureLayer(featureSource, style);
 
     }

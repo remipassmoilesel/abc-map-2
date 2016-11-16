@@ -17,8 +17,6 @@ import java.sql.SQLException;
  */
 public abstract class AbstractOrmDAO {
 
-    public static final String TABLE_PREFIX = "abcmap_";
-
     protected final CustomLogger logger = LogManager.getLogger(AbstractOrmDAO.class);
     protected final JdbcPooledConnectionSource connectionSource;
     protected final Dao dao;

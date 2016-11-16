@@ -9,6 +9,7 @@ import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
+import org.abcmap.core.utils.SqliteUtils;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.jdbc.JDBCDataStore;
@@ -48,11 +49,7 @@ public class ProjectReader {
         project.initializeGeopackage();
 
         // get database connection with project
-        Map<String, String> params = new HashMap();
-        params.put("dbtype", "geopkg");
-        params.put("database", newTempDatabase.toString());
-
-        JDBCDataStore datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
+        JDBCDataStore datastore = SqliteUtils.getDatastoreFromGeopackage(newTempDatabase);
 
         try {
 
@@ -63,12 +60,9 @@ public class ProjectReader {
             // create layers
             for (LayerIndexEntry entry : indexes) {
 
-                AbstractLayer layer;
-
                 if (LayerType.FEATURES.equals(entry.getType())) {
                     // here features from a shapefile should be named with the layer id
-                    ContentFeatureSource featureSource = datastore.getFeatureSource(entry.getLayerId());
-                    layer = new FeatureLayer(entry, featureSource);
+                    FeatureLayer layer = new FeatureLayer(entry, project.getGeopkg(), false);
                     project.addLayer(layer);
                 } else {
                     logger.warning("Unknown type: " + entry.getType());

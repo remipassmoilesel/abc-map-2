@@ -2,14 +2,14 @@ package org.abcmap.core.project.layer;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import org.abcmap.core.project.dao.AbstractOrmDAO;
+import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.project.dao.DataModel;
 
 /**
  * Object that represent layer metadata. They are stored separately in database.
  */
 
-@DatabaseTable(tableName = AbstractOrmDAO.TABLE_PREFIX + "layer_index")
+@DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "layer_index")
 public class LayerIndexEntry implements DataModel{
 
     private static final String ID_FIELD_NAME = "id";

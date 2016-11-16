@@ -2,10 +2,10 @@ package org.abcmap.core.project;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import org.abcmap.core.project.dao.AbstractOrmDAO;
+import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.project.dao.DataModel;
 
-@DatabaseTable(tableName = AbstractOrmDAO.TABLE_PREFIX + "metadata")
+@DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "metadata")
 public class ProjectMetadataPeer implements DataModel {
 
     private static final String NAME_FIELD_NAME = "name";
