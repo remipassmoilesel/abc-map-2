@@ -5,6 +5,8 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.layer.Layer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
+import org.abcmap.core.styles.StyleContainer;
+import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.utils.CRSUtils;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.geotools.data.DataStoreFinder;
@@ -19,14 +21,13 @@ import org.geotools.map.MapContent;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 
 /**
@@ -43,6 +44,11 @@ public class Project {
      * Temp directory, where is located database
      */
     private final Path tempDirectory;
+
+    /**
+     * Build and store styles
+     */
+    private final StyleLibrary styleLibrary;
 
     /**
      * Only one layer is alterable at a time, the active layer
@@ -111,6 +117,8 @@ public class Project {
         this.mainMapContent = new MapContent();
         this.crs = CRSUtils.GENERIC_2D;
         this.finalPath = null;
+
+        this.styleLibrary = new StyleLibrary();
 
     }
 
@@ -371,39 +379,33 @@ public class Project {
         return indexes;
     }
 
-    /**
-     * Data used: layers, metadataContainer, finalpath, crs
-     *
-     * @param o
-     * @return
-     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Project project = (Project) o;
+        return Objects.equals(styleLibrary, project.styleLibrary) &&
+                Objects.equals(finalPath, project.finalPath) &&
+                Objects.equals(layers, project.layers) &&
+                Objects.equals(metadataContainer, project.metadataContainer) &&
+                Objects.equals(crs, project.crs);
+    }
 
-        if (finalPath != null ? !finalPath.equals(project.finalPath) : project.finalPath != null) return false;
-        if (layers != null ? !layers.equals(project.layers) : project.layers != null) return false;
-        if (metadataContainer != null ? !metadataContainer.equals(project.metadataContainer) : project.metadataContainer != null)
-            return false;
-        return crs != null ? crs.equals(project.crs) : project.crs == null;
+    @Override
+    public int hashCode() {
+        return Objects.hash(styleLibrary, finalPath, layers, metadataContainer, crs);
+    }
 
+    public StyleContainer getStyle(Color activeForeground, Color activeBackground, int activeThick) {
+        return getStyleLibrary().getStyle(activeForeground, activeBackground, activeThick);
     }
 
     /**
-     * Data used: layers, metadataContainer, finalpath, crs
+     * Return the style library associated with the project
      *
      * @return
      */
-    @Override
-    public int hashCode() {
-        int result = finalPath != null ? finalPath.hashCode() : 0;
-        result = 31 * result + (layers != null ? layers.hashCode() : 0);
-        result = 31 * result + (metadataContainer != null ? metadataContainer.hashCode() : 0);
-        result = 31 * result + (crs != null ? crs.hashCode() : 0);
-        return result;
+    public StyleLibrary getStyleLibrary() {
+        return styleLibrary;
     }
-
 }

@@ -6,9 +6,10 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
+import org.abcmap.core.project.dao.StyleDAO;
 import org.abcmap.core.project.layer.Layer;
-import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
+import org.abcmap.core.styles.StyleContainer;
 import org.geotools.geopkg.FeatureEntry;
 import org.geotools.geopkg.GeoPackage;
 
@@ -16,8 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Contain methods to write a project
@@ -124,6 +123,11 @@ public class ProjectWriter {
         // write layer indexes
         LayerIndexDAO lidao = new LayerIndexDAO(destination);
         lidao.writeAllEntries(project.getLayerIndexEntries());
+
+        // write styles
+        StyleDAO sdao = new StyleDAO(destination);
+        sdao.createTableIfNotExist();
+        sdao.writeAll(project.getStyleLibrary().getStyleCollection());
 
     }
 

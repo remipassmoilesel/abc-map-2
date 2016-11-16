@@ -4,6 +4,7 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
+import org.abcmap.core.project.dao.StyleDAO;
 import org.abcmap.core.project.layer.Layer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
@@ -82,6 +83,10 @@ public class ProjectReader {
             // get metadata
             ProjectMetadataDAO mtdao = new ProjectMetadataDAO(projectFile);
             project.setMetadataContainer(mtdao.readMetadata());
+
+            // get styles
+            StyleDAO stdao = new StyleDAO(projectFile);
+            project.getStyleLibrary().setStyleCollection(stdao.readStyles());
 
         } catch (Exception e) {
             throw new IOException("Error while reading project", e);
