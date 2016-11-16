@@ -6,12 +6,10 @@ import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.GeomUtils;
-import org.abcmap.core.utils.SqliteUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 import static org.junit.Assert.assertTrue;
 
@@ -29,7 +27,7 @@ public class LayerVisitorTest {
     public void tests() throws IOException {
 
         Project project = MainManager.getProjectManager().getProject();
-        Layer activeLayer = project.getActiveLayer();
+        FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
 
         GeometryFactory geom = GeomUtils.getGeometryFactory();
 

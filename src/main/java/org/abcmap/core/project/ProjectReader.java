@@ -5,7 +5,8 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.project.dao.StyleDAO;
-import org.abcmap.core.project.layer.Layer;
+import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
 import org.geotools.data.DataStoreFinder;
@@ -62,12 +63,12 @@ public class ProjectReader {
             // create layers
             for (LayerIndexEntry entry : indexes) {
 
-                Layer layer;
+                AbstractLayer layer;
 
                 if (LayerType.FEATURES.equals(entry.getType())) {
                     // here features from a shapefile should be named with the layer id
                     ContentFeatureSource featureSource = datastore.getFeatureSource(entry.getLayerId());
-                    layer = new Layer(entry, featureSource);
+                    layer = new FeatureLayer(entry, featureSource);
                     project.addLayer(layer);
                 } else {
                     logger.warning("Unknown type: " + entry.getType());

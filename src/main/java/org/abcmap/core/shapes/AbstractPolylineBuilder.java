@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layer.FeatureLayer;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.util.ArrayList;
@@ -12,6 +13,10 @@ import java.util.ArrayList;
  * Abstract tool designed to draw lines or polygon
  */
 public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
+
+    public AbstractPolylineBuilder(FeatureLayer layer) {
+        super(layer);
+    }
 
     protected ArrayList<Coordinate> shapePoints;
 
@@ -40,7 +45,7 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
         Point pointShape = geometryFactory.createPoint(firstPoint);
 
         // store the current feature to change geometries later
-        currentFeature = project.getActiveLayer().addShape(pointShape);
+        currentFeature = getActiveLayer().addShape(pointShape);
 
         applyStyle();
 
@@ -62,7 +67,7 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
         // modify geometry
         currentFeature.setDefaultGeometry(getGeometry());
 
-        currentFeature = project.getActiveLayer().updateFeature(currentFeature);
+        currentFeature = getActiveLayer().updateFeature(currentFeature);
 
         applyStyle();
 
@@ -86,7 +91,7 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
 
         applyStyle();
 
-        currentFeature = project.getActiveLayer().updateFeature(currentFeature);
+        currentFeature = getActiveLayer().updateFeature(currentFeature);
 
         SimpleFeature returnVal = currentFeature;
 
@@ -111,7 +116,7 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
 
         throwIfNotDrawing();
 
-        project.getActiveLayer().removeFeatures(currentFeature);
+        getActiveLayer().removeFeatures(currentFeature);
 
         resetTool();
     }

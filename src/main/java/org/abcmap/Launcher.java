@@ -1,6 +1,7 @@
 package org.abcmap;
 
 
+import com.j256.ormlite.logger.LocalLog;
 import org.abcmap.core.configuration.ConfigurationContainer;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.MainManager;

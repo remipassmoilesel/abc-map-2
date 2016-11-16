@@ -409,7 +409,7 @@ public class GPXParser {
 					 * extensionParsers.iterator(); while(it.hasNext()) {
 					 * IExtensionParser parser = it.next(); Object data =
 					 * parser.parseWaypointExtension(currentNode);
-					 * //.addExtensionData(parser.getId(), data); }
+					 * //.addExtensionData(parser.getLayerId(), data); }
 					 */
 				}
 			}

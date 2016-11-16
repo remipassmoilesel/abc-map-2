@@ -3,6 +3,7 @@ package org.abcmap.core.shapes;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layer.FeatureLayer;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.util.ArrayList;
@@ -12,12 +13,16 @@ import java.util.ArrayList;
  */
 public class PolygonBuilder extends AbstractPolylineBuilder {
 
+    public PolygonBuilder(FeatureLayer layer) {
+        super(layer);
+    }
+
     @Override
     protected Geometry getGeometry() {
 
         // polygon must have at least 4 summit
         // when 2 or 3 summits are available, draw a linestring
-        if(shapePoints.size() < 4){
+        if (shapePoints.size() < 4) {
             return geometryFactory.createLineString(shapePoints.toArray(new Coordinate[shapePoints.size()]));
         }
 
@@ -31,7 +36,7 @@ public class PolygonBuilder extends AbstractPolylineBuilder {
         sc2.addAll(shapePoints);
 
         // if first and last are not the same, add the first point to the list
-        if(first.equals(last) == false){
+        if (first.equals(last) == false) {
             sc2.add(first);
         }
 
@@ -49,7 +54,7 @@ public class PolygonBuilder extends AbstractPolylineBuilder {
         throwIfNotDrawing();
 
         // too less points, cancel drawing
-        if(shapePoints.size() < 4){
+        if (shapePoints.size() < 4) {
             cancelDrawing();
             return null;
         }

@@ -7,7 +7,6 @@ import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
-import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeomUtils;
 import org.junit.Before;
@@ -37,7 +36,7 @@ public class LayerFeaturesTest {
     public void tests() throws IOException {
 
         Project project = MainManager.getProjectManager().getProject();
-        Layer activeLayer = project.getActiveLayer();
+        FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
 
         // add a feature and retrieve it
         SimpleFeature point1 = activeLayer.addShape(geom.createPoint(new Coordinate(25, 58)));

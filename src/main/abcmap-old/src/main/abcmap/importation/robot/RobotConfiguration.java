@@ -149,7 +149,7 @@ public class RobotConfiguration {
 		String[] rslt = new String[predefinedConfigurations.length];
 		for (int i = 0; i < predefinedConfigurations.length; i++) {
 			// TODO: remplacer lorsque ce sera necessaire
-			// rslt[i] = Lng.get(predefinedConfigurations[i].getId());
+			// rslt[i] = Lng.get(predefinedConfigurations[i].getLayerId());
 			rslt[i] = predefinedConfigurations[i].getName();
 		}
 		return rslt;

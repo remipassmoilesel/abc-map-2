@@ -1,5 +1,8 @@
 package org.abcmap.core.project;
 
+/**
+ * Metadata peer names
+ */
 public enum PMConstants {
 
     /**

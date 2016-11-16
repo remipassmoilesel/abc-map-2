@@ -2,20 +2,9 @@ package org.abcmap.core.styles;
 
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.layer.Layer;
-import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
-import org.abcmap.core.utils.FeatureUtils;
-import org.geotools.filter.identity.FeatureIdImpl;
-import org.geotools.styling.*;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.filter.Filter;
-import org.opengis.filter.FilterFactory;
-import org.opengis.filter.Id;
-import org.opengis.filter.identity.Identifier;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Objects;
 
 /**

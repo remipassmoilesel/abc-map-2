@@ -3,10 +3,8 @@ package org.abcmap.core.project;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
-import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
-import org.abcmap.core.project.layer.Layer;
-import org.abcmap.core.project.layer.LayerType;
+import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.junit.BeforeClass;
@@ -15,16 +13,12 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
 
-import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertFalse;
 
 /**
- * Created by remipassmoilesel on 10/11/16.
+ * Test project writer and reader
  */
-
 public class ProjectReaderWriterTest {
 
     private static final GeometryFactory geom = JTSFactoryFinder.getGeometryFactory();
@@ -66,13 +60,13 @@ public class ProjectReaderWriterTest {
             }
 
             // layer index test
-            newProject.addNewLayer("Second layer", true, 1, LayerType.FEATURES);
+            newProject.addNewFeatureLayer("Second layer", true, 1);
 
             LayerIndexDAO lidao = new LayerIndexDAO(newProject.getDatabasePath());
             writer.writeMetadatas(newProject, newProject.getDatabasePath());
-            assertTrue("Layer index test", lidao.readAllEntries().size() == 2);
+            assertTrue("AbstractLayer index test", lidao.readAllEntries().size() == 2);
 
-            Layer l = newProject.getLayers().get(0);
+            FeatureLayer l = (FeatureLayer) newProject.getLayers().get(0);
             for (int i = 0; i < 100; i++) {
                 l.addShape(geom.createPoint(new Coordinate(i, i)));
             }

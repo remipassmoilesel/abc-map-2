@@ -1,10 +1,12 @@
 package org.abcmap.core.managers;
 
+import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.shapes.DrawManagerException;
 import org.abcmap.core.shapes.LineBuilder;
 import org.abcmap.core.shapes.PointBuilder;
 import org.abcmap.core.shapes.PolygonBuilder;
 import org.abcmap.core.styles.StyleContainer;
-import org.abcmap.core.styles.StyleLibrary;
 
 import java.awt.*;
 
@@ -44,8 +46,10 @@ public class DrawManager {
      *
      * @return
      */
-    public LineBuilder getLineBuilder() {
-        LineBuilder builder = new LineBuilder();
+    public LineBuilder getLineBuilder() throws DrawManagerException {
+        FeatureLayer layer = getActiveFeatureLayerOrThrow();
+
+        LineBuilder builder = new LineBuilder(layer);
         builder.setStyle(getActiveStyle());
         return builder;
 
@@ -56,8 +60,10 @@ public class DrawManager {
      *
      * @return
      */
-    public PolygonBuilder getPolygonBuilder() {
-        PolygonBuilder builder = new PolygonBuilder();
+    public PolygonBuilder getPolygonBuilder() throws DrawManagerException {
+        FeatureLayer layer = getActiveFeatureLayerOrThrow();
+
+        PolygonBuilder builder = new PolygonBuilder(layer);
         builder.setStyle(getActiveStyle());
         return builder;
     }
@@ -67,8 +73,10 @@ public class DrawManager {
      *
      * @return
      */
-    public PointBuilder getPointBuilder() {
-        PointBuilder builder = new PointBuilder();
+    public PointBuilder getPointBuilder() throws DrawManagerException {
+        FeatureLayer layer = getActiveFeatureLayerOrThrow();
+
+        PointBuilder builder = new PointBuilder(layer);
         builder.setStyle(getActiveStyle());
         return builder;
     }
@@ -93,4 +101,20 @@ public class DrawManager {
         this.activeBackground = activeBackground;
     }
 
+    /**
+     * Return the current active layer if it is a feature layer, or throw an exception
+     *
+     * @return
+     * @throws DrawManagerException
+     */
+    public FeatureLayer getActiveFeatureLayerOrThrow() throws DrawManagerException {
+
+        AbstractLayer layer = projectMan.getProject().getActiveLayer();
+        if (layer instanceof FeatureLayer == false) {
+            throw new DrawManagerException("Active layer is not a feature layer");
+        }
+
+        return (FeatureLayer) layer;
+
+    }
 }

@@ -7,9 +7,9 @@ import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.project.dao.StyleDAO;
-import org.abcmap.core.project.layer.Layer;
+import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerType;
-import org.abcmap.core.styles.StyleContainer;
 import org.geotools.geopkg.FeatureEntry;
 import org.geotools.geopkg.GeoPackage;
 
@@ -50,7 +50,7 @@ public class ProjectWriter {
         project.initializeGeopackage();
 
         // add the first layer
-        project.addNewLayer("First layer", true, 0, LayerType.FEATURES);
+        project.addNewFeatureLayer("First layer", true, 0);
 
         // set the first layer active
         project.setActiveLayer(0);
@@ -89,11 +89,11 @@ public class ProjectWriter {
         try (Connection connection = geopkg.getDataSource().getConnection()) {
 
             // write layer contents
-            for (Layer layer : project.getLayers()) {
+            for (AbstractLayer layer : project.getLayers()) {
 
                 if (LayerType.FEATURES.equals(layer.getType())) {
                     FeatureEntry fe = new FeatureEntry();
-                    geopkg.add(fe, layer.getFeatureSource(), null);
+                    geopkg.add(fe, ((FeatureLayer) layer).getFeatureSource(), null);
                 } else {
                     logger.warning("Unknown type: " + layer.getType());
                 }

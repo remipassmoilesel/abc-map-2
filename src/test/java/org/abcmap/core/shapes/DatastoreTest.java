@@ -1,9 +1,6 @@
 package org.abcmap.core.shapes;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.Layer;
 import org.junit.Before;
 import org.junit.Test;
 

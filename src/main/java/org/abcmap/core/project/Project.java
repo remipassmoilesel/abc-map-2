@@ -2,7 +2,8 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.project.layer.Layer;
+import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
 import org.abcmap.core.styles.StyleContainer;
@@ -27,7 +28,6 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -53,7 +53,7 @@ public class Project {
     /**
      * Only one layer is alterable at a time, the active layer
      */
-    private Layer activeLayer;
+    private AbstractLayer activeLayer;
 
     /**
      * Final path of the project, where the user want to save it.
@@ -75,7 +75,7 @@ public class Project {
     /**
      * List of layers. Layers wrap Geotools layers.
      */
-    private ArrayList<Layer> layers;
+    private ArrayList<AbstractLayer> layers;
 
     /**
      * Geotools map content used to render and display map
@@ -184,7 +184,7 @@ public class Project {
      *
      * @return
      */
-    public ArrayList<Layer> getLayers() {
+    public ArrayList<AbstractLayer> getLayers() {
         return layers;
     }
 
@@ -194,9 +194,8 @@ public class Project {
      * @param name
      * @param visible
      * @param zindex
-     * @param type
      */
-    public Layer addNewLayer(String name, boolean visible, int zindex, LayerType type) {
+    public AbstractLayer addNewFeatureLayer(String name, boolean visible, int zindex) {
 
         // create a new feature source
         String layerid = LayerIndexEntry.generateId();
@@ -209,7 +208,7 @@ public class Project {
         }
 
         // create a layer wrapper and store it
-        Layer layer = new Layer(layerid, name, visible, zindex, type, source);
+        AbstractLayer layer = new FeatureLayer(layerid, name, visible, zindex, source);
         return addLayer(layer);
     }
 
@@ -243,16 +242,27 @@ public class Project {
      * @param layer
      * @return
      */
-    protected Layer addLayer(Layer layer) {
+    protected AbstractLayer addLayer(AbstractLayer layer) {
         layers.add(layer);
         mainMapContent.addLayer(layer.getInternalLayer());
         return layer;
     }
 
+    /**
+     * Set the project coordinate reference system
+     * // TODO: generalize to layers ?
+     *
+     * @param crs
+     */
     public void setCrs(CoordinateReferenceSystem crs) {
         this.crs = crs;
     }
 
+    /**
+     * Return the coordinate reference system of project
+     *
+     * @return
+     */
     public CoordinateReferenceSystem getCrs() {
         return crs;
     }
@@ -336,7 +346,7 @@ public class Project {
      *
      * @param activeLayer
      */
-    public void setActiveLayer(Layer activeLayer) {
+    public void setActiveLayer(AbstractLayer activeLayer) {
         this.activeLayer = activeLayer;
     }
 
@@ -345,7 +355,7 @@ public class Project {
      *
      * @return
      */
-    public Layer getActiveLayer() {
+    public AbstractLayer getActiveLayer() {
         return activeLayer;
     }
 
@@ -373,7 +383,7 @@ public class Project {
      */
     protected ArrayList<LayerIndexEntry> getLayerIndexEntries() {
         ArrayList<LayerIndexEntry> indexes = new ArrayList<>();
-        for (Layer layer : getLayers()) {
+        for (AbstractLayer layer : getLayers()) {
             indexes.add(layer.getIndexEntry());
         }
         return indexes;

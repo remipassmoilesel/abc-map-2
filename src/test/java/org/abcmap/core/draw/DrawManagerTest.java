@@ -8,6 +8,8 @@ import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.StyleDAO;
+import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.shapes.DrawManagerException;
 import org.abcmap.core.shapes.LineBuilder;
 import org.abcmap.core.shapes.PointBuilder;
 import org.abcmap.core.shapes.PolygonBuilder;
@@ -31,10 +33,11 @@ public class DrawManagerTest {
     }
 
     @Test
-    public void tests() throws DAOException {
+    public void tests() throws DAOException, DrawManagerException {
 
         DrawManager dm = MainManager.getDrawManager();
         ProjectManager pm = MainManager.getProjectManager();
+        FeatureLayer activeLayer = (FeatureLayer) pm.getProject().getActiveLayer();
 
         int pointNumber = 20;
         int lineNumber = 20;
@@ -77,7 +80,7 @@ public class DrawManagerTest {
 
 
         final int[] shapeCount = {0};
-        pm.getProject().getActiveLayer().executeVisit((SimpleFeature f) -> {
+        activeLayer.executeVisit((SimpleFeature f) -> {
 
             // test style id
             String sid = FeatureUtils.getStyleId(f);

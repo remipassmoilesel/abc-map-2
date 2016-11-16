@@ -3,6 +3,7 @@ package org.abcmap.core.shapes;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeomUtils;
@@ -17,6 +18,7 @@ import org.opengis.feature.simple.SimpleFeature;
  */
 public abstract class AbstractShapeBuilder {
 
+    protected final FeatureLayer activeLayer;
     protected GeometryFactory geometryFactory = GeomUtils.getGeometryFactory();
     protected final Project project;
 
@@ -30,9 +32,11 @@ public abstract class AbstractShapeBuilder {
      */
     protected SimpleFeature currentFeature;
 
-    public AbstractShapeBuilder() {
+    public AbstractShapeBuilder(FeatureLayer layer)  {
+
         this.project = MainManager.getProjectManager().getProject();
         this.style = null;
+        this.activeLayer = (FeatureLayer) project.getActiveLayer();
     }
 
     /**
@@ -60,7 +64,7 @@ public abstract class AbstractShapeBuilder {
 
         if (style != null) {
             FeatureUtils.applyStyle(style, currentFeature);
-            currentFeature = project.getActiveLayer().updateFeature(currentFeature);
+            currentFeature = getActiveLayer().updateFeature(currentFeature);
         }
     }
 
@@ -77,7 +81,7 @@ public abstract class AbstractShapeBuilder {
      */
     protected void throwIfNotDrawing() {
         if (isDrawing() == false) {
-            throw new DrawingException("Cannot perform this operation while not drawing");
+            throw new ShapeBuilderException("Cannot perform this operation while not drawing");
         }
     }
 
@@ -86,8 +90,16 @@ public abstract class AbstractShapeBuilder {
      */
     protected void throwIfDrawing() {
         if (isDrawing() == true) {
-            throw new DrawingException("Cannot perform this operation while drawing");
+            throw new ShapeBuilderException("Cannot perform this operation while drawing");
         }
     }
 
+    /**
+     * Return the active feature layer where tool is supposed to draw
+     *
+     * @return
+     */
+    protected FeatureLayer getActiveLayer() {
+        return activeLayer;
+    }
 }

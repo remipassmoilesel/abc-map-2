@@ -49,7 +49,7 @@ public class LayerIndexDAOTest {
         // create layer index entries
         ArrayList<LayerIndexEntry> written = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            LayerIndexEntry lie = new LayerIndexEntry(null, "Layer " + i, true, i, LayerType.FEATURES);
+            LayerIndexEntry lie = new LayerIndexEntry(null, "AbstractLayer " + i, true, i, LayerType.FEATURES);
             written.add(lie);
             dao.create(lie);
         }

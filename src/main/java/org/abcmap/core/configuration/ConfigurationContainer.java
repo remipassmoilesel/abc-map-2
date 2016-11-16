@@ -51,7 +51,7 @@ public class ConfigurationContainer implements Serializable {
     public Integer WINDOW_HIDDING_DELAY = 700;
 
     /**
-     * Number of points necessary for assembling images,
+     * Number of shapePoints necessary for assembling images,
      */
     public Integer IMPORT_MATCHING_POINTS_THRESHOLD = 20;
 

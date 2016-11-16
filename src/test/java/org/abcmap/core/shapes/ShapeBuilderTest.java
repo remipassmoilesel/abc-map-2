@@ -3,11 +3,11 @@ package org.abcmap.core.shapes;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import jj2000.j2k.codestream.CoordInfo;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.Layer;
+import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeomUtils;
 import org.junit.Before;
@@ -17,7 +17,6 @@ import org.opengis.filter.FilterFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -38,10 +37,10 @@ public class ShapeBuilderTest {
     public void tests() throws IOException {
 
         Project project = MainManager.getProjectManager().getProject();
-        Layer activeLayer = project.getActiveLayer();
+        FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
 
         // test point building
-        PointBuilder pointB = new PointBuilder();
+        PointBuilder pointB = new PointBuilder(activeLayer);
 
         for (int i = 100; i < 120; i++) {
             SimpleFeature pt = pointB.addPoint(new Coordinate(i, i));
@@ -60,7 +59,7 @@ public class ShapeBuilderTest {
         }
 
         // test line building
-        LineBuilder lineB = new LineBuilder();
+        LineBuilder lineB = new LineBuilder(activeLayer);
         for (int i = 150; i < 170; i++) {
 
             ArrayList<Coordinate> points = new ArrayList<>();
@@ -89,7 +88,7 @@ public class ShapeBuilderTest {
         }
 
         // test polygon building
-        PolygonBuilder polyB = new PolygonBuilder();
+        PolygonBuilder polyB = new PolygonBuilder(activeLayer);
         for (int i = 170; i < 200; i++) {
 
             ArrayList<Coordinate> points = new ArrayList<>();
