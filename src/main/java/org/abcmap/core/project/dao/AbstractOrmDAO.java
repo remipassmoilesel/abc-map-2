@@ -17,6 +17,8 @@ import java.sql.SQLException;
  */
 public abstract class AbstractOrmDAO {
 
+    public static final String TABLE_PREFIX = "abcmap_";
+
     protected final CustomLogger logger = LogManager.getLogger(AbstractOrmDAO.class);
     protected final JdbcPooledConnectionSource connectionSource;
     protected final Dao dao;
@@ -119,6 +121,46 @@ public abstract class AbstractOrmDAO {
     }
 
     /**
+     * etrieve an id by its id
+     *
+     * @param e
+     */
+    public Object readById(Object e) throws DAOException {
+        try {
+            return dao.queryForId(e);
+        } catch (SQLException e1) {
+            throw new DAOException(e1);
+        }
+    }
+
+    /**
+     * Return number of row in table
+     *
+     * @return
+     * @throws DAOException
+     */
+    public long getRowCount() throws DAOException {
+        try {
+            return dao.countOf();
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
+    }
+
+    /**
+     * Delete all entries from package
+     *
+     * @throws DAOException
+     */
+    public void deleteAll() throws DAOException {
+        try {
+            dao.deleteBuilder().delete();
+        } catch (SQLException e) {
+            throw new DAOException(e);
+        }
+    }
+
+    /**
      * Close resource if needed
      *
      * @throws Throwable
@@ -127,7 +169,10 @@ public abstract class AbstractOrmDAO {
     protected void finalize() throws Throwable {
         super.finalize();
         if (connectionSource != null) {
+            logger.warning("Database connection was not closed: " + this + " / " + connectionSource);
             connectionSource.close();
         }
     }
+
+
 }

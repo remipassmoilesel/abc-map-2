@@ -33,44 +33,43 @@ public class LayerIndexDAOTest {
     @Test
     public void tests() throws IOException, DAOException, SQLException {
 
-        Path tempfolder = TestUtils.PLAYGROUND_DIRECTORY.resolve("layerIndexTest");
+        Path tempfolder = TestUtils.PLAYGROUND_DIRECTORY.resolve("layerIndexPersistenceTest");
         Files.createDirectories(tempfolder);
 
         Path db = tempfolder.resolve("layer_index.db");
-
-        // create layer index entries
-        ArrayList<LayerIndexEntry> list = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            list.add(new LayerIndexEntry(null, "Layer " + i, true, i, LayerType.FEATURES));
-        }
-
-        assertTrue("Creation test", list.equals(list));
 
         // clean previous db if necessary
         if(Files.exists(db)){
             Files.delete(db);
         }
 
-        // open connection to db
-        Map params = new HashMap();
-        params.put("dbtype", "geopkg");
-        params.put("database", db.toString());
-
-        JDBCDataStore datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
-        Connection connection = datastore.getConnection(Transaction.AUTO_COMMIT);
-
         // scheme creation test
-        LayerIndexDAO dao = new LayerIndexDAO(connection);
+        LayerIndexDAO dao = new LayerIndexDAO(db);
 
-        // writing test
-        dao.writeLayerIndex(list);
+        // create layer index entries
+        ArrayList<LayerIndexEntry> written = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            LayerIndexEntry lie = new LayerIndexEntry(null, "Layer " + i, true, i, LayerType.FEATURES);
+            written.add(lie);
+            dao.create(lie);
+        }
+
+        assertTrue("Basic equality test", written.equals(written));
 
         // reading test
-        ArrayList<LayerIndexEntry> readList = dao.readLayerIndex();
-        assertTrue("Reading test", readList.equals(list));
+        ArrayList<LayerIndexEntry> readList = new ArrayList<>();
+        dao.visit((Object o)->{
+            LayerIndexEntry lie = (LayerIndexEntry) o;
+            readList.add(lie);
+            return true;
+        });
 
-        connection.close();
-        datastore.dispose();
+        assertTrue("Reading test", readList.equals(written));
+
+        dao.deleteAll();
+
+        assertTrue("Delete test", dao.readAllEntries().size() == 0);
+
     }
 
 }

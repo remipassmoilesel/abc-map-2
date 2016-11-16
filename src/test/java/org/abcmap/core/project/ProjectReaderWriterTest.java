@@ -62,16 +62,10 @@ public class ProjectReaderWriterTest {
 
             // layer index test
             newProject.addNewLayer("Second layer", true, 1, LayerType.FEATURES);
-            newProject.executeWithDatabaseConnection((connection) -> {
-                LayerIndexDAO dao = null;
-                try {
-                    dao = new LayerIndexDAO(connection);
-                    assertTrue("Layer index test", dao.readLayerIndex().size() == 2);
-                } catch (DAOException e) {
-                    e.printStackTrace();
-                }
-                return null;
-            });
+
+            LayerIndexDAO lidao = new LayerIndexDAO(newProject.getDatabasePath());
+            writer.writeMetadatas(newProject, newProject.getDatabasePath());
+            assertTrue("Layer index test", lidao.readAllEntries().size() == 2);
 
             Layer l = newProject.getLayers().get(0);
             for (int i = 0; i < 100; i++) {

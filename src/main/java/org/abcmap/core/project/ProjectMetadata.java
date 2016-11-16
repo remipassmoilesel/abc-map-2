@@ -5,6 +5,7 @@ import org.abcmap.core.utils.Utils;
 import java.awt.*;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 
 /**
@@ -15,6 +16,7 @@ public class ProjectMetadata {
     private HashMap<PMConstants, String> metadataList;
 
     public ProjectMetadata() {
+
         metadataList = new HashMap<>();
 
         // default metadataList
@@ -29,41 +31,40 @@ public class ProjectMetadata {
 
     }
 
-    public HashMap<PMConstants, String> getMetadata() {
-        return metadataList;
-    }
-
-    public void setMetadataList(HashMap<PMConstants, String> metadataList) {
-        this.metadataList = metadataList;
-    }
-
+    /**
+     * Update a single value
+     *
+     * @param name
+     * @param value
+     */
     public void updateValue(PMConstants name, String value) {
         metadataList.put(name, value);
     }
 
+    /**
+     * Get the corresponding metadata
+     *
+     * @param name
+     * @return
+     */
     public String getValue(PMConstants name) {
         return metadataList.get(name);
+    }
+
+    public HashMap<PMConstants, String> getAllValues() {
+        return metadataList;
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ProjectMetadata that = (ProjectMetadata) o;
-
-        return metadataList != null ? metadataList.equals(that.metadataList) : that.metadataList == null;
+        return Objects.equals(metadataList, that.metadataList);
     }
 
     @Override
     public int hashCode() {
-        return metadataList != null ? metadataList.hashCode() : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "ProjectMetadata{" +
-                "metadataList=" + metadataList +
-                '}';
+        return Objects.hash(metadataList);
     }
 }

@@ -29,7 +29,7 @@ public class ProjectMetadataDAOTest {
     @Test
     public void tests() throws IOException, DAOException, SQLException {
 
-        Path tempfolder = TestUtils.PLAYGROUND_DIRECTORY.resolve("layerIndexTest");
+        Path tempfolder = TestUtils.PLAYGROUND_DIRECTORY.resolve("metadatasPersistenceTest");
         Files.createDirectories(tempfolder);
 
         Path db = tempfolder.resolve("metadatas.db");
@@ -45,16 +45,8 @@ public class ProjectMetadataDAOTest {
         assertTrue("Equality test", originalMtd.equals(originalMtd));
         assertTrue("Constant name test", PMConstants.safeValueOf("SOMETHING_NEVER_FOUND_#######") == null);
 
-        // open connection to db
-        Map params = new HashMap();
-        params.put("dbtype", "geopkg");
-        params.put("database", db.toString());
-
-        JDBCDataStore datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
-        Connection connection = datastore.getConnection(Transaction.AUTO_COMMIT);
-
         // creation test
-        ProjectMetadataDAO dao = new ProjectMetadataDAO(connection);
+        ProjectMetadataDAO dao = new ProjectMetadataDAO(db);
 
         // writing test
         dao.writeMetadata(originalMtd);
@@ -67,9 +59,6 @@ public class ProjectMetadataDAOTest {
         //System.out.println(originalMtd.getValue(PMConstants.CREATED));
 
         assertTrue("Reading test", readMtd.equals(originalMtd));
-
-        connection.close();
-        datastore.dispose();
 
     }
 

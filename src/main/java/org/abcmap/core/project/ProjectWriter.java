@@ -80,15 +80,14 @@ public class ProjectWriter {
         GeoPackage geopkg = new GeoPackage(destination.toFile());
         geopkg.init();
 
+        try {
+            writeMetadatas(project, destination);
+        } catch (DAOException e) {
+            throw new IOException(e);
+        }
+
         // get database connection
         try (Connection connection = geopkg.getDataSource().getConnection()) {
-
-            // write metadata
-            ProjectMetadataDAO mtdao = new ProjectMetadataDAO(connection);
-            mtdao.writeMetadata(project.getMetadataContainer());
-
-            // write layer indexes
-            writeLayerIndex(connection, project);
 
             // write layer contents
             for (Layer layer : project.getLayers()) {
@@ -109,13 +108,23 @@ public class ProjectWriter {
 
     }
 
-    public static void writeLayerIndex(Connection connection, Project project) throws IOException {
-        try {
-            LayerIndexDAO dao = new LayerIndexDAO(connection);
-            dao.writeLayerIndex(project.getLayerIndexEntries());
-        } catch (DAOException e) {
-            throw new IOException(e);
-        }
+    /**
+     * Write metadatas and layer index to specified destination
+     *
+     * @param project
+     * @param destination
+     * @throws DAOException
+     */
+    public static void writeMetadatas(Project project, Path destination) throws DAOException {
+
+        // write metadata
+        ProjectMetadataDAO mtdao = new ProjectMetadataDAO(destination);
+        mtdao.writeMetadata(project.getMetadataContainer());
+
+        // write layer indexes
+        LayerIndexDAO lidao = new LayerIndexDAO(destination);
+        lidao.writeAllEntries(project.getLayerIndexEntries());
+
     }
 
 }

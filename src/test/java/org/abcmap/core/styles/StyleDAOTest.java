@@ -60,6 +60,8 @@ public class StyleDAOTest {
 
         }
 
+        assertTrue("Basic equality test", written.equals(written));
+
         ArrayList<StyleContainer> read = new ArrayList<>();
 
         dao.visit((Object o) -> {

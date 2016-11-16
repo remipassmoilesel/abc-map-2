@@ -2,23 +2,21 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.project.layer.Layer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
 import org.geotools.data.DataStoreFinder;
-import org.geotools.data.Transaction;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.jdbc.JDBCDataStore;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Read a project and store information
@@ -40,25 +38,25 @@ public class ProjectReader {
     public Project read(Path tempfolder, Path projectFile) throws IOException {
 
         // copy file in temp directory
-        Path tempProject = tempfolder.resolve(ProjectWriter.TEMPORARY_NAME);
-        Files.copy(projectFile, tempProject);
+        Path newTempDatabase = tempfolder.resolve(ProjectWriter.TEMPORARY_NAME);
+        Files.copy(projectFile, newTempDatabase);
 
         // create project
-        Project project = new Project(tempProject);
+        Project project = new Project(newTempDatabase);
         project.initializeGeopackage();
 
         // get database connection with project
         Map<String, String> params = new HashMap();
         params.put("dbtype", "geopkg");
-        params.put("database", tempProject.toString());
+        params.put("database", newTempDatabase.toString());
 
         JDBCDataStore datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
 
-        try (Connection connection = datastore.getConnection(Transaction.AUTO_COMMIT)) {
+        try {
 
             // get layer index
-            LayerIndexDAO lidao = new LayerIndexDAO(connection);
-            ArrayList<LayerIndexEntry> indexes = lidao.readLayerIndex();
+            LayerIndexDAO lidao = new LayerIndexDAO(newTempDatabase);
+            ArrayList<LayerIndexEntry> indexes = lidao.readAllEntries();
 
             // create layers
             for (LayerIndexEntry entry : indexes) {
@@ -82,15 +80,11 @@ public class ProjectReader {
             //TODO read layouts
 
             // get metadata
-            ProjectMetadataDAO mtdao = new ProjectMetadataDAO(connection);
-            ProjectMetadata readedMtd = mtdao.readMetadata();
+            ProjectMetadataDAO mtdao = new ProjectMetadataDAO(projectFile);
+            project.setMetadataContainer(mtdao.readMetadata());
 
-            project.setMetadataContainer(readedMtd);
-
-        } catch (SQLException | IOException | DAOException e) {
-            throw new IOException("Error while reading file", e);
-        } finally {
-            datastore.dispose();
+        } catch (Exception e) {
+            throw new IOException("Error while reading project", e);
         }
 
         return project;

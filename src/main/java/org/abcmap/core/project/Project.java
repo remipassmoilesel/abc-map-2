@@ -236,18 +236,9 @@ public class Project {
      * @return
      */
     protected Layer addLayer(Layer layer) {
-
         layers.add(layer);
         mainMapContent.addLayer(layer.getInternalLayer());
-
-        return (Layer) executeWithDatabaseConnection((connection) -> {
-            try {
-                ProjectWriter.writeLayerIndex(connection, this);
-                return layer;
-            } catch (IOException e) {
-                return null;
-            }
-        });
+        return layer;
     }
 
     public void setCrs(CoordinateReferenceSystem crs) {
@@ -264,7 +255,7 @@ public class Project {
      * @return
      */
     public String getBackgroundColor() {
-        return metadataContainer.getMetadata().get(PMConstants.BG_COLOR);
+        return metadataContainer.getValue(PMConstants.BG_COLOR);
     }
 
     @Override
@@ -294,42 +285,6 @@ public class Project {
 
         geopkg.close();
         geopkg = null;
-    }
-
-
-    /**
-     * Data used: layers, metadataContainer, finalpath, crs
-     *
-     * @param o
-     * @return
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Project project = (Project) o;
-
-        if (finalPath != null ? !finalPath.equals(project.finalPath) : project.finalPath != null) return false;
-        if (layers != null ? !layers.equals(project.layers) : project.layers != null) return false;
-        if (metadataContainer != null ? !metadataContainer.equals(project.metadataContainer) : project.metadataContainer != null)
-            return false;
-        return crs != null ? crs.equals(project.crs) : project.crs == null;
-
-    }
-
-    /**
-     * Data used: layers, metadataContainer, finalpath, crs
-     *
-     * @return
-     */
-    @Override
-    public int hashCode() {
-        int result = finalPath != null ? finalPath.hashCode() : 0;
-        result = 31 * result + (layers != null ? layers.hashCode() : 0);
-        result = 31 * result + (metadataContainer != null ? metadataContainer.hashCode() : 0);
-        result = 31 * result + (crs != null ? crs.hashCode() : 0);
-        return result;
     }
 
     /**
@@ -388,7 +343,7 @@ public class Project {
 
     /**
      * Execute an operation with database connection
-     *
+     * <p>
      * Execute an operation here avoid to have too many connections outside, maybe unclosed
      *
      * @return
@@ -408,12 +363,47 @@ public class Project {
      *
      * @return
      */
-    protected List<LayerIndexEntry> getLayerIndexEntries() {
-        ArrayList<LayerIndexEntry> indexes = new ArrayList<LayerIndexEntry>();
+    protected ArrayList<LayerIndexEntry> getLayerIndexEntries() {
+        ArrayList<LayerIndexEntry> indexes = new ArrayList<>();
         for (Layer layer : getLayers()) {
             indexes.add(layer.getIndexEntry());
         }
         return indexes;
+    }
+
+    /**
+     * Data used: layers, metadataContainer, finalpath, crs
+     *
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Project project = (Project) o;
+
+        if (finalPath != null ? !finalPath.equals(project.finalPath) : project.finalPath != null) return false;
+        if (layers != null ? !layers.equals(project.layers) : project.layers != null) return false;
+        if (metadataContainer != null ? !metadataContainer.equals(project.metadataContainer) : project.metadataContainer != null)
+            return false;
+        return crs != null ? crs.equals(project.crs) : project.crs == null;
+
+    }
+
+    /**
+     * Data used: layers, metadataContainer, finalpath, crs
+     *
+     * @return
+     */
+    @Override
+    public int hashCode() {
+        int result = finalPath != null ? finalPath.hashCode() : 0;
+        result = 31 * result + (layers != null ? layers.hashCode() : 0);
+        result = 31 * result + (metadataContainer != null ? metadataContainer.hashCode() : 0);
+        result = 31 * result + (crs != null ? crs.hashCode() : 0);
+        return result;
     }
 
 }

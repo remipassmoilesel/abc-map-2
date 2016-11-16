@@ -1,15 +1,40 @@
 package org.abcmap.core.project.layer;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+import org.abcmap.core.project.dao.AbstractOrmDAO;
+import org.abcmap.core.project.dao.DataModel;
+
 /**
  * Object that represent layer metadata. They are stored separately in database.
  */
-public class LayerIndexEntry {
 
-    private LayerType type;
+@DatabaseTable(tableName = AbstractOrmDAO.TABLE_PREFIX + "styles")
+public class LayerIndexEntry implements DataModel{
+
+    private static final String ID_FIELD_NAME = "id";
+    private static final String TYPE_FIELD_NAME = "type";
+    private static final String NAME_FIELD_NAME = "name";
+    private static final String VISIBLE_FIELD_NAME = "visible";
+    private static final String ZINDEX_FIELD_NAME = "zindex";
+
+    @DatabaseField(id = true, columnName = ID_FIELD_NAME)
     private String layerId;
+
+    @DatabaseField(columnName = TYPE_FIELD_NAME)
+    private LayerType type;
+
+    @DatabaseField(columnName = NAME_FIELD_NAME)
     private String name;
+
+    @DatabaseField(columnName = VISIBLE_FIELD_NAME)
     private boolean visible;
+
+    @DatabaseField(columnName = ZINDEX_FIELD_NAME)
     private int zindex;
+
+    public LayerIndexEntry() {
+    }
 
     public LayerIndexEntry(String layerId, String name, boolean visible, int zindex, LayerType type) {
         if (layerId == null) {
