@@ -1,36 +1,24 @@
 package org.abcmap.core.project;
 
-import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.layer.*;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.utils.CRSUtils;
-import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
-import org.abcmap.core.utils.SqliteUtils;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.FeatureSource;
+import org.abcmap.core.utils.SQLiteUtils;
 import org.geotools.data.Transaction;
-import org.geotools.data.store.ContentFeatureSource;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.geopkg.*;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.MapContent;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -134,7 +122,7 @@ public class Project {
 
         this.geopkg = new GeoPackage(databasePath.toFile());
 
-        this.datastore = SqliteUtils.getDatastoreFromGeopackage(databasePath);
+        this.datastore = SQLiteUtils.getDatastoreFromGeopackage(databasePath);
 
     }
 

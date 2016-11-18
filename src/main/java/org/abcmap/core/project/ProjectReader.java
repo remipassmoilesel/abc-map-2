@@ -5,21 +5,16 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.project.dao.StyleDAO;
-import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
-import org.abcmap.core.utils.SqliteUtils;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.store.ContentFeatureSource;
+import org.abcmap.core.utils.SQLiteUtils;
 import org.geotools.jdbc.JDBCDataStore;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Read a project and store information
@@ -49,7 +44,7 @@ public class ProjectReader {
         project.initializeGeopackage();
 
         // get database connection with project
-        JDBCDataStore datastore = SqliteUtils.getDatastoreFromGeopackage(newTempDatabase);
+        JDBCDataStore datastore = SQLiteUtils.getDatastoreFromGeopackage(newTempDatabase);
 
         try {
 

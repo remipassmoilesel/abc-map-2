@@ -17,6 +17,7 @@ import java.util.Random;
 public class TestUtils {
 
     public static final Path PLAYGROUND_DIRECTORY = Paths.get("tests-playground");
+    public static final Path RESOURCES_DIRECTORY = Paths.get("src/test/resources");
     private static final Color[] randomColors = new Color[]{
             Color.red,
             Color.blue,

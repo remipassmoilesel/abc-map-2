@@ -1,20 +1,10 @@
 package org.abcmap.core.project.dao;
 
-import com.j256.ormlite.stmt.DeleteBuilder;
-import com.j256.ormlite.stmt.PreparedDelete;
-import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.layer.LayerIndexEntry;
-import org.abcmap.core.project.layer.LayerType;
-import org.abcmap.core.utils.SqliteUtils;
 
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 
 /**

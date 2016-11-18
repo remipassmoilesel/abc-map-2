@@ -21,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Test for add, find, retrieve features and geometries
  */
-public class LayerFeaturesTest {
+public class FeatureLayerFeaturesTest {
 
 
     private static FilterFactory ff = FeatureUtils.getFilterFactory();

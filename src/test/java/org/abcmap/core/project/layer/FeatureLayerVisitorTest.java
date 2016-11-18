@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Simple feature visitor
  */
-public class LayerVisitorTest {
+public class FeatureLayerVisitorTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {

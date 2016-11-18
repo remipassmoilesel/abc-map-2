@@ -36,7 +36,7 @@ public class ProjectReaderWriterTest {
 
             // clean previous directories
             if (Files.isDirectory(tempDirectory)) {
-                Utils.deleteRecursively(tempDirectory.toFile());
+                Utils.deleteDirectories(tempDirectory.toFile());
             }
             Files.createDirectories(tempDirectory);
 
