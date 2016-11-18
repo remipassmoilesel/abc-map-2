@@ -2,7 +2,7 @@ package org.abcmap.core.styles;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
-import org.abcmap.core.project.dao.AbstractOrmDAO;
+import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.project.dao.DataModel;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
@@ -17,8 +17,11 @@ import java.util.Objects;
 
 /**
  * Persistent style
+ *
+ * // TODO add style to main style
+ *
  */
-@DatabaseTable(tableName = AbstractOrmDAO.TABLE_PREFIX + "styles")
+@DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "styles")
 public class StyleContainer implements DataModel {
 
     private final static StyleFactory sf = FeatureUtils.getStyleFactory();

@@ -1,15 +1,21 @@
 package org.abcmap.core.utils;
 
+import org.geotools.data.DataStoreFinder;
+import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.sql.SqlUtil;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by remipassmoilesel on 08/11/16.
  */
-public class SqliteUtils {
+public class SQLiteUtils {
 
     /**
      * Get informations about tables
@@ -78,6 +84,7 @@ public class SqliteUtils {
 
     /**
      * Run a SQL script available in classpath
+     *
      * @param name
      * @param connection
      * @throws SQLException
@@ -88,6 +95,22 @@ public class SqliteUtils {
             throw new IllegalArgumentException("Unable to find resource: " + name);
         }
         SqlUtil.runScript(script, connection);
+    }
+
+    /**
+     * Return a JDBC datastore from a geopackage
+     *
+     * @param geopackage
+     * @return
+     * @throws IOException
+     */
+    public static JDBCDataStore getDatastoreFromGeopackage(Path geopackage) throws IOException {
+
+        Map<String, String> params = new HashMap();
+        params.put("dbtype", "geopkg");
+        params.put("database", geopackage.toString());
+
+        return (JDBCDataStore) DataStoreFinder.getDataStore(params);
     }
 
 

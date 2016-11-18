@@ -102,6 +102,6 @@ public class TempFilesManager {
      * @throws IOException
      */
     public void deleteTempFile(Path tempPath) throws IOException {
-        Utils.deleteRecursively(tempPath.toFile());
+        Utils.deleteDirectories(tempPath.toFile());
     }
 }

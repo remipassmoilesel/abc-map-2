@@ -3,6 +3,7 @@ package org.abcmap.core.utils;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.gui.utils.GuiUtils;
+import org.apache.commons.io.FileUtils;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -20,6 +21,7 @@ import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.instrument.Instrumentation;
+import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
@@ -354,25 +356,9 @@ public class Utils {
      * @param file
      * @throws IOException
      */
-    public static void deleteRecursively(File file) throws IOException {
-        if (file.isDirectory()) {
-            if (file.list().length == 0) {
-                file.delete();
-            } else {
-                String files[] = file.list();
-                for (String temp : files) {
-                    File fileDelete = new File(file, temp);
-                    deleteRecursively(fileDelete);
-                }
-                if (file.list().length == 0) {
-                    file.delete();
-                }
-            }
-        } else {
-            file.delete();
-        }
+    public static void deleteDirectories(File file) throws IOException {
+        FileUtils.deleteDirectory(file);
     }
-
 
 
     /**
@@ -422,7 +408,7 @@ public class Utils {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] bytes = null;
         try {
-            ImageIO.write(img, "jpg", baos);
+            ImageIO.write(img, "png", baos);
             baos.flush();
             bytes = baos.toByteArray();
         } catch (IOException e) {
