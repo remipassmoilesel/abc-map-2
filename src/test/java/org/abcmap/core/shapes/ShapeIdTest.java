@@ -74,6 +74,7 @@ public class ShapeIdTest {
         Files.createFile(db);
 
         GeoPackage geopkg = new GeoPackage(db.toFile());
+        geopkg.init();
 
         // create a feature type
         String featureId = "feature1";

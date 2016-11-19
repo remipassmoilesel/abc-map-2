@@ -8,7 +8,7 @@ import org.abcmap.core.project.dao.StyleDAO;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
-import org.abcmap.core.utils.SQLiteUtils;
+import org.abcmap.core.utils.SQLUtils;
 import org.geotools.jdbc.JDBCDataStore;
 
 import java.io.IOException;
@@ -44,7 +44,7 @@ public class ProjectReader {
         project.initializeGeopackage();
 
         // get database connection with project
-        JDBCDataStore datastore = SQLiteUtils.getDatastoreFromGeopackage(newTempDatabase);
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromGeopackage(newTempDatabase);
 
         try {
 

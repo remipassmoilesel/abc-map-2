@@ -6,7 +6,8 @@ import org.abcmap.core.project.layer.*;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.utils.CRSUtils;
-import org.abcmap.core.utils.SQLiteUtils;
+import org.abcmap.core.utils.SQLProcessor;
+import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.Transaction;
 import org.geotools.geopkg.*;
 import org.geotools.jdbc.JDBCDataStore;
@@ -122,7 +123,7 @@ public class Project {
 
         this.geopkg = new GeoPackage(databasePath.toFile());
 
-        this.datastore = SQLiteUtils.getDatastoreFromGeopackage(databasePath);
+        this.datastore = SQLUtils.getDatastoreFromGeopackage(databasePath);
 
     }
 
@@ -341,15 +342,19 @@ public class Project {
     /**
      * Execute an operation with database connection
      * <p>
+     * "function" is a transaction block, if an exception is thrown nothing will be committed.
+     * <p>
+     * Be careful when you process long operations, SQLite do not support high concurrency
+     * <p>
      * Execute an operation here avoid to have too many connections outside, maybe unclosed
      *
      * @return
      */
-    public Object executeWithDatabaseConnection(Function<Connection, Object> function) {
-
-        try (Connection connection = datastore.getConnection(Transaction.AUTO_COMMIT)) {
-            return function.apply(connection);
-        } catch (SQLException | IOException e) {
+    public Object executeWithDatabaseConnection(SQLProcessor processor) {
+        try {
+            // sqlutils will process a transaction, not in auto commit mode
+            return SQLUtils.processTransaction(datastore.getConnection(Transaction.AUTO_COMMIT), processor);
+        } catch (Exception e) {
             logger.error(e);
             return null;
         }
@@ -400,6 +405,7 @@ public class Project {
 
     /**
      * Get the base geopackage
+     *
      * @return
      */
     public GeoPackage getGeopkg() {

@@ -3,7 +3,7 @@ package org.abcmap.core.project.layer;
 import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
-import org.abcmap.core.utils.SQLiteUtils;
+import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
@@ -52,7 +52,7 @@ public class FeatureLayer extends AbstractLayer {
             geopkg.create(fe, type);
         }
 
-        JDBCDataStore datastore = SQLiteUtils.getDatastoreFromGeopackage(geopkg.getFile().toPath());
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromGeopackage(geopkg.getFile().toPath());
         this.featureSource = datastore.getFeatureSource(entry.getLayerId());
         this.featureStore = (SimpleFeatureStore) featureSource;
 

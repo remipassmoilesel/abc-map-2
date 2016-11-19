@@ -4,14 +4,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
 import org.abcmap.core.project.tiles.TileCoverageEntry;
 import org.abcmap.core.project.tiles.TileStore;
-import org.abcmap.core.utils.SQLiteUtils;
+import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geopkg.GeoPackage;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
@@ -56,7 +55,7 @@ public class TileStoreTest {
         String coverageName = "coverage1";
         TileCoverageEntry coverageEntry = storage.addCoverage(coverageName);
 
-        ArrayList<String> list = SQLiteUtils.getTableList(storage.getDatabaseConnection());
+        ArrayList<String> list = SQLUtils.getSqliteTableList(storage.getDatabaseConnection());
 
         assertTrue("Storage creation test", list.contains(TileStore.MASTER_TABLE_NAME));
         assertTrue("Coverage creation test 1", list.contains(TileStore.DATA_TABLE_PREFIX + coverageName));

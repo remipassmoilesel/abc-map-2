@@ -2,7 +2,7 @@ package org.abcmap.core.project;
 
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.utils.SQLiteUtils;
+import org.abcmap.core.utils.SQLUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ public class ProjectConnectionTest {
 
         boolean executed = (boolean) project.executeWithDatabaseConnection((connection) -> {
             try {
-                return SQLiteUtils.getTableList(connection).size() > 0;
+                return SQLUtils.getSqliteTableList(connection).size() > 0;
             } catch (SQLException e) {
                 return false;
             }

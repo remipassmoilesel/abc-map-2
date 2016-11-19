@@ -16,7 +16,6 @@ import org.geotools.geopkg.GeoPackage;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
 
 /**
  * Contain methods to write a project
@@ -85,23 +84,17 @@ public class ProjectWriter {
             throw new IOException(e);
         }
 
-        // get database connection
-        try (Connection connection = geopkg.getDataSource().getConnection()) {
+        // write layer contents
+        for (AbstractLayer layer : project.getLayers()) {
 
-            // write layer contents
-            for (AbstractLayer layer : project.getLayers()) {
-
-                if (LayerType.FEATURES.equals(layer.getType())) {
-                    FeatureEntry fe = new FeatureEntry();
-                    geopkg.add(fe, ((FeatureLayer) layer).getFeatureSource(), null);
-                } else {
-                    logger.warning("Unknown type: " + layer.getType());
-                }
+            if (LayerType.FEATURES.equals(layer.getType())) {
+                FeatureEntry fe = new FeatureEntry();
+                geopkg.add(fe, ((FeatureLayer) layer).getFeatureSource(), null);
+            } else {
+                logger.warning("Unknown type: " + layer.getType());
             }
-
-        } catch (Exception e) {
-            throw new IOException("Error while writing project", e);
         }
+
 
         return geopkg;
 

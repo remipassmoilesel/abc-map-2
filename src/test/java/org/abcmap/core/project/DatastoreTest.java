@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeomUtils;
-import org.abcmap.core.utils.SQLiteUtils;
+import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.FeatureStore;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -70,7 +70,7 @@ public class DatastoreTest {
         // get feature store from geopackage
         geopkg.create(fe, type);
 
-        JDBCDataStore datastore = SQLiteUtils.getDatastoreFromGeopackage(geopkg.getFile().toPath());
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromGeopackage(geopkg.getFile().toPath());
         FeatureStore featureStore = (FeatureStore) datastore.getFeatureSource("feature1");
 
         for (int i = 0; i < 100; i++) {
