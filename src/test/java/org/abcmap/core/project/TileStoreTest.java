@@ -76,9 +76,12 @@ public class TileStoreTest {
                 continue;
             }
 
+            // tiles ared added twice
+            ids.add(storage.addTile(coverageName, new Coordinate(x, y), p));
             ids.add(storage.addTile(coverageName, new Coordinate(x, y), p));
 
             x += 500;
+            tileNumber++;
             tileNumber++;
         }
 
@@ -110,8 +113,33 @@ public class TileStoreTest {
             assertTrue("Insert tiles test 3", tileNumber == i);
         }
 
-        boolean deleted = storage.deleteTile(coverageName, ids.get(0));
-        assertTrue("Deletion test", deleted);
+        // delete tiles
+        boolean deleteOne = storage.deleteTile(coverageName, ids.remove(0));
+        assertTrue("Deletion test 1", deleteOne);
+
+        ArrayList<String> toRemove = new ArrayList();
+        int nbrToRemove = 3;
+        int i = 0;
+        while (i < nbrToRemove) {
+            toRemove.add(ids.remove(0));
+            i++;
+        }
+
+        boolean deleteSeveral = storage.deleteTiles(coverageName, toRemove);
+        assertTrue("Deletion test 2", deleteSeveral);
+
+        // move tiles
+        boolean moveOne = storage.moveTile(coverageName, ids.get(0), 2000d, 2000d);
+        assertTrue("Move tile test 1", moveOne);
+
+        ArrayList<Object[]> toMove = new ArrayList<>();
+        toMove.add(new Object[]{ids.get(1), 2500d, 2500d});
+        toMove.add(new Object[]{ids.get(2), 2400d, 2400d});
+        toMove.add(new Object[]{ids.get(3), 2300d, 2300d});
+        boolean moveSeveral = storage.moveTiles(coverageName, toMove);
+        assertTrue("Move tile test 2", moveSeveral);
+
+
     }
 
 }

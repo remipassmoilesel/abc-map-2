@@ -15,8 +15,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Store tiles in a database.
@@ -247,10 +246,22 @@ public class TileStore {
         }
     }
 
+    /**
+     * Return the spatial table name associated with coverage
+     *
+     * @param coverageName
+     * @return
+     */
     public static String getSpatialTableName(String coverageName) {
         return SPATIAL_TABLE_PREFIX + coverageName;
     }
 
+    /**
+     * Return the data table name associated with coverage
+     *
+     * @param coverageName
+     * @return
+     */
     public static String getDataTableName(String coverageName) {
         return DATA_TABLE_PREFIX + coverageName;
     }
@@ -350,6 +361,20 @@ public class TileStore {
      * @throws IOException
      */
     public boolean deleteTile(String coverageName, String tileId) throws IOException {
+        ArrayList<String> list = new ArrayList<>();
+        list.add(tileId);
+        return deleteTiles(coverageName, list);
+    }
+
+    /**
+     * Delete specified tiles
+     *
+     * @param coverageName
+     * @param ids
+     * @return
+     * @throws IOException
+     */
+    public boolean deleteTiles(String coverageName, List<String> ids) throws IOException {
 
         if (coverages.containsKey(coverageName) == false) {
             throw new IllegalArgumentException("Unknown coverage: " + coverageName);
@@ -361,30 +386,113 @@ public class TileStore {
         try {
             Object result = SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
 
-                int deleted = 0;
+                int totalDeleted = 0;
 
-                // delete entry from data table
-                PreparedStatement deleteStat = conn.prepareStatement(req1);
-                deleteStat.setString(1, tileId);
+                for (String tileId : ids) {
 
-                deleted += deleteStat.executeUpdate();
-                deleteStat.close();
+                    // delete entry from data table
+                    PreparedStatement deleteStat = conn.prepareStatement(req1);
+                    deleteStat.setString(1, tileId);
 
-                // delete from spatial table
-                deleteStat = conn.prepareStatement(req2);
-                deleteStat.setString(1, tileId);
+                    int deleted = deleteStat.executeUpdate();
+                    deleteStat.close();
 
-                deleted += deleteStat.executeUpdate();
-                deleteStat.close();
+                    // delete from spatial table
+                    deleteStat = conn.prepareStatement(req2);
+                    deleteStat.setString(1, tileId);
+
+                    deleted += deleteStat.executeUpdate();
+                    deleteStat.close();
+
+                    if (deleted > 2) {
+                        throw new IOException("Error while deleting tile, more than two tuples were deleted: " + deleted);
+                    }
+
+                    totalDeleted += deleted;
+                }
 
                 // return true if deletion OK
-                return deleted == 2;
+                return totalDeleted == ids.size() * 2;
             });
 
             return result != null && (boolean) result;
 
         } catch (Exception e) {
             throw new IOException("Error while deleting tile", e);
+        }
+    }
+
+    /**
+     * Move tile to the specified position
+     *
+     * @param coverageName
+     * @param tileId
+     * @param x
+     * @param y
+     * @return
+     * @throws IOException
+     */
+    public boolean moveTile(String coverageName, String tileId, double x, double y) throws IOException {
+        ArrayList<Object[]> toRemove = new ArrayList<Object[]>();
+        toRemove.add(new Object[]{tileId, x, y});
+        return moveTiles(coverageName, toRemove);
+    }
+
+    /**
+     * Move tiles to the specified position
+     * <p>
+     * toRemove[0] -> tileId, toRemove[1] -> Double x, toRemove[2] -> Double y
+     *
+     * @param coverageName
+     * @param toMove
+     * @return
+     * @throws IOException
+     */
+    public boolean moveTiles(String coverageName, List<Object[]> toMove) throws IOException {
+
+        if (coverages.containsKey(coverageName) == false) {
+            throw new IllegalArgumentException("Unknown coverage: " + coverageName);
+        }
+
+        String req1 = "UPDATE " + getSpatialTableName(coverageName) + " SET " + MIN_X_FIELD_NAME + "=?, " + MIN_Y_FIELD_NAME + "=? " +
+                "WHERE " + TILE_ID_FIELD_NAME + "=?;";
+
+        try {
+            Object result = SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
+
+                Iterator<Object[]> it = toMove.iterator();
+                int totalUpdated = 0;
+
+                for (Object[] entry : toMove) {
+
+                    String tileId = (String) entry[0];
+                    Double x = (Double) entry[1];
+                    Double y = (Double) entry[2];
+
+                    // delete entry from data table
+                    PreparedStatement updateStat = conn.prepareStatement(req1);
+                    updateStat.setDouble(1, x);
+                    updateStat.setDouble(2, y);
+                    updateStat.setString(3, tileId);
+
+                    int updated = updateStat.executeUpdate();
+                    updateStat.close();
+
+                    if (updated > 1) {
+                        throw new IOException("Error while moving tile, more than one tuple were updated: " + updated);
+                    }
+
+                    totalUpdated += updated;
+                }
+
+                // return true if update OK
+                return totalUpdated == toMove.size();
+            });
+
+            return result != null && (boolean) result;
+
+        } catch (Exception e) {
+            throw new IOException("Error while moving tile", e);
         }
     }
 
