@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -242,9 +242,17 @@ public class TileStore {
 
                 return null;
             });
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new IOException("Error while initializing tile: ", e);
         }
+    }
+
+    public static String getSpatialTableName(String coverageName) {
+        return SPATIAL_TABLE_PREFIX + coverageName;
+    }
+
+    public static String getDataTableName(String coverageName) {
+        return DATA_TABLE_PREFIX + coverageName;
     }
 
     /**
@@ -261,8 +269,8 @@ public class TileStore {
         }
 
         // generate table names
-        String spatialTableName = SPATIAL_TABLE_PREFIX + coverageName;
-        String dataTableName = DATA_TABLE_PREFIX + coverageName;
+        String spatialTableName = getSpatialTableName(coverageName);
+        String dataTableName = getDataTableName(coverageName);
 
         try {
             String finalCoverageName = coverageName;
@@ -331,6 +339,53 @@ public class TileStore {
         coverages.put(coverageName, entry);
 
         return entry;
+    }
+
+    /**
+     * Delete specified tile from specified coverage. Return true if tile has been deleted corectly.
+     *
+     * @param coverageName
+     * @param tileId
+     * @return
+     * @throws IOException
+     */
+    public boolean deleteTile(String coverageName, String tileId) throws IOException {
+
+        if (coverages.containsKey(coverageName) == false) {
+            throw new IllegalArgumentException("Unknown coverage: " + coverageName);
+        }
+
+        String req1 = "DELETE FROM " + getDataTableName(coverageName) + " WHERE " + TILE_ID_FIELD_NAME + "=?;";
+        String req2 = "DELETE FROM " + getSpatialTableName(coverageName) + " WHERE " + TILE_ID_FIELD_NAME + "=?;";
+
+        try {
+            Object result = SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
+
+                int deleted = 0;
+
+                // delete entry from data table
+                PreparedStatement deleteStat = conn.prepareStatement(req1);
+                deleteStat.setString(1, tileId);
+
+                deleted += deleteStat.executeUpdate();
+                deleteStat.close();
+
+                // delete from spatial table
+                deleteStat = conn.prepareStatement(req2);
+                deleteStat.setString(1, tileId);
+
+                deleted += deleteStat.executeUpdate();
+                deleteStat.close();
+
+                // return true if deletion OK
+                return deleted == 2;
+            });
+
+            return result != null && (boolean) result;
+
+        } catch (Exception e) {
+            throw new IOException("Error while deleting tile", e);
+        }
     }
 
 

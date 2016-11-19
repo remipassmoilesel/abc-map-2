@@ -134,7 +134,7 @@ public class SQLUtils {
      * @param processor
      * @throws SQLException
      */
-    public static Object processTransaction(Connection conn, SQLProcessor processor) throws SQLException {
+    public static Object processTransaction(Connection conn, SQLProcessor processor) throws Exception {
         return processTransaction(conn, processor, true);
     }
 
@@ -147,7 +147,7 @@ public class SQLUtils {
      * @param processor
      * @throws SQLException
      */
-    public static Object processTransaction(Connection conn, SQLProcessor processor, boolean closeConnectionAfter) throws SQLException {
+    public static Object processTransaction(Connection conn, SQLProcessor processor, boolean closeConnectionAfter) throws Exception {
 
         try {
 
@@ -166,7 +166,7 @@ public class SQLUtils {
             // error, cancel transaction
             conn.rollback();
 
-            throw new SQLException("Error while performing transaction: " + e);
+            throw new SQLException("Error while performing transaction: ", e);
 
         } finally {
 

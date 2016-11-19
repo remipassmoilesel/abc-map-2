@@ -110,6 +110,8 @@ public class TileStoreTest {
             assertTrue("Insert tiles test 3", tileNumber == i);
         }
 
+        boolean deleted = storage.deleteTile(coverageName, ids.get(0));
+        assertTrue("Deletion test", deleted);
     }
 
 }
