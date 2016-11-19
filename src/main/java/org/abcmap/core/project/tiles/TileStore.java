@@ -2,6 +2,7 @@ package org.abcmap.core.project.tiles;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.Transaction;
 import org.geotools.jdbc.JDBCDataStore;
@@ -20,7 +21,8 @@ import java.util.Map;
 /**
  * Store tiles in a database.
  * <p>
- * TileStore can store several named coverage.
+ * TileStore can store several named coverage. Why do not use built in Geopackage tile management ? Because
+ * we need to set position of tile with eventual overlap.
  */
 public class TileStore {
 
@@ -94,7 +96,7 @@ public class TileStore {
         // get width and height if necessary
         BufferedImage bimg = ImageIO.read(imagePath.toFile());
 
-        if(bimg == null){
+        if (bimg == null) {
             throw new IllegalStateException("Unsupported image format");
         }
 
@@ -105,41 +107,49 @@ public class TileStore {
 
         String tileId = generateTileId();
 
-        try (Connection conn = getDatabaseConnection()) {
+        Integer finalWidth = width;
+        Integer finalHeight = height;
 
-            // insert image in data table
-            String req = "INSERT INTO " + coverageEntry.getDataTableName() + " ( "
-                    + " " + TILE_ID_FIELD_NAME + ", "
-                    + " " + TILE_DATA_FIELD_NAME + ") "
-                    + " VALUES  (?,?);";
+        try {
+            SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
 
-            //System.out.println(req);
+                // insert image in data table
+                String req = "INSERT INTO " + coverageEntry.getDataTableName() + " ( "
+                        + " " + TILE_ID_FIELD_NAME + ", "
+                        + " " + TILE_DATA_FIELD_NAME + ") "
+                        + " VALUES  (?,?);";
 
-            PreparedStatement imageStat = conn.prepareStatement(req);
-            imageStat.setString(1, tileId);
-            imageStat.setBytes(2, imageToByteArray(bimg));
-            imageStat.execute();
+                //System.out.println(req);
 
-            // insert tuple in spatial table
-            req = "INSERT INTO " + coverageEntry.getSpatialTableName() + " ("
-                    + TILE_ID_FIELD_NAME + ", "
-                    + MIN_X_FIELD_NAME + ", "
-                    + MIN_Y_FIELD_NAME + ", "
-                    + MAX_X_FIELD_NAME + ", "
-                    + MAX_Y_FIELD_NAME + ") "
-                    + " VALUES  (?,?,?,?,?);";
+                PreparedStatement imageStat = conn.prepareStatement(req);
+                imageStat.setString(1, tileId);
+                imageStat.setBytes(2, imageToByteArray(bimg));
+                imageStat.execute();
+                imageStat.close();
 
-            //System.out.println(req);
+                // insert tuple in spatial table
+                req = "INSERT INTO " + coverageEntry.getSpatialTableName() + " ("
+                        + TILE_ID_FIELD_NAME + ", "
+                        + MIN_X_FIELD_NAME + ", "
+                        + MIN_Y_FIELD_NAME + ", "
+                        + MAX_X_FIELD_NAME + ", "
+                        + MAX_Y_FIELD_NAME + ") "
+                        + " VALUES  (?,?,?,?,?);";
 
-            PreparedStatement spatialStat = conn.prepareStatement(req);
-            spatialStat.setString(1, tileId);
-            spatialStat.setDouble(2, position.x);
-            spatialStat.setDouble(3, position.y);
-            spatialStat.setDouble(4, width);
-            spatialStat.setDouble(5, height);
-            spatialStat.execute();
+                //System.out.println(req);
 
-        } catch (SQLException e) {
+                PreparedStatement spatialStat = conn.prepareStatement(req);
+                spatialStat.setString(1, tileId);
+                spatialStat.setDouble(2, position.x);
+                spatialStat.setDouble(3, position.y);
+                spatialStat.setDouble(4, finalWidth);
+                spatialStat.setDouble(5, finalHeight);
+                spatialStat.execute();
+                spatialStat.close();
+
+                return null;
+            });
+        } catch (Exception e) {
             throw new IOException("Error while adding tile: ", e);
         }
 
@@ -207,29 +217,33 @@ public class TileStore {
      */
     public void initialize() throws IOException {
 
-        // create the master table where are stored references to coverages
-        try (Connection conn = getDatabaseConnection()) {
+        try {
+            SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
 
-            String req = "CREATE TABLE " + MASTER_TABLE_NAME + " ("
-                    + COVERAGE_NAME_FIELD_NAME + " VARCHAR(128) NOT NULL, "
-                    + SPATIAL_TABLE_NAME_FIELD_NAME + " VARCHAR(128)  NOT NULL, "
-                    + TILE_TABLE_NAME_FIELD_NAME + " VARCHAR(128)  NOT NULL, "
-                    + RES_X_FIELD_NAME + " DOUBLE, "
-                    + RES_Y_FIELD_NAME + " DOUBLE, "
-                    + MIN_X_FIELD_NAME + " DOUBLE, "
-                    + MIN_Y_FIELD_NAME + " DOUBLE, "
-                    + MAX_X_FIELD_NAME + " DOUBLE, "
-                    + MAX_Y_FIELD_NAME + " DOUBLE, "
-                    + "CONSTRAINT " + MASTER_TABLE_NAME + "_pk PRIMARY KEY("
-                    + COVERAGE_NAME_FIELD_NAME + ", "
-                    + SPATIAL_TABLE_NAME_FIELD_NAME + ", "
-                    + TILE_TABLE_NAME_FIELD_NAME + "));";
+                // create the master table where are stored references to coverages
+                String req = "CREATE TABLE " + MASTER_TABLE_NAME + " ("
+                        + COVERAGE_NAME_FIELD_NAME + " VARCHAR(128) NOT NULL, "
+                        + SPATIAL_TABLE_NAME_FIELD_NAME + " VARCHAR(128)  NOT NULL, "
+                        + TILE_TABLE_NAME_FIELD_NAME + " VARCHAR(128)  NOT NULL, "
+                        + RES_X_FIELD_NAME + " DOUBLE, "
+                        + RES_Y_FIELD_NAME + " DOUBLE, "
+                        + MIN_X_FIELD_NAME + " DOUBLE, "
+                        + MIN_Y_FIELD_NAME + " DOUBLE, "
+                        + MAX_X_FIELD_NAME + " DOUBLE, "
+                        + MAX_Y_FIELD_NAME + " DOUBLE, "
+                        + "CONSTRAINT " + MASTER_TABLE_NAME + "_pk PRIMARY KEY("
+                        + COVERAGE_NAME_FIELD_NAME + ", "
+                        + SPATIAL_TABLE_NAME_FIELD_NAME + ", "
+                        + TILE_TABLE_NAME_FIELD_NAME + "));";
 
-            PreparedStatement masterStat = conn.prepareStatement(req);
-            masterStat.execute();
+                PreparedStatement masterStat = conn.prepareStatement(req);
+                masterStat.execute();
+                masterStat.close();
 
+                return null;
+            });
         } catch (SQLException e) {
-            throw new IOException("Error while creating master table: ", e);
+            throw new IOException("Error while initializing tile: ", e);
         }
     }
 
@@ -250,61 +264,66 @@ public class TileStore {
         String spatialTableName = SPATIAL_TABLE_PREFIX + coverageName;
         String dataTableName = DATA_TABLE_PREFIX + coverageName;
 
-        try (Connection conn = getDatabaseConnection()) {
+        try {
+            String finalCoverageName = coverageName;
+            SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
 
-            // insert a tuple in master table
-            String req = "INSERT INTO " + MASTER_TABLE_NAME + " ("
-                    + COVERAGE_NAME_FIELD_NAME + ", "
-                    + TILE_TABLE_NAME_FIELD_NAME + ", "
-                    + SPATIAL_TABLE_NAME_FIELD_NAME + ") "
-                    + "VALUES (?,?,?);";
+                // insert a tuple in master table
+                String req = "INSERT INTO " + MASTER_TABLE_NAME + " ("
+                        + COVERAGE_NAME_FIELD_NAME + ", "
+                        + TILE_TABLE_NAME_FIELD_NAME + ", "
+                        + SPATIAL_TABLE_NAME_FIELD_NAME + ") "
+                        + "VALUES (?,?,?);";
 
-            //System.out.println(req);
+                //System.out.println(req);
 
-            // insert a tuple in master table
-            PreparedStatement masterEntryStat = conn.prepareStatement(req);
+                // insert a tuple in master table
+                PreparedStatement masterEntryStat = conn.prepareStatement(req);
 
-            masterEntryStat.setString(1, coverageName);
-            masterEntryStat.setString(2, spatialTableName);
-            masterEntryStat.setString(3, dataTableName);
+                masterEntryStat.setString(1, finalCoverageName);
+                masterEntryStat.setString(2, spatialTableName);
+                masterEntryStat.setString(3, dataTableName);
 
-            masterEntryStat.execute();
+                masterEntryStat.execute();
+                masterEntryStat.close();
 
-            // create spatial table
-            req = "CREATE TABLE " + spatialTableName + " ("
-                    + TILE_ID_FIELD_NAME + " VARCHAR(128), "
-                    + MIN_X_FIELD_NAME + " DOUBLE NOT NULL, "
-                    + MIN_Y_FIELD_NAME + " DOUBLE NOT NULL, "
-                    + MAX_X_FIELD_NAME + " DOUBLE NOT NULL, "
-                    + MAX_Y_FIELD_NAME + " DOUBLE NOT NULL, "
-                    + "CONSTRAINT " + spatialTableName + "_pk PRIMARY KEY(" + TILE_ID_FIELD_NAME + "));";
+                // create spatial table
+                req = "CREATE TABLE " + spatialTableName + " ("
+                        + TILE_ID_FIELD_NAME + " VARCHAR(128), "
+                        + MIN_X_FIELD_NAME + " DOUBLE NOT NULL, "
+                        + MIN_Y_FIELD_NAME + " DOUBLE NOT NULL, "
+                        + MAX_X_FIELD_NAME + " DOUBLE NOT NULL, "
+                        + MAX_Y_FIELD_NAME + " DOUBLE NOT NULL, "
+                        + "CONSTRAINT " + spatialTableName + "_pk PRIMARY KEY(" + TILE_ID_FIELD_NAME + "));";
 
-            //System.out.println(req);
+                //System.out.println(req);
 
-            PreparedStatement spatStat = conn.prepareStatement(req);
-            spatStat.execute();
+                PreparedStatement spatStat = conn.prepareStatement(req);
+                spatStat.execute();
+                spatStat.close();
 
-            // create tile data table
-            req = "CREATE TABLE " + dataTableName + " ("
-                    + TILE_ID_FIELD_NAME + " VARCHAR(128), "
-                    + TILE_DATA_FIELD_NAME + " BLOB, "
-                    + "CONSTRAINT " + spatialTableName + "_pk PRIMARY KEY(" + TILE_ID_FIELD_NAME + "));";
+                // create tile data table
+                req = "CREATE TABLE " + dataTableName + " ("
+                        + TILE_ID_FIELD_NAME + " VARCHAR(128), "
+                        + TILE_DATA_FIELD_NAME + " BLOB, "
+                        + "CONSTRAINT " + spatialTableName + "_pk PRIMARY KEY(" + TILE_ID_FIELD_NAME + "));";
 
-            //System.out.println(req);
+                //System.out.println(req);
 
-            PreparedStatement dataStat = conn.prepareStatement(req);
-            dataStat.execute();
+                PreparedStatement dataStat = conn.prepareStatement(req);
+                dataStat.execute();
+                dataStat.close();
 
-            // create an index on tiles
-            req = "CREATE INDEX " + spatialTableName + "_index ON " + spatialTableName + "(" + MIN_X_FIELD_NAME + ", " + MIN_Y_FIELD_NAME + ");";
-            PreparedStatement indexStat = conn.prepareStatement(req);
+                // create an index on tiles
+                req = "CREATE INDEX " + spatialTableName + "_index ON " + spatialTableName + "(" + MIN_X_FIELD_NAME + ", " + MIN_Y_FIELD_NAME + ");";
+                PreparedStatement indexStat = conn.prepareStatement(req);
+                indexStat.execute();
+                indexStat.close();
 
-            //System.out.println(req);
-
-            indexStat.execute();
-
-        } catch (SQLException e) {
-            throw new IOException("Error while creating master table: ", e);
+                return null;
+            });
+        } catch (Exception e) {
+            throw new IOException("Error while adding coverage: ", e);
         }
 
         // store table names
