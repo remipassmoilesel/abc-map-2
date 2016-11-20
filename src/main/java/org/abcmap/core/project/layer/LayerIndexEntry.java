@@ -10,7 +10,7 @@ import org.abcmap.core.project.dao.DataModel;
  */
 
 @DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "layer_index")
-public class LayerIndexEntry implements DataModel{
+public class LayerIndexEntry implements DataModel {
 
     private static final String ID_FIELD_NAME = "id";
     private static final String TYPE_FIELD_NAME = "type";
@@ -37,15 +37,18 @@ public class LayerIndexEntry implements DataModel{
     }
 
     public LayerIndexEntry(String layerId, String name, boolean visible, int zindex, LayerType type) {
-        if (layerId == null) {
-            generateNewIndex();
-        } else {
-            this.layerId = layerId;
-        }
+
         this.name = name;
         this.visible = visible;
         this.zindex = zindex;
         this.type = type;
+
+        if (layerId == null) {
+            generateNewId();
+        } else {
+            this.layerId = layerId;
+        }
+
     }
 
     public LayerType getType() {
@@ -88,12 +91,33 @@ public class LayerIndexEntry implements DataModel{
         this.zindex = zindex;
     }
 
-    public void generateNewIndex() {
-        this.setLayerId(generateId());
+    /**
+     * Generate a new id for this layer entry, associated with its type
+     */
+    public void generateNewId() {
+
+        String prefix = null;
+        if (getType() != null) {
+            prefix = generateId(getType().toString().toLowerCase());
+        }
+
+        this.setLayerId(prefix);
     }
 
-    public static final String generateId() {
-        return "abcmap_layerid_" + System.nanoTime();
+    /**
+     * Generate a unique layer id with an optionnal prefix
+     *
+     * @param prefix
+     * @return
+     */
+    public static final String generateId(String prefix) {
+
+        if (prefix == null) {
+            prefix = "";
+        } else {
+            prefix += "_";
+        }
+        return "abm_layer_" + prefix + System.nanoTime();
     }
 
     @Override
