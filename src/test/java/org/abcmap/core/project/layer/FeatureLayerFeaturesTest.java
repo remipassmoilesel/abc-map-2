@@ -8,7 +8,7 @@ import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
-import org.abcmap.core.utils.GeomUtils;
+import org.abcmap.core.utils.GeoUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
@@ -25,7 +25,7 @@ public class FeatureLayerFeaturesTest {
 
 
     private static FilterFactory ff = FeatureUtils.getFilterFactory();
-    private static GeometryFactory geom = GeomUtils.getGeometryFactory();
+    private static GeometryFactory geom = GeoUtils.getGeometryFactory();
 
     @Before
     public void beforeTest() throws IOException {
@@ -55,7 +55,7 @@ public class FeatureLayerFeaturesTest {
         activeLayer.executeVisit((SimpleFeature f) -> {
 
             if (count[0] == 0) {
-                assertTrue("Update feature test 1", f.getAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME) == null);
+                assertTrue("Update feature test 1", f.getAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals(""));
             } else if (count[0] == 1) {
                 assertTrue("Update feature test 2", f.getAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals("arbitrary_value"));
             }

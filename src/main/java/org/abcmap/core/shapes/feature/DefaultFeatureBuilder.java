@@ -24,8 +24,25 @@ public class DefaultFeatureBuilder {
         builder = new SimpleFeatureBuilder(getDefaultFeatureType(featureName, crs));
     }
 
-    public SimpleFeature build(Geometry geom) {
+    /**
+     * Build a feature with associated geometry
+     *
+     * @param geom
+     * @return
+     */
+    public synchronized SimpleFeature build(Geometry geom) {
+        return build(geom, "");
+    }
+
+    /**
+     * Build a feature with associated geometry and style
+     *
+     * @param geom
+     * @return
+     */
+    public synchronized SimpleFeature build(Geometry geom, String styleId) {
         builder.add(geom);
+        builder.add(styleId);
         return builder.buildFeature(null);
     }
 
