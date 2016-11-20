@@ -6,10 +6,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
-import org.abcmap.core.utils.GeomUtils;
+import org.abcmap.core.utils.GeoUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
@@ -26,7 +25,7 @@ import static junit.framework.TestCase.assertTrue;
 public class ShapeBuilderTest {
 
     private static FilterFactory ff = FeatureUtils.getFilterFactory();
-    private static GeometryFactory geom = GeomUtils.getGeometryFactory();
+    private static GeometryFactory geom = GeoUtils.getGeometryFactory();
 
     @Before
     public void beforeTest() throws IOException {

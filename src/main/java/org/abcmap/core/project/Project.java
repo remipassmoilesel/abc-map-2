@@ -3,9 +3,10 @@ package org.abcmap.core.project;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.layer.*;
+import org.abcmap.core.project.tiles.TileStorage;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
-import org.abcmap.core.utils.CRSUtils;
+import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLProcessor;
 import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.Transaction;
@@ -17,10 +18,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * Represent a serializable project. Projects are stored in Geopakages, some kind of sqlite
@@ -41,6 +39,11 @@ public class Project {
      * Build and store styles
      */
     private final StyleLibrary styleLibrary;
+
+    /**
+     * Tile storage of the project, where are stored all tile coverages
+     */
+    private final TileStorage tileStorage;
 
     /**
      * Only one layer is alterable at a time, the active layer
@@ -107,23 +110,27 @@ public class Project {
         this.metadataContainer = new ProjectMetadata();
         this.layers = new ArrayList();
         this.mainMapContent = new MapContent();
-        this.crs = CRSUtils.GENERIC_2D;
+        this.crs = GeoUtils.GENERIC_2D;
         this.finalPath = null;
 
         this.styleLibrary = new StyleLibrary();
 
+        this.tileStorage = new TileStorage(databasePath);
+
     }
 
     /**
-     * Initialize geopackage object when database file is ready
+     * Initialize database when file is ready
      *
      * @throws IOException
      */
-    protected void initializeGeopackage() throws IOException {
+    protected void initializeDatabase() throws IOException {
 
         this.geopkg = new GeoPackage(databasePath.toFile());
 
         this.datastore = SQLUtils.getDatastoreFromGeopackage(databasePath);
+
+        tileStorage.initialize();
 
     }
 
@@ -208,7 +215,7 @@ public class Project {
     public AbstractLayer addNewTileLayer(String name, boolean visible, int zindex) {
         TileLayer layer = null;
         try {
-            layer = new TileLayer(null, name, visible, zindex, geopkg);
+            layer = new TileLayer(null, name, visible, zindex, geopkg, true);
         } catch (IOException e) {
             logger.error(e);
             return null;
@@ -410,5 +417,9 @@ public class Project {
      */
     public GeoPackage getGeopkg() {
         return geopkg;
+    }
+
+    public TileStorage getTileStorage() {
+        return tileStorage;
     }
 }

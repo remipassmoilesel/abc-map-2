@@ -45,8 +45,9 @@ public class ProjectWriter {
 
         // create a new project and initialize it
         Project project = new Project(path);
-        new ProjectWriter().write(project, path);
-        project.initializeGeopackage();
+        ProjectWriter pwriter = new ProjectWriter();
+        pwriter.write(project, path);
+        project.initializeDatabase();
 
         // add the first layer
         project.addNewFeatureLayer("First layer", true, 0);

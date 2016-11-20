@@ -117,7 +117,7 @@ public class LayerIndexEntry implements DataModel {
         } else {
             prefix += "_";
         }
-        return "abm_layer_" + prefix + System.nanoTime();
+        return "abcmap_layer_" + prefix + System.nanoTime();
     }
 
     @Override

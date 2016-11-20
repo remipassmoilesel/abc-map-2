@@ -1,6 +1,7 @@
 package org.abcmap.core.utils;
 
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
+import org.abcmap.core.shapes.feature.TileFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
@@ -34,6 +35,17 @@ public class FeatureUtils {
     }
 
     /**
+     * Return a tile outline feature builder
+     *
+     * @param name
+     * @param crs
+     * @return
+     */
+    public static TileFeatureBuilder getTileFeatureBuilder(String name, CoordinateReferenceSystem crs) {
+        return new TileFeatureBuilder(name, crs);
+    }
+
+    /**
      * Return the ID of feature or null.
      * <p>
      * Can be usefull to change the default ID field
@@ -62,6 +74,7 @@ public class FeatureUtils {
 
     /**
      * Return a style factory
+     *
      * @return
      */
     public static StyleFactory getStyleFactory() {
@@ -70,6 +83,7 @@ public class FeatureUtils {
 
     /**
      * Return a filter factory
+     *
      * @return
      */
     public static FilterFactory getFilterFactory() {
@@ -78,12 +92,13 @@ public class FeatureUtils {
 
     /**
      * Return a filter for specified ids
+     *
      * @param ids
      * @return
      */
     public static Filter getIdFilter(String... ids) {
         HashSet<Identifier> set = new HashSet<>();
-        for(String id : ids){
+        for (String id : ids) {
             set.add(new FeatureIdImpl(id));
         }
         return ff.id(set);

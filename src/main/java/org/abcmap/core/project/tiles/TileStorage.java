@@ -20,10 +20,10 @@ import java.util.*;
 /**
  * Store tiles in a database.
  * <p>
- * TileStore can store several named coverage. Why do not use built in Geopackage tile management ? Because
+ * TileStorage can store several named coverage. Why do not use built in Geopackage tile management ? Because
  * we need to set position of tile with eventual overlap.
  */
-public class TileStore {
+public class TileStorage {
 
     public static final String MASTER_TABLE_NAME = ConfigurationConstants.SQL_TABLE_PREFIX + "tiles_master_table";
     public static final String SPATIAL_TABLE_PREFIX = ConfigurationConstants.SQL_TABLE_PREFIX + "tile_spatial_";
@@ -57,7 +57,7 @@ public class TileStore {
      * @param p
      * @throws IOException
      */
-    public TileStore(Path p) throws IOException {
+    public TileStorage(Path p) throws IOException {
         this.databasePath = p;
         this.coverages = new HashMap<>();
     }
@@ -66,25 +66,23 @@ public class TileStore {
      * Add a tile to specified coverage
      *
      * @param coverageName
-     * @param position
-     * @param img
-     * @throws IOException
-     */
-    public String addTile(String coverageName, Coordinate position, Path img) throws IOException {
-        return addTile(coverageName, img, position, null, null);
-    }
-
-    /**
-     * Add a tile to specified coverage
-     *
-     * @param coverageName
      * @param imagePath
      * @param position
-     * @param width
-     * @param height
      * @throws IOException
      */
-    public String addTile(String coverageName, Path imagePath, Coordinate position, Integer width, Integer height) throws IOException {
+    public String addTile(String coverageName, Path imagePath, Coordinate position) throws IOException {
+
+        BufferedImage bimg = ImageIO.read(imagePath.toFile());
+
+        if (bimg == null) {
+            throw new IllegalStateException("Unsupported image format");
+        }
+
+        return addTile(coverageName, bimg, position);
+
+    }
+
+    public String addTile(String coverageName, BufferedImage bimg, Coordinate position) throws IOException {
 
         // retrieve informations about coverage
         TileCoverageEntry coverageEntry = coverages.get(coverageName);
@@ -93,21 +91,10 @@ public class TileStore {
         }
 
         // get width and height if necessary
-        BufferedImage bimg = ImageIO.read(imagePath.toFile());
-
-        if (bimg == null) {
-            throw new IllegalStateException("Unsupported image format");
-        }
-
-        if (width == null || height == null) {
-            width = bimg.getWidth();
-            height = bimg.getHeight();
-        }
-
         String tileId = generateTileId();
 
-        Integer finalWidth = width;
-        Integer finalHeight = height;
+        Integer finalWidth = bimg.getWidth();
+        Integer finalHeight = bimg.getHeight();
 
         try {
             SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
@@ -220,7 +207,7 @@ public class TileStore {
             SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
 
                 // create the master table where are stored references to coverages
-                String req = "CREATE TABLE " + MASTER_TABLE_NAME + " ("
+                String req = "CREATE TABLE IF NOT EXISTS " + MASTER_TABLE_NAME + " ("
                         + COVERAGE_NAME_FIELD_NAME + " VARCHAR(128) NOT NULL, "
                         + SPATIAL_TABLE_NAME_FIELD_NAME + " VARCHAR(128)  NOT NULL, "
                         + TILE_TABLE_NAME_FIELD_NAME + " VARCHAR(128)  NOT NULL, "
@@ -300,8 +287,8 @@ public class TileStore {
                 PreparedStatement masterEntryStat = conn.prepareStatement(req);
 
                 masterEntryStat.setString(1, finalCoverageName);
-                masterEntryStat.setString(2, spatialTableName);
-                masterEntryStat.setString(3, dataTableName);
+                masterEntryStat.setString(2, dataTableName);
+                masterEntryStat.setString(3, spatialTableName);
 
                 masterEntryStat.execute();
                 masterEntryStat.close();

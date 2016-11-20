@@ -1,30 +1,18 @@
 package org.abcmap.core.project.layer;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
-import org.abcmap.core.utils.CRSUtils;
+import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.FeatureUtils;
-import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
-import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.map.FeatureLayer;
+import org.geotools.graph.util.geom.GeometryUtil;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.type.Name;
-import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
-import org.opengis.filter.identity.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import java.io.IOException;
-import java.lang.ref.Reference;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This object is a wrapper of Geotools layer
@@ -34,7 +22,10 @@ public abstract class AbstractLayer {
     protected static final CustomLogger logger = LogManager.getLogger(AbstractLayer.class);
     protected final static StyleFactory sf = FeatureUtils.getStyleFactory();
     protected final static FilterFactory ff = FeatureUtils.getFilterFactory();
+    protected final static GeometryFactory geom = GeoUtils.getGeometryFactory();
+    protected ProjectManager pman;
 
+    protected final String crsCode;
     protected CoordinateReferenceSystem crs;
     protected org.geotools.map.Layer internalLayer;
     protected LayerIndexEntry indexEntry;
@@ -47,9 +38,11 @@ public abstract class AbstractLayer {
      * @param entry
      */
     public AbstractLayer(LayerIndexEntry entry) {
+        pman = MainManager.getProjectManager();
         this.indexEntry = entry;
         this.style = sf.createStyle();
-        this.crs = CRSUtils.GENERIC_2D;
+        this.crsCode = "EPSG:404000";
+        this.crs = GeoUtils.GENERIC_2D;
     }
 
     /**

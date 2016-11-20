@@ -6,7 +6,7 @@ import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.utils.FeatureUtils;
-import org.abcmap.core.utils.GeomUtils;
+import org.abcmap.core.utils.GeoUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
@@ -19,7 +19,7 @@ import org.opengis.feature.simple.SimpleFeature;
 public abstract class AbstractShapeBuilder {
 
     protected final FeatureLayer activeLayer;
-    protected GeometryFactory geometryFactory = GeomUtils.getGeometryFactory();
+    protected GeometryFactory geometryFactory = GeoUtils.getGeometryFactory();
     protected final Project project;
 
     /**

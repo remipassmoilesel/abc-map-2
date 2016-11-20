@@ -3,7 +3,7 @@ package org.abcmap.core.project;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
 import org.abcmap.core.project.tiles.TileCoverageEntry;
-import org.abcmap.core.project.tiles.TileStore;
+import org.abcmap.core.project.tiles.TileStorage;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geopkg.GeoPackage;
@@ -25,7 +25,7 @@ import static junit.framework.Assert.assertTrue;
 /**
  * Created by remipassmoilesel on 18/11/16.
  */
-public class TileStoreTest {
+public class TileStorageTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
@@ -48,7 +48,7 @@ public class TileStoreTest {
         geopk.init();
 
         // create a tile storage
-        TileStore storage = new TileStore(geopkPath);
+        TileStorage storage = new TileStorage(geopkPath);
         storage.initialize();
 
         // create a new coverage
@@ -57,9 +57,9 @@ public class TileStoreTest {
 
         ArrayList<String> list = SQLUtils.getSqliteTableList(storage.getDatabaseConnection());
 
-        assertTrue("Storage creation test", list.contains(TileStore.MASTER_TABLE_NAME));
-        assertTrue("Coverage creation test 1", list.contains(TileStore.DATA_TABLE_PREFIX + coverageName));
-        assertTrue("Coverage creation test 2", list.contains(TileStore.SPATIAL_TABLE_PREFIX + coverageName));
+        assertTrue("Storage creation test", list.contains(TileStorage.MASTER_TABLE_NAME));
+        assertTrue("Coverage creation test 1", list.contains(TileStorage.DATA_TABLE_PREFIX + coverageName));
+        assertTrue("Coverage creation test 2", list.contains(TileStorage.SPATIAL_TABLE_PREFIX + coverageName));
 
         // add tiles to coverage
         Path tilesRoot = TestUtils.RESOURCES_DIRECTORY.resolve("tiles");
@@ -77,8 +77,8 @@ public class TileStoreTest {
             }
 
             // tiles ared added twice
-            ids.add(storage.addTile(coverageName, new Coordinate(x, y), p));
-            ids.add(storage.addTile(coverageName, new Coordinate(x, y), p));
+            ids.add(storage.addTile(coverageName, p, new Coordinate(x, y)));
+            ids.add(storage.addTile(coverageName, p, new Coordinate(x, y)));
 
             x += 500;
             tileNumber++;
@@ -94,14 +94,14 @@ public class TileStoreTest {
             for (String id : ids) {
 
                 // check if tile was inserted in spatial table
-                PreparedStatement req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getSpatialTableName() + " WHERE " + TileStore.TILE_ID_FIELD_NAME + " = ?;");
+                PreparedStatement req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getSpatialTableName() + " WHERE " + TileStorage.TILE_ID_FIELD_NAME + " = ?;");
                 req.setString(1, id);
                 ResultSet rs = req.executeQuery();
 
                 assertTrue("Insert tiles test 1:" + i, rs.getInt(1) == 1);
 
                 // check if tile was inserted in data table
-                req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getDataTableName() + " WHERE " + TileStore.TILE_ID_FIELD_NAME + " = ?;");
+                req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getDataTableName() + " WHERE " + TileStorage.TILE_ID_FIELD_NAME + " = ?;");
                 req.setString(1, id);
                 rs = req.executeQuery();
 

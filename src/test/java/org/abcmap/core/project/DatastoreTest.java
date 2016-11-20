@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.utils.FeatureUtils;
-import org.abcmap.core.utils.GeomUtils;
+import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.FeatureStore;
 import org.geotools.feature.FeatureIterator;
@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class DatastoreTest {
 
-    private static final GeometryFactory geom = GeomUtils.getGeometryFactory();
+    private static final GeometryFactory geom = GeoUtils.getGeometryFactory();
 
     @BeforeClass
     public static void beforeTests() throws IOException {

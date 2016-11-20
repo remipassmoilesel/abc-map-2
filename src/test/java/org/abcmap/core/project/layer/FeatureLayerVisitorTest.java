@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.utils.GeomUtils;
+import org.abcmap.core.utils.GeoUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -29,7 +29,7 @@ public class FeatureLayerVisitorTest {
         Project project = MainManager.getProjectManager().getProject();
         FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
 
-        GeometryFactory geom = GeomUtils.getGeometryFactory();
+        GeometryFactory geom = GeoUtils.getGeometryFactory();
 
         for (int i = 0; i < 50; i++) {
             activeLayer.addShape(geom.createPoint(new Coordinate(i, i)));

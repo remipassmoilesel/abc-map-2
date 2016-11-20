@@ -31,6 +31,21 @@ public class FeatureLayer extends AbstractLayer {
     protected DefaultFeatureBuilder featureBuilder;
     protected SimpleFeatureSource featureSource;
 
+    /**
+     * Create a feature layer object.
+     * <p>
+     * If you want to create a new layer, set create to true to initialize a new database place.
+     * <p>
+     * If you want to read an existing layer, set create to false.
+     *
+     * @param layerId
+     * @param title
+     * @param visible
+     * @param zindex
+     * @param geopkg
+     * @param create
+     * @throws IOException
+     */
     public FeatureLayer(String layerId, String title, boolean visible, int zindex, GeoPackage geopkg, boolean create) throws IOException {
         this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.FEATURES), geopkg, create);
     }
@@ -41,12 +56,9 @@ public class FeatureLayer extends AbstractLayer {
         // if true, create a new geopackage entry
         if (create) {
             // create a simple feature type
-            // /!\ If DefaultEngineeringCRS.GENERIC2D is used, a lot of time is waste.
-            // Prefer CRS.decode("EPSG:40400");
             SimpleFeatureType type = DefaultFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), this.crs);
             FeatureEntry fe = new FeatureEntry();
             fe.setBounds(new ReferencedEnvelope());
-            fe.setSrid(null);
 
             // create a geopackage entry
             geopkg.create(fe, type);

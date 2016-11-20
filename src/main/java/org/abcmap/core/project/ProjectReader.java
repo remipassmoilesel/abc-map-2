@@ -8,8 +8,6 @@ import org.abcmap.core.project.dao.StyleDAO;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
-import org.abcmap.core.utils.SQLUtils;
-import org.geotools.jdbc.JDBCDataStore;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,10 +39,7 @@ public class ProjectReader {
 
         // create project
         Project project = new Project(newTempDatabase);
-        project.initializeGeopackage();
-
-        // get database connection with project
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromGeopackage(newTempDatabase);
+        project.initializeDatabase();
 
         try {
 
@@ -60,7 +55,7 @@ public class ProjectReader {
                     FeatureLayer layer = new FeatureLayer(entry, project.getGeopkg(), false);
                     project.addLayer(layer);
                 } else {
-                    logger.warning("Unknown type: " + entry.getType());
+                    logger.error("Unknown type: " + entry.getType());
                 }
 
             }
