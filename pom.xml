@@ -90,12 +90,6 @@
 
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-geopkg</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.geotools</groupId>
             <artifactId>gt-imagepyramid</artifactId>
             <version>${geotools.version}</version>
         </dependency>
@@ -111,6 +105,12 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-imagemosaic-jdbc</artifactId>
             <version>17-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geotools.jdbc</groupId>
+            <artifactId>gt-jdbc-h2</artifactId>
+            <version>${geotools.version}</version>
         </dependency>
 
         <dependency>

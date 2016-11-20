@@ -6,7 +6,6 @@ import org.abcmap.core.project.tiles.TileCoverageEntry;
 import org.abcmap.core.project.tiles.TileStorage;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
-import org.geotools.geopkg.GeoPackage;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,14 +40,11 @@ public class TileStorageTest {
 
         Files.createDirectories(root);
 
-        // create a geopackage
-        Path geopkPath = root.resolve("tileStorage.geopk");
-
-        GeoPackage geopk = new GeoPackage(geopkPath.toFile());
-        geopk.init();
+        // create a database
+        Path databasePath = root.resolve("tileStorage.h2");
 
         // create a tile storage
-        TileStorage storage = new TileStorage(geopkPath);
+        TileStorage storage = new TileStorage(databasePath);
         storage.initialize();
 
         // create a new coverage

@@ -82,7 +82,7 @@ public class DrawManagerTest {
         final int[] shapeCount = {0};
         activeLayer.executeVisit((SimpleFeature f) -> {
 
-            // test style id
+            // test style numericalId
             String sid = FeatureUtils.getStyleId(f);
             assertTrue("Style test", sid != null);
 

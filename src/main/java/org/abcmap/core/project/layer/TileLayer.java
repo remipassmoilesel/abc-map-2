@@ -1,6 +1,6 @@
 package org.abcmap.core.project.layer;
 
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 import org.abcmap.core.project.tiles.TileStorage;
 import org.abcmap.core.shapes.feature.TileFeatureBuilder;
@@ -14,22 +14,21 @@ import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.data.store.ContentFeatureSource;
+import org.geotools.gce.imagemosaic.jdbc.Config;
 import org.geotools.gce.imagemosaic.jdbc.ImageMosaicJDBCFormat;
 import org.geotools.gce.imagemosaic.jdbc.ImageMosaicJDBCReader;
 import org.geotools.gce.imagemosaic.jdbc.SpatialExtension;
 import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.geopkg.FeatureEntry;
-import org.geotools.geopkg.GeoPackage;
 import org.geotools.jdbc.JDBCDataStore;
-import org.geotools.map.*;
 import org.geotools.map.FeatureLayer;
+import org.geotools.map.GridCoverageLayer;
+import org.geotools.map.Layer;
 import org.geotools.referencing.CRS;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValue;
-import org.geotools.gce.imagemosaic.jdbc.Config;
 import org.opengis.referencing.FactoryException;
 
 import javax.imageio.ImageIO;
@@ -58,13 +57,15 @@ public class TileLayer extends AbstractLayer {
     private final String coverageName;
     private final FeatureLayer outlineLayer;
 
-    public TileLayer(String layerId, String title, boolean visible, int zindex, GeoPackage geopkg, boolean create) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), geopkg, create);
+    public TileLayer(String layerId, String title, boolean visible, int zindex, Path databasePath, boolean create) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), databasePath, create);
     }
 
-    public TileLayer(LayerIndexEntry entry, GeoPackage geopkg, boolean create) throws IOException {
+    public TileLayer(LayerIndexEntry entry, Path databasePath, boolean create) throws IOException {
 
         super(entry);
+
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(databasePath);
 
         tileStorage = pman.getProject().getTileStorage();
         coverageName = entry.getLayerId();
@@ -77,15 +78,12 @@ public class TileLayer extends AbstractLayer {
 
             // create an outline feature entry
             SimpleFeatureType type = TileFeatureBuilder.getTileFeatureType(entry.getLayerId(), this.crs);
-            FeatureEntry fe = new FeatureEntry();
-            fe.setBounds(new ReferencedEnvelope());
 
-            // create a geopackage entry
-            geopkg.create(fe, type);
+            datastore.createSchema(type);
 
         }
 
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromGeopackage(geopkg.getFile().toPath());
+
         this.featureSource = datastore.getFeatureSource(entry.getLayerId());
         this.featureStore = (SimpleFeatureStore) featureSource;
 
@@ -95,7 +93,7 @@ public class TileLayer extends AbstractLayer {
         // outline layer, with an empty style
         this.outlineLayer = new org.geotools.map.FeatureLayer(featureSource, sf.createStyle());
 
-        createCoverageLayer(geopkg.getFile().toPath(), coverageName, crsCode);
+        createCoverageLayer(databasePath, coverageName, crsCode);
     }
 
     /**

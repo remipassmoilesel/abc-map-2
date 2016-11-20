@@ -126,6 +126,22 @@ public class SQLUtils {
     }
 
     /**
+     * Return a JDBC datastore from a h2 embedded database
+     *
+     * @param database
+     * @return
+     * @throws IOException
+     */
+    public static JDBCDataStore getDatastoreFromH2(Path database) throws IOException {
+
+        Map<String, String> params = new HashMap();
+        params.put("dbtype", "h2");
+        params.put("database", database.toAbsolutePath().toString());
+
+        return (JDBCDataStore) DataStoreFinder.getDataStore(params);
+    }
+
+    /**
      * Process a transaction and close connection after if specified.
      * <p>
      * Allow to reduce the code length
@@ -164,7 +180,11 @@ public class SQLUtils {
         } catch (Exception e) {
 
             // error, cancel transaction
-            conn.rollback();
+            try{
+                conn.rollback();
+            } catch (Exception e1){
+                throw new SQLException("Error while performing transaction: ", e1);
+            }
 
             throw new SQLException("Error while performing transaction: ", e);
 

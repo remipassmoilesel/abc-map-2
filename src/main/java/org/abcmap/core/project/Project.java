@@ -9,8 +9,6 @@ import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLProcessor;
 import org.abcmap.core.utils.SQLUtils;
-import org.geotools.data.Transaction;
-import org.geotools.geopkg.*;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.MapContent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -18,6 +16,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -56,11 +57,6 @@ public class Project {
      * This location is used only to save project.
      */
     private Path finalPath;
-
-    /**
-     * Database associated with project
-     */
-    private GeoPackage geopkg;
 
     /**
      * The path of the database
@@ -126,8 +122,6 @@ public class Project {
      */
     protected void initializeDatabase() throws IOException {
 
-        this.geopkg = new GeoPackage(databasePath.toFile());
-
         this.datastore = SQLUtils.getDatastoreFromGeopackage(databasePath);
 
         tileStorage.initialize();
@@ -146,6 +140,7 @@ public class Project {
     public Path getDatabasePath() {
         return databasePath;
     }
+
 
     /**
      * Set the path of the temporary database
@@ -195,7 +190,7 @@ public class Project {
         // create a layer wrapper and store it
         AbstractLayer layer = null;
         try {
-            layer = new FeatureLayer(null, name, visible, zindex, geopkg, true);
+            layer = new FeatureLayer(null, name, visible, zindex, databasePath, true);
         } catch (IOException e) {
             logger.error(e);
             return null;
@@ -215,7 +210,7 @@ public class Project {
     public AbstractLayer addNewTileLayer(String name, boolean visible, int zindex) {
         TileLayer layer = null;
         try {
-            layer = new TileLayer(null, name, visible, zindex, geopkg, true);
+            layer = new TileLayer(null, name, visible, zindex, databasePath, true);
         } catch (IOException e) {
             logger.error(e);
             return null;
@@ -272,11 +267,6 @@ public class Project {
             datastore.dispose();
         }
 
-        if (geopkg != null) {
-            logger.warning("Closing geopackage: " + geopkg.getFile().toString());
-            geopkg.close();
-        }
-
     }
 
     /**
@@ -287,9 +277,6 @@ public class Project {
     public void close() {
         datastore.dispose();
         datastore = null;
-
-        geopkg.close();
-        geopkg = null;
     }
 
     /**
@@ -360,7 +347,8 @@ public class Project {
     public Object executeWithDatabaseConnection(SQLProcessor processor) {
         try {
             // sqlutils will process a transaction, not in auto commit mode
-            return SQLUtils.processTransaction(datastore.getConnection(Transaction.AUTO_COMMIT), processor);
+            // connection will be closed by utils function
+            return SQLUtils.processTransaction(getDatabaseConnection(), processor);
         } catch (Exception e) {
             logger.error(e);
             return null;
@@ -410,16 +398,19 @@ public class Project {
         return styleLibrary;
     }
 
-    /**
-     * Get the base geopackage
-     *
-     * @return
-     */
-    public GeoPackage getGeopkg() {
-        return geopkg;
-    }
-
     public TileStorage getTileStorage() {
         return tileStorage;
+    }
+
+    /**
+     * Return the database connection.
+     * <p>
+     * Prefer use of executeWithDatabaseConnection() instead
+     *
+     * @return
+     * @throws IOException
+     */
+    public Connection getDatabaseConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:sqlite:" + databasePath);
     }
 }

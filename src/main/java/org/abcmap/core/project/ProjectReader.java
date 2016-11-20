@@ -52,7 +52,7 @@ public class ProjectReader {
 
                 if (LayerType.FEATURES.equals(entry.getType())) {
                     // here features from a shapefile should be named with the layer id
-                    FeatureLayer layer = new FeatureLayer(entry, project.getGeopkg(), false);
+                    FeatureLayer layer = new FeatureLayer(entry, newTempDatabase, false);
                     project.addLayer(layer);
                 } else {
                     logger.error("Unknown type: " + entry.getType());

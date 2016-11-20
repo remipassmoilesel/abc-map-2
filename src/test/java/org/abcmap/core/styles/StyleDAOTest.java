@@ -51,7 +51,7 @@ public class StyleDAOTest {
 
             StyleContainer s = new StyleContainer(stylePatterns.get(rand.next()));
 
-            // change id
+            // change numericalId
             s.generateId();
 
             dao.create(s);

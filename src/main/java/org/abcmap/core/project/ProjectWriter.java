@@ -10,8 +10,10 @@ import org.abcmap.core.project.dao.StyleDAO;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerType;
-import org.geotools.geopkg.FeatureEntry;
-import org.geotools.geopkg.GeoPackage;
+import org.abcmap.core.utils.SQLUtils;
+import org.geotools.data.FeatureStore;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.jdbc.JDBCDataStore;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -62,22 +64,21 @@ public class ProjectWriter {
      * Write a project at specified destination. If specified destination is already a file,
      * it will be overwrite
      * <p>
-     * This method do not close geopackage after writing, so you have to close it manually
+     * This method do not close database after writing, so you have to close it manually
      *
      * @param project
      * @param destination
      * @throws IOException
      */
-    public GeoPackage write(Project project, Path destination) throws IOException {
+    public boolean write(Project project, Path destination) throws IOException {
 
         // delete eventual previous file
         if (Files.exists(destination)) {
             Files.delete(destination);
         }
 
-        // create a new geopackage
-        GeoPackage geopkg = new GeoPackage(destination.toFile());
-        geopkg.init();
+        // create a new database
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(destination);
 
         try {
             writeMetadatas(project, destination);
@@ -89,15 +90,19 @@ public class ProjectWriter {
         for (AbstractLayer layer : project.getLayers()) {
 
             if (LayerType.FEATURES.equals(layer.getType())) {
-                FeatureEntry fe = new FeatureEntry();
-                geopkg.add(fe, ((FeatureLayer) layer).getFeatureSource(), null);
+
+                SimpleFeatureSource featureSource = ((FeatureLayer) layer).getFeatureSource();
+                datastore.createSchema(featureSource.getSchema());
+
+                FeatureStore featureStore = (FeatureStore) datastore.getFeatureSource(featureSource.getSchema().getTypeName());
+                featureStore.addFeatures(featureSource.getFeatures());
+
             } else {
                 logger.warning("Unknown type: " + layer.getType());
             }
         }
 
-
-        return geopkg;
+        return true;
 
     }
 
