@@ -37,7 +37,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -58,7 +57,6 @@ public class TileLayer extends AbstractLayer {
     private final TileFeatureBuilder featureBuilder;
     private final String coverageName;
     private final FeatureLayer outlineLayer;
-    private String transparentTileId;
 
     public TileLayer(String layerId, String title, boolean visible, int zindex, GeoPackage geopkg, boolean create) throws IOException {
         this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), geopkg, create);
@@ -75,7 +73,7 @@ public class TileLayer extends AbstractLayer {
         if (create) {
 
             // create a tile storage entry
-            tileStorage.addCoverage(entry.getLayerId());
+            tileStorage.createCoverage(entry.getLayerId());
 
             // create an outline feature entry
             SimpleFeatureType type = TileFeatureBuilder.getTileFeatureType(entry.getLayerId(), this.crs);
@@ -84,10 +82,6 @@ public class TileLayer extends AbstractLayer {
 
             // create a geopackage entry
             geopkg.create(fe, type);
-
-            // add a first transparent tile. If no tile are found when creating a coverage layer,
-            // the plugin will delete mosaic
-            addTransparentTile();
 
         }
 
@@ -102,21 +96,6 @@ public class TileLayer extends AbstractLayer {
         this.outlineLayer = new org.geotools.map.FeatureLayer(featureSource, sf.createStyle());
 
         createCoverageLayer(geopkg.getFile().toPath(), coverageName, crsCode);
-    }
-
-    /**
-     * Add a first transparent tile.
-     * <p>
-     * If no tile are found when creating a coverage layer, the plugin will delete mosaic
-     */
-    private void addTransparentTile() throws IOException {
-        BufferedImage img = ImageIO.read(TileLayer.class.getResourceAsStream("/tiles/transparent_tile.png"));
-        this.transparentTileId = tileStorage.addTile(coverageName, img, new Coordinate(0, 0));
-    }
-
-    private void removeTransparentTile() throws IOException {
-        tileStorage.deleteTile(coverageName, transparentTileId);
-        transparentTileId = null;
     }
 
     /**
@@ -149,15 +128,6 @@ public class TileLayer extends AbstractLayer {
      * @param position
      */
     public String addTile(BufferedImage image, Coordinate position) {
-
-        // remove the first transparent tile if needed
-        if (transparentTileId != null) {
-            try {
-                removeTransparentTile();
-            } catch (IOException e) {
-                throw new IllegalStateException("Unable to remove transparent tile");
-            }
-        }
 
         try {
 
@@ -323,6 +293,14 @@ public class TileLayer extends AbstractLayer {
         return internalLayer;
     }
 
+    /**
+     * Return a feature layer containing shapes that are outlines of real tiles.
+     *
+     * @return
+     */
+    public FeatureLayer getOutlineLayer() {
+        return outlineLayer;
+    }
 
     @Override
     public ReferencedEnvelope getBounds() {

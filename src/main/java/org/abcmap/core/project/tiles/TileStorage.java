@@ -2,6 +2,7 @@ package org.abcmap.core.project.tiles;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.project.layer.TileLayer;
 import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.data.Transaction;
@@ -82,7 +83,30 @@ public class TileStorage {
 
     }
 
+    /**
+     * Add a tile to the specified coverage
+     *
+     * @param coverageName
+     * @param bimg
+     * @param position
+     * @return
+     * @throws IOException
+     */
     public String addTile(String coverageName, BufferedImage bimg, Coordinate position) throws IOException {
+        return addTile(coverageName, bimg, position, null);
+    }
+
+    /**
+     * Add a tile to the specified coverage
+     *
+     * @param coverageName
+     * @param bimg
+     * @param position
+     * @param tileId
+     * @return
+     * @throws IOException
+     */
+    public String addTile(String coverageName, BufferedImage bimg, Coordinate position, String tileId) throws IOException {
 
         // retrieve informations about coverage
         TileCoverageEntry coverageEntry = coverages.get(coverageName);
@@ -91,12 +115,15 @@ public class TileStorage {
         }
 
         // get width and height if necessary
-        String tileId = generateTileId();
+        if(tileId == null){
+            tileId = generateTileId();
+        }
 
         Integer finalWidth = bimg.getWidth();
         Integer finalHeight = bimg.getHeight();
 
         try {
+            String finalTileId = tileId;
             SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
 
                 // insert image in data table
@@ -108,7 +135,7 @@ public class TileStorage {
                 //System.out.println(req);
 
                 PreparedStatement imageStat = conn.prepareStatement(req);
-                imageStat.setString(1, tileId);
+                imageStat.setString(1, finalTileId);
                 imageStat.setBytes(2, imageToByteArray(bimg));
                 imageStat.execute();
                 imageStat.close();
@@ -125,7 +152,7 @@ public class TileStorage {
                 //System.out.println(req);
 
                 PreparedStatement spatialStat = conn.prepareStatement(req);
-                spatialStat.setString(1, tileId);
+                spatialStat.setString(1, finalTileId);
                 spatialStat.setDouble(2, position.x);
                 spatialStat.setDouble(3, position.y);
                 spatialStat.setDouble(4, finalWidth);
@@ -258,7 +285,7 @@ public class TileStorage {
      * <p>
      * /!\ Name must be database compliant, and will be trimmed and passed in lower case
      */
-    public TileCoverageEntry addCoverage(String coverageName) throws IOException {
+    public TileCoverageEntry createCoverage(String coverageName) throws IOException {
 
         // check name and format it
         coverageName = coverageName.trim().toLowerCase();
@@ -270,7 +297,9 @@ public class TileStorage {
         String spatialTableName = getSpatialTableName(coverageName);
         String dataTableName = getDataTableName(coverageName);
 
+
         try {
+
             String finalCoverageName = coverageName;
             SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
 
@@ -335,6 +364,10 @@ public class TileStorage {
         // store table names
         TileCoverageEntry entry = new TileCoverageEntry(coverageName, spatialTableName, dataTableName);
         coverages.put(coverageName, entry);
+
+        // Insert a fake transparent tile. If not tiles are found by plugin, the coverage will be deleted
+        BufferedImage img = ImageIO.read(TileStorage.class.getResourceAsStream("/tiles/transparent_tile.png"));
+        addTile(coverageName, img, new Coordinate(0, 0), "TRANSPARENT_TILE");
 
         return entry;
     }

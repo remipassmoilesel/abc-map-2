@@ -53,7 +53,7 @@ public class TileStorageTest {
 
         // create a new coverage
         String coverageName = "coverage1";
-        TileCoverageEntry coverageEntry = storage.addCoverage(coverageName);
+        TileCoverageEntry coverageEntry = storage.createCoverage(coverageName);
 
         ArrayList<String> list = SQLUtils.getSqliteTableList(storage.getDatabaseConnection());
 
