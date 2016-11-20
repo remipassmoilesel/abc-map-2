@@ -37,6 +37,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
@@ -57,6 +58,7 @@ public class TileLayer extends AbstractLayer {
     private final TileFeatureBuilder featureBuilder;
     private final String coverageName;
     private final FeatureLayer outlineLayer;
+    private String transparentTileId;
 
     public TileLayer(String layerId, String title, boolean visible, int zindex, GeoPackage geopkg, boolean create) throws IOException {
         this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), geopkg, create);
@@ -83,6 +85,10 @@ public class TileLayer extends AbstractLayer {
             // create a geopackage entry
             geopkg.create(fe, type);
 
+            // add a first transparent tile. If no tile are found when creating a coverage layer,
+            // the plugin will delete mosaic
+            addTransparentTile();
+
         }
 
         JDBCDataStore datastore = SQLUtils.getDatastoreFromGeopackage(geopkg.getFile().toPath());
@@ -95,7 +101,22 @@ public class TileLayer extends AbstractLayer {
         // outline layer, with an empty style
         this.outlineLayer = new org.geotools.map.FeatureLayer(featureSource, sf.createStyle());
 
-        //createCoverageLayer(geopkg.getFile().toPath(), coverageName, crsCode);
+        createCoverageLayer(geopkg.getFile().toPath(), coverageName, crsCode);
+    }
+
+    /**
+     * Add a first transparent tile.
+     * <p>
+     * If no tile are found when creating a coverage layer, the plugin will delete mosaic
+     */
+    private void addTransparentTile() throws IOException {
+        BufferedImage img = ImageIO.read(TileLayer.class.getResourceAsStream("/tiles/transparent_tile.png"));
+        this.transparentTileId = tileStorage.addTile(coverageName, img, new Coordinate(0, 0));
+    }
+
+    private void removeTransparentTile() throws IOException {
+        tileStorage.deleteTile(coverageName, transparentTileId);
+        transparentTileId = null;
     }
 
     /**
@@ -128,6 +149,15 @@ public class TileLayer extends AbstractLayer {
      * @param position
      */
     public String addTile(BufferedImage image, Coordinate position) {
+
+        // remove the first transparent tile if needed
+        if (transparentTileId != null) {
+            try {
+                removeTransparentTile();
+            } catch (IOException e) {
+                throw new IllegalStateException("Unable to remove transparent tile");
+            }
+        }
 
         try {
 
@@ -250,6 +280,10 @@ public class TileLayer extends AbstractLayer {
      * @throws IOException
      */
     private Layer createCoverageLayer(Path databasePath, String coverageName, String crsCode) throws IOException {
+
+        // Sometimes this message will appear:
+        // 2016-11-20T14:22:27.512+0100  WARNING  Config{xmlUrl='org.abcmap.abcmap_layer_tiles_17950576434080_17950863637457', coverageName='abcmap_layer_tiles_17950576434080', geoRasterAttribute='null', coordsys='EPSG:404000', spatialExtension=UNIVERSAL, dstype='DBCP', username='', password='', jdbcUrl='jdbc:sqlite:./tmp/2016-11-20-14-22/project.abm', driverClassName='org.sqlite.JDBC', maxActive=5, maxIdle=0, jndiReferenceName='null', coverageNameAttribute='coverage_name', blobAttributeNameInTileTable='tile_data', keyAttributeNameInTileTable='tile_id', keyAttributeNameInSpatialTable='tile_id', geomAttributeNameInSpatialTable='null', maxXAttribute='max_x', maxYAttribute='max_y', minXAttribute='min_x', minYAttribute='min_y', masterTable='abcmap_tiles_master_table', resXAttribute='res_x', resYAttribute='res_y', tileTableNameAtribute='tile_table_name', spatialTableNameAtribute='spatial_table_name', sqlUpdateMosaicStatement='update abcmap_tiles_master_table set max_x = ?,max_y = ?,min_x = ?,min_y = ? where coverage_name = ?  and tile_table_name = ?  and spatial_table_name = ? ', sqlSelectCoverageStatement='select * from abcmap_tiles_master_table where coverage_name = ? ', sqlUpdateResStatement='update abcmap_tiles_master_table set res_x = ?,res_y = ?  where coverage_name = ?  and tile_table_name = ?  and spatial_table_name = ? ', verifyCardinality=false, ignoreAxisOrder=false, interpolation=1, tileMaxXAttribute='max_x', tileMaxYAttribute='max_y', tileMinXAttribute='min_x', tileMinYAttribute='min_y', jdbcAccessClassName='null'}
+        // It is ImagePymaridFormat.class that log it can handle Config object as source
 
         Config config = getConfiguration(databasePath, coverageName, crsCode);
 
