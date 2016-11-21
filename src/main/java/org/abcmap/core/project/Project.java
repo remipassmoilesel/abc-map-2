@@ -12,7 +12,6 @@ import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLProcessor;
 import org.abcmap.core.utils.SQLUtils;
-import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.MapContent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -89,11 +88,6 @@ public class Project {
     private CoordinateReferenceSystem crs;
 
     /**
-     * Database object where are stored all data
-     */
-    private JDBCDataStore datastore;
-
-    /**
      * Create a new project associated with the database at specified location.
      * <p>
      * Project file must be a temporary project file.
@@ -115,18 +109,6 @@ public class Project {
         this.styleLibrary = new StyleLibrary();
 
         this.tileStorage = new TileStorage(databasePath);
-
-    }
-
-    /**
-     * Initialize database when file is ready
-     *
-     * @throws IOException
-     */
-    protected void initializeDatabase() throws IOException {
-
-        this.datastore = SQLUtils.getDatastoreFromH2(databasePath);
-
         tileStorage.initialize();
 
     }
@@ -281,12 +263,6 @@ public class Project {
             logger.error(e);
         }
 
-        if (datastore != null) {
-            datastore.dispose();
-        } else {
-            logger.warning("Datastore was already closed");
-        }
-        datastore = null;
     }
 
     /**

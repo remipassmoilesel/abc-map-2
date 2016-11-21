@@ -68,7 +68,6 @@ public class FeatureLayer extends AbstractLayer {
         // create a feature builder associated with the layer
         this.featureBuilder = FeatureUtils.getDefaultFeatureBuilder(entry.getLayerId(), crs);
         this.internalLayer = new org.geotools.map.FeatureLayer(featureSource, style);
-
     }
 
     /**

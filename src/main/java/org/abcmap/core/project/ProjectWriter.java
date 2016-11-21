@@ -60,8 +60,6 @@ public class ProjectWriter {
             throw new IOException("Error while creating a new project", e);
         }
 
-        project.initializeDatabase();
-
         // add the first layer
         project.addNewFeatureLayer("First layer", true, 0);
 
