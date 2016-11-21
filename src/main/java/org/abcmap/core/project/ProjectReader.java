@@ -75,6 +75,7 @@ public class ProjectReader {
             // recreate layers
             LayerIndexDAO lidao = new LayerIndexDAO(newDatabase);
             ArrayList<LayerIndexEntry> indexes = lidao.readAllEntries();
+            lidao.close();
 
             for (LayerIndexEntry entry : indexes) {
 

@@ -5,6 +5,7 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -28,7 +29,7 @@ public abstract class AbstractLayer {
     protected CoordinateReferenceSystem crs;
     protected org.geotools.map.Layer internalLayer;
     protected LayerIndexEntry indexEntry;
-    protected Style style;
+    protected Style layerStyle;
 
 
     /**
@@ -39,9 +40,11 @@ public abstract class AbstractLayer {
     public AbstractLayer(LayerIndexEntry entry) {
         pman = MainManager.getProjectManager();
         this.indexEntry = entry;
-        this.style = sf.createStyle();
+        this.layerStyle = sf.createStyle();
         this.crsCode = "EPSG:404000";
         this.crs = GeoUtils.GENERIC_2D;
+
+        this.layerStyle = sf.createStyle();
     }
 
     /**
@@ -65,8 +68,8 @@ public abstract class AbstractLayer {
      *
      * @return
      */
-    public Style getStyle() {
-        return style;
+    public Style getLayerStyle() {
+        return layerStyle;
     }
 
     /**

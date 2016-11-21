@@ -57,13 +57,8 @@ public abstract class AbstractShapeBuilder {
      * Apply style to the current feature. Throw  NullPointerEx if current feature is null
      */
     protected void applyStyle() {
-
-        if (currentFeature == null) {
-            throw new NullPointerException("Current feature is null");
-        }
-
         if (style != null) {
-            FeatureUtils.applyStyle(style, currentFeature);
+            project.getStyleLibrary().applyStyle(style, activeLayer, currentFeature);
             currentFeature = getActiveLayer().updateFeature(currentFeature);
         }
     }

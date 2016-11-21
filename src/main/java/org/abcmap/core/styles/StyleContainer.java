@@ -63,6 +63,11 @@ public class StyleContainer implements DataModel {
         this.thick = other.thick;
     }
 
+    /**
+     * Return a rule, tht can be added to a layer style
+     *
+     * @return
+     */
     public Rule getRule() {
 
         if (this.rule == null) {
@@ -183,4 +188,5 @@ public class StyleContainer implements DataModel {
         return r;
 
     }
+
 }

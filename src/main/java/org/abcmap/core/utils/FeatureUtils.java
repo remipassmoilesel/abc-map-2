@@ -1,5 +1,7 @@
 package org.abcmap.core.utils;
 
+import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.shapes.feature.TileFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
@@ -10,6 +12,7 @@ import org.geotools.filter.identity.FeatureIdImpl;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
@@ -107,12 +110,16 @@ public class FeatureUtils {
     /**
      * Apply a style to specified feature
      *
-     * @param feature
+     * To apply this style, this method insert style id in "style_id" field.
+     *
+     * If the are no appropriate field, a IllegalAttributeException is raised
+     *
+     * @param features
      * @param style
      */
-    public static void applyStyle(StyleContainer style, SimpleFeature feature) {
+    public static void applyStyleToFeatures(StyleContainer style, SimpleFeature... features) {
 
-        if (feature == null) {
+        if (features == null) {
             throw new NullPointerException("Feature cannot be null");
         }
 
@@ -120,7 +127,11 @@ public class FeatureUtils {
             throw new NullPointerException("Style cannot be null");
         }
 
-        feature.setAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME, style.getId());
+        // apply style to feature
+        for (SimpleFeature feature : features) {
+            feature.setAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME, style.getId());
+        }
+
     }
 
     /**

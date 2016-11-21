@@ -94,7 +94,7 @@ public class GeoUtils {
         // We need at least three bands to create an RGB style
         int numBands = cov.getNumSampleDimensions();
         if (numBands < 3) {
-            throw new IllegalStateException("Need more bands to make an RGB style: " + numBands);
+            throw new IllegalStateException("Need more bands to make an RGB layerStyle: " + numBands);
         }
 
         // Get the names of the bands
