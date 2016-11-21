@@ -2,15 +2,16 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.project.layer.*;
+import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.project.layer.LayerIndexEntry;
+import org.abcmap.core.project.layer.TileLayer;
 import org.abcmap.core.project.tiles.TileStorage;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLProcessor;
 import org.abcmap.core.utils.SQLUtils;
-import org.geotools.data.Transaction;
-import org.geotools.geopkg.*;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.MapContent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -18,7 +19,10 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represent a serializable project. Projects are stored in Geopakages, some kind of sqlite
@@ -56,11 +60,6 @@ public class Project {
      * This location is used only to save project.
      */
     private Path finalPath;
-
-    /**
-     * Database associated with project
-     */
-    private GeoPackage geopkg;
 
     /**
      * The path of the database
@@ -126,9 +125,7 @@ public class Project {
      */
     protected void initializeDatabase() throws IOException {
 
-        this.geopkg = new GeoPackage(databasePath.toFile());
-
-        this.datastore = SQLUtils.getDatastoreFromGeopackage(databasePath);
+        this.datastore = SQLUtils.getDatastoreFromH2(databasePath);
 
         tileStorage.initialize();
 
@@ -146,6 +143,7 @@ public class Project {
     public Path getDatabasePath() {
         return databasePath;
     }
+
 
     /**
      * Set the path of the temporary database
@@ -195,7 +193,7 @@ public class Project {
         // create a layer wrapper and store it
         AbstractLayer layer = null;
         try {
-            layer = new FeatureLayer(null, name, visible, zindex, geopkg, true);
+            layer = new FeatureLayer(null, name, visible, zindex, databasePath, true);
         } catch (IOException e) {
             logger.error(e);
             return null;
@@ -215,7 +213,7 @@ public class Project {
     public AbstractLayer addNewTileLayer(String name, boolean visible, int zindex) {
         TileLayer layer = null;
         try {
-            layer = new TileLayer(null, name, visible, zindex, geopkg, true);
+            layer = new TileLayer(null, name, visible, zindex, databasePath, true);
         } catch (IOException e) {
             logger.error(e);
             return null;
@@ -266,17 +264,7 @@ public class Project {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-
-        if (datastore != null) {
-            logger.warning("Closing datastore: " + datastore);
-            datastore.dispose();
-        }
-
-        if (geopkg != null) {
-            logger.warning("Closing geopackage: " + geopkg.getFile().toString());
-            geopkg.close();
-        }
-
+        close();
     }
 
     /**
@@ -285,11 +273,20 @@ public class Project {
      * Temporary files are not deleted
      */
     public void close() {
-        datastore.dispose();
-        datastore = null;
 
-        geopkg.close();
-        geopkg = null;
+        try {
+            SQLUtils.shutdownH2Database(databasePath);
+        } catch (SQLException e) {
+            logger.error("Error while shutting down database");
+            logger.error(e);
+        }
+
+        if (datastore != null) {
+            datastore.dispose();
+        } else {
+            logger.warning("Datastore was already closed");
+        }
+        datastore = null;
     }
 
     /**
@@ -354,13 +351,17 @@ public class Project {
      * Be careful when you process long operations, SQLite do not support high concurrency
      * <p>
      * Execute an operation here avoid to have too many connections outside, maybe unclosed
+     * <p>
+     * <p>
+     * /!\ No excpetions are thrown, please return a result that can indicate a potential fail. Eg: Boolean: null, true, false
      *
      * @return
      */
     public Object executeWithDatabaseConnection(SQLProcessor processor) {
         try {
             // sqlutils will process a transaction, not in auto commit mode
-            return SQLUtils.processTransaction(datastore.getConnection(Transaction.AUTO_COMMIT), processor);
+            // connection will be closed by utils function
+            return SQLUtils.processTransaction(getDatabaseConnection(), processor);
         } catch (Exception e) {
             logger.error(e);
             return null;
@@ -410,16 +411,19 @@ public class Project {
         return styleLibrary;
     }
 
-    /**
-     * Get the base geopackage
-     *
-     * @return
-     */
-    public GeoPackage getGeopkg() {
-        return geopkg;
-    }
-
     public TileStorage getTileStorage() {
         return tileStorage;
+    }
+
+    /**
+     * Return the database connection.
+     * <p>
+     * Prefer use of executeWithDatabaseConnection() instead
+     *
+     * @return
+     * @throws IOException
+     */
+    public Connection getDatabaseConnection() throws SQLException {
+        return SQLUtils.createH2Connection(databasePath);
     }
 }

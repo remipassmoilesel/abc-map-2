@@ -17,20 +17,19 @@ import java.util.Objects;
 
 /**
  * Persistent style
- *
+ * <p>
  * // TODO add style to main style
- *
  */
-@DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "styles")
+@DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "STYLES")
 public class StyleContainer implements DataModel {
 
     private final static StyleFactory sf = FeatureUtils.getStyleFactory();
     private final static FilterFactory ff = FeatureUtils.getFilterFactory();
 
-    private static final String ID_FIELD_NAME = "id";
-    private static final String FOREGROUND_FIELD_NAME = "foreground";
-    private static final String BACKGROUND_FIELD_NAME = "background";
-    private static final String THICK_FIELD_NAME = "thick";
+    private static final String ID_FIELD_NAME = "ID";
+    private static final String FOREGROUND_FIELD_NAME = "FOREGROUND";
+    private static final String BACKGROUND_FIELD_NAME = "BACKGROUND";
+    private static final String THICK_FIELD_NAME = "THICK";
 
     @DatabaseField(id = true, columnName = ID_FIELD_NAME)
     private String id;

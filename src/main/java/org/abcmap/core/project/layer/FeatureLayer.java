@@ -8,8 +8,6 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.geopkg.FeatureEntry;
-import org.geotools.geopkg.GeoPackage;
 import org.geotools.jdbc.JDBCDataStore;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -18,6 +16,7 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.identity.Identifier;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -42,29 +41,27 @@ public class FeatureLayer extends AbstractLayer {
      * @param title
      * @param visible
      * @param zindex
-     * @param geopkg
+     * @param databasePath
      * @param create
      * @throws IOException
      */
-    public FeatureLayer(String layerId, String title, boolean visible, int zindex, GeoPackage geopkg, boolean create) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.FEATURES), geopkg, create);
+    public FeatureLayer(String layerId, String title, boolean visible, int zindex,
+                        Path databasePath, boolean create) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.FEATURES), databasePath, create);
     }
 
-    public FeatureLayer(LayerIndexEntry entry, GeoPackage geopkg, boolean create) throws IOException {
+    public FeatureLayer(LayerIndexEntry entry, Path databasePath, boolean create) throws IOException {
         super(entry);
 
-        // if true, create a new geopackage entry
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(databasePath);
+
+        // if true, create a new database entry
         if (create) {
             // create a simple feature type
             SimpleFeatureType type = DefaultFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), this.crs);
-            FeatureEntry fe = new FeatureEntry();
-            fe.setBounds(new ReferencedEnvelope());
-
-            // create a geopackage entry
-            geopkg.create(fe, type);
+            datastore.createSchema(type);
         }
 
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromGeopackage(geopkg.getFile().toPath());
         this.featureSource = datastore.getFeatureSource(entry.getLayerId());
         this.featureStore = (SimpleFeatureStore) featureSource;
 

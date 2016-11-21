@@ -51,7 +51,7 @@ public class StyleDAOTest {
 
             StyleContainer s = new StyleContainer(stylePatterns.get(rand.next()));
 
-            // change id
+            // change numericalId
             s.generateId();
 
             dao.create(s);
@@ -64,7 +64,11 @@ public class StyleDAOTest {
 
         ArrayList<StyleContainer> read = dao.readStyles();
 
-        assertTrue("Read / write test", written.equals(read));
+        // here we cannot compare lists directly because order change after reading
+        for (StyleContainer styleContainer : read) {
+            assertTrue("Read / write test: " + styleContainer, written.contains(styleContainer));
+        }
+
 
     }
 }

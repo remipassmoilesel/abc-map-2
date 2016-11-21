@@ -35,11 +35,6 @@ public class ConcurrentReadWriteDatabaseTest {
     private static int tasksDone = 0;
     private Path databasePath;
 
-    @BeforeClass
-    public static void beforeTests() throws IOException {
-        TestUtils.createNewProject();
-    }
-
     public Connection getConnection() throws SQLException {
         return DriverManager.getConnection("jdbc:" + CURRENT_DRIVER + ":./" + databasePath + ";DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE", "", "");
     }
@@ -99,7 +94,7 @@ public class ConcurrentReadWriteDatabaseTest {
 
         SQLUtils.processTransaction(getConnection(), (conn) -> {
 
-            PreparedStatement createStat = conn.prepareStatement("CREATE TABLE " + TEST_TABLE_NAME + " (columnA TEXT NOT NULL, columnB TEXT NOT NULL);");
+            PreparedStatement createStat = conn.prepareStatement("CREATE TABLE \"" + TEST_TABLE_NAME + "\" (columnA TEXT NOT NULL, columnB TEXT NOT NULL);");
             createStat.execute();
 
             for (int i = 0; i < 8000; i++) {

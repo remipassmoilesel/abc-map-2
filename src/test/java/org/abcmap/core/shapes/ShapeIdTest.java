@@ -4,18 +4,14 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
-import org.geotools.data.DataStoreFinder;
+import org.abcmap.core.utils.SQLUtils;
+import org.apache.commons.io.FileUtils;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.geopkg.FeatureEntry;
-import org.geotools.geopkg.GeoPackage;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.Test;
@@ -25,17 +21,14 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertFalse;
 
 /**
- * This test was created because of a bug in Geotools 15.2. This bug was fixed in Geotools 16. However, this test check if generated id are the same.
+ * This test was created because of a bug in Geotools 15.2. This bug was fixed in Geotools 16. However, this test check if generated numericalId are the same.
  * <p>
- * If you run it with Geotools 15.2, this test is a simple demonstration of shape id issue with Geotools and Geopackage.
+ * If you run it with Geotools 15.2, this test is a simple demonstration of shape numericalId issue with Geotools and Geopackage.
  * <p>
  * Sample output on Geotools 15.2:
  * <p>
@@ -65,16 +58,12 @@ public class ShapeIdTest {
     @Test
     public void test() throws IOException {
 
-        // create a geopackage
-        Path directory = TestUtils.PLAYGROUND_DIRECTORY.resolve("shapeIdIssue");
-        Files.createDirectories(directory);
+        // create a database
+        Path tempDirectory = TestUtils.PLAYGROUND_DIRECTORY.resolve("shapeIdIssue");
+        FileUtils.deleteDirectory(tempDirectory.toFile());
+        Files.createDirectories(tempDirectory);
 
-        Path db = directory.resolve("geopkg.db");
-        Files.deleteIfExists(db);
-        Files.createFile(db);
-
-        GeoPackage geopkg = new GeoPackage(db.toFile());
-        geopkg.init();
+        Path db = tempDirectory.resolve("database.h2");
 
         // create a feature type
         String featureId = "feature1";
@@ -87,18 +76,10 @@ public class ShapeIdTest {
         SimpleFeatureType type = tbuilder.buildFeatureType();
         SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(type);
 
-        FeatureEntry fe = new FeatureEntry();
-        fe.setBounds(new ReferencedEnvelope());
-        fe.setSrid(null);
+        // get feature store from database
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(db);
+        datastore.createSchema(type);
 
-        // get feature store from geopackage
-        geopkg.create(fe, type);
-
-        Map<String, String> params = new HashMap();
-        params.put("dbtype", "geopkg");
-        params.put("database", db.toString());
-
-        JDBCDataStore datastore = (JDBCDataStore) DataStoreFinder.getDataStore(params);
         FeatureStore featurestore = (FeatureStore) datastore.getFeatureSource(featureId);
 
         // add points to datastore

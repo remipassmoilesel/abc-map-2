@@ -90,12 +90,6 @@
 
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-geopkg</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.geotools</groupId>
             <artifactId>gt-imagepyramid</artifactId>
             <version>${geotools.version}</version>
         </dependency>
@@ -114,10 +108,23 @@
         </dependency>
 
         <dependency>
+            <groupId>org.geotools.jdbc</groupId>
+            <artifactId>gt-jdbc-h2</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.12</version>
         </dependency>
 
     </dependencies>

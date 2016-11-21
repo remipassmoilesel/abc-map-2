@@ -1,20 +1,13 @@
 package org.abcmap.core.project.layer;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import junit.framework.Assert;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
-import org.geotools.metadata.iso.citation.Citations;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opengis.metadata.citation.Citation;
 import org.opengis.referencing.FactoryException;
 
 import java.io.IOException;
@@ -41,9 +34,6 @@ public class TileLayerTest {
     public void tests() throws IOException, FactoryException {
 
         // create temp directories
-        Path root = TestUtils.PLAYGROUND_DIRECTORY.resolve("tileLayerTest");
-        Utils.deleteDirectories(root.toFile());
-
         ProjectManager pman = MainManager.getProjectManager();
         Project project = pman.getProject();
         TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 2);
@@ -76,31 +66,41 @@ public class TileLayerTest {
 
         // count inserted outlines
         int finalTileNumber = tileNumber;
+        final boolean[] rowCountOk = {false};
         project.executeWithDatabaseConnection((conn) -> {
 
-            PreparedStatement selectStat = conn.prepareStatement("SELECT count(*) FROM " + outlinesTableName);
-            ResultSet rslt = selectStat.executeQuery();
-            int rowCount = rslt.getInt(1);
+            PreparedStatement selectStat = conn.prepareStatement("SELECT count(*) FROM \"" + outlinesTableName + "\"");
 
-            assertTrue("Tile outline test 1", rowCount == finalTileNumber);
+            ResultSet rslt = selectStat.executeQuery();
+            rslt.next();
+
+            rowCountOk[0] = rslt.getInt(1) == finalTileNumber;
 
             return null;
         });
+
+        assertTrue("Tile outline test 1", rowCountOk[0]);
 
         // delete some tiles
         layer.removeTiles(ids.subList(0, 5));
+
+        rowCountOk[0] = false;
         project.executeWithDatabaseConnection((conn) -> {
 
-            PreparedStatement selectStat = conn.prepareStatement("SELECT count(*) FROM " + outlinesTableName);
-            ResultSet rslt = selectStat.executeQuery();
-            int rowCount = rslt.getInt(1);
+            PreparedStatement selectStat = conn.prepareStatement("SELECT count(*) FROM \"" + outlinesTableName + "\"");
 
-            assertTrue("Tile outline test 2", rowCount == finalTileNumber - 5);
+            ResultSet rslt = selectStat.executeQuery();
+            rslt.next();
+
+            rowCountOk[0] = rslt.getInt(1) == finalTileNumber - 5;
 
             return null;
         });
 
+        assertTrue("Tile outline test 2", rowCountOk[0]);
+
         assertTrue("Tile coverage test", layer.getInternalLayer() != null);
+
     }
 
 }

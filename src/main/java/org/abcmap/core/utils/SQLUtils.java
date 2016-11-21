@@ -6,13 +6,11 @@ import org.geotools.sql.SqlUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectOutputStream;
 import java.nio.file.Path;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * Created by remipassmoilesel on 08/11/16.
@@ -126,6 +124,22 @@ public class SQLUtils {
     }
 
     /**
+     * Return a JDBC datastore from a h2 embedded database
+     *
+     * @param database
+     * @return
+     * @throws IOException
+     */
+    public static JDBCDataStore getDatastoreFromH2(Path database) throws IOException {
+
+        Map<String, String> params = new HashMap();
+        params.put("dbtype", "h2");
+        params.put("database", database.toAbsolutePath().toString());
+
+        return (JDBCDataStore) DataStoreFinder.getDataStore(params);
+    }
+
+    /**
      * Process a transaction and close connection after if specified.
      * <p>
      * Allow to reduce the code length
@@ -164,7 +178,11 @@ public class SQLUtils {
         } catch (Exception e) {
 
             // error, cancel transaction
-            conn.rollback();
+            try {
+                conn.rollback();
+            } catch (Exception e1) {
+                throw new SQLException("Error while performing transaction: ", e1);
+            }
 
             throw new SQLException("Error while performing transaction: ", e);
 
@@ -181,5 +199,40 @@ public class SQLUtils {
 
     }
 
+    /**
+     * Return list of available tables in database.
+     * <p>
+     * /!\ Table names are in lower case
+     *
+     * @param connection
+     * @return
+     * @throws SQLException
+     */
+    public static ArrayList<String> getH2TableList(Connection connection) throws SQLException {
 
+        String request = "SHOW TABLES;";
+
+        Statement stmt = connection.createStatement();
+        ResultSet results = stmt.executeQuery(request);
+
+        ArrayList<String> tables = new ArrayList<>();
+
+        while (results.next()) {
+            tables.add(results.getString(1));
+        }
+
+        results.close();
+
+        return tables;
+    }
+
+    public static Connection createH2Connection(Path databasePath) throws SQLException {
+        return DriverManager.getConnection("jdbc:h2:file:" + databasePath.toAbsolutePath().toString());
+    }
+
+    public static void shutdownH2Database(Path databasePath) throws SQLException {
+        Connection conn = DriverManager.getConnection("jdbc:h2:file:" + databasePath.toAbsolutePath());
+        PreparedStatement stat = conn.prepareStatement("SHUTDOWN");
+        stat.execute();
+    }
 }

@@ -26,7 +26,7 @@ public class TempFilesManager {
         // check if temp folder exist
         this.tempFolder = ConfigurationConstants.TEMP_FOLDER;
 
-        if(Files.exists(tempFolder) == false){
+        if (Files.exists(tempFolder) == false) {
             Files.createDirectories(tempFolder);
         }
 
@@ -39,7 +39,7 @@ public class TempFilesManager {
      * @param suffix
      * @return
      */
-    public Path createTemporaryFile(String prefix, String suffix) throws IOException{
+    public Path createTemporaryFile(String prefix, String suffix) throws IOException {
 
         // prefix is mandatory
         if (prefix == null) {
@@ -52,10 +52,10 @@ public class TempFilesManager {
 
         Path file = null;
 
-        do{
+        do {
             String name = prefix + System.nanoTime() + suffix;
             file = Paths.get(getTempDirectoryPath(), name);
-        } while(Files.exists(file));
+        } while (Files.exists(file));
 
         Files.createFile(file);
 
@@ -69,8 +69,23 @@ public class TempFilesManager {
      * @throws IOException
      */
     public Path createProjectTempDirectory() throws IOException {
+        return createTempDirectory(ConfigurationConstants.TEMP_FOLDER);
+    }
+
+    /**
+     * Create a temporary directory at specified root
+     *
+     * @param root
+     * @return
+     * @throws IOException
+     */
+    public Path createTempDirectory(Path root) throws IOException {
 
         Path finalPath;
+
+        if (root == null) {
+            root = Paths.get(".");
+        }
 
         // generate a non existent path
         int i = 0;
@@ -78,14 +93,13 @@ public class TempFilesManager {
         String complement = "";
 
         do {
-            if(i == 0){
+            if (i == 0) {
                 complement = "";
-            }
-            else {
+            } else {
                 complement = "_" + i;
             }
             name = new SimpleDateFormat("yyyy-M-d-HH-mm").format(new Date()) + complement;
-            finalPath = Paths.get(ConfigurationConstants.TEMP_FOLDER.toString(), name);
+            finalPath = root.resolve(name);
             i++;
         } while (Files.exists(finalPath));
 

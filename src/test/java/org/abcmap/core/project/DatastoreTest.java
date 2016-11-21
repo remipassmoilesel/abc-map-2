@@ -6,13 +6,11 @@ import org.abcmap.TestUtils;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLUtils;
+import org.apache.commons.io.FileUtils;
 import org.geotools.data.FeatureStore;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
-import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.geopkg.FeatureEntry;
-import org.geotools.geopkg.GeoPackage;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.BeforeClass;
@@ -42,17 +40,14 @@ public class DatastoreTest {
     public void tests() throws IOException {
 
         Path tempDir = TestUtils.PLAYGROUND_DIRECTORY.resolve("datastoreTest");
+        FileUtils.deleteDirectory(tempDir.toFile());
         Files.createDirectories(tempDir);
 
-        // create a geopackage
-        Path directory = TestUtils.PLAYGROUND_DIRECTORY.resolve("shapeIdIssue");
-        Files.createDirectories(directory);
-
-        Path db = directory.resolve("geopkg.db");
+        Path db = tempDir.resolve("project.h2");
         Files.deleteIfExists(db);
         Files.createFile(db);
 
-        GeoPackage geopkg = new GeoPackage(db.toFile());
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(db);
         String featureId = "feature1";
 
         SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
@@ -63,14 +58,9 @@ public class DatastoreTest {
         SimpleFeatureType type = tbuilder.buildFeatureType();
         SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(type);
 
-        FeatureEntry fe = new FeatureEntry();
-        fe.setBounds(new ReferencedEnvelope());
-        fe.setSrid(null);
+        // get feature store in database
+        datastore.createSchema(type);
 
-        // get feature store from geopackage
-        geopkg.create(fe, type);
-
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromGeopackage(geopkg.getFile().toPath());
         FeatureStore featureStore = (FeatureStore) datastore.getFeatureSource("feature1");
 
         for (int i = 0; i < 100; i++) {
@@ -79,9 +69,6 @@ public class DatastoreTest {
 
             featureStore.addFeatures(FeatureUtils.asList(fbuilder.buildFeature(null)));
         }
-
-        // test reading  after geopackage closing
-        geopkg.close();
 
         int count = 0;
         FeatureIterator it = featureStore.getFeatures().features();

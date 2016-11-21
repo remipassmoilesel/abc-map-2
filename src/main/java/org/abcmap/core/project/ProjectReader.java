@@ -8,6 +8,7 @@ import org.abcmap.core.project.dao.StyleDAO;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
+import org.abcmap.core.utils.ZipUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,8 +35,11 @@ public class ProjectReader {
     public Project read(Path tempfolder, Path projectFile) throws IOException {
 
         // copy file in temp directory
-        Path newTempDatabase = tempfolder.resolve(ProjectWriter.TEMPORARY_NAME);
+        Path newTempDatabase = tempfolder.resolve(ProjectWriter.PROJECT_TEMP_NAME);
         Files.copy(projectFile, newTempDatabase);
+
+        // uncompress
+        ZipUtils.uncompress(newTempDatabase, tempfolder);
 
         // create project
         Project project = new Project(newTempDatabase);
@@ -52,25 +56,27 @@ public class ProjectReader {
 
                 if (LayerType.FEATURES.equals(entry.getType())) {
                     // here features from a shapefile should be named with the layer id
-                    FeatureLayer layer = new FeatureLayer(entry, project.getGeopkg(), false);
+                    FeatureLayer layer = new FeatureLayer(entry, newTempDatabase, false);
                     project.addLayer(layer);
                 } else {
-                    logger.error("Unknown type: " + entry.getType());
+                    logger.error("Unknown layer type: " + entry.getType());
                 }
 
             }
 
             // set the first layer active
-            project.setActiveLayer(0);
+            if (project.getLayers().size() < 1) {
+                throw new IOException("Invalid project, no layers found");
+            }
 
             //TODO read layouts
 
             // get metadata
-            ProjectMetadataDAO mtdao = new ProjectMetadataDAO(projectFile);
+            ProjectMetadataDAO mtdao = new ProjectMetadataDAO(newTempDatabase);
             project.setMetadataContainer(mtdao.readMetadata());
 
             // get styles
-            StyleDAO stdao = new StyleDAO(projectFile);
+            StyleDAO stdao = new StyleDAO(newTempDatabase);
             project.getStyleLibrary().setStyleCollection(stdao.readStyles());
 
         } catch (Exception e) {

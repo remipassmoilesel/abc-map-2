@@ -9,14 +9,14 @@ import org.abcmap.core.project.dao.DataModel;
  * Object that represent layer metadata. They are stored separately in database.
  */
 
-@DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "layer_index")
+@DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "LAYER_INDEX")
 public class LayerIndexEntry implements DataModel {
 
-    private static final String ID_FIELD_NAME = "id";
-    private static final String TYPE_FIELD_NAME = "type";
-    private static final String NAME_FIELD_NAME = "name";
-    private static final String VISIBLE_FIELD_NAME = "visible";
-    private static final String ZINDEX_FIELD_NAME = "zindex";
+    private static final String ID_FIELD_NAME = "ID";
+    private static final String TYPE_FIELD_NAME = "TYPE";
+    private static final String NAME_FIELD_NAME = "NAME";
+    private static final String VISIBLE_FIELD_NAME = "VISIBLE";
+    private static final String ZINDEX_FIELD_NAME = "ZINDEX";
 
     @DatabaseField(id = true, columnName = ID_FIELD_NAME)
     private String layerId;
@@ -117,7 +117,7 @@ public class LayerIndexEntry implements DataModel {
         } else {
             prefix += "_";
         }
-        return "abcmap_layer_" + prefix + System.nanoTime();
+        return "ABM_LAYER_" + prefix.toUpperCase() + System.nanoTime();
     }
 
     @Override
