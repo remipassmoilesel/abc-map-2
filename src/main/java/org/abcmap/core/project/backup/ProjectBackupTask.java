@@ -13,8 +13,6 @@ import java.nio.file.Path;
 import java.util.TimerTask;
 import java.util.concurrent.locks.ReentrantLock;
 
-import static org.geotools.xml.DocumentWriter.logger;
-
 /**
  * Created by remipassmoilesel on 12/11/16.
  */
@@ -49,7 +47,7 @@ public class ProjectBackupTask extends TimerTask{
             Project p = pman.getProject();
             Path backupPath =  p.getDatabasePath().resolveSibling(p.getDatabasePath().getFileName() + BACKUP_SUFFIX);
             try {
-                writer.write(p, backupPath);
+                writer.export(p, backupPath);
             } catch (IOException e) {
                 logger.error("Unable to backup project");
                 logger.error(e);

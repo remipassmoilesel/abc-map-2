@@ -9,21 +9,12 @@ import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.project.dao.StyleDAO;
-import org.abcmap.core.project.layer.AbstractLayer;
-import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.project.layer.LayerType;
-import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.ZipUtils;
-import org.apache.commons.io.FileUtils;
-import org.geotools.data.FeatureStore;
-import org.geotools.data.simple.SimpleFeatureSource;
-import org.geotools.jdbc.JDBCDataStore;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.sql.PreparedStatement;
 
 /**
  * Contain methods to write a project
@@ -36,6 +27,9 @@ public class ProjectWriter {
      * Temporary name of the project database when open
      */
     public static final String PROJECT_TEMP_NAME = "project." + ConfigurationConstants.PROJECT_EXTENSION + ".tmp";
+    public static final String PROJECT_ZIP_DUMP_NAME = "dump.zip";
+    public static final String PROJECT_DUMP_NAME = "dump.sql";
+
     private final TempFilesManager tempMan;
 
     public ProjectWriter() {
@@ -60,7 +54,11 @@ public class ProjectWriter {
         Project project = new Project(path);
 
         ProjectWriter pwriter = new ProjectWriter();
-        pwriter.write(project, path, false, null);
+        try {
+            pwriter.writeMetadatas(project, project.getDatabasePath());
+        } catch (DAOException e) {
+            throw new IOException("Error while creating a new project", e);
+        }
 
         project.initializeDatabase();
 
@@ -75,92 +73,47 @@ public class ProjectWriter {
 
 
     /**
-     * Write a project at specified destination. If specified destination is already a file,
-     * it will be overwrite
-     * <p>
-     * If bundle is set to true, you have to set a temporary directory. Database will be compressed in one file, and tempdir will be deleted just after.
-     *
-     * @param project
-     * @param destination
-     * @return
-     * @throws IOException
-     */
-    public boolean write(Project project, Path destination) throws IOException {
-        return write(project, destination, true, tempMan.createTempDirectory(project.getTempDirectory()));
-    }
-
-    /**
-     * Write a project at specified destination. If specified destination is already a file,
-     * it will be overwrite
-     * <p>
-     * If bundle is set to true, you have to set a temporary directory. Database will be compressed in one file, and tempdir will be deleted just after.
+     * Write a project at specified destination
      *
      * @param project
      * @param destination
      * @throws IOException
      */
-    public boolean write(Project project, Path destination, boolean bundle, Path tempdir) throws IOException {
+    public boolean export(Project project, Path destination) throws IOException {
 
-        // delete eventual previous file
-        if (Files.exists(destination)) {
-            Files.delete(destination);
-        }
-
-        if (bundle == true && tempdir == null) {
-            throw new NullPointerException("If bundle is set to true, temporary directory must not be null");
-        }
-
-        // create a new temporary database
-        Path tempProject;
-        if (bundle) {
-            tempProject = tempdir.resolve(PROJECT_TEMP_NAME);
-        } else {
-            tempProject = destination;
-        }
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(tempProject);
-
+        // write metadata into original project before dump
         try {
-            writeMetadatas(project, tempProject);
+            writeMetadatas(project, project.getDatabasePath());
         } catch (DAOException e) {
-            throw new IOException(e);
+            throw new IOException("Error while writing project", e);
         }
 
-        // write layer contents
-        for (AbstractLayer layer : project.getLayers()) {
+        // dump database
+        Path dump = project.getTempDirectory().toAbsolutePath().resolve(PROJECT_DUMP_NAME);
+        Files.deleteIfExists(dump);
 
-            if (LayerType.FEATURES.equals(layer.getType())) {
+        Boolean executed = (boolean) project.executeWithDatabaseConnection((conn) -> {
 
-                SimpleFeatureSource featureSource = ((FeatureLayer) layer).getFeatureSource();
-                datastore.createSchema(featureSource.getSchema());
+            PreparedStatement stat = conn.prepareStatement("SCRIPT DROP TO ?;");
+            stat.setString(1, dump.toString());
+            stat.execute();
 
-                FeatureStore featureStore = (FeatureStore) datastore.getFeatureSource(featureSource.getSchema().getTypeName());
-                featureStore.addFeatures(featureSource.getFeatures());
+            return true;
 
-            } else {
-                logger.warning("Unknown layer type: " + layer.getType());
-            }
+        });
+
+        if (executed != true) {
+            throw new IOException("Error while writing project");
         }
 
-        datastore.dispose();
+        // compress and copy to destination
+        Path zipDump = project.getTempDirectory().resolve(PROJECT_ZIP_DUMP_NAME);
+        Files.deleteIfExists(zipDump);
 
-        if (bundle) {
+        ZipUtils.compress(project.getTempDirectory(), dump, zipDump);
 
-            // compress temporary database
-            Iterator<Path> dit = Files.newDirectoryStream(tempdir).iterator();
-            ArrayList<Path> toCompress = new ArrayList<>();
-            while (dit.hasNext()) {
-                Path p = dit.next();
-                if (p.toString().toLowerCase().endsWith(".db")) {
-                    toCompress.add(p);
-                }
-            }
-
-            ZipUtils.compress(toCompress, destination);
-
-            // delete temporary files
-            FileUtils.deleteDirectory(tempdir.toFile());
-
-        }
+        // copy to destination
+        Files.copy(zipDump, destination);
 
         return true;
 
@@ -173,20 +126,23 @@ public class ProjectWriter {
      * @param destination
      * @throws DAOException
      */
-    public static void writeMetadatas(Project project, Path destination) throws DAOException {
+    public void writeMetadatas(Project project, Path destination) throws DAOException {
 
         // write metadata
         ProjectMetadataDAO mtdao = new ProjectMetadataDAO(destination);
         mtdao.writeMetadata(project.getMetadataContainer());
+        mtdao.close();
 
         // write layer indexes
         LayerIndexDAO lidao = new LayerIndexDAO(destination);
         lidao.writeAllEntries(project.getLayerIndexEntries());
+        lidao.close();
 
         // write styles
         StyleDAO sdao = new StyleDAO(destination);
         sdao.createTableIfNotExist();
         sdao.writeAll(project.getStyleLibrary().getStyleCollection());
+        sdao.close();
 
     }
 

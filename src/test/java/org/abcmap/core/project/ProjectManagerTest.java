@@ -74,7 +74,7 @@ public class ProjectManagerTest {
         try {
             pman.openProject(savedPath);
             openedProj = pman.getProject();
-            opened = Files.exists(openedProj.getDatabasePath());
+            opened = Files.exists(Paths.get(openedProj.getDatabasePath().toString() + ".data.db"));
         } catch (IOException e) {
             e.printStackTrace();
         }

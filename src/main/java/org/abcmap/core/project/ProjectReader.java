@@ -2,17 +2,23 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.project.dao.StyleDAO;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;
+import org.abcmap.core.project.layer.TileLayer;
+import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.ZipUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -35,54 +41,98 @@ public class ProjectReader {
     public Project read(Path tempfolder, Path projectFile) throws IOException {
 
         // copy file in temp directory
-        Path newTempDatabase = tempfolder.resolve(ProjectWriter.PROJECT_TEMP_NAME);
-        Files.copy(projectFile, newTempDatabase);
+        Path zipDump = tempfolder.resolve(ProjectWriter.PROJECT_ZIP_DUMP_NAME);
+        Files.copy(projectFile, zipDump);
 
-        // uncompress
-        ZipUtils.uncompress(newTempDatabase, tempfolder);
+        // uncompress file
+        ZipUtils.uncompress(zipDump, tempfolder);
+        Files.delete(zipDump);
 
-        // create project
-        Project project = new Project(newTempDatabase);
-        project.initializeDatabase();
+        Path dump = tempfolder.resolve(ProjectWriter.PROJECT_DUMP_NAME);
+
+        // create a database and load dump
+        Path newDatabase = tempfolder.resolve(ProjectWriter.PROJECT_TEMP_NAME);
+        try {
+            Connection conn = SQLUtils.createH2Connection(newDatabase);
+            PreparedStatement loadStat = conn.prepareStatement("RUNSCRIPT FROM ?;");
+            loadStat.setString(1, dump.toAbsolutePath().toString());
+            loadStat.execute();
+
+            // delete dump
+            Files.delete(dump);
+
+        } catch (SQLException e) {
+            throw new IOException("Error while reading project", e);
+        }
+
+        Project newProject = new Project(newDatabase);
 
         try {
 
-            // get layer index
-            LayerIndexDAO lidao = new LayerIndexDAO(newTempDatabase);
+            // read metadatas
+            readMetadatas(newDatabase, newProject);
+
+            // recreate layers
+            LayerIndexDAO lidao = new LayerIndexDAO(newDatabase);
             ArrayList<LayerIndexEntry> indexes = lidao.readAllEntries();
 
-            // create layers
             for (LayerIndexEntry entry : indexes) {
 
+                // layer contain geometries
                 if (LayerType.FEATURES.equals(entry.getType())) {
-                    // here features from a shapefile should be named with the layer id
-                    FeatureLayer layer = new FeatureLayer(entry, newTempDatabase, false);
-                    project.addLayer(layer);
-                } else {
+                    FeatureLayer layer = new FeatureLayer(entry, newDatabase, false);
+                    newProject.addLayer(layer);
+                }
+
+                // Layer contain tiles
+                else if (LayerType.TILES.equals(entry.getType())) {
+                    TileLayer layer = new TileLayer(entry, newDatabase, false);
+                    newProject.addLayer(layer);
+                }
+
+                // unrecognized layer
+                else {
                     logger.error("Unknown layer type: " + entry.getType());
+                    //TODO throw an exception ?
                 }
 
             }
 
-            // set the first layer active
-            if (project.getLayers().size() < 1) {
+            // check if ther is at least one layer
+            if (newProject.getLayers().size() < 1) {
                 throw new IOException("Invalid project, no layers found");
             }
 
-            //TODO read layouts
+            // set the first layer active
+            newProject.setActiveLayer(0);
 
-            // get metadata
-            ProjectMetadataDAO mtdao = new ProjectMetadataDAO(newTempDatabase);
-            project.setMetadataContainer(mtdao.readMetadata());
-
-            // get styles
-            StyleDAO stdao = new StyleDAO(newTempDatabase);
-            project.getStyleLibrary().setStyleCollection(stdao.readStyles());
-
-        } catch (Exception e) {
-            throw new IOException("Error while reading project", e);
+        } catch (DAOException e) {
+            throw new IOException(e);
         }
 
-        return project;
+        return newProject;
     }
+
+
+    /**
+     * Write metadatas and layer index to specified destination
+     *
+     * @param project
+     * @param source
+     * @throws DAOException
+     */
+    public void readMetadatas(Path source, Project project) throws DAOException {
+
+        // write metadata
+        ProjectMetadataDAO mtdao = new ProjectMetadataDAO(source);
+        project.setMetadataContainer(mtdao.readMetadata());
+        mtdao.close();
+
+        // get styles
+        StyleDAO stdao = new StyleDAO(source);
+        project.getStyleLibrary().setStyleCollection(stdao.readStyles());
+        stdao.close();
+
+    }
+
 }

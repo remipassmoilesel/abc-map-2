@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
 import org.abcmap.core.project.tiles.TileCoverageEntry;
 import org.abcmap.core.project.tiles.TileStorage;
+import org.abcmap.core.project.tiles.TileStorageQueries;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
 import org.junit.BeforeClass;
@@ -53,9 +54,9 @@ public class TileStorageTest {
 
         ArrayList<String> list = SQLUtils.getH2TableList(storage.getDatabaseConnection());
 
-        assertTrue("Storage creation test", list.contains(TileStorage.MASTER_TABLE_NAME));
-        assertTrue("Coverage creation test 1", list.contains(TileStorage.DATA_TABLE_PREFIX + coverageName));
-        assertTrue("Coverage creation test 2", list.contains(TileStorage.SPATIAL_TABLE_PREFIX + coverageName));
+        assertTrue("Storage creation test", list.contains(TileStorageQueries.MASTER_TABLE_NAME));
+        assertTrue("Coverage creation test 1", list.contains(TileStorageQueries.DATA_TABLE_PREFIX + coverageName));
+        assertTrue("Coverage creation test 2", list.contains(TileStorageQueries.SPATIAL_TABLE_PREFIX + coverageName));
 
         // add tiles to coverage
         Path tilesRoot = TestUtils.RESOURCES_DIRECTORY.resolve("tiles");
@@ -91,7 +92,7 @@ public class TileStorageTest {
 
                 // check if tile was inserted in spatial table
                 PreparedStatement req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getSpatialTableName() + " " +
-                        "WHERE " + TileStorage.TILE_ID_FIELD_NAME + " = ?;");
+                        "WHERE " + TileStorageQueries.TILE_ID_FIELD_NAME + " = ?;");
                 req.setString(1, id);
 
                 ResultSet rs = req.executeQuery();
@@ -101,7 +102,7 @@ public class TileStorageTest {
 
                 // check if tile was inserted in data table
                 req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getDataTableName()
-                        + " WHERE " + TileStorage.TILE_ID_FIELD_NAME + " = ?;");
+                        + " WHERE " + TileStorageQueries.TILE_ID_FIELD_NAME + " = ?;");
                 req.setString(1, id);
 
                 rs = req.executeQuery();

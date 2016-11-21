@@ -426,4 +426,5 @@ public class Project {
     public Connection getDatabaseConnection() throws SQLException {
         return SQLUtils.createH2Connection(databasePath);
     }
+
 }

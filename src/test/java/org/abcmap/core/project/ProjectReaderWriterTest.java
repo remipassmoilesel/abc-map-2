@@ -66,23 +66,23 @@ public class ProjectReaderWriterTest {
 
             // add layers
             newProject.addNewFeatureLayer("Second layer", true, 1);
+            newProject.addNewTileLayer("Third layer", true, 1);
 
+            // test layer index writing
             LayerIndexDAO lidao = new LayerIndexDAO(newProject.getDatabasePath());
             writer.writeMetadatas(newProject, newProject.getDatabasePath());
 
-            assertTrue("AbstractLayer index test", lidao.readAllEntries().size() == 2);
+            assertTrue("AbstractLayer index test", lidao.readAllEntries().size() == 3);
 
+            // add layer elements
             FeatureLayer l = (FeatureLayer) newProject.getLayers().get(0);
             for (int i = 0; i < 100; i++) {
                 l.addShape(geom.createPoint(new Coordinate(i, i)));
             }
 
-            // add a tile layer
-            newProject.addNewTileLayer("Tile layer one", true, 2);
-
-            // Writing test
+            // test project writing
             Path savedProject = tempDirectory.resolve("savedProject.abm");
-            writer.write(newProject, savedProject);
+            writer.export(newProject, savedProject);
 
             assertTrue("Writing test", Files.isRegularFile(savedProject));
 

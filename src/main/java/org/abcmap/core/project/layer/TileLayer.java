@@ -3,6 +3,7 @@ package org.abcmap.core.project.layer;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 import org.abcmap.core.project.tiles.TileStorage;
+import org.abcmap.core.project.tiles.TileStorageQueries;
 import org.abcmap.core.shapes.feature.TileFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
@@ -12,6 +13,7 @@ import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
+import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.gce.imagemosaic.jdbc.Config;
@@ -218,27 +220,27 @@ public class TileLayer extends AbstractLayer {
         config.setSpatialExtension(SpatialExtension.fromString("universal"));
 
         // master table
-        config.setMasterTable(TileStorage.MASTER_TABLE_NAME);
-        config.setCoverageNameAttribute(TileStorage.COVERAGE_NAME_FIELD_NAME);
-        config.setTileMinXAttribute(TileStorage.MIN_X_FIELD_NAME);
-        config.setTileMinYAttribute(TileStorage.MIN_Y_FIELD_NAME);
-        config.setTileMaxXAttribute(TileStorage.MAX_X_FIELD_NAME);
-        config.setTileMaxYAttribute(TileStorage.MAX_Y_FIELD_NAME);
-        config.setTileTableNameAtribute(TileStorage.TILE_TABLE_NAME_FIELD_NAME);
-        config.setSpatialTableNameAtribute(TileStorage.SPATIAL_TABLE_NAME_FIELD_NAME);
+        config.setMasterTable(TileStorageQueries.MASTER_TABLE_NAME);
+        config.setCoverageNameAttribute(TileStorageQueries.COVERAGE_NAME_FIELD_NAME);
+        config.setTileMinXAttribute(TileStorageQueries.MIN_X_FIELD_NAME);
+        config.setTileMinYAttribute(TileStorageQueries.MIN_Y_FIELD_NAME);
+        config.setTileMaxXAttribute(TileStorageQueries.MAX_X_FIELD_NAME);
+        config.setTileMaxYAttribute(TileStorageQueries.MAX_Y_FIELD_NAME);
+        config.setTileTableNameAtribute(TileStorageQueries.TILE_TABLE_NAME_FIELD_NAME);
+        config.setSpatialTableNameAtribute(TileStorageQueries.SPATIAL_TABLE_NAME_FIELD_NAME);
 
         // tile table
-        config.setBlobAttributeNameInTileTable(TileStorage.TILE_DATA_FIELD_NAME);
-        config.setKeyAttributeNameInTileTable(TileStorage.TILE_ID_FIELD_NAME);
+        config.setBlobAttributeNameInTileTable(TileStorageQueries.TILE_DATA_FIELD_NAME);
+        config.setKeyAttributeNameInTileTable(TileStorageQueries.TILE_ID_FIELD_NAME);
 
         // spatial table
-        config.setKeyAttributeNameInSpatialTable(TileStorage.TILE_ID_FIELD_NAME);
-        config.setMinXAttribute(TileStorage.MIN_X_FIELD_NAME);
-        config.setMinYAttribute(TileStorage.MIN_Y_FIELD_NAME);
-        config.setMaxXAttribute(TileStorage.MAX_X_FIELD_NAME);
-        config.setMaxYAttribute(TileStorage.MAX_Y_FIELD_NAME);
-        config.setResXAttribute(TileStorage.RES_X_FIELD_NAME);
-        config.setResYAttribute(TileStorage.RES_Y_FIELD_NAME);
+        config.setKeyAttributeNameInSpatialTable(TileStorageQueries.TILE_ID_FIELD_NAME);
+        config.setMinXAttribute(TileStorageQueries.MIN_X_FIELD_NAME);
+        config.setMinYAttribute(TileStorageQueries.MIN_Y_FIELD_NAME);
+        config.setMaxXAttribute(TileStorageQueries.MAX_X_FIELD_NAME);
+        config.setMaxYAttribute(TileStorageQueries.MAX_Y_FIELD_NAME);
+        config.setResXAttribute(TileStorageQueries.RES_X_FIELD_NAME);
+        config.setResYAttribute(TileStorageQueries.RES_Y_FIELD_NAME);
 
         config.validateConfig();
 
@@ -307,5 +309,9 @@ public class TileLayer extends AbstractLayer {
     @Override
     public ReferencedEnvelope getBounds() {
         throw new IllegalStateException("Not implemented for now");
+    }
+
+    public SimpleFeatureSource getOutlineFeatureSource() {
+        return featureSource;
     }
 }

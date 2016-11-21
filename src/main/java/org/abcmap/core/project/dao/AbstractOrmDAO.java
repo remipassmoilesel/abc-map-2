@@ -182,10 +182,32 @@ public abstract class AbstractOrmDAO {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
+
         if (connectionSource != null) {
             logger.warning("Database connection was not closed: " + this + " / " + connectionSource);
-            connectionSource.close();
+            close();
         }
+
+    }
+
+    public void close() throws DAOException {
+
+        if (connectionSource != null) {
+            try {
+                connectionSource.close();
+            } catch (IOException e) {
+                throw new DAOException(e);
+            }
+        }
+
+        if (dao != null) {
+            try {
+                dao.closeLastIterator();
+            } catch (IOException e) {
+                throw new DAOException(e);
+            }
+        }
+
     }
 
 }

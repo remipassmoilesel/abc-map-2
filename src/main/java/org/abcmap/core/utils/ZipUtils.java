@@ -27,13 +27,27 @@ public class ZipUtils {
     /**
      * Compress a list of files to the specified destination
      *
+     * @param file
+     * @param archiveDestination
+     * @throws IOException
+     */
+    public static void compress(Path root, Path file, Path archiveDestination) throws IOException {
+        ArrayList<Path> list = new ArrayList<>();
+        list.add(file);
+        compress(root, list, archiveDestination);
+    }
+
+
+    /**
+     * Compress a list of files to the specified destination
+     *
      * @param files
      * @param archiveDestination
      * @throws IOException
      */
     public static void compress(Path root, List<Path> files, Path archiveDestination) throws IOException {
 
-        if(root == null){
+        if (root == null) {
             root = Paths.get(".");
         }
 

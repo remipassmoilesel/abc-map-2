@@ -144,7 +144,7 @@ public class ProjectManager {
         ProjectWriter writer = new ProjectWriter();
         Path tempDir = tempMan.createTempDirectory(currentProject.getTempDirectory());
         try {
-            writer.write(currentProject, p, true, tempDir);
+            writer.export(currentProject, p);
         } catch (IOException e) {
             throw new IOException("Error while writing project", e);
         }
