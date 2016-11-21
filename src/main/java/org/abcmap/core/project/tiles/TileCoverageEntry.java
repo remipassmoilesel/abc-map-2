@@ -13,8 +13,8 @@ public class TileCoverageEntry {
 
     public TileCoverageEntry(String coverageName) {
         this.coverageName = coverageName;
-        this.spatialTableName = TileStorage.generateSpatialTableName(coverageName);
-        this.dataTableName = TileStorage.generateDataTableName(coverageName);
+        this.spatialTableName = TileStorageQueries.generateSpatialTableName(coverageName);
+        this.dataTableName = TileStorageQueries.generateDataTableName(coverageName);
     }
 
     public String getCoverageName() {
