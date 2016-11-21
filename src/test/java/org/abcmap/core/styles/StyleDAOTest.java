@@ -64,7 +64,11 @@ public class StyleDAOTest {
 
         ArrayList<StyleContainer> read = dao.readStyles();
 
-        assertTrue("Read / write test", written.equals(read));
+        // here we cannot compare lists directly because order change after reading
+        for (StyleContainer styleContainer : read) {
+            assertTrue("Read / write test: " + styleContainer, written.contains(styleContainer));
+        }
+
 
     }
 }

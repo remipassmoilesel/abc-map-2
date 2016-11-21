@@ -6,6 +6,7 @@ import org.abcmap.TestUtils;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLUtils;
+import org.apache.commons.io.FileUtils;
 import org.geotools.data.FeatureStore;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -39,13 +40,10 @@ public class DatastoreTest {
     public void tests() throws IOException {
 
         Path tempDir = TestUtils.PLAYGROUND_DIRECTORY.resolve("datastoreTest");
+        FileUtils.deleteDirectory(tempDir.toFile());
         Files.createDirectories(tempDir);
 
-        // create a database
-        Path directory = TestUtils.PLAYGROUND_DIRECTORY.resolve("shapeIdIssue");
-        Files.createDirectories(directory);
-
-        Path db = directory.resolve("geopkg.db");
+        Path db = tempDir.resolve("project.h2");
         Files.deleteIfExists(db);
         Files.createFile(db);
 

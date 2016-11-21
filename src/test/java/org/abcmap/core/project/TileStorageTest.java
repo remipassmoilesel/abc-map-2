@@ -35,23 +35,23 @@ public class TileStorageTest {
     public void tests() throws IOException, SQLException {
 
         // create temp directories
-        Path root = TestUtils.PLAYGROUND_DIRECTORY.resolve("tileStorageTest");
-        Utils.deleteDirectories(root.toFile());
+        Path tempDirectory = TestUtils.PLAYGROUND_DIRECTORY.resolve("tileStorageTest");
+        Utils.deleteDirectories(tempDirectory.toFile());
 
-        Files.createDirectories(root);
+        Files.createDirectories(tempDirectory);
 
         // create a database
-        Path databasePath = root.resolve("tileStorage.h2");
+        Path databasePath = tempDirectory.resolve("tileStorage.h2");
 
         // create a tile storage
         TileStorage storage = new TileStorage(databasePath);
         storage.initialize();
 
-        // create a new coverage
-        String coverageName = "coverage1";
+        // create a new coverage, upper case mandatory
+        String coverageName = "COVERAGE1";
         TileCoverageEntry coverageEntry = storage.createCoverage(coverageName);
 
-        ArrayList<String> list = SQLUtils.getSqliteTableList(storage.getDatabaseConnection());
+        ArrayList<String> list = SQLUtils.getH2TableList(storage.getDatabaseConnection());
 
         assertTrue("Storage creation test", list.contains(TileStorage.MASTER_TABLE_NAME));
         assertTrue("Coverage creation test 1", list.contains(TileStorage.DATA_TABLE_PREFIX + coverageName));
@@ -90,16 +90,22 @@ public class TileStorageTest {
             for (String id : ids) {
 
                 // check if tile was inserted in spatial table
-                PreparedStatement req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getSpatialTableName() + " WHERE " + TileStorage.TILE_ID_FIELD_NAME + " = ?;");
+                PreparedStatement req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getSpatialTableName() + " " +
+                        "WHERE " + TileStorage.TILE_ID_FIELD_NAME + " = ?;");
                 req.setString(1, id);
+
                 ResultSet rs = req.executeQuery();
+                rs.next();
 
                 assertTrue("Insert tiles test 1:" + i, rs.getInt(1) == 1);
 
                 // check if tile was inserted in data table
-                req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getDataTableName() + " WHERE " + TileStorage.TILE_ID_FIELD_NAME + " = ?;");
+                req = conn.prepareStatement("SELECT count(*) FROM " + coverageEntry.getDataTableName()
+                        + " WHERE " + TileStorage.TILE_ID_FIELD_NAME + " = ?;");
                 req.setString(1, id);
+
                 rs = req.executeQuery();
+                rs.next();
 
                 assertTrue("Insert tiles test 2:" + i, rs.getInt(1) == 1);
 

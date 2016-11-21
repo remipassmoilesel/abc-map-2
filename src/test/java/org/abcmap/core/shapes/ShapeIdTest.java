@@ -5,6 +5,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.utils.SQLUtils;
+import org.apache.commons.io.FileUtils;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.feature.DefaultFeatureCollection;
@@ -58,12 +59,11 @@ public class ShapeIdTest {
     public void test() throws IOException {
 
         // create a database
-        Path directory = TestUtils.PLAYGROUND_DIRECTORY.resolve("shapeIdIssue");
-        Files.createDirectories(directory);
+        Path tempDirectory = TestUtils.PLAYGROUND_DIRECTORY.resolve("shapeIdIssue");
+        FileUtils.deleteDirectory(tempDirectory.toFile());
+        Files.createDirectories(tempDirectory);
 
-        Path db = directory.resolve("database.h2");
-        Files.deleteIfExists(db);
-        Files.createFile(db);
+        Path db = tempDirectory.resolve("database.h2");
 
         // create a feature type
         String featureId = "feature1";
@@ -78,6 +78,8 @@ public class ShapeIdTest {
 
         // get feature store from database
         JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(db);
+        datastore.createSchema(type);
+
         FeatureStore featurestore = (FeatureStore) datastore.getFeatureSource(featureId);
 
         // add points to datastore

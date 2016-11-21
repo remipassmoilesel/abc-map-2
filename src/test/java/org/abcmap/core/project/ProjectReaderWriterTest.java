@@ -40,8 +40,8 @@ public class ProjectReaderWriterTest {
             }
             Files.createDirectories(tempDirectory);
 
-            // temp directory for creating project
-            Path newProjectTempDirectory = tempDirectory.resolve("newProjectTempDirectory");
+            //  directory where will be saved the new project
+            Path newProjectTempDirectory = tempDirectory.resolve("newProjectDirectory");
             Files.createDirectories(newProjectTempDirectory);
 
             ProjectWriter writer = new ProjectWriter();
@@ -52,7 +52,7 @@ public class ProjectReaderWriterTest {
             newProject.getMetadataContainer().updateValue(PMConstants.TITLE, "New title of the death");
 
             assertTrue("Creation test",
-                    Files.isRegularFile(newProjectTempDirectory.resolve(ProjectWriter.TEMPORARY_NAME)));
+                    Files.isRegularFile(newProjectTempDirectory.resolve(ProjectWriter.PROJECT_TEMP_NAME + ".data.db")));
 
             // add styles
             for (int i = 1; i < 10; i++) {
@@ -72,10 +72,10 @@ public class ProjectReaderWriterTest {
             }
 
             // Writing test
-            Path writedProject = tempDirectory.resolve("writedProject.abm");
-            writer.write(newProject, writedProject);
+            Path savedProject = tempDirectory.resolve("savedProject.abm");
+            writer.write(newProject, savedProject);
 
-            assertTrue("Writing test", Files.isRegularFile(writedProject));
+            assertTrue("Writing test", Files.isRegularFile(savedProject));
 
             // Basic project equality test
             assertTrue("Basic project equality test", newProject.equals(newProject));
@@ -86,8 +86,8 @@ public class ProjectReaderWriterTest {
             Files.createDirectories(openProjectTempDirectory1);
             Files.createDirectories(openProjectTempDirectory2);
 
-            Project p1 = reader.read(openProjectTempDirectory1, writedProject);
-            Project p2 = reader.read(openProjectTempDirectory2, writedProject);
+            Project p1 = reader.read(openProjectTempDirectory1, savedProject);
+            Project p2 = reader.read(openProjectTempDirectory2, savedProject);
 
             assertTrue("Metadata reading test 1", newProject.getMetadataContainer().equals(p1.getMetadataContainer()));
             assertTrue("Metadata reading test 2", p1.getMetadataContainer().equals(p2.getMetadataContainer()));
@@ -98,6 +98,22 @@ public class ProjectReaderWriterTest {
             assertTrue("Project reading test 1", newProject.equals(p1));
             assertTrue("Project reading test 2", p1.equals(p2));
 
+            // re-test all after closing projects
+            newProject.close();
+            p1.close();
+            p2.close();
+
+            Path openProjectTempDirectory3 = tempDirectory.resolve("openProjectTempDirectory3");
+            Path openProjectTempDirectory4 = tempDirectory.resolve("openProjectTempDirectory4");
+            Files.createDirectories(openProjectTempDirectory3);
+            Files.createDirectories(openProjectTempDirectory4);
+
+            Project p3 = reader.read(openProjectTempDirectory3, savedProject);
+            Project p4 = reader.read(openProjectTempDirectory4, savedProject);
+
+            assertTrue("Metadata reading test 3", p1.getMetadataContainer().equals(p2.getMetadataContainer()));
+            assertTrue("Layers reading test 3", p1.getLayers().equals(p2.getLayers()));
+            assertTrue("Project reading test 3", p1.equals(p2));
 
         } catch (Exception e) {
             e.printStackTrace();

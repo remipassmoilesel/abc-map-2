@@ -3,12 +3,14 @@ package org.abcmap.core.project;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
+import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.Assert.assertTrue;
 
@@ -26,6 +28,7 @@ public class ProjectManagerTest {
     public void tests() throws IOException {
 
         Path tempDir = TestUtils.PLAYGROUND_DIRECTORY.resolve("projectManagerTest");
+        FileUtils.deleteDirectory(tempDir.toFile());
         Files.createDirectories(tempDir);
 
         Path savedPath = tempDir.resolve("saved.abm");
@@ -36,19 +39,20 @@ public class ProjectManagerTest {
         Project newproj = null;
         try {
             pman.createNewProject();
-            newproj = pman.getProject();
-            created = Files.exists(newproj.getDatabasePath());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        assertTrue("Creation test", created);
+        newproj = pman.getProject();
+        created = Files.exists(Paths.get(newproj.getDatabasePath().toString() + ".data.db"));
+
+        assertTrue("Creation test", created && newproj != null);
 
         // save the project at another location
         boolean saved = false;
         newproj.setFinalPath(savedPath);
         try {
             pman.saveProject();
-            saved = Files.exists(newproj.getFinalPath());
+            saved =  Files.exists(Paths.get(newproj.getFinalPath().toString()));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -58,7 +62,7 @@ public class ProjectManagerTest {
         boolean closed = false;
         try {
             pman.closeProjet();
-            closed = Files.exists(newproj.getDatabasePath()) == false;
+            closed = Files.exists(Paths.get(newproj.getDatabasePath().toString() + ".data.db")) == false;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -75,13 +79,6 @@ public class ProjectManagerTest {
             e.printStackTrace();
         }
         assertTrue("Open test", opened);
-
-//        // last close, optionnal
-//        try {
-//            pman.closeProjet();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
 
     }
 }

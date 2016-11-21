@@ -32,13 +32,13 @@ public class WriteAccessTest implements Runnable {
 
                 System.out.println(stringId + " Writing");
 
-                PreparedStatement createStat = conn.prepareStatement("CREATE TABLE " + stringId.toLowerCase() + " (columnA TEXT NOT NULL, columnB TEXT NOT NULL);");
+                PreparedStatement createStat = conn.prepareStatement("CREATE TABLE \"" + stringId.toLowerCase() + "\" (columnA TEXT NOT NULL, columnB TEXT NOT NULL);");
                 createStat.execute();
 
                 for (int i = 0; i < 5; i++) {
 
 
-                    PreparedStatement stat = conn.prepareStatement("INSERT INTO " + stringId + " (columnA, columnB) VALUES(?,?);");
+                    PreparedStatement stat = conn.prepareStatement("INSERT INTO " + stringId.toLowerCase() + " (columnA, columnB) VALUES(?,?);");
                     stat.setString(1, "fakeValue_" + System.nanoTime());
                     stat.setString(2, "fakeValue_" + System.nanoTime());
 
