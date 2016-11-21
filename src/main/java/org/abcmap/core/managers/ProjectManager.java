@@ -42,7 +42,7 @@ public class ProjectManager {
      *
      * @throws IOException
      */
-    public void createNewProject() throws IOException {
+    public Project createNewProject() throws IOException {
 
         // get a new temp path
         Path dir = null;
@@ -60,6 +60,8 @@ public class ProjectManager {
         } catch (IOException e) {
             throw new IOException("Error while creating project", e);
         }
+
+        return currentProject;
 
     }
 

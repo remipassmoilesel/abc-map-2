@@ -3,8 +3,11 @@ package org.abcmap.core.project;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
+import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.project.layer.TileLayer;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.junit.BeforeClass;
@@ -13,6 +16,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -48,28 +52,33 @@ public class ProjectReaderWriterTest {
             ProjectReader reader = new ProjectReader();
 
             // test creation
-            Project newProject = writer.createNew(newProjectTempDirectory);
+            ProjectManager pman = MainManager.getProjectManager();
+            Project newProject = pman.createNewProject();
             newProject.getMetadataContainer().updateValue(PMConstants.TITLE, "New title of the death");
 
             assertTrue("Creation test",
-                    Files.isRegularFile(newProjectTempDirectory.resolve(ProjectWriter.PROJECT_TEMP_NAME + ".data.db")));
+                    Files.isRegularFile(Paths.get(newProject.getDatabasePath().toAbsolutePath().toString() + ".data.db")));
 
             // add styles
             for (int i = 1; i < 10; i++) {
                 newProject.getStyle(TestUtils.getRandomColor(), TestUtils.getRandomColor(), i);
             }
 
-            // layer index test
+            // add layers
             newProject.addNewFeatureLayer("Second layer", true, 1);
 
             LayerIndexDAO lidao = new LayerIndexDAO(newProject.getDatabasePath());
             writer.writeMetadatas(newProject, newProject.getDatabasePath());
+
             assertTrue("AbstractLayer index test", lidao.readAllEntries().size() == 2);
 
             FeatureLayer l = (FeatureLayer) newProject.getLayers().get(0);
             for (int i = 0; i < 100; i++) {
                 l.addShape(geom.createPoint(new Coordinate(i, i)));
             }
+
+            // add a tile layer
+            newProject.addNewTileLayer("Tile layer one", true, 2);
 
             // Writing test
             Path savedProject = tempDirectory.resolve("savedProject.abm");

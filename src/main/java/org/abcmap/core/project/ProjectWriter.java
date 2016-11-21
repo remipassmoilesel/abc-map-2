@@ -137,7 +137,7 @@ public class ProjectWriter {
                 featureStore.addFeatures(featureSource.getFeatures());
 
             } else {
-                logger.warning("Unknown type: " + layer.getType());
+                logger.warning("Unknown layer type: " + layer.getType());
             }
         }
 

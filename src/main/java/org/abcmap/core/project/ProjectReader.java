@@ -59,7 +59,7 @@ public class ProjectReader {
                     FeatureLayer layer = new FeatureLayer(entry, newTempDatabase, false);
                     project.addLayer(layer);
                 } else {
-                    logger.error("Unknown type: " + entry.getType());
+                    logger.error("Unknown layer type: " + entry.getType());
                 }
 
             }

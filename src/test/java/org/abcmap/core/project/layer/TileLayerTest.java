@@ -84,7 +84,6 @@ public class TileLayerTest {
         // delete some tiles
         layer.removeTiles(ids.subList(0, 5));
 
-
         rowCountOk[0] = false;
         project.executeWithDatabaseConnection((conn) -> {
 
@@ -101,6 +100,7 @@ public class TileLayerTest {
         assertTrue("Tile outline test 2", rowCountOk[0]);
 
         assertTrue("Tile coverage test", layer.getInternalLayer() != null);
+
     }
 
 }
