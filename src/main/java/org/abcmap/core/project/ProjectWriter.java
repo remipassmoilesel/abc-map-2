@@ -3,6 +3,8 @@ package org.abcmap.core.project;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.TempFilesManager;
 import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
@@ -11,6 +13,8 @@ import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerType;
 import org.abcmap.core.utils.SQLUtils;
+import org.abcmap.core.utils.ZipUtils;
+import org.apache.commons.io.FileUtils;
 import org.geotools.data.FeatureStore;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.jdbc.JDBCDataStore;
@@ -18,6 +22,8 @@ import org.geotools.jdbc.JDBCDataStore;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Contain methods to write a project
@@ -29,7 +35,12 @@ public class ProjectWriter {
     /**
      * Temporary name of the project database when open
      */
-    public static final String TEMPORARY_NAME = "project." + ConfigurationConstants.PROJECT_EXTENSION;
+    public static final String PROJECT_TEMP_NAME = "project." + ConfigurationConstants.PROJECT_EXTENSION + ".tmp";
+    private final TempFilesManager tempMan;
+
+    public ProjectWriter() {
+        tempMan = MainManager.getTempFilesManager();
+    }
 
     /**
      * Create a new project with a single feature layer
@@ -43,12 +54,14 @@ public class ProjectWriter {
         }
 
         // create a new project
-        Path path = tempfolder.resolve(TEMPORARY_NAME);
+        Path path = tempfolder.resolve(PROJECT_TEMP_NAME);
 
         // create a new project and initialize it
         Project project = new Project(path);
+
         ProjectWriter pwriter = new ProjectWriter();
-        pwriter.write(project, path);
+        pwriter.write(project, path, false, null);
+
         project.initializeDatabase();
 
         // add the first layer
@@ -60,28 +73,54 @@ public class ProjectWriter {
         return project;
     }
 
+
     /**
      * Write a project at specified destination. If specified destination is already a file,
      * it will be overwrite
      * <p>
-     * This method do not close database after writing, so you have to close it manually
+     * If bundle is set to true, you have to set a temporary directory. Database will be compressed in one file, and tempdir will be deleted just after.
+     *
+     * @param project
+     * @param destination
+     * @return
+     * @throws IOException
+     */
+    public boolean write(Project project, Path destination) throws IOException {
+        return write(project, destination, true, tempMan.createTempDirectory(project.getTempDirectory()));
+    }
+
+    /**
+     * Write a project at specified destination. If specified destination is already a file,
+     * it will be overwrite
+     * <p>
+     * If bundle is set to true, you have to set a temporary directory. Database will be compressed in one file, and tempdir will be deleted just after.
      *
      * @param project
      * @param destination
      * @throws IOException
      */
-    public boolean write(Project project, Path destination) throws IOException {
+    public boolean write(Project project, Path destination, boolean bundle, Path tempdir) throws IOException {
 
         // delete eventual previous file
         if (Files.exists(destination)) {
             Files.delete(destination);
         }
 
-        // create a new database
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(destination);
+        if (bundle == true && tempdir == null) {
+            throw new NullPointerException("If bundle is set to true, temporary directory must not be null");
+        }
+
+        // create a new temporary database
+        Path tempProject;
+        if (bundle) {
+            tempProject = tempdir.resolve(PROJECT_TEMP_NAME);
+        } else {
+            tempProject = destination;
+        }
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(tempProject);
 
         try {
-            writeMetadatas(project, destination);
+            writeMetadatas(project, tempProject);
         } catch (DAOException e) {
             throw new IOException(e);
         }
@@ -100,6 +139,27 @@ public class ProjectWriter {
             } else {
                 logger.warning("Unknown type: " + layer.getType());
             }
+        }
+
+        datastore.dispose();
+
+        if (bundle) {
+
+            // compress temporary database
+            Iterator<Path> dit = Files.newDirectoryStream(tempdir).iterator();
+            ArrayList<Path> toCompress = new ArrayList<>();
+            while (dit.hasNext()) {
+                Path p = dit.next();
+                if (p.toString().toLowerCase().endsWith(".db")) {
+                    toCompress.add(p);
+                }
+            }
+
+            ZipUtils.compress(toCompress, destination);
+
+            // delete temporary files
+            FileUtils.deleteDirectory(tempdir.toFile());
+
         }
 
         return true;

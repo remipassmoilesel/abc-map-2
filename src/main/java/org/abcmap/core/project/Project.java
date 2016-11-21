@@ -2,7 +2,10 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.project.layer.*;
+import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.project.layer.LayerIndexEntry;
+import org.abcmap.core.project.layer.TileLayer;
 import org.abcmap.core.project.tiles.TileStorage;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
@@ -17,9 +20,9 @@ import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represent a serializable project. Projects are stored in Geopakages, some kind of sqlite
@@ -122,7 +125,7 @@ public class Project {
      */
     protected void initializeDatabase() throws IOException {
 
-        this.datastore = SQLUtils.getDatastoreFromGeopackage(databasePath);
+        this.datastore = SQLUtils.getDatastoreFromH2(databasePath);
 
         tileStorage.initialize();
 
@@ -261,12 +264,7 @@ public class Project {
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-
-        if (datastore != null) {
-            logger.warning("Closing datastore: " + datastore);
-            datastore.dispose();
-        }
-
+        close();
     }
 
     /**
@@ -275,7 +273,19 @@ public class Project {
      * Temporary files are not deleted
      */
     public void close() {
-        datastore.dispose();
+
+        try {
+            SQLUtils.shutdownH2Database(databasePath);
+        } catch (SQLException e) {
+            logger.error("Error while shutting down database");
+            logger.error(e);
+        }
+
+        if (datastore != null) {
+            datastore.dispose();
+        } else {
+            logger.warning("Datastore was already closed");
+        }
         datastore = null;
     }
 
@@ -341,6 +351,9 @@ public class Project {
      * Be careful when you process long operations, SQLite do not support high concurrency
      * <p>
      * Execute an operation here avoid to have too many connections outside, maybe unclosed
+     * <p>
+     * <p>
+     * /!\ No excpetions are thrown, please return a result that can indicate a potential fail. Eg: Boolean: null, true, false
      *
      * @return
      */
@@ -411,6 +424,6 @@ public class Project {
      * @throws IOException
      */
     public Connection getDatabaseConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:sqlite:" + databasePath);
+        return SQLUtils.createH2Connection(databasePath);
     }
 }

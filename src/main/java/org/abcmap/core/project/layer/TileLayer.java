@@ -54,6 +54,10 @@ public class TileLayer extends AbstractLayer {
     private final ContentFeatureSource featureSource;
     private final SimpleFeatureStore featureStore;
     private final TileFeatureBuilder featureBuilder;
+
+    /**
+     * Name of current coverage, uppercase mandatory
+     */
     private final String coverageName;
     private final FeatureLayer outlineLayer;
 
@@ -68,7 +72,9 @@ public class TileLayer extends AbstractLayer {
         JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(databasePath);
 
         tileStorage = pman.getProject().getTileStorage();
-        coverageName = entry.getLayerId();
+
+        // uppercase mandatory
+        coverageName = entry.getLayerId().toUpperCase();
 
         // if true, create database entries
         if (create) {
@@ -172,8 +178,6 @@ public class TileLayer extends AbstractLayer {
                 filter = ff.or(filter, ff.equal(ff.property(TileFeatureBuilder.TILE_ID_ATTRIBUTE_NAME), ff.literal(id), true));
             }
 
-            System.out.println(filter);
-
             featureStore.removeFeatures(filter);
 
             return true;
@@ -207,8 +211,8 @@ public class TileLayer extends AbstractLayer {
         config.setDstype("DBCP");
         config.setUsername("");
         config.setPassword("");
-        config.setJdbcUrl("jdbc:sqlite:" + databasePath.toString());
-        config.setDriverClassName("org.sqlite.JDBC");
+        config.setJdbcUrl("jdbc:h2:file:" + databasePath.toString());
+        config.setDriverClassName("org.h2.Driver");
         config.setMaxActive(5);
         config.setMaxIdle(0);
         config.setSpatialExtension(SpatialExtension.fromString("universal"));

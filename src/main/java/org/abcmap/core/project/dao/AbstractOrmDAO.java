@@ -24,7 +24,7 @@ public abstract class AbstractOrmDAO {
 
     public AbstractOrmDAO(Path dbPath, Class<? extends DataModel> entity) throws DAOException {
 
-        String databaseUrl = "jdbc:sqlite:" + dbPath.toString();
+        String databaseUrl = "jdbc:h2:" + dbPath.toString();
         try {
 
             // initialize sqlite connection

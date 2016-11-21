@@ -11,10 +11,10 @@ public class TileCoverageEntry {
     private String spatialTableName;
     private String dataTableName;
 
-    public TileCoverageEntry(String coverageName, String spatialTableName, String dataTableName) {
+    public TileCoverageEntry(String coverageName) {
         this.coverageName = coverageName;
-        this.spatialTableName = spatialTableName;
-        this.dataTableName = dataTableName;
+        this.spatialTableName = TileStorage.generateSpatialTableName(coverageName);
+        this.dataTableName = TileStorage.generateDataTableName(coverageName);
     }
 
     public String getCoverageName() {
@@ -55,4 +55,6 @@ public class TileCoverageEntry {
     public int hashCode() {
         return Objects.hash(coverageName, spatialTableName, dataTableName);
     }
+
+
 }

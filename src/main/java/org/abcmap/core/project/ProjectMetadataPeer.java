@@ -5,11 +5,11 @@ import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.project.dao.DataModel;
 
-@DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "metadata")
+@DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "METADATA")
 public class ProjectMetadataPeer implements DataModel {
 
-    private static final String NAME_FIELD_NAME = "name";
-    private static final String VALUE_FIELD_NAME = "value";
+    private static final String NAME_FIELD_NAME = "NAME";
+    private static final String VALUE_FIELD_NAME = "VALUE";
 
     @DatabaseField(id = true, columnName = NAME_FIELD_NAME)
     private PMConstants name;
