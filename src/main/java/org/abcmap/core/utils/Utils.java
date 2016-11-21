@@ -324,6 +324,10 @@ public class Utils {
         return ext.equalsIgnoreCase(extension);
     }
 
+    public static boolean checkExtension(Path file, String extension) {
+        return checkExtension(file.toString(), extension);
+    }
+
     /**
      * Return file extension or empty string
      *

@@ -1,12 +1,14 @@
 package org.abcmap.core.utils;
 
 import org.abcmap.TestUtils;
+import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 
 import static org.junit.Assert.assertTrue;
@@ -36,7 +38,7 @@ public class ZipUtilsTest {
         Path archive = tempDir.resolve("archive.zip");
 
         // compress files
-        ZipUtils.compress(files, archive);
+        ZipUtils.compress(tempDir, files, archive);
 
         assertTrue("Compression test", Files.exists(archive));
 
@@ -48,6 +50,25 @@ public class ZipUtilsTest {
         for (int i = 0; i < 10; i++) {
             assertTrue("Uncompression test " + i, Files.exists(dest.resolve("file_" + i + ".txt")));
         }
+
+        // test file visit
+        Path folderArch = tempDir.resolve("folder.zip");
+        ZipUtils.compressFolder(tempDir, folderArch);
+
+        assertTrue("Walking compression test", Files.exists(folderArch));
+
+        // test file visit
+        Path folderArch2 = tempDir.resolve("folder2.zip");
+        ZipUtils.walkFileTree(tempDir, folderArch2, (p, attrs) -> {
+
+            if (Utils.checkExtension(p, "txt")) {
+                return true;
+            }
+
+            return false;
+        });
+
+        assertTrue("Walking compression test", Files.exists(folderArch));
     }
 
 }
