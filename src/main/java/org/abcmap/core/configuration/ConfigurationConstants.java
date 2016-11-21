@@ -92,6 +92,9 @@ public class ConfigurationConstants {
 
     public static final int BACKUP_INTERVAL = 2000 * 60;
 
-    public static final String SQL_TABLE_PREFIX = "abcmap_";
+    /**
+     * Upper case mandatory
+     */
+    public static final String SQL_TABLE_PREFIX = "ABCMAP_";
 
 }

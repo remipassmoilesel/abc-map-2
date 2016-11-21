@@ -140,8 +140,9 @@ public class ProjectManager {
     public void saveProject(Path p) throws IOException {
 
         ProjectWriter writer = new ProjectWriter();
+        Path tempDir = tempMan.createTempDirectory(currentProject.getTempDirectory());
         try {
-            writer.write(currentProject, p);
+            writer.write(currentProject, p, true, tempDir);
         } catch (IOException e) {
             throw new IOException("Error while writing project", e);
         }
