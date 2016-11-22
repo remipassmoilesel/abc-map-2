@@ -101,6 +101,9 @@ public abstract class AbstractOrmDAO {
      * @param e
      */
     public void create(Object e) throws IOException {
+
+        throwIfIllegalType(e);
+
         try {
             dao.create(e);
         } catch (SQLException e1) {
@@ -109,13 +112,16 @@ public abstract class AbstractOrmDAO {
     }
 
     /**
-     * Delete an entry for this object
+     * Update an entry for this object
      *
      * @param e
      */
-    public void update(Object e) throws IOException {
+    public int update(Object e) throws IOException {
+
+        throwIfIllegalType(e);
+
         try {
-            dao.update(e);
+            return dao.update(e);
         } catch (SQLException e1) {
             throw new IOException(e1);
         }
@@ -126,9 +132,12 @@ public abstract class AbstractOrmDAO {
      *
      * @param e
      */
-    public void delete(Object e) throws IOException {
+    public int delete(Object e) throws IOException {
+
+        throwIfIllegalType(e);
+
         try {
-            dao.delete(e);
+            return dao.delete(e);
         } catch (SQLException e1) {
             throw new IOException(e1);
         }
@@ -200,6 +209,12 @@ public abstract class AbstractOrmDAO {
             dao.closeLastIterator();
         }
 
+    }
+
+    protected void throwIfIllegalType(Object o) {
+        if (dataModel.isInstance(o) == false) {
+            throw new IllegalArgumentException("Illegal class " + o.getClass().getName() + ", need " + dataModel.getName());
+        }
     }
 
 }
