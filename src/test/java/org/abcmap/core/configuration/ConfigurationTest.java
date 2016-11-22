@@ -3,6 +3,7 @@ package org.abcmap.core.configuration;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.ConfigurationManager;
 import org.abcmap.core.managers.MainManager;
+import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,31 +23,30 @@ public class ConfigurationTest {
     @Test
     public void configurationTest() throws IOException {
 
-        ConfigurationManager config = MainManager.getConfigurationManager();
+        ConfigurationManager configm = MainManager.getConfigurationManager();
 
-        assertTrue("Equality test", config.equals(config));
+        // basic equality test
+        assertTrue("Equality test", configm.getConfiguration().equals(configm.getConfiguration()));
 
-        /*
-         * Save configuration
-         */
+        // prepare temp files
+        Path tempDir = TestUtils.PLAYGROUND_DIRECTORY.resolve("configurationPersistenceTest");
+        FileUtils.deleteDirectory(tempDir.toFile());
+        Files.createDirectories(tempDir);
 
-        Path configurationDir = TestUtils.PLAYGROUND_DIRECTORY.resolve("configurationPersistenceTest");
-        Files.createDirectories(configurationDir);
-
-        Path configurationPath = configurationDir.resolve("configuration.xml");
-
+        // create default configuration
+        Path configurationPath = tempDir.resolve("configuration.xml");
         ConfigurationContainer defaultConfiguration = new ConfigurationContainer();
 
-        config.saveConfiguration(defaultConfiguration, configurationPath);
+        // change configuration
+        defaultConfiguration.DEFAULT_LANGUAGE = "bloubi";
+        defaultConfiguration.HOME = "/home/bloubiboy";
 
+        // save configuration
+        configm.saveConfiguration(defaultConfiguration, configurationPath);
         assertTrue("Save configuration", Files.exists(configurationPath));
 
-        /*
-         * Load configuration
-         */
-
-        ConfigurationContainer loadedConfig = config.loadConfiguration(configurationPath);
-
+        // load and compare
+        ConfigurationContainer loadedConfig = configm.loadConfiguration(configurationPath);
         assertTrue("Load configuration", loadedConfig.equals(defaultConfiguration));
 
     }
