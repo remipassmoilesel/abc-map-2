@@ -1,13 +1,10 @@
 package org.abcmap.core.draw;
 
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.dao.DAOException;
-import org.abcmap.core.project.dao.StyleDAO;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.shapes.DrawManagerException;
 import org.abcmap.core.shapes.LineBuilder;
@@ -33,7 +30,7 @@ public class DrawManagerTest {
     }
 
     @Test
-    public void tests() throws DAOException, DrawManagerException {
+    public void tests() throws IOException, DrawManagerException {
 
         DrawManager dm = MainManager.getDrawManager();
         ProjectManager pm = MainManager.getProjectManager();

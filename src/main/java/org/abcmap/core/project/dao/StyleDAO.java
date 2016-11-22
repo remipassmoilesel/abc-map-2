@@ -4,6 +4,7 @@ import org.abcmap.core.project.ProjectMetadata;
 import org.abcmap.core.project.ProjectMetadataPeer;
 import org.abcmap.core.styles.StyleContainer;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
  */
 public class StyleDAO extends AbstractOrmDAO {
 
-    public StyleDAO(Path p) throws DAOException {
+    public StyleDAO(Path p) throws IOException {
         super(p, StyleContainer.class);
     }
 
@@ -21,9 +22,9 @@ public class StyleDAO extends AbstractOrmDAO {
      * Delete all current styles and write the specified list in database.
      *
      * @param list
-     * @throws DAOException
+     * @throws IOException
      */
-    public void writeAll(ArrayList<StyleContainer> list) throws DAOException {
+    public void writeAll(ArrayList<StyleContainer> list) throws IOException {
 
         deleteAll();
 
@@ -31,7 +32,7 @@ public class StyleDAO extends AbstractOrmDAO {
             try {
                 dao.create(ctr);
             } catch (SQLException e) {
-                throw new DAOException(e);
+                throw new IOException(e);
             }
         }
 

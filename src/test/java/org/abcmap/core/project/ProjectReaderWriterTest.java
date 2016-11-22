@@ -5,10 +5,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.project.layer.TileLayer;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.junit.BeforeClass;
@@ -34,7 +32,7 @@ public class ProjectReaderWriterTest {
     }
 
     @Test
-    public void tests() throws DAOException, IOException {
+    public void tests() throws IOException {
 
         Path tempDirectory = TestUtils.PLAYGROUND_DIRECTORY.resolve("projectIoTest");
 

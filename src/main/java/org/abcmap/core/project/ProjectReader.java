@@ -2,7 +2,6 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.project.dao.StyleDAO;
@@ -67,49 +66,45 @@ public class ProjectReader {
 
         Project newProject = new Project(newDatabase);
 
-        try {
 
-            // read metadatas
-            readMetadatas(newDatabase, newProject);
+        // read metadatas
+        readMetadatas(newDatabase, newProject);
 
-            // recreate layers
-            LayerIndexDAO lidao = new LayerIndexDAO(newDatabase);
-            ArrayList<LayerIndexEntry> indexes = lidao.readAllEntries();
-            lidao.close();
+        // recreate layers
+        LayerIndexDAO lidao = new LayerIndexDAO(newDatabase);
+        ArrayList<LayerIndexEntry> indexes = lidao.readAllEntries();
+        lidao.close();
 
-            for (LayerIndexEntry entry : indexes) {
+        for (LayerIndexEntry entry : indexes) {
 
-                // layer contain geometries
-                if (LayerType.FEATURES.equals(entry.getType())) {
-                    FeatureLayer layer = new FeatureLayer(entry, newDatabase, false);
-                    newProject.addLayer(layer);
-                }
-
-                // Layer contain tiles
-                else if (LayerType.TILES.equals(entry.getType())) {
-                    TileLayer layer = new TileLayer(entry, newDatabase, false);
-                    newProject.addLayer(layer);
-                }
-
-                // unrecognized layer
-                else {
-                    logger.error("Unknown layer type: " + entry.getType());
-                    //TODO throw an exception ?
-                }
-
+            // layer contain geometries
+            if (LayerType.FEATURES.equals(entry.getType())) {
+                FeatureLayer layer = new FeatureLayer(entry, newDatabase, false);
+                newProject.addLayer(layer);
             }
 
-            // check if ther is at least one layer
-            if (newProject.getLayers().size() < 1) {
-                throw new IOException("Invalid project, no layers found");
+            // Layer contain tiles
+            else if (LayerType.TILES.equals(entry.getType())) {
+                TileLayer layer = new TileLayer(entry, newDatabase, false);
+                newProject.addLayer(layer);
             }
 
-            // set the first layer active
-            newProject.setActiveLayer(0);
+            // unrecognized layer
+            else {
+                logger.error("Unknown layer type: " + entry.getType());
+                //TODO throw an exception ?
+            }
 
-        } catch (DAOException e) {
-            throw new IOException(e);
         }
+
+        // check if ther is at least one layer
+        if (newProject.getLayers().size() < 1) {
+            throw new IOException("Invalid project, no layers found");
+        }
+
+        // set the first layer active
+        newProject.setActiveLayer(0);
+
 
         return newProject;
     }
@@ -120,9 +115,9 @@ public class ProjectReader {
      *
      * @param project
      * @param source
-     * @throws DAOException
+     * @throws IOException
      */
-    public void readMetadatas(Path source, Project project) throws DAOException {
+    public void readMetadatas(Path source, Project project) throws IOException {
 
         // write metadata
         ProjectMetadataDAO mtdao = new ProjectMetadataDAO(source);

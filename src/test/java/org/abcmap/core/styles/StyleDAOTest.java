@@ -1,7 +1,6 @@
 package org.abcmap.core.styles;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.StyleDAO;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +24,7 @@ public class StyleDAOTest {
     }
 
     @Test
-    public void tests() throws IOException, DAOException {
+    public void tests() throws IOException {
 
         Path tempfolder = TestUtils.PLAYGROUND_DIRECTORY.resolve("stylePersistenceTest");
         Files.createDirectories(tempfolder);

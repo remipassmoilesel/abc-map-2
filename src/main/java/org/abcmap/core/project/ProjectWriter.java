@@ -5,7 +5,6 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.TempFilesManager;
-import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.LayerIndexDAO;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.abcmap.core.project.dao.StyleDAO;
@@ -54,11 +53,7 @@ public class ProjectWriter {
         Project project = new Project(path);
 
         ProjectWriter pwriter = new ProjectWriter();
-        try {
-            pwriter.writeMetadatas(project, project.getDatabasePath());
-        } catch (DAOException e) {
-            throw new IOException("Error while creating a new project", e);
-        }
+        pwriter.writeMetadatas(project, project.getDatabasePath());
 
         // add the first layer
         project.addNewFeatureLayer("First layer", true, 0);
@@ -80,11 +75,7 @@ public class ProjectWriter {
     public boolean export(Project project, Path destination) throws IOException {
 
         // write metadata into original project before dump
-        try {
-            writeMetadatas(project, project.getDatabasePath());
-        } catch (DAOException e) {
-            throw new IOException("Error while writing project", e);
-        }
+        writeMetadatas(project, project.getDatabasePath());
 
         // dump database
         Path dump = project.getTempDirectory().toAbsolutePath().resolve(PROJECT_DUMP_NAME);
@@ -122,9 +113,8 @@ public class ProjectWriter {
      *
      * @param project
      * @param destination
-     * @throws DAOException
      */
-    public void writeMetadatas(Project project, Path destination) throws DAOException {
+    public void writeMetadatas(Project project, Path destination) throws IOException {
 
         // write metadata
         ProjectMetadataDAO mtdao = new ProjectMetadataDAO(destination);

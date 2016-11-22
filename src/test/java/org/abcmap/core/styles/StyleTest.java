@@ -1,10 +1,8 @@
 package org.abcmap.core.styles;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -74,7 +72,7 @@ public class StyleTest {
 
         assertTrue("Style application test", feat.getAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals(style1.getId()));
 
-        for(FeatureTypeStyle fts : project.getActiveLayer().getLayerStyle().featureTypeStyles()){
+        for (FeatureTypeStyle fts : project.getActiveLayer().getLayerStyle().featureTypeStyles()) {
             assertTrue("Style application test 2", fts == ftsApplied);
         }
     }

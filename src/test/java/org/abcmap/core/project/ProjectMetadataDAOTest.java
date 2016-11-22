@@ -1,23 +1,15 @@
 package org.abcmap.core.project;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.project.dao.DAOException;
 import org.abcmap.core.project.dao.ProjectMetadataDAO;
 import org.apache.commons.io.FileUtils;
-import org.geotools.data.DataStoreFinder;
-import org.geotools.data.Transaction;
-import org.geotools.jdbc.JDBCDataStore;
-import org.hsqldb.lib.FileUtil;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 import static junit.framework.TestCase.assertTrue;
 
@@ -32,7 +24,7 @@ public class ProjectMetadataDAOTest {
     }
 
     @Test
-    public void tests() throws IOException, DAOException, SQLException {
+    public void tests() throws IOException, SQLException {
 
         // create temp files
         Path tempfolder = TestUtils.PLAYGROUND_DIRECTORY.resolve("metadatasPersistenceTest");

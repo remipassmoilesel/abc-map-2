@@ -4,6 +4,7 @@ import org.abcmap.core.project.PMConstants;
 import org.abcmap.core.project.ProjectMetadata;
 import org.abcmap.core.project.ProjectMetadataPeer;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.Iterator;
  */
 public class ProjectMetadataDAO extends AbstractOrmDAO {
 
-    public ProjectMetadataDAO(Path dbPath) throws DAOException {
+    public ProjectMetadataDAO(Path dbPath) throws IOException {
         super(dbPath, ProjectMetadataPeer.class);
     }
 
@@ -32,7 +33,7 @@ public class ProjectMetadataDAO extends AbstractOrmDAO {
         return ctr;
     }
 
-    public void writeMetadata(ProjectMetadata ctr) throws DAOException {
+    public void writeMetadata(ProjectMetadata ctr) throws IOException {
 
         deleteAll();
 
@@ -47,7 +48,7 @@ public class ProjectMetadataDAO extends AbstractOrmDAO {
             try {
                 dao.create(new ProjectMetadataPeer(name, value));
             } catch (SQLException e) {
-                throw new DAOException(e);
+                throw new IOException(e);
             }
 
         }

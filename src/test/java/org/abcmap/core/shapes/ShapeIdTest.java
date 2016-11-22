@@ -111,7 +111,7 @@ public class ShapeIdTest {
         HashSet<String> set = new HashSet<>();
         while (it.hasNext()) {
 
-            //System.out.println(it.next().getID());
+            //System.out.println(it.getNext().getID());
 
             String id = it.next().getID();
 

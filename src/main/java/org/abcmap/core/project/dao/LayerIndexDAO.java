@@ -2,6 +2,7 @@ package org.abcmap.core.project.dao;
 
 import org.abcmap.core.project.layer.LayerIndexEntry;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
  * This object allow to read and write layer index from project
  */
 public class LayerIndexDAO extends AbstractOrmDAO {
-    public LayerIndexDAO(Path dbPath) throws DAOException {
+    public LayerIndexDAO(Path dbPath) throws IOException {
         super(dbPath, LayerIndexEntry.class);
     }
 
@@ -25,7 +26,7 @@ public class LayerIndexDAO extends AbstractOrmDAO {
         return entries;
     }
 
-    public void writeAllEntries(ArrayList<LayerIndexEntry> entries) throws DAOException {
+    public void writeAllEntries(ArrayList<LayerIndexEntry> entries) throws IOException {
 
         deleteAll();
 
@@ -33,7 +34,7 @@ public class LayerIndexDAO extends AbstractOrmDAO {
             try {
                 dao.create(entry);
             } catch (SQLException e) {
-                throw new DAOException(e);
+                throw new IOException(e);
             }
         }
 

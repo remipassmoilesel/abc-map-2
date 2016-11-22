@@ -22,7 +22,7 @@ public abstract class AbstractOrmDAO {
     protected final Dao dao;
     private final Class<? extends DataModel> dataModel;
 
-    public AbstractOrmDAO(Path dbPath, Class<? extends DataModel> entity) throws DAOException {
+    public AbstractOrmDAO(Path dbPath, Class<? extends DataModel> entity) throws IOException {
 
         String databaseUrl = "jdbc:h2:" + dbPath.toString();
         try {
@@ -42,7 +42,7 @@ public abstract class AbstractOrmDAO {
             createTableIfNotExist();
 
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw new IOException(e);
         }
 
 
@@ -51,13 +51,13 @@ public abstract class AbstractOrmDAO {
     /**
      * Create table scheme if not existing
      *
-     * @throws DAOException
+     * @throws IOException
      */
-    public void createTableIfNotExist() throws DAOException {
+    public void createTableIfNotExist() throws IOException {
         try {
             TableUtils.createTableIfNotExists(connectionSource, dataModel);
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw new IOException(e);
         }
     }
 
@@ -100,11 +100,11 @@ public abstract class AbstractOrmDAO {
      *
      * @param e
      */
-    public void create(Object e) throws DAOException {
+    public void create(Object e) throws IOException {
         try {
             dao.create(e);
         } catch (SQLException e1) {
-            throw new DAOException(e1);
+            throw new IOException(e1);
         }
     }
 
@@ -113,11 +113,11 @@ public abstract class AbstractOrmDAO {
      *
      * @param e
      */
-    public void update(Object e) throws DAOException {
+    public void update(Object e) throws IOException {
         try {
             dao.update(e);
         } catch (SQLException e1) {
-            throw new DAOException(e1);
+            throw new IOException(e1);
         }
     }
 
@@ -126,11 +126,11 @@ public abstract class AbstractOrmDAO {
      *
      * @param e
      */
-    public void delete(Object e) throws DAOException {
+    public void delete(Object e) throws IOException {
         try {
             dao.delete(e);
         } catch (SQLException e1) {
-            throw new DAOException(e1);
+            throw new IOException(e1);
         }
     }
 
@@ -139,11 +139,11 @@ public abstract class AbstractOrmDAO {
      *
      * @param e
      */
-    public Object readById(Object e) throws DAOException {
+    public Object readById(Object e) throws IOException {
         try {
             return dao.queryForId(e);
         } catch (SQLException e1) {
-            throw new DAOException(e1);
+            throw new IOException(e1);
         }
     }
 
@@ -151,26 +151,26 @@ public abstract class AbstractOrmDAO {
      * Return number of row in table
      *
      * @return
-     * @throws DAOException
+     * @throws IOException
      */
-    public long getRowCount() throws DAOException {
+    public long getRowCount() throws IOException {
         try {
             return dao.countOf();
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw new IOException(e);
         }
     }
 
     /**
      * Delete all entries from package
      *
-     * @throws DAOException
+     * @throws IOException
      */
-    public void deleteAll() throws DAOException {
+    public void deleteAll() throws IOException {
         try {
             dao.deleteBuilder().delete();
         } catch (SQLException e) {
-            throw new DAOException(e);
+            throw new IOException(e);
         }
     }
 
@@ -190,22 +190,14 @@ public abstract class AbstractOrmDAO {
 
     }
 
-    public void close() throws DAOException {
+    public void close() throws IOException {
 
         if (connectionSource != null) {
-            try {
-                connectionSource.close();
-            } catch (IOException e) {
-                throw new DAOException(e);
-            }
+            connectionSource.close();
         }
 
         if (dao != null) {
-            try {
-                dao.closeLastIterator();
-            } catch (IOException e) {
-                throw new DAOException(e);
-            }
+            dao.closeLastIterator();
         }
 
     }

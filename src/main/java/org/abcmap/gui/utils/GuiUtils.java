@@ -321,7 +321,7 @@ public class GuiUtils {
     }
 
     /**
-     * Return the next parent of specified class, or null
+     * Return the getNext parent of specified class, or null
      *
      * @param comp
      * @param searchedClass
