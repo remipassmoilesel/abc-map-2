@@ -26,7 +26,7 @@ public class ProjectConnectionTest {
         TestUtils.createNewProject();
     }
 
-    @Test @Ignore
+    @Test
     public void tests() throws IOException {
 
         Project project = MainManager.getProjectManager().getProject();
@@ -38,36 +38,43 @@ public class ProjectConnectionTest {
             PreparedStatement stat = connection.prepareStatement("CREATE TABLE " + tableName + " (COLUMN_A TEXT, COLUMN_B TEXT);");
             stat.execute();
 
-            stat = connection.prepareStatement("INSERT INTO " + tableName + " (COLUMN_A, COLUMN_B) VALUES(?,?)");
-            stat.setString(1, "aaaa");
-            stat.setString(2, "bbbb");
-
-            int res = stat.executeUpdate();
+            for (int i = 0; i < 10; i++) {
+                stat = connection.prepareStatement("INSERT INTO " + tableName + " (COLUMN_A, COLUMN_B) VALUES(?,?)");
+                stat.setString(1, "aaaa" + i);
+                stat.setString(2, "bbbb" + i);
+                stat.executeUpdate();
+            }
 
             if (true) {
                 throw new Exception("You shall not pass !");
             }
 
-            return res == 1;
+            return true;
 
         });
 
-        // code above must fail
+        // code above must fail, table will be created but data are not inserted
         assertTrue("Connection test 1", executed == null);
 
         executed = (Boolean) project.executeWithDatabaseConnection((connection) -> {
 
-            PreparedStatement stat = connection.prepareStatement("CREATE TABLE " + tableName + " (COLUMN_A TEXT, COLUMN_B TEXT);");
-            stat.execute();
 
-            stat = connection.prepareStatement("INSERT INTO " + tableName + " (columnA, columnB) VALUES(?,?)");
-            stat.setString(1, "aaaa");
-            stat.setString(2, "bbbb");
+            PreparedStatement stat = connection.prepareStatement("SELECT count(*) FROM " + tableName + ";");
+            ResultSet rs = stat.executeQuery();
+            rs.next();
 
-            int res = stat.executeUpdate();
+            // nothing in table normally
+            assertTrue("Transaction test", rs.getInt(1) == 0);
 
-            return res == 1;
+            int inserted = 0;
+            for (int i = 0; i < 10; i++) {
+                stat = connection.prepareStatement("INSERT INTO " + tableName + " (COLUMN_A, COLUMN_B) VALUES(?,?)");
+                stat.setString(1, "aaaa" + i);
+                stat.setString(2, "bbbb" + i);
+                inserted += stat.executeUpdate();
+            }
 
+            return inserted == 10;
         });
 
         assertTrue("Connection test 2", executed == true);
@@ -78,7 +85,7 @@ public class ProjectConnectionTest {
             ResultSet res = stat.executeQuery();
             res.next();
 
-            assertTrue("Transaction test", res.getInt(1) == 1);
+            assertTrue("Transaction test", res.getInt(1) == 10);
 
             return null;
         });
