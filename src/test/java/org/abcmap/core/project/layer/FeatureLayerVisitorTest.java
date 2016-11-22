@@ -40,6 +40,8 @@ public class FeatureLayerVisitorTest {
 
             i[0]++;
 
+            assertTrue("Visitor test " + i, feature != null);
+
             if (i[0] == 17) {
                 return false;
             }
@@ -47,7 +49,7 @@ public class FeatureLayerVisitorTest {
             return true;
         }, null);
 
-        assertTrue("Visitor test", i[0] == 17);
+        assertTrue("Visitor final test", i[0] == 17);
 
     }
 

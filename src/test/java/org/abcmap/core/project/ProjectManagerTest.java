@@ -27,6 +27,7 @@ public class ProjectManagerTest {
     @Test
     public void tests() throws IOException {
 
+        // create temp files
         Path tempDir = TestUtils.PLAYGROUND_DIRECTORY.resolve("projectManagerTest");
         FileUtils.deleteDirectory(tempDir.toFile());
         Files.createDirectories(tempDir);
