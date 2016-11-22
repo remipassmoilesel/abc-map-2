@@ -43,16 +43,22 @@ public class DrawManagerTest {
         int lineNumber = 20;
         int polygonNumber = 20;
 
-        PrimitiveIterator.OfInt randSummits = new Random().ints(4, 16).iterator();
+        // change style
+        dm.setActiveForeground(Color.red);
+        dm.setActiveBackground(Color.black);
 
+        // draw random points
+        PrimitiveIterator.OfInt randSummits = new Random().ints(4, 16).iterator();
         PointBuilder pbuilder = dm.getPointBuilder();
         for (int i = 0; i < pointNumber; i++) {
             pbuilder.addPoint(TestUtils.getRandomPoint());
         }
 
-        dm.setActiveForeground(Color.red);
-        dm.setActiveBackground(Color.black);
+        // change style
+        dm.setActiveForeground(Color.DARK_GRAY);
+        dm.setActiveBackground(Color.green);
 
+        // draw random lines
         LineBuilder lbuilder = dm.getLineBuilder();
         for (int i = 0; i < lineNumber; i++) {
             lbuilder.newLine(TestUtils.getRandomPoint());
@@ -64,9 +70,11 @@ public class DrawManagerTest {
             lbuilder.terminateLine(TestUtils.getRandomPoint());
         }
 
+        // change style
         dm.setActiveForeground(Color.cyan);
         dm.setActiveBackground(Color.yellow);
 
+        // draw random polygons
         PolygonBuilder plbuilder = dm.getPolygonBuilder();
         for (int i = 0; i < polygonNumber; i++) {
             plbuilder.newLine(TestUtils.getRandomPoint());
@@ -78,7 +86,7 @@ public class DrawManagerTest {
             plbuilder.terminateLine(TestUtils.getRandomPoint());
         }
 
-
+        // check that all shapes have a style id
         final int[] shapeCount = {0};
         activeLayer.executeVisit((SimpleFeature f) -> {
 
