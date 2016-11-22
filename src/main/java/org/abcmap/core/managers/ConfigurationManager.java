@@ -86,4 +86,8 @@ public class ConfigurationManager {
         this.currentConfiguration = config;
         return currentConfiguration;
     }
+
+    public ConfigurationContainer getConfiguration() {
+        return currentConfiguration;
+    }
 }
