@@ -170,15 +170,14 @@ public class Project {
      * @param visible
      * @param zindex
      */
-    public AbstractLayer addNewFeatureLayer(String name, boolean visible, int zindex) {
+    public AbstractLayer addNewFeatureLayer(String name, boolean visible, int zindex) throws IOException {
 
         // create a layer wrapper and store it
         AbstractLayer layer = null;
         try {
             layer = new FeatureLayer(null, name, visible, zindex, databasePath, true);
-        } catch (IOException e) {
-            logger.error(e);
-            return null;
+        } catch (Exception e) {
+            throw new IOException("Error while adding tile layer: ", e);
         }
 
         return addLayer(layer);
@@ -192,13 +191,12 @@ public class Project {
      * @param zindex
      * @return
      */
-    public AbstractLayer addNewTileLayer(String name, boolean visible, int zindex) {
+    public AbstractLayer addNewTileLayer(String name, boolean visible, int zindex) throws IOException {
         TileLayer layer = null;
         try {
             layer = new TileLayer(null, name, visible, zindex, databasePath, true);
-        } catch (IOException e) {
-            logger.error(e);
-            return null;
+        } catch (Exception e) {
+            throw new IOException("Error while adding tile layer: ", e);
         }
         return addLayer(layer);
     }

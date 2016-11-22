@@ -5,6 +5,7 @@ import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.shapes.feature.TileFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
+import org.geotools.data.FeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
@@ -109,9 +110,9 @@ public class FeatureUtils {
 
     /**
      * Apply a style to specified feature
-     *
+     * <p>
      * To apply this style, this method insert style id in "style_id" field.
-     *
+     * <p>
      * If the are no appropriate field, a IllegalAttributeException is raised
      *
      * @param features
@@ -165,4 +166,16 @@ public class FeatureUtils {
 
         return attrs;
     }
+
+    /**
+     * Close the datastore associated with a feature source
+     * <p>
+     * /!\ Be careful, it will close other feature source too.
+     *
+     * @param store
+     */
+    public static void closeFeatureStore(FeatureStore store) {
+        store.getDataStore().dispose();
+    }
+
 }
