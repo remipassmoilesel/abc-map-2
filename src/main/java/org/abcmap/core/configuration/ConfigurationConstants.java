@@ -1,5 +1,7 @@
 package org.abcmap.core.configuration;
 
+import com.labun.surf.Params;
+
 import javax.swing.filechooser.FileSystemView;
 import java.awt.*;
 import java.nio.charset.Charset;
@@ -96,5 +98,13 @@ public class ConfigurationConstants {
      * Upper case mandatory
      */
     public static final String SQL_TABLE_PREFIX = "ABCMAP_";
+
+
+    public static final Params[] SURF_PARAMS = new Params[]{
+            new Params(4, 4, 0.01f, 2, false, false, false, 1, false),
+            new Params(4, 4, 0.001f, 2, false, false, false, 1, false),
+            new Params(4, 4, 0.0001f, 2, false, false, false, 1, false),
+            new Params(4, 4, 0.00001f, 2, false, false, false, 1, false),
+            new Params(4, 4, 0.000001f, 2, false, false, false, 1, false),};
 
 }

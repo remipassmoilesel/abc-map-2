@@ -1,9 +1,15 @@
 package org.abcmap.core.imageanalyzer;
 
+import com.labun.surf.IntegralImage;
 import com.labun.surf.InterestPoint;
+import com.labun.surf.Params;
+import com.labun.surf.plugin.IJFacade;
 import ij.ImagePlus;
+import org.abcmap.core.managers.ConfigurationManager;
+import org.abcmap.core.managers.MainManager;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,13 +17,44 @@ import java.util.List;
  */
 public class MatchablePointFactory {
 
+    private final ConfigurationManager configm;
+    private final Params surfConfig;
+    private final Integer surfMode;
+
+    public MatchablePointFactory() {
+        this.configm = MainManager.getConfigurationManager();
+        this.surfConfig = configm.getSurfConfiguration();
+        this.surfMode = configm.getConfiguration().IMPORT_SURF_MODE;
+    }
+
+    public MatchablePointContainer getPointsContainer(BufferedImage img, String id) {
+
+        MatchablePointContainer mpc = new MatchablePointContainer();
+        mpc.setSurfMode(surfMode);
+        mpc.setImageId(id);
+        mpc.setPoints(getPointsList(img));
+
+        return mpc;
+    }
+
+    /**
+     * Process an image and return a list of matchable points
+     *
+     * @param img
+     * @return
+     */
+    public ArrayList<MatchablePoint> getPointsList(BufferedImage img) {
+        IntegralImage itimg = createIntegralImage(img);
+        return surfAnalyse(itimg);
+    }
+
     /**
      * Return an image that ImageJ can process
      *
      * @param bimg
      * @return
      */
-    private ImagePlus createImagePlus(BufferedImage bimg) {
+    private IntegralImage createIntegralImage(BufferedImage bimg) {
 
         ImagePlus imp = new ImagePlus("", bimg);
 
@@ -27,22 +64,31 @@ public class MatchablePointFactory {
             imp.updateAndDraw();
         }
 
-        return imp;
-
+        return new IntegralImage(imp.getProcessor(), true);
     }
 
-    public List<MatchablePoint> surfAnalyse(ImagePlus imp)  {
+    /**
+     * Search interest points and return as a list
+     *
+     * @param img
+     * @return
+     */
+    private ArrayList<MatchablePoint> surfAnalyse(IntegralImage img) {
 
         // maj parametre surf utilisés pour analyse
-        surfMode = new Integer(confm.getConfiguration().SURF_MODE);
+        Integer surfMode = configm.getConfiguration().IMPORT_SURF_MODE;
 
         // analyse et extraire les poijnts d'interet
-        IntegralImage intImg = new IntegralImage(img.getProcessor(), true);
-        ipts = IJFacade.detectAndDescribeInterestPoints(intImg, importm.getSurfParameters());
 
-        // serialisation des points
-        serializePointsSafeMode();
+        List<InterestPoint> ipts = IJFacade.detectAndDescribeInterestPoints(img, configm.getSurfConfiguration());
+        ArrayList<MatchablePoint> mtpt = new ArrayList<>(ipts.size());
 
-        return ipts;
+        for (InterestPoint p : ipts) {
+            mtpt.add(new MatchablePoint((double) p.x, (double) p.y));
+        }
+
+        return mtpt;
     }
+
+
 }

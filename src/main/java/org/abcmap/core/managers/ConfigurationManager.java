@@ -1,5 +1,6 @@
 package org.abcmap.core.managers;
 
+import com.labun.surf.Params;
 import com.thoughtworks.xstream.XStream;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.configuration.ConfigurationContainer;
@@ -90,4 +91,24 @@ public class ConfigurationManager {
     public ConfigurationContainer getConfiguration() {
         return currentConfiguration;
     }
+
+
+    /**
+     * Return the current SURF configuration.
+     *
+     * @return
+     */
+    public Params getSurfConfiguration() {
+
+        // check if current parameter is valid
+        if (currentConfiguration.IMPORT_SURF_MODE < 0
+                || currentConfiguration.IMPORT_SURF_MODE > ConfigurationConstants.SURF_PARAMS.length - 1) {
+            currentConfiguration.IMPORT_SURF_MODE = 0;
+        }
+
+        return ConfigurationConstants.SURF_PARAMS[currentConfiguration.IMPORT_SURF_MODE];
+
+    }
+
+
 }
