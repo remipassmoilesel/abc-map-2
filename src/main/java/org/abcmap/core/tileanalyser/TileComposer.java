@@ -25,6 +25,12 @@ public class TileComposer {
     private int surfConfigId;
     private InterestPointFactory iptsFactory;
 
+    /**
+     * Distance tolerance between two matching points. For example, one point is at 0.5 pixel,
+     * other one is at 0.6 pixel, if tolerance is about 0.2, it is accepted as a matching point.
+     */
+    private double distanceTolerance;
+
     public TileComposer(Path interestPointDatabase, Params surfConfig, int pointThreshold, int surfModeId) throws IOException {
         this.pointThreshold = pointThreshold;
         this.surfConfig = surfConfig;
@@ -32,70 +38,87 @@ public class TileComposer {
 
         this.iptsFactory = new InterestPointFactory(surfConfig);
         this.iptsDao = new InterestPointStorage(interestPointDatabase);
+
+        this.distanceTolerance = 0.3;
     }
 
     /**
      * Return the position of specified image comapred to other image found in specified image source, in order to assemble them.
      *
-     * @param toStitch
+     * @param tileToMove
      * @param source
      * @return
      * @throws IOException
      * @throws TileAnalyseException
      */
-    public synchronized Coordinate process(TileContainer toStitch, TileSource source) throws IOException, TileAnalyseException {
+    public synchronized Coordinate process(TileContainer tileToMove, TileSource source) throws IOException, TileAnalyseException {
 
+        // reset source to iterate last tiles before
         source.reset();
 
         TileContainer currentCtr = source.next();
 
-        // no image yet, return 0.0
+        // no image to analyse, throw exception
         if (currentCtr == null) {
             throw new TileAnalyseException("No tiles found in source");
         }
 
-        InterestPoint refPointA = null;
-        InterestPoint refPointB = null;
+        // reference interest point of tile to insert
+        InterestPoint insertedTileIP = null;
+        // reference interest point of reference tile
+        InterestPoint referenceTileIP = null;
 
-        TileContainer referenceImage = null;
+        // reference tile
+        TileContainer referenceTile = null;
 
         // else search image with enough common points
-        searchReference:
+        searchReferenceTile:
         while (currentCtr != null) {
 
             // search common point between images
-            Map<InterestPoint, InterestPoint> commonPoints = getCommonPoints(toStitch, currentCtr);
+            Map<InterestPoint, InterestPoint> commonPoints = getCommonPoints(tileToMove, currentCtr);
 
-            // enough points, search common positions
-            if (commonPoints.size() > pointThreshold) {
+            // not enough points, continue
+            if (commonPoints.size() < pointThreshold) {
+                continue;
+            }
 
-                // iterate common points to get matching positions
-                for (InterestPoint ip1 : commonPoints.keySet()) {
-                    InterestPoint ip2 = commonPoints.get(ip1);
+            // iterate common points to get matching positions
+            for (InterestPoint ip1 : commonPoints.keySet()) {
+                InterestPoint ip2 = commonPoints.get(ip1);
 
-                    int matching = 0;
-                    for (InterestPoint ipTest1 : commonPoints.keySet()) {
-                        InterestPoint ipTest2 = commonPoints.get(ipTest1);
+                int matching = 0;
+                int i = 0;
+                for (InterestPoint ipTest1 : commonPoints.keySet()) {
+                    InterestPoint ipTest2 = commonPoints.get(ipTest1);
 
-                        double dX1 = Math.abs(ipTest1.x - ip1.x);
-                        double dY1 = Math.abs(ipTest1.y - ip1.y);
-                        double dX2 = Math.abs(ipTest2.x - ip2.x);
-                        double dY2 = Math.abs(ipTest2.y - ip2.y);
+                    double dX1 = Math.abs(ipTest1.x - ip1.x);
+                    double dY1 = Math.abs(ipTest1.y - ip1.y);
+                    double dX2 = Math.abs(ipTest2.x - ip2.x);
+                    double dY2 = Math.abs(ipTest2.y - ip2.y);
 
-                        // if distance between points is < than 0.5, count as matching
-                        double ttDist = Math.abs((dX1 + dY1) - (dX2 + dY2));
-                        if (ttDist < 0.5) {
-                            matching++;
-                            if (matching >= pointThreshold) {
-                                referenceImage = currentCtr;
-                                refPointA = ip1;
-                                refPointB = ip2;
-                                break searchReference;
-                            }
+                    // if distance between points is < than 0.5, count as matching
+                    double ttDist = Math.abs((dX1 + dY1) - (dX2 + dY2));
+                    if (ttDist < distanceTolerance) {
+                        matching++;
+                        if (matching >= pointThreshold) {
+
+                            //System.out.println("commonPoints.size()");
+                            //System.out.println(commonPoints.size());
+                            //System.out.println("index: " + i);
+
+                            referenceTile = currentCtr;
+                            insertedTileIP = ip1;
+                            referenceTileIP = ip2;
+
+                            break searchReferenceTile;
                         }
                     }
 
+                    i++;
                 }
+
+
             }
 
             currentCtr = source.next();
@@ -103,16 +126,30 @@ public class TileComposer {
         }
 
         // no reference image have be found
-        if (referenceImage == null) {
+        if (referenceTile == null) {
             throw new TileAnalyseException("Image cannot be assembled");
         }
 
-        // TODO: invert X and Y axis
-        // get position rapported to reference image
-        double x = (refPointB.x - refPointA.x + referenceImage.getPosition().x);
-        double y = (refPointB.y - refPointA.y + referenceImage.getPosition().y);
+        // position BLC on map of tile
+        Coordinate refTilePosition = referenceTile.getPosition();
 
-        return new Coordinate(x, y);
+        // height of reference tile
+        int referenceTileHeight = referenceTile.getImage().getHeight();
+
+        // position BLC of reference interest point on tile
+        Coordinate relativeRefIP = new Coordinate(referenceTileIP.x, referenceTileHeight - referenceTileIP.y);
+
+        // absolute position of reference point
+        Coordinate absoluteRefPoint = new Coordinate(refTilePosition.x + relativeRefIP.x, refTilePosition.y + relativeRefIP.y);
+
+        // position BLC of interest point of tile to insert
+        int insertedTileHeight = tileToMove.getImage().getHeight();
+        Coordinate blcInsertedTileInterestPoint = new Coordinate(insertedTileIP.x, insertedTileHeight - insertedTileIP.y);
+
+        Coordinate result = new Coordinate(absoluteRefPoint.x - blcInsertedTileInterestPoint.x,
+                absoluteRefPoint.y - blcInsertedTileInterestPoint.y);
+
+        return result;
 
     }
 

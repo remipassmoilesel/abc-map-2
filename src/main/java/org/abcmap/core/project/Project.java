@@ -422,12 +422,12 @@ public class Project {
     /**
      * Show a project for debug purposes
      */
-    public void showForDebug() {
+    public void showForDebug(boolean includeTileOutlines)  {
 
         SwingUtilities.invokeLater(() -> {
 
             // Create a JMapFrame with a menu to choose the display style for the
-            JMapFrame frame = new JMapFrame(buildMapContent(true));
+            JMapFrame frame = new JMapFrame(buildMapContent(includeTileOutlines));
             frame.setSize(800, 600);
             frame.enableStatusBar(true);
             frame.enableTool(JMapFrame.Tool.ZOOM, JMapFrame.Tool.PAN, JMapFrame.Tool.RESET);

@@ -8,15 +8,18 @@ import org.abcmap.core.project.tiles.TileContainer;
 import org.abcmap.core.tileanalyser.*;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
+import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.map.GridCoverageLayer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -29,7 +32,7 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class TileComposerTest {
 
-    private static final boolean SHOW_IN_WINDOW = true;
+    private static final boolean SHOW_IN_WINDOW = false;
 
     @BeforeClass
     public static void beforeTests() throws IOException {
@@ -39,53 +42,94 @@ public class TileComposerTest {
     @Test
     public void tests() throws IOException, TileAnalyseException, InterruptedException {
 
-        String root = "/pictures/belledonne_";
+        String root = "/tiles/osm_";
 
         Project project = MainManager.getProjectManager().getProject();
         Path databasePath = project.getDatabasePath();
 
+        // create a tile layer
         TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 2);
 
+        // get surf configuration
         Params surfConfig = MainManager.getConfigurationManager().getSurfConfiguration();
 
-        TileComposer composer = new TileComposer(databasePath, surfConfig, 5, 3);
+        // create a tile composer, to get best positions for tiles
+        TileComposer composer = new TileComposer(databasePath, surfConfig, 40, 5);
         TileSource source = new TileStorageSource(project.getTileStorage(), layer.getCoverageName());
 
-        // search points in pictures
-        InterestPointFactory mpf = new InterestPointFactory(surfConfig);
+        ArrayList<Coordinate> coords = new ArrayList<>();
+        ArrayList<BufferedImage> imgs = new ArrayList<>();
+
+        // the first tile have to be placed manually
+        Coordinate firstPosition = new Coordinate(2000, 1000);
+
+        ArrayList<Coordinate> expected = new ArrayList();
+        expected.add(firstPosition);
+        expected.add(new Coordinate(1478.6803359985352, 982.1077270507812));
+        expected.add(new Coordinate(919.2462692260742, 1257.8359985351562));
+        expected.add(new Coordinate(919.2940902709961, 1032.83740234375));
+
+        ArrayList<Coordinate> computed = new ArrayList();
+        computed.add(firstPosition);
+
+        // iterate pictures
         for (int i = 0; i < 4; i++) {
 
             // read image
-            String imgPath = root + (i + 1) + ".jpg";
+            String imgPath = root + (i + 1) + ".png";
+
             BufferedImage img = ImageIO.read(TileComposerTest.class.getResourceAsStream(imgPath));
             assertTrue("Image reading: " + imgPath, img != null);
+            imgs.add(img);
 
-            TileContainer toStitch = new TileContainer(null, img, new Coordinate(0, 0));
+            TileContainer toStitch = new TileContainer(null, img, new Coordinate());
 
             // first tile, add it manually
             if (i == 0) {
+                toStitch.setPosition(firstPosition);
+                coords.add(firstPosition);
                 layer.addTile(toStitch);
                 continue;
             }
 
-            // get best position for tile
+            // analyze tile to get best position
             Coordinate position = composer.process(toStitch, source);
-
             assertTrue("Coordinate position test", position != null);
 
+            computed.add(position);
+
+            // set position
+            coords.add(position);
             toStitch.setPosition(position);
 
             // add tile
             layer.addTile(toStitch);
 
-            System.out.println(toStitch);
         }
 
-        layer.refreshCoverage();
+        //System.out.println(expected);
+        //System.out.println(computed);
+
+        // test is rounded here to avoid bad precision errors
+        for (int i = 0; i < expected.size(); i++) {
+
+            Coordinate ca = expected.get(i);
+            Coordinate cb = computed.get(i);
+
+            double cax = Utils.round(ca.x, 3);
+            double cay = Utils.round(ca.y, 3);
+            double cbx = Utils.round(cb.x, 3);
+            double cby = Utils.round(cb.y, 3);
+
+            assertTrue("Tile computed positions: " + cax + " " + cbx, cax == cbx);
+            assertTrue("Tile computed positions: " + cay + " " + cby, cay == cby);
+        }
+
+        //assertTrue("Tile computed positions", expected.equals(computed));
 
         if (SHOW_IN_WINDOW) {
-            project.showForDebug();
-            //ImageIO.write(layer.getCoverage().getRenderedImage(), "png", new File("test.png"));
+            layer.refreshCoverage();
+            project.showForDebug(true);
             Thread.sleep(50000);
         }
 

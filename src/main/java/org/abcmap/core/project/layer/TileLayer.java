@@ -5,6 +5,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import org.abcmap.core.project.tiles.TileContainer;
 import org.abcmap.core.project.tiles.TileStorage;
 import org.abcmap.core.project.tiles.TileStorageQueries;
+import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
 import org.abcmap.core.shapes.feature.TileFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
@@ -14,9 +15,7 @@ import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
-import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.gce.imagemosaic.jdbc.Config;
 import org.geotools.gce.imagemosaic.jdbc.ImageMosaicJDBCFormat;
 import org.geotools.gce.imagemosaic.jdbc.ImageMosaicJDBCReader;
@@ -28,6 +27,8 @@ import org.geotools.map.FeatureLayer;
 import org.geotools.map.GridCoverageLayer;
 import org.geotools.map.Layer;
 import org.geotools.referencing.CRS;
+import org.geotools.styling.*;
+import org.geotools.styling.Stroke;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.parameter.GeneralParameterValue;
@@ -63,6 +64,8 @@ public class TileLayer extends AbstractLayer {
     private final String coverageName;
     private final FeatureLayer outlineLayer;
     private final Path databasePath;
+    private final Style outlineStyle;
+    private FeatureTypeStyle outlineFeatureType;
 
     public TileLayer(String layerId, String title, boolean visible, int zindex, Path databasePath, boolean create) throws IOException {
         this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), databasePath, create);
@@ -99,7 +102,10 @@ public class TileLayer extends AbstractLayer {
         this.featureBuilder = FeatureUtils.getTileFeatureBuilder(entry.getLayerId(), crs);
 
         // outline layer, with an empty style
-        this.outlineLayer = new org.geotools.map.FeatureLayer(featureStore, sf.createStyle());
+        this.outlineStyle = sf.createStyle();
+        outlineStyle.featureTypeStyles().add(getOutlineFeatureType());
+
+        this.outlineLayer = new org.geotools.map.FeatureLayer(featureStore, outlineStyle);
 
         refreshCoverage();
     }
@@ -280,7 +286,7 @@ public class TileLayer extends AbstractLayer {
         ParameterValue<GridGeometry2D> gg = AbstractGridFormat.READ_GRIDGEOMETRY2D.createValue();
 
         // create an envelope, 2 Points, lower left and upper right, x,y order
-        GeneralEnvelope envelope = new GeneralEnvelope(new double[]{0, 0}, new double[]{1000, 1000});
+        GeneralEnvelope envelope = new GeneralEnvelope(new double[]{0, 0}, new double[]{3000, 3000});
 
         // set a CRS for the envelope
         try {
@@ -290,8 +296,8 @@ public class TileLayer extends AbstractLayer {
         }
 
         // Set the envelope into the parameter object
-        int width = 1000;
-        int heigth = 1000;
+        int width = 3000;
+        int heigth = 3000;
 
         // to check: GridEnvelope2D was GeneralGridRange (unavailable)
         gg.setValue(new GridGeometry2D(new GridEnvelope2D(new Rectangle(0, 0, width, heigth)), envelope));
@@ -336,4 +342,27 @@ public class TileLayer extends AbstractLayer {
         return coverageName;
     }
 
+    private static FeatureTypeStyle getOutlineFeatureType() {
+
+        Color foreground = Color.green;
+        Color background = Color.yellow;
+
+        // create point symbolizer
+        Stroke stroke = sf.stroke(ff.literal(foreground), null, null, null, null, null, null);
+        Fill fill = sf.fill(null, ff.literal(background), ff.literal(0.2));
+
+        // create line symbolizer
+        LineSymbolizer lineSym = sf.createLineSymbolizer(stroke, null);
+
+        // create polygon symbolizer
+        PolygonSymbolizer polygonSym = sf.createPolygonSymbolizer(stroke, fill, null);
+
+        // create rule
+        Rule r = sf.createRule();
+        r.symbolizers().add(lineSym);
+        r.symbolizers().add(polygonSym);
+        r.setIsElseFilter(true);
+
+        return sf.createFeatureTypeStyle(new Rule[]{r});
+    }
 }
