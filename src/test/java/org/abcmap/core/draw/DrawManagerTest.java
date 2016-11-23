@@ -25,12 +25,12 @@ import static org.junit.Assert.assertTrue;
 public class DrawManagerTest {
 
     @BeforeClass
-    public static void beforeTests() throws IOException {
+    public static void beforeTests() throws IOException, InterruptedException {
         TestUtils.createNewProject();
     }
 
     @Test
-    public void tests() throws IOException, DrawManagerException {
+    public void tests() throws IOException, DrawManagerException, InterruptedException {
 
         DrawManager dm = MainManager.getDrawManager();
         ProjectManager pm = MainManager.getProjectManager();

@@ -46,7 +46,7 @@ public class StyleTest {
             FeatureUtils.applyStyleToFeatures(style, fb.buildFeature(null));
             styleApplied = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         }
 
         assertTrue("Style util exception test", styleApplied == false);
