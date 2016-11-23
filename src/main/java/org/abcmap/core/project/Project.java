@@ -399,14 +399,21 @@ public class Project {
      *
      * @return
      */
-    public MapContent buildMapContent() {
+    public MapContent buildMapContent(boolean includeTileOutlines) {
 
         MapContent content = new MapContent();
 
+        // sort layers by zindex
         Collections.sort(layers);
 
+        // add layers
         for (AbstractLayer layer : layers) {
+
+            // optionally add tile outlines
             content.addLayer(layer.getInternalLayer());
+            if(includeTileOutlines && layer instanceof TileLayer){
+                content.addLayer(((TileLayer) layer).getOutlineLayer());
+            }
         }
 
         return content;
@@ -420,7 +427,7 @@ public class Project {
         SwingUtilities.invokeLater(() -> {
 
             // Create a JMapFrame with a menu to choose the display style for the
-            JMapFrame frame = new JMapFrame(buildMapContent());
+            JMapFrame frame = new JMapFrame(buildMapContent(true));
             frame.setSize(800, 600);
             frame.enableStatusBar(true);
             frame.enableTool(JMapFrame.Tool.ZOOM, JMapFrame.Tool.PAN, JMapFrame.Tool.RESET);
