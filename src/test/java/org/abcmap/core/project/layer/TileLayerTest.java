@@ -31,7 +31,7 @@ public class TileLayerTest {
     }
 
     @Test
-    public void tests() throws IOException, FactoryException {
+    public void tests() throws IOException, FactoryException, InterruptedException {
 
         // create temp directories
         ProjectManager pman = MainManager.getProjectManager();

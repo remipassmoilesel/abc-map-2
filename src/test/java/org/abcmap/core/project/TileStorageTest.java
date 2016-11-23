@@ -2,6 +2,7 @@ package org.abcmap.core.project;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
+import org.abcmap.core.project.tiles.TileContainer;
 import org.abcmap.core.project.tiles.TileCoverageEntry;
 import org.abcmap.core.project.tiles.TileStorage;
 import org.abcmap.core.project.tiles.TileStorageQueries;
@@ -50,7 +51,7 @@ public class TileStorageTest {
 
         // create a new coverage, upper case mandatory
         String coverageName = "COVERAGE1";
-        TileCoverageEntry coverageEntry = storage.createCoverage(coverageName);
+        TileCoverageEntry coverageEntry = storage.createCoverageStorage(coverageName);
 
         ArrayList<String> list = SQLUtils.getH2TableList(storage.getDatabaseConnection());
 
@@ -115,6 +116,19 @@ public class TileStorageTest {
 
             assertTrue("Insert tiles test 3", tileNumber == i);
         }
+
+        // get last  tiles test
+        for (int i = ids.size() - 1, j = 0; i > 0; i--, j++) {
+
+            ArrayList<TileContainer> ts = storage.getLastTiles(coverageName, j, 1);
+            assertTrue("Last tiles retrieving test " + j, ts.size() == 1);
+
+            String idA = ts.get(0).getTileId();
+            String idB = ids.get(i);
+            assertTrue("Last tiles retrieving test " + j + " : " + idA + " / " + idB, idA.equals(idB));
+
+        }
+
 
         // delete tiles
         boolean deleteOne = storage.deleteTile(coverageName, ids.remove(0));

@@ -2,14 +2,15 @@ package org.abcmap.core.project.tiles;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.utils.SQLUtils;
+import org.abcmap.core.utils.Utils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +25,7 @@ import java.util.List;
  */
 public class TileStorage {
 
+    private static final String FAKE_TILE_ID = "FAKE_TILE_ID";
     /**
      * Path of database file associated with tile store
      */
@@ -111,7 +113,7 @@ public class TileStorage {
                 PreparedStatement imageStat = TileStorageQueries.insertIntoDataTable(conn, coverageEntry.getDataTableName());
 
                 imageStat.setString(1, finalTileId);
-                imageStat.setBytes(2, imageToByteArray(bimg));
+                imageStat.setBytes(2, Utils.imageToByte(bimg));
                 imageStat.execute();
                 imageStat.close();
 
@@ -125,6 +127,9 @@ public class TileStorage {
                 spatialStat.execute();
                 spatialStat.close();
 
+                // TODO: to optimize
+                deleteFakeTile(conn, coverageEntry);
+
                 return null;
             });
         } catch (Exception e) {
@@ -132,25 +137,6 @@ public class TileStorage {
         }
 
         return tileId;
-    }
-
-    /**
-     * Read an image and return a byte array
-     * <p>
-     * Here we read image instead of open an input stream to avoid null pointer exceptions
-     * (sometimes services are available for reading, but not for input streams)
-     *
-     * @param img
-     * @return
-     * @throws IOException
-     */
-    private static byte[] imageToByteArray(BufferedImage img) throws IOException {
-
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-            ImageIO.write(img, "png", out);
-            return out.toByteArray();
-        }
-
     }
 
     /**
@@ -205,7 +191,7 @@ public class TileStorage {
      * <p>
      * /!\ Name must be database compliant, and will be trimmed and passed in lower case
      */
-    public TileCoverageEntry createCoverage(String coverageName) throws IOException {
+    public TileCoverageEntry createCoverageStorage(String coverageName) throws IOException {
 
         // check name and format it, upper case mandatory
         coverageName = coverageName.trim().toUpperCase();
@@ -246,6 +232,8 @@ public class TileStorage {
                 indexStat.execute();
                 indexStat.close();
 
+                addFakeTile(conn, entry);
+
                 return null;
             });
 
@@ -255,11 +243,76 @@ public class TileStorage {
 
         coverages.put(coverageName, entry);
 
-        // Insert a fake transparent tile. If not tiles are found by plugin, the coverage will be deleted
-        BufferedImage img = ImageIO.read(TileStorage.class.getResourceAsStream("/tiles/transparent_tile.png"));
-        addTile(coverageName, img, new Coordinate(0, 0), "TRANSPARENT_TILE");
-
         return entry;
+    }
+
+    /**
+     * Insert a fake transparent tile. If not tiles are found by JDBC mosaic plugin, the coverage will be deleted
+     * <p>
+     * This method do not use transaction, it have to include in another transaction
+     *
+     * @param conn
+     */
+    private void addFakeTile(Connection conn, TileCoverageEntry coverageEntry) throws IOException, SQLException {
+
+        // check how many tiles are present
+        PreparedStatement countStat = TileStorageQueries.countTileData(conn, coverageEntry.getDataTableName());
+        ResultSet rs = countStat.executeQuery();
+        rs.next();
+        int count = rs.getInt(1);
+        rs.close();
+        countStat.close();
+
+        // if no tiles are present, or just one, insert fake
+        if (count < 2) {
+
+            BufferedImage bimg = ImageIO.read(TileStorage.class.getResourceAsStream("/tiles/transparent_tile.png"));
+            //Integer finalWidth = bimg.getWidth();
+            //Integer finalHeight = bimg.getHeight();
+
+            PreparedStatement dataStat = TileStorageQueries.insertIntoDataTable(conn, coverageEntry.getDataTableName());
+
+            dataStat.setString(1, FAKE_TILE_ID);
+            dataStat.setBytes(2, Utils.imageToByte(bimg));
+            dataStat.execute();
+            dataStat.close();
+
+            PreparedStatement spatialStat = TileStorageQueries.insertIntoSpatialTable(conn, coverageEntry.getSpatialTableName());
+
+            spatialStat.setString(1, FAKE_TILE_ID);
+            spatialStat.setDouble(2, 0);
+            spatialStat.setDouble(3, 0);
+            spatialStat.setDouble(4, 1);
+            spatialStat.setDouble(5, 1);
+            spatialStat.execute();
+            spatialStat.close();
+
+        }
+
+
+    }
+
+    /**
+     * Delete a fake transparent tile. If not tiles are found by JDBC mosaic plugin, the coverage will be deleted
+     * <p>
+     * This method do not use transaction, it have to include in another transaction
+     *
+     * @param conn
+     */
+    private void deleteFakeTile(Connection conn, TileCoverageEntry coverageEntry) throws IOException, SQLException {
+
+        PreparedStatement dataStat = TileStorageQueries.deleteFromDataTable(conn, coverageEntry.getDataTableName());
+
+        dataStat.setString(1, FAKE_TILE_ID);
+        dataStat.execute();
+        dataStat.close();
+
+        PreparedStatement spatialStat = TileStorageQueries.deleteFromSpatialTable(conn, coverageEntry.getSpatialTableName());
+
+        spatialStat.setString(1, FAKE_TILE_ID);
+        spatialStat.execute();
+        spatialStat.close();
+
     }
 
     /**
@@ -297,6 +350,10 @@ public class TileStorage {
                 int totalDeleted = 0;
 
                 for (String tileId : ids) {
+
+                    // TODO: to optimize, do not call every times
+                    // add fake tile if necessary
+                    addFakeTile(conn, entry);
 
                     // delete entry from data table
                     PreparedStatement deleteStat = TileStorageQueries.deleteFromDataTable(conn, entry.getDataTableName());
@@ -405,4 +462,42 @@ public class TileStorage {
         }
     }
 
+    public ArrayList<TileContainer> getLastTiles(String coverageName, int offset, int number) throws IOException {
+
+        TileCoverageEntry entry = coverages.get(coverageName);
+        if (entry == null) {
+            throw new IllegalArgumentException("Unknown coverage: " + coverageName);
+        }
+
+        try {
+            Object result = SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
+
+                // update tile position
+                PreparedStatement selectStat = TileStorageQueries.selectLastTiles(conn, entry.getDataTableName(), entry.getSpatialTableName());
+
+                selectStat.setInt(1, offset);
+                selectStat.setInt(2, number);
+                ResultSet rs = selectStat.executeQuery();
+
+                ArrayList<TileContainer> results = new ArrayList<>();
+
+                while (rs.next()) {
+                    String id = rs.getString(1);
+                    byte[] bytes = rs.getBytes(2);
+                    double x = rs.getDouble(3);
+                    double y = rs.getDouble(4);
+
+                    BufferedImage img = Utils.bytesToImage(bytes);
+                    results.add(new TileContainer(id, img, new Coordinate(x, y)));
+                }
+
+                return results;
+            });
+
+            return (ArrayList<TileContainer>) result;
+
+        } catch (Exception e) {
+            throw new IOException("Error while searching tiles", e);
+        }
+    }
 }

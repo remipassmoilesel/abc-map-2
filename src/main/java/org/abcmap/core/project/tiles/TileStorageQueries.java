@@ -219,6 +219,61 @@ public class TileStorageQueries {
     }
 
 
+    public static PreparedStatement selectLastTiles(Connection conn, String dataTn, String spaTn) throws SQLException {
+
+        String dtid = dataTn + "." + TILE_ID_FIELD_NAME;
+        String spid = spaTn + "." + TILE_ID_FIELD_NAME;
+        String dtdt = dataTn + "." + TILE_DATA_FIELD_NAME;
+        String spminx = spaTn + "." + MIN_X_FIELD_NAME;
+        String spminy = spaTn + "." + MIN_Y_FIELD_NAME;
+
+        String req = "SELECT " +
+                dtid + ", " +
+                dtdt + ", " +
+                spminx + ", " +
+                spminy + " " +
+                " FROM " + dataTn + "," + spaTn +
+                " WHERE " + dtid + " = " + spid +
+                " ORDER BY " + dtid + " DESC LIMIT ?,?;";
+
+        //System.out.println(req);
+
+        return conn.prepareStatement(req);
+    }
+
+
+    public static PreparedStatement selectByTileId(Connection conn, String tileId, String dataTn, String spaTn) throws SQLException {
+
+        String dtid = dataTn + "." + TILE_ID_FIELD_NAME;
+        String spid = spaTn + "." + TILE_ID_FIELD_NAME;
+        String dtdt = dataTn + "." + TILE_DATA_FIELD_NAME;
+        String spminx = spaTn + "." + MIN_X_FIELD_NAME;
+        String spminy = spaTn + "." + MIN_Y_FIELD_NAME;
+
+        String req = "SELECT " +
+                dtid + ", " +
+                dtdt + ", " +
+                spminx + ", " +
+                spminy + " " +
+                " FROM " + dataTn + "," + spaTn +
+                " WHERE " + dtid + " = " + spid +
+                " AND " + dtid + " = ? " +
+                " ORDER BY " + dtid + " DESC LIMIT ?,?;";
+
+        //System.out.println(req);
+
+        return conn.prepareStatement(req);
+    }
+
+    public static PreparedStatement countTileData(Connection conn, String dataTn) throws SQLException {
+
+        String req = "SELECT count(*) FROM " + dataTn + ";";
+
+        //System.out.println(req);
+
+        return conn.prepareStatement(req);
+    }
+
     /**
      * Return the spatial table name associated with coverage
      *
@@ -238,4 +293,6 @@ public class TileStorageQueries {
     public static String generateDataTableName(String coverageName) {
         return (DATA_TABLE_PREFIX + coverageName).toUpperCase();
     }
+
+
 }
