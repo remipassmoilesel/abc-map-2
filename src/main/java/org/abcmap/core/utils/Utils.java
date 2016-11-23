@@ -402,49 +402,43 @@ public class Utils {
     }
 
     /**
-     * Image to byte array conversion
+     * Return a byte array or null if an error occur
      *
      * @param img
      * @return
      */
     public static byte[] imageToByte(BufferedImage img) {
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        byte[] bytes = null;
         try {
-            ImageIO.write(img, "png", baos);
-            baos.flush();
-            bytes = baos.toByteArray();
+            try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+                ImageIO.write(img, "png", out);
+                return out.toByteArray();
+            }
         } catch (IOException e) {
             logger.error(e);
-        } finally {
-            try {
-                baos.close();
-            } catch (IOException e) {
-                logger.error(e);
-            }
+            return null;
         }
-        return bytes;
+
     }
 
-    public static BufferedImage byteToImage(byte[] bytes) {
+    /**
+     * Return a buffered image generated from byte array or null if an error occur
+     *
+     * @param bytes
+     * @return
+     */
+    public static BufferedImage bytesToImage(byte[] bytes) {
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
 
-        BufferedImage img = null;
         try {
-            img = ImageIO.read(bais);
+            try (ByteArrayInputStream in = new ByteArrayInputStream(bytes)) {
+                return ImageIO.read(in);
+            }
         } catch (IOException e) {
             logger.error(e);
-        } finally {
-            try {
-                bais.close();
-            } catch (IOException e) {
-                logger.error(e);
-            }
+            return null;
         }
 
-        return img;
     }
 
     public static void premain(String args, Instrumentation inst) {
