@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class TileStorage {
 
-    private static final String FAKE_TILE_ID = "FAKE_TILE_ID";
+    public static final String FAKE_TILE_ID = "FAKE_TILE_ID";
     /**
      * Path of database file associated with tile store
      */
@@ -144,7 +144,7 @@ public class TileStorage {
      *
      * @return
      */
-    private String generateTileId() {
+    public static String generateTileId() {
         return "tile_" + System.nanoTime();
     }
 
@@ -267,8 +267,6 @@ public class TileStorage {
         if (count < 2) {
 
             BufferedImage bimg = ImageIO.read(TileStorage.class.getResourceAsStream("/tiles/transparent_tile.png"));
-            //Integer finalWidth = bimg.getWidth();
-            //Integer finalHeight = bimg.getHeight();
 
             PreparedStatement dataStat = TileStorageQueries.insertIntoDataTable(conn, coverageEntry.getDataTableName());
 
@@ -279,11 +277,12 @@ public class TileStorage {
 
             PreparedStatement spatialStat = TileStorageQueries.insertIntoSpatialTable(conn, coverageEntry.getSpatialTableName());
 
+            // even it is a fake tile, we need exact dimensions or errors will be raised
             spatialStat.setString(1, FAKE_TILE_ID);
             spatialStat.setDouble(2, 0);
             spatialStat.setDouble(3, 0);
-            spatialStat.setDouble(4, 1);
-            spatialStat.setDouble(5, 1);
+            spatialStat.setDouble(4, bimg.getWidth());
+            spatialStat.setDouble(5, bimg.getHeight());
             spatialStat.execute();
             spatialStat.close();
 

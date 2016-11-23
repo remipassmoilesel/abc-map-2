@@ -15,8 +15,14 @@ public class TileContainer {
     private String tileId;
 
     public TileContainer(String tileId, BufferedImage image, Coordinate position) {
+
+        if (tileId == null) {
+            this.tileId = TileStorage.generateTileId();
+        } else {
+            this.tileId = tileId;
+        }
+
         this.image = image;
-        this.tileId = tileId;
         this.position = position;
     }
 

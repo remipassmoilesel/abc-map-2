@@ -42,7 +42,7 @@ public class ProjectBackupTask extends TimerTask{
                 return;
             }
 
-            // save project getNext to the original but with a backup suffix
+            // save project next to the original but with a backup suffix
             ProjectWriter writer = new ProjectWriter();
             Project p = pman.getProject();
             Path backupPath =  p.getDatabasePath().resolveSibling(p.getDatabasePath().getFileName() + BACKUP_SUFFIX);

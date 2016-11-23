@@ -4,3 +4,4 @@ target/*
 log/*
 tmp/*
 tests-playground/*
+src/main/abcmap-old

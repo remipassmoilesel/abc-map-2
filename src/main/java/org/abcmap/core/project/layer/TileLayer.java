@@ -2,6 +2,7 @@ package org.abcmap.core.project.layer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
+import org.abcmap.core.project.tiles.TileContainer;
 import org.abcmap.core.project.tiles.TileStorage;
 import org.abcmap.core.project.tiles.TileStorageQueries;
 import org.abcmap.core.shapes.feature.TileFeatureBuilder;
@@ -62,6 +63,7 @@ public class TileLayer extends AbstractLayer {
      */
     private final String coverageName;
     private final FeatureLayer outlineLayer;
+    private GridCoverage2D coverage;
 
     public TileLayer(String layerId, String title, boolean visible, int zindex, Path databasePath, boolean create) throws IOException {
         this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), databasePath, create);
@@ -82,7 +84,7 @@ public class TileLayer extends AbstractLayer {
         if (create) {
 
             // create a tile storage entry
-            tileStorage.createCoverage(entry.getLayerId());
+            tileStorage.createCoverageStorage(entry.getLayerId());
 
             // create an outline feature entry
             SimpleFeatureType type = TileFeatureBuilder.getTileFeatureType(entry.getLayerId(), this.crs);
@@ -90,7 +92,6 @@ public class TileLayer extends AbstractLayer {
             datastore.createSchema(type);
 
         }
-
 
         this.featureSource = datastore.getFeatureSource(entry.getLayerId());
         this.featureStore = (SimpleFeatureStore) featureSource;
@@ -101,7 +102,7 @@ public class TileLayer extends AbstractLayer {
         // outline layer, with an empty style
         this.outlineLayer = new org.geotools.map.FeatureLayer(featureSource, sf.createStyle());
 
-        createCoverageLayer(databasePath, coverageName, crsCode);
+        buildCoverageLayer(databasePath, coverageName, crsCode);
     }
 
     /**
@@ -123,6 +124,17 @@ public class TileLayer extends AbstractLayer {
         }
 
         return addTile(img, position);
+    }
+
+    /**
+     * Add a tile to this layer, and return its id.
+     * <p>
+     * Return null if an error occur
+     *
+     * @param container
+     */
+    public String addTile(TileContainer container) {
+        return addTile(container.getImage(), container.getPosition());
     }
 
     /**
@@ -253,7 +265,7 @@ public class TileLayer extends AbstractLayer {
      * @param crsCode
      * @throws IOException
      */
-    private Layer createCoverageLayer(Path databasePath, String coverageName, String crsCode) throws IOException {
+    private Layer buildCoverageLayer(Path databasePath, String coverageName, String crsCode) throws IOException {
 
         // Sometimes this message will appear:
         // 2016-11-20T14:22:27.512+0100  WARNING  Config{xmlUrl='org.abcmap.abcmap_layer_tiles_17950576434080_17950863637457', coverageName='abcmap_layer_tiles_17950576434080', geoRasterAttribute='null', coordsys='EPSG:404000', spatialExtension=UNIVERSAL, dstype='DBCP', username='', password='', jdbcUrl='jdbc:sqlite:./tmp/2016-11-20-14-22/project.abm', driverClassName='org.sqlite.JDBC', maxActive=5, maxIdle=0, jndiReferenceName='null', coverageNameAttribute='coverage_name', blobAttributeNameInTileTable='tile_data', keyAttributeNameInTileTable='tile_id', keyAttributeNameInSpatialTable='tile_id', geomAttributeNameInSpatialTable='null', maxXAttribute='max_x', maxYAttribute='max_y', minXAttribute='min_x', minYAttribute='min_y', masterTable='abcmap_tiles_master_table', resXAttribute='res_x', resYAttribute='res_y', tileTableNameAtribute='tile_table_name', spatialTableNameAtribute='spatial_table_name', sqlUpdateMosaicStatement='update abcmap_tiles_master_table set max_x = ?,max_y = ?,min_x = ?,min_y = ? where coverage_name = ?  and tile_table_name = ?  and spatial_table_name = ? ', sqlSelectCoverageStatement='select * from abcmap_tiles_master_table where coverage_name = ? ', sqlUpdateResStatement='update abcmap_tiles_master_table set res_x = ?,res_y = ?  where coverage_name = ?  and tile_table_name = ?  and spatial_table_name = ? ', verifyCardinality=false, ignoreAxisOrder=false, interpolation=1, tileMaxXAttribute='max_x', tileMaxYAttribute='max_y', tileMinXAttribute='min_x', tileMinYAttribute='min_y', jdbcAccessClassName='null'}
@@ -292,6 +304,8 @@ public class TileLayer extends AbstractLayer {
         GeneralParameterValue[] params = new GeneralParameterValue[]{gg, outTransp};
         GridCoverage2D coverage = reader.read(params);
 
+        this.coverage = coverage;
+
         internalLayer = new GridCoverageLayer(coverage, GeoUtils.getDefaultRGBRasterStyle(reader, new GeneralParameterValue[]{gg, outTransp}));
 
         return internalLayer;
@@ -313,5 +327,13 @@ public class TileLayer extends AbstractLayer {
 
     public SimpleFeatureSource getOutlineFeatureSource() {
         return featureSource;
+    }
+
+    public String getCoverageName() {
+        return coverageName;
+    }
+
+    public GridCoverage2D getCoverage() {
+        return coverage;
     }
 }

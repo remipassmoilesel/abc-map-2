@@ -13,8 +13,10 @@ import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLProcessor;
 import org.abcmap.core.utils.SQLUtils;
 import org.geotools.map.MapContent;
+import org.geotools.swing.JMapFrame;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -401,4 +403,20 @@ public class Project {
         return SQLUtils.createH2Connection(databasePath);
     }
 
+    public void showForDebug() {
+
+        SwingUtilities.invokeLater(() -> {
+
+            // Create a JMapFrame with a menu to choose the display style for the
+            JMapFrame frame = new JMapFrame(mainMapContent);
+            frame.setSize(800, 600);
+            frame.enableStatusBar(true);
+            frame.enableTool(JMapFrame.Tool.ZOOM, JMapFrame.Tool.PAN, JMapFrame.Tool.RESET);
+            frame.enableToolBar(true);
+            frame.enableLayerTable(true);
+            frame.setVisible(true);
+
+        });
+
+    }
 }
