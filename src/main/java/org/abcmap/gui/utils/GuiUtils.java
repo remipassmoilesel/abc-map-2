@@ -17,6 +17,7 @@ import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
 import java.awt.geom.Area;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
 import java.awt.event.ActionListener;
@@ -878,6 +879,25 @@ public class GuiUtils {
         }
 
         return lbl;
+    }
+
+    public static void showImage(BufferedImage img) {
+
+        SwingUtilities.invokeLater(() -> {
+
+            JFrame frame = new JFrame();
+            frame.setTitle(img.toString());
+
+            JPanel content = new JPanel();
+            content.add(new JLabel(new ImageIcon(img)));
+
+            frame.setContentPane(content);
+
+            frame.pack();
+            frame.setLocationRelativeTo(null);
+            frame.setVisible(true);
+        });
+
     }
 
 }

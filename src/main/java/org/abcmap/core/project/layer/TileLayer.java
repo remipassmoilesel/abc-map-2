@@ -54,7 +54,6 @@ public class TileLayer extends AbstractLayer {
      * Tile store, where are actually stored tiles
      */
     private final TileStorage tileStorage;
-    private final ContentFeatureSource featureSource;
     private final SimpleFeatureStore featureStore;
     private final TileFeatureBuilder featureBuilder;
 
@@ -63,7 +62,7 @@ public class TileLayer extends AbstractLayer {
      */
     private final String coverageName;
     private final FeatureLayer outlineLayer;
-    private GridCoverage2D coverage;
+    private final Path databasePath;
 
     public TileLayer(String layerId, String title, boolean visible, int zindex, Path databasePath, boolean create) throws IOException {
         this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), databasePath, create);
@@ -75,7 +74,8 @@ public class TileLayer extends AbstractLayer {
 
         JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(databasePath);
 
-        tileStorage = pman.getProject().getTileStorage();
+        this.databasePath = databasePath;
+        this.tileStorage = pman.getProject().getTileStorage();
 
         // uppercase mandatory
         coverageName = entry.getLayerId().toUpperCase();
@@ -93,15 +93,18 @@ public class TileLayer extends AbstractLayer {
 
         }
 
-        this.featureSource = datastore.getFeatureSource(entry.getLayerId());
-        this.featureStore = (SimpleFeatureStore) featureSource;
+        this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
 
         // create a feature builder to create outlines
         this.featureBuilder = FeatureUtils.getTileFeatureBuilder(entry.getLayerId(), crs);
 
         // outline layer, with an empty style
-        this.outlineLayer = new org.geotools.map.FeatureLayer(featureSource, sf.createStyle());
+        this.outlineLayer = new org.geotools.map.FeatureLayer(featureStore, sf.createStyle());
 
+        refreshCoverage();
+    }
+
+    public void refreshCoverage() throws IOException {
         buildCoverageLayer(databasePath, coverageName, crsCode);
     }
 
@@ -217,7 +220,8 @@ public class TileLayer extends AbstractLayer {
         // General config
         config.setCoverageName(coverageName);
         config.setCoordsys(crsCode);
-        config.setInterpolation(1);
+        // interpolation 1 = nearest neighbour, 2 = bipolar, 3 = bicubic
+        config.setInterpolation(3);
         config.setIgnoreAxisOrder(false);
         config.setVerifyCardinality(false);
 
@@ -267,10 +271,6 @@ public class TileLayer extends AbstractLayer {
      */
     private Layer buildCoverageLayer(Path databasePath, String coverageName, String crsCode) throws IOException {
 
-        // Sometimes this message will appear:
-        // 2016-11-20T14:22:27.512+0100  WARNING  Config{xmlUrl='org.abcmap.abcmap_layer_tiles_17950576434080_17950863637457', coverageName='abcmap_layer_tiles_17950576434080', geoRasterAttribute='null', coordsys='EPSG:404000', spatialExtension=UNIVERSAL, dstype='DBCP', username='', password='', jdbcUrl='jdbc:sqlite:./tmp/2016-11-20-14-22/project.abm', driverClassName='org.sqlite.JDBC', maxActive=5, maxIdle=0, jndiReferenceName='null', coverageNameAttribute='coverage_name', blobAttributeNameInTileTable='tile_data', keyAttributeNameInTileTable='tile_id', keyAttributeNameInSpatialTable='tile_id', geomAttributeNameInSpatialTable='null', maxXAttribute='max_x', maxYAttribute='max_y', minXAttribute='min_x', minYAttribute='min_y', masterTable='abcmap_tiles_master_table', resXAttribute='res_x', resYAttribute='res_y', tileTableNameAtribute='tile_table_name', spatialTableNameAtribute='spatial_table_name', sqlUpdateMosaicStatement='update abcmap_tiles_master_table set max_x = ?,max_y = ?,min_x = ?,min_y = ? where coverage_name = ?  and tile_table_name = ?  and spatial_table_name = ? ', sqlSelectCoverageStatement='select * from abcmap_tiles_master_table where coverage_name = ? ', sqlUpdateResStatement='update abcmap_tiles_master_table set res_x = ?,res_y = ?  where coverage_name = ?  and tile_table_name = ?  and spatial_table_name = ? ', verifyCardinality=false, ignoreAxisOrder=false, interpolation=1, tileMaxXAttribute='max_x', tileMaxYAttribute='max_y', tileMinXAttribute='min_x', tileMinYAttribute='min_y', jdbcAccessClassName='null'}
-        // It is ImagePymaridFormat.class that log it can handle Config object as source
-
         Config config = getConfiguration(databasePath, coverageName, crsCode);
 
         AbstractGridFormat format = GridFormatFinder.findFormat(config);
@@ -280,7 +280,7 @@ public class TileLayer extends AbstractLayer {
         ParameterValue<GridGeometry2D> gg = AbstractGridFormat.READ_GRIDGEOMETRY2D.createValue();
 
         // create an envelope, 2 Points, lower left and upper right, x,y order
-        GeneralEnvelope envelope = new GeneralEnvelope(new double[]{0, 0}, new double[]{3000, 3000});
+        GeneralEnvelope envelope = new GeneralEnvelope(new double[]{0, 0}, new double[]{1000, 1000});
 
         // set a CRS for the envelope
         try {
@@ -290,8 +290,8 @@ public class TileLayer extends AbstractLayer {
         }
 
         // Set the envelope into the parameter object
-        int width = 3000;
-        int heigth = 3000;
+        int width = 1000;
+        int heigth = 1000;
 
         // to check: GridEnvelope2D was GeneralGridRange (unavailable)
         gg.setValue(new GridGeometry2D(new GridEnvelope2D(new Rectangle(0, 0, width, heigth)), envelope));
@@ -304,9 +304,7 @@ public class TileLayer extends AbstractLayer {
         GeneralParameterValue[] params = new GeneralParameterValue[]{gg, outTransp};
         GridCoverage2D coverage = reader.read(params);
 
-        this.coverage = coverage;
-
-        internalLayer = new GridCoverageLayer(coverage, GeoUtils.getDefaultRGBRasterStyle(reader, new GeneralParameterValue[]{gg, outTransp}));
+        this.internalLayer = new GridCoverageLayer(coverage, GeoUtils.getDefaultRGBRasterStyle(coverage));
 
         return internalLayer;
     }
@@ -325,15 +323,17 @@ public class TileLayer extends AbstractLayer {
         throw new IllegalStateException("Not implemented for now");
     }
 
-    public SimpleFeatureSource getOutlineFeatureSource() {
-        return featureSource;
+    /**
+     * Return the outline feature store
+     *
+     * @return
+     */
+    public SimpleFeatureStore getOutlineFeatureStore() {
+        return featureStore;
     }
 
     public String getCoverageName() {
         return coverageName;
     }
 
-    public GridCoverage2D getCoverage() {
-        return coverage;
-    }
 }

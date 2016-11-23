@@ -5,7 +5,6 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -17,7 +16,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * This object is a wrapper of Geotools layer
  */
-public abstract class AbstractLayer {
+public abstract class AbstractLayer implements Comparable<AbstractLayer> {
 
     protected static final CustomLogger logger = LogManager.getLogger(AbstractLayer.class);
     protected final static StyleFactory sf = FeatureUtils.getStyleFactory();
@@ -133,5 +132,30 @@ public abstract class AbstractLayer {
     public int hashCode() {
         return indexEntry != null ? indexEntry.hashCode() : 0;
     }
+
+    public int getZindex() {
+        return indexEntry.getZindex();
+    }
+
+    @Override
+    public int compareTo(AbstractLayer other) {
+
+        // other layer have a smaller zindex, it have to be under this
+        if (other.getZindex() < this.getZindex()) {
+            return 1;
+        }
+
+        // other layer have a greater zindex, it have to be above this
+        else if (other.getZindex() != this.getZindex()) {
+            return -1;
+        }
+
+        // other layer have the same zindex
+        else {
+            return 0;
+        }
+
+    }
+
 
 }

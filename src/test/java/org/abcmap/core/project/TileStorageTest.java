@@ -1,6 +1,7 @@
 package org.abcmap.core.project;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import junit.framework.TestCase;
 import org.abcmap.TestUtils;
 import org.abcmap.core.project.tiles.TileContainer;
 import org.abcmap.core.project.tiles.TileCoverageEntry;
@@ -11,6 +12,10 @@ import org.abcmap.core.utils.Utils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,8 +61,8 @@ public class TileStorageTest {
         ArrayList<String> list = SQLUtils.getH2TableList(storage.getDatabaseConnection());
 
         assertTrue("Storage creation test", list.contains(TileStorageQueries.MASTER_TABLE_NAME));
-        assertTrue("Coverage creation test 1", list.contains(TileStorageQueries.DATA_TABLE_PREFIX + coverageName));
-        assertTrue("Coverage creation test 2", list.contains(TileStorageQueries.SPATIAL_TABLE_PREFIX + coverageName));
+        assertTrue("Coverage creation test 1", list.contains(TileStorageQueries.generateDataTableName(coverageName)));
+        assertTrue("Coverage creation test 2", list.contains(TileStorageQueries.generateSpatialTableName(coverageName)));
 
         // add tiles to coverage
         Path tilesRoot = TestUtils.RESOURCES_DIRECTORY.resolve("tiles");
@@ -66,6 +71,7 @@ public class TileStorageTest {
         int x = 0;
         int y = 0;
         ArrayList<String> ids = new ArrayList<>();
+        ArrayList<BufferedImage> imgs = new ArrayList<>();
         while (dit.hasNext()) {
             Path p = dit.next();
 
@@ -78,6 +84,10 @@ public class TileStorageTest {
             ids.add(storage.addTile(coverageName, p, new Coordinate(x, y)));
             ids.add(storage.addTile(coverageName, p, new Coordinate(x, y)));
 
+            BufferedImage img = ImageIO.read(p.toFile());
+            imgs.add(img);
+            imgs.add(img);
+
             x += 500;
             tileNumber++;
             tileNumber++;
@@ -85,6 +95,34 @@ public class TileStorageTest {
 
         assertTrue("Insert tiles test 1", tileNumber > 0);
         assertTrue("Insert tiles test 2", tileNumber == ids.size());
+
+        // test tile data
+        try (Connection conn = storage.getDatabaseConnection()) {
+
+            PreparedStatement selectStat = conn.prepareStatement("SELECT * " +
+                    " FROM " + TileStorageQueries.generateDataTableName(coverageName) +
+                    " ORDER BY " + TileStorageQueries.TILE_ID_FIELD_NAME + " ASC");
+
+            ResultSet rslt = selectStat.executeQuery();
+
+            int i = 0;
+            while (rslt.next()) {
+
+                Raster r1 = imgs.get(i).getData();
+                Raster r2 = Utils.bytesToImage(rslt.getBytes(2)).getData();
+
+                // compare random pixels
+                for (int j = 0; j < 20; j += 8) {
+                    assertTrue("Image comparison test " + i, r1.getPixel(j, j, (int[]) null)[0] == r2.getPixel(j, j, (int[]) null)[0]);
+                    assertTrue("Image comparison test " + i, r1.getPixel(j, j, (int[]) null)[1] == r2.getPixel(j, j, (int[]) null)[1]);
+                    assertTrue("Image comparison test " + i, r1.getPixel(j, j, (int[]) null)[2] == r2.getPixel(j, j, (int[]) null)[2]);
+                }
+
+                i++;
+            }
+
+        }
+
 
         try (Connection conn = storage.getDatabaseConnection()) {
 
@@ -117,7 +155,7 @@ public class TileStorageTest {
             assertTrue("Insert tiles test 3", tileNumber == i);
         }
 
-        // get last  tiles test
+        // get last tiles test
         for (int i = ids.size() - 1, j = 0; i > 0; i--, j++) {
 
             ArrayList<TileContainer> ts = storage.getLastTiles(coverageName, j, 1);
@@ -128,7 +166,6 @@ public class TileStorageTest {
             assertTrue("Last tiles retrieving test " + j + " : " + idA + " / " + idB, idA.equals(idB));
 
         }
-
 
         // delete tiles
         boolean deleteOne = storage.deleteTile(coverageName, ids.remove(0));

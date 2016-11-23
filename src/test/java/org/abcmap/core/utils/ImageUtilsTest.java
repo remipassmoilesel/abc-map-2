@@ -46,6 +46,8 @@ public class ImageUtilsTest {
             // compare random pixels
             for (int j = 0; j < 20; j += 8) {
                 assertTrue("Image comparison test", r1.getPixel(j, j, (int[]) null)[0] == r2.getPixel(j, j, (int[]) null)[0]);
+                assertTrue("Image comparison test", r1.getPixel(j, j, (int[]) null)[1] == r2.getPixel(j, j, (int[]) null)[1]);
+                assertTrue("Image comparison test", r1.getPixel(j, j, (int[]) null)[2] == r2.getPixel(j, j, (int[]) null)[2]);
             }
 
             //ImageIO.write(img, "png", new File("test1.png"));

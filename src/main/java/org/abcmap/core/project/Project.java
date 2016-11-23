@@ -12,6 +12,7 @@ import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLProcessor;
 import org.abcmap.core.utils.SQLUtils;
+import org.abcmap.core.utils.Utils;
 import org.geotools.map.MapContent;
 import org.geotools.swing.JMapFrame;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -23,6 +24,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Objects;
 
 /**
@@ -73,11 +75,6 @@ public class Project {
     private ArrayList<AbstractLayer> layers;
 
     /**
-     * Geotools map content used to render and display map
-     */
-    private MapContent mainMapContent;
-
-    /**
      * Metadata about project
      */
     private ProjectMetadata metadataContainer;
@@ -104,7 +101,6 @@ public class Project {
         this.tempDirectory = databasePath.getParent();
         this.metadataContainer = new ProjectMetadata();
         this.layers = new ArrayList();
-        this.mainMapContent = new MapContent();
         this.crs = GeoUtils.GENERIC_2D;
         this.finalPath = null;
 
@@ -113,10 +109,6 @@ public class Project {
         this.tileStorage = new TileStorage(databasePath);
         tileStorage.initialize();
 
-    }
-
-    public MapContent getMainMapContent() {
-        return mainMapContent;
     }
 
     /**
@@ -211,7 +203,6 @@ public class Project {
      */
     protected AbstractLayer addLayer(AbstractLayer layer) {
         layers.add(layer);
-        mainMapContent.addLayer(layer.getInternalLayer());
         return layer;
     }
 
@@ -403,12 +394,33 @@ public class Project {
         return SQLUtils.createH2Connection(databasePath);
     }
 
+    /**
+     * Build a Geotools map content with available layers
+     *
+     * @return
+     */
+    public MapContent buildMapContent() {
+
+        MapContent content = new MapContent();
+
+        Collections.sort(layers);
+
+        for (AbstractLayer layer : layers) {
+            content.addLayer(layer.getInternalLayer());
+        }
+
+        return content;
+    }
+
+    /**
+     * Show a project for debug purposes
+     */
     public void showForDebug() {
 
         SwingUtilities.invokeLater(() -> {
 
             // Create a JMapFrame with a menu to choose the display style for the
-            JMapFrame frame = new JMapFrame(mainMapContent);
+            JMapFrame frame = new JMapFrame(buildMapContent());
             frame.setSize(800, 600);
             frame.enableStatusBar(true);
             frame.enableTool(JMapFrame.Tool.ZOOM, JMapFrame.Tool.PAN, JMapFrame.Tool.RESET);
