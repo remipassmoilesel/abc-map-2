@@ -122,8 +122,8 @@ public class TileStorage {
                 spatialStat.setString(1, finalTileId);
                 spatialStat.setDouble(2, position.x);
                 spatialStat.setDouble(3, position.y);
-                spatialStat.setDouble(4, finalWidth);
-                spatialStat.setDouble(5, finalHeight);
+                spatialStat.setDouble(4, position.x + finalWidth);
+                spatialStat.setDouble(5, position.y + finalHeight);
                 spatialStat.execute();
                 spatialStat.close();
 

@@ -6,7 +6,13 @@ import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 /**
- * Created by remipassmoilesel on 23/11/16.
+ * Container to manipulate tiles with image and few informations:
+ * <p>
+ * - ID: string id
+ * <p>
+ * - position: coordinate in map unit, placed by bottom left corner
+ * <p>
+ * - image: buffered image of tile
  */
 public class TileContainer {
 
@@ -26,6 +32,11 @@ public class TileContainer {
         this.position = position;
     }
 
+    /**
+     * Get the buffered image of tile
+     *
+     * @return
+     */
     public BufferedImage getImage() {
         return image;
     }
@@ -34,6 +45,11 @@ public class TileContainer {
         this.image = image;
     }
 
+    /**
+     * Get unique identifier of tile
+     *
+     * @return
+     */
     public String getTileId() {
         return tileId;
     }
@@ -42,10 +58,20 @@ public class TileContainer {
         this.tileId = tileId;
     }
 
+    /**
+     * Get position of bottom left corner of tile on map
+     *
+     * @return
+     */
     public Coordinate getPosition() {
         return position;
     }
 
+    /**
+     * Set position of bottom left corner of tile on map
+     *
+     * @return
+     */
     public void setPosition(Coordinate position) {
         this.position = position;
     }
