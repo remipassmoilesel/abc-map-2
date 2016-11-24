@@ -9,14 +9,17 @@ import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.geotools.renderer.RenderListener;
+import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.*;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.style.ContrastMethod;
 
-import java.io.IOException;
+import java.awt.*;
 
 /**
  * Created by remipassmoilesel on 10/11/16.
@@ -142,6 +145,12 @@ public class GeoUtils {
         return SLD.wrapSymbolizers(sym);
     }
 
+    /**
+     * Return default gray scale style for raster elements
+     *
+     * @param bandNum
+     * @return
+     */
     public static org.geotools.styling.Style getDefaultGrayScaleRasterStyle(Integer bandNum) {
 
         // Now we create a RasterSymbolizer using the selected channels
@@ -153,6 +162,32 @@ public class GeoUtils {
 
         return SLD.wrapSymbolizers(sym);
 
+    }
+
+    /**
+     * Return a streaming renderer
+     */
+    public static StreamingRenderer buildRenderer() {
+
+        StreamingRenderer renderer = new StreamingRenderer();
+
+        RenderingHints javaHints = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        renderer.setJava2DHints(javaHints);
+
+        renderer.addRenderListener(new RenderListener() {
+
+            @Override
+            public void featureRenderer(SimpleFeature feature) {
+//                System.out.println(feature);
+            }
+
+            @Override
+            public void errorOccurred(Exception e) {
+                System.out.println(e);
+            }
+        });
+
+        return renderer;
     }
 
 }
