@@ -1,4 +1,4 @@
-package org.abcmap.core.project.dao;
+package org.abcmap.core.dao;
 
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.Dao;

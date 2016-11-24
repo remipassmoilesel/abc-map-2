@@ -5,9 +5,9 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.TempFilesManager;
-import org.abcmap.core.project.dao.LayerIndexDAO;
-import org.abcmap.core.project.dao.ProjectMetadataDAO;
-import org.abcmap.core.project.dao.StyleDAO;
+import org.abcmap.core.dao.LayerIndexDAO;
+import org.abcmap.core.dao.ProjectMetadataDAO;
+import org.abcmap.core.dao.StyleDAO;
 import org.abcmap.core.utils.ZipUtils;
 
 import java.io.IOException;

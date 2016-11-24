@@ -3,7 +3,7 @@ package org.abcmap.core.project.layer;
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
-import org.abcmap.core.project.dao.DataModel;
+import org.abcmap.core.dao.DataModel;
 
 /**
  * Object that represent layer metadata. They are stored separately in database.

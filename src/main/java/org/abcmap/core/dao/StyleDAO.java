@@ -1,7 +1,5 @@
-package org.abcmap.core.project.dao;
+package org.abcmap.core.dao;
 
-import org.abcmap.core.project.ProjectMetadata;
-import org.abcmap.core.project.ProjectMetadataPeer;
 import org.abcmap.core.styles.StyleContainer;
 
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package org.abcmap.core.styles;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.project.dao.StyleDAO;
+import org.abcmap.core.dao.StyleDAO;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

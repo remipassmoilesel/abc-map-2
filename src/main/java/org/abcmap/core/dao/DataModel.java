@@ -1,4 +1,4 @@
-package org.abcmap.core.project.dao;
+package org.abcmap.core.dao;
 
 /**
  * Tag interface for data model

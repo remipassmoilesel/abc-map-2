@@ -1,4 +1,4 @@
-package org.abcmap.core.project.tiles;
+package org.abcmap.core.tiles;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.utils.SQLUtils;

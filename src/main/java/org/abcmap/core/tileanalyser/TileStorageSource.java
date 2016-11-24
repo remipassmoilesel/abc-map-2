@@ -1,7 +1,7 @@
 package org.abcmap.core.tileanalyser;
 
-import org.abcmap.core.project.tiles.TileContainer;
-import org.abcmap.core.project.tiles.TileStorage;
+import org.abcmap.core.tiles.TileContainer;
+import org.abcmap.core.tiles.TileStorage;
 
 import java.io.IOException;
 import java.util.ArrayList;

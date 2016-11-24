@@ -1,20 +1,14 @@
 package org.abcmap.core.project.layer;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import junit.framework.TestCase;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.tiles.TileStorageQueries;
-import org.abcmap.core.utils.Utils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.referencing.FactoryException;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

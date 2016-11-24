@@ -4,26 +4,19 @@ import com.labun.surf.Params;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
 import org.abcmap.core.project.layer.TileLayer;
-import org.abcmap.core.project.tiles.TileContainer;
+import org.abcmap.core.tiles.TileContainer;
 import org.abcmap.core.tileanalyser.*;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.Utils;
-import org.abcmap.gui.utils.GuiUtils;
-import org.geotools.map.GridCoverageLayer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.nio.Buffer;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import static junit.framework.TestCase.assertTrue;
 

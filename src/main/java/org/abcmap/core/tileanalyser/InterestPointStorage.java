@@ -1,6 +1,6 @@
 package org.abcmap.core.tileanalyser;
 
-import org.abcmap.core.project.dao.AbstractOrmDAO;
+import org.abcmap.core.dao.AbstractOrmDAO;
 
 import java.io.IOException;
 import java.nio.file.Path;

@@ -2,9 +2,9 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.project.dao.LayerIndexDAO;
-import org.abcmap.core.project.dao.ProjectMetadataDAO;
-import org.abcmap.core.project.dao.StyleDAO;
+import org.abcmap.core.dao.LayerIndexDAO;
+import org.abcmap.core.dao.ProjectMetadataDAO;
+import org.abcmap.core.dao.StyleDAO;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.LayerType;

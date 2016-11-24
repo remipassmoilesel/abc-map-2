@@ -4,9 +4,8 @@ import com.labun.surf.InterestPoint;
 import com.labun.surf.Matcher;
 import com.labun.surf.Params;
 import com.vividsolutions.jts.geom.Coordinate;
-import org.abcmap.core.project.tiles.TileContainer;
+import org.abcmap.core.tiles.TileContainer;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;

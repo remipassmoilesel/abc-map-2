@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.dao.LayerIndexDAO;
+import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;

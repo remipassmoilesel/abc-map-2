@@ -1,7 +1,7 @@
 package org.abcmap.core.project.layer;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.project.dao.LayerIndexDAO;
+import org.abcmap.core.dao.LayerIndexDAO;
 import org.junit.BeforeClass;
 import org.junit.Test;
 

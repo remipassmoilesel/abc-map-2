@@ -2,10 +2,9 @@ package org.abcmap.core.project.layer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
-import org.abcmap.core.project.tiles.TileContainer;
-import org.abcmap.core.project.tiles.TileStorage;
-import org.abcmap.core.project.tiles.TileStorageQueries;
-import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
+import org.abcmap.core.tiles.TileContainer;
+import org.abcmap.core.tiles.TileStorage;
+import org.abcmap.core.tiles.TileStorageQueries;
 import org.abcmap.core.shapes.feature.TileFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;

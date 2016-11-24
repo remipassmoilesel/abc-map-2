@@ -1,4 +1,4 @@
-package org.abcmap.core.project.dao;
+package org.abcmap.core.dao;
 
 import org.abcmap.core.project.PMConstants;
 import org.abcmap.core.project.ProjectMetadata;

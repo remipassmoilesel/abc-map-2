@@ -1,7 +1,7 @@
 package org.abcmap.core.project;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.project.dao.ProjectMetadataDAO;
+import org.abcmap.core.dao.ProjectMetadataDAO;
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;

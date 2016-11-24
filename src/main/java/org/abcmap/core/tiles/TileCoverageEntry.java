@@ -1,4 +1,4 @@
-package org.abcmap.core.project.tiles;
+package org.abcmap.core.tiles;
 
 import java.util.Objects;
 

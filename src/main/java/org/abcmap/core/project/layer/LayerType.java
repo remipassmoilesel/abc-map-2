@@ -9,10 +9,16 @@ public enum LayerType {
      * A features layer
      */
     FEATURES,
+
     /**
      * A tiles layer is a raster layer made of tiles created with Abc-Map
      */
-    TILES;
+    TILES,
+
+    /**
+     * A distant raster layer
+     */
+    WMS;
 
     /**
      * Return the corresponding enum object or null.

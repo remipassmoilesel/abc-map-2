@@ -1,12 +1,11 @@
 package org.abcmap.core.project;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import junit.framework.TestCase;
 import org.abcmap.TestUtils;
-import org.abcmap.core.project.tiles.TileContainer;
-import org.abcmap.core.project.tiles.TileCoverageEntry;
-import org.abcmap.core.project.tiles.TileStorage;
-import org.abcmap.core.project.tiles.TileStorageQueries;
+import org.abcmap.core.tiles.TileContainer;
+import org.abcmap.core.tiles.TileCoverageEntry;
+import org.abcmap.core.tiles.TileStorage;
+import org.abcmap.core.tiles.TileStorageQueries;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
 import org.junit.BeforeClass;
@@ -15,7 +14,6 @@ import org.junit.Test;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
-import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

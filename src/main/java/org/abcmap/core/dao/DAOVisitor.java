@@ -1,4 +1,4 @@
-package org.abcmap.core.project.dao;
+package org.abcmap.core.dao;
 
 /**
  * Used in lambdas to visit style collections
