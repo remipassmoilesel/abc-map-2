@@ -1,0 +1,6 @@
+[submodule "lib/geotools"]
+	path = lib/geotools
+	url = https://github.com/remipassmoilesel/geotools
+[submodule "lib/imagej-surf"]
+	path = lib/imagej-surf
+	url = https://github.com/remipassmoilesel/imagej-surf
