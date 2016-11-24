@@ -61,10 +61,8 @@ public class TileLayerTest {
 
             // add tiles twice
             ids.add(layer.addTile(p, new Coordinate(x, y)));
-            ids.add(layer.addTile(p, new Coordinate(x, y)));
 
             x += 500;
-            tileNumber++;
             tileNumber++;
         }
 

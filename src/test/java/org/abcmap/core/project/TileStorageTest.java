@@ -82,14 +82,11 @@ public class TileStorageTest {
 
             // tiles ared added twice
             ids.add(storage.addTile(coverageName, p, new Coordinate(x, y)));
-            ids.add(storage.addTile(coverageName, p, new Coordinate(x, y)));
 
             BufferedImage img = ImageIO.read(p.toFile());
             imgs.add(img);
-            imgs.add(img);
 
             x += 500;
-            tileNumber++;
             tileNumber++;
         }
 
