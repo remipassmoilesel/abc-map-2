@@ -295,4 +295,18 @@ public class TileStorageQueries {
     }
 
 
+    public static PreparedStatement selectAllSpatialEntries(Connection conn, String spatialTableName) throws SQLException {
+
+        String req = "SELECT "
+                + MIN_X_FIELD_NAME + ", "
+                + MIN_Y_FIELD_NAME + ", "
+                + MAX_X_FIELD_NAME + ", "
+                + MAX_Y_FIELD_NAME + " "
+                + " FROM " + spatialTableName + ";";
+
+        //System.out.println(req);
+
+        return conn.prepareStatement(req);
+
+    }
 }

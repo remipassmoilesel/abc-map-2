@@ -100,9 +100,6 @@ public class TileComposerTest {
 
         }
 
-        //System.out.println(expected);
-        //System.out.println(computed);
-
         // test is rounded here to avoid bad precision errors
         for (int i = 0; i < expected.size(); i++) {
 
@@ -114,11 +111,9 @@ public class TileComposerTest {
             double cbx = Utils.round(cb.x, 3);
             double cby = Utils.round(cb.y, 3);
 
-            assertTrue("Tile computed positions: " + cax + " " + cbx, cax == cbx);
-            assertTrue("Tile computed positions: " + cay + " " + cby, cay == cby);
+            assertTrue("Tile computed positions: " + cax + " " + cbx, cax - cbx < 1);
+            assertTrue("Tile computed positions: " + cay + " " + cby, cay - cby < 1);
         }
-
-        //assertTrue("Tile computed positions", expected.equals(computed));
 
         if (SHOW_IN_WINDOW) {
             layer.refreshCoverage();

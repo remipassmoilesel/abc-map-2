@@ -47,7 +47,9 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
     }
 
     /**
-     * Return the actual bounds of the layer
+     * Return the actual bounds of the layer, namely its lower left corner and upper right corner.
+     *
+     *
      *
      * @return
      */

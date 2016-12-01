@@ -3,6 +3,8 @@ package org.abcmap.core.tiles;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -498,5 +500,60 @@ public class TileStorage {
         } catch (Exception e) {
             throw new IOException("Error while searching tiles", e);
         }
+    }
+
+    /**
+     * Iterate all spatial entries of coverage looking for lower left corner and upper right corner.
+     *
+     * @param coverageName
+     * @return
+     * @throws Exception
+     */
+    public ReferencedEnvelope computeCoverageBounds(String coverageName) throws Exception {
+
+        // update tile position
+        TileCoverageEntry entry = coverages.get(coverageName);
+        if (entry == null) {
+            throw new IllegalArgumentException("Unknown coverage: " + coverageName);
+        }
+
+        final double[] d = new double[]{0, 0, 0, 0};
+        try {
+            SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
+
+                PreparedStatement selectStat = TileStorageQueries.selectAllSpatialEntries(conn, entry.getSpatialTableName());
+                ResultSet rs = selectStat.executeQuery();
+
+                boolean firstLoop = true;
+
+                while (rs.next()) {
+                    double minx = rs.getDouble(1);
+                    double miny = rs.getDouble(2);
+                    double maxx = rs.getDouble(3);
+                    double maxy = rs.getDouble(4);
+
+                    if (minx < d[0] || firstLoop) {
+                        d[0] = minx;
+                    }
+                    if (miny < d[1] || firstLoop) {
+                        d[1] = miny;
+                    }
+                    if (maxx > d[2] || firstLoop) {
+                        d[2] = maxx;
+                    }
+                    if (maxy > d[3] || firstLoop) {
+                        d[3] = maxy;
+                    }
+
+                    firstLoop = false;
+                }
+
+                return null;
+            });
+        } catch (Exception e) {
+            throw new Exception("Error while computing dimensions", e);
+        }
+
+        return new ReferencedEnvelope(d[0], d[2], d[1], d[3], DefaultEngineeringCRS.GENERIC_2D);
     }
 }
