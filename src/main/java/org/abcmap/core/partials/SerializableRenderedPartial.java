@@ -2,6 +2,7 @@ package org.abcmap.core.partials;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
+import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
 import org.abcmap.core.utils.BufferedImagePersister;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -18,7 +19,7 @@ import java.util.Objects;
 @DatabaseTable(tableName = SerializableRenderedPartial.TABLE_NAME)
 public class SerializableRenderedPartial implements DataModel{
 
-    public static final String TABLE_NAME = "PARTIALS";
+    public static final String TABLE_NAME = ConfigurationConstants.SQL_TABLE_PREFIX + "PARTIALS";
     public static final String PARTIAL_ID_FIELD_NAME = "ID";
     public static final String PARTIAL_IMAGE_FIELD_NAME = "IMAGE";
     public static final String PARTIAL_X1_FIELD_NAME = "X1";

@@ -41,7 +41,7 @@ public class RenderedPartialStore {
         this.loadedPartials = new ArrayList<>();
         this.databasePath = databasePath;
 
-        this.connectionSource = new JdbcPooledConnectionSource("jdbc:h2:./" + databasePath + ";DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE", "", "");
+        this.connectionSource = new JdbcPooledConnectionSource("jdbc:h2:./" + databasePath, "", "");
         connectionSource.setMaxConnectionAgeMillis(5 * 60 * 1000);
         connectionSource.setTestBeforeGet(true);
         connectionSource.initialize();
@@ -146,5 +146,9 @@ public class RenderedPartialStore {
 
     public static long getAddedInDatabase() {
         return addedInDatabase;
+    }
+
+    public ArrayList<RenderedPartial> getLoadedPartials() {
+        return loadedPartials;
     }
 }

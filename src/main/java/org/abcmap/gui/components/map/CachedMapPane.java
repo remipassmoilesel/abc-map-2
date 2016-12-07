@@ -61,12 +61,12 @@ public class CachedMapPane extends JPanel {
      */
     private RenderedPartialQueryResult currentPartials;
 
-    public CachedMapPane(MapContent map) {
+    public CachedMapPane(RenderedPartialFactory factory, MapContent map) {
 
         setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 
         this.map = map;
-        this.partialFactory = new RenderedPartialFactory(map);
+        this.partialFactory = factory;
         this.lock = new ReentrantLock();
 
         this.addComponentListener(new RefreshMapComponentListener());

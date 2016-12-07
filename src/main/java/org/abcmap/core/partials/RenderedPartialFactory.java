@@ -32,7 +32,7 @@ public class RenderedPartialFactory {
     /**
      * Associated map content
      */
-    private final MapContent mapContent;
+    private MapContent mapContent;
 
     /**
      * Where are stored partials
@@ -50,15 +50,17 @@ public class RenderedPartialFactory {
     private int partialSidePx = 500;
 
 
-    public RenderedPartialFactory(Path databasePath, MapContent content) {
-
-        mapContent = content;
+    public RenderedPartialFactory(Path databasePath) {
 
         try {
             store = new RenderedPartialStore(databasePath);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to initialize database: " + e.getMessage(), e);
         }
+    }
+
+    public void setMapContent(MapContent mapContent) {
+        this.mapContent = mapContent;
     }
 
     /**
@@ -92,6 +94,10 @@ public class RenderedPartialFactory {
      * @return
      */
     public RenderedPartialQueryResult intersect(ReferencedEnvelope worldBounds, Runnable toNotifyWhenPartialsCome) {
+
+        if (mapContent == null) {
+            throw new NullPointerException("Noting to render, map content is null");
+        }
 
         // keep the same value until end of rendering process, even if value is changed by setter
         double partialSideDg = this.partialSideDg;
@@ -249,5 +255,9 @@ public class RenderedPartialFactory {
 
     public static long getLoadedPartialsReused() {
         return loadedPartialsReused;
+    }
+
+    public RenderedPartialStore getStore() {
+        return store;
     }
 }

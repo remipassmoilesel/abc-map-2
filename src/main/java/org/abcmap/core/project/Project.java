@@ -2,6 +2,7 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.partials.RenderedPartialFactory;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
@@ -50,6 +51,11 @@ public class Project {
      * Tile storage of the project, where are stored all tile coverages
      */
     private final TileStorage tileStorage;
+
+    /**
+     * Where are stored map rendered map partials, for display purposes
+     */
+    private final RenderedPartialFactory partialFactory;
 
     /**
      * Only one layer is alterable at a time, the active layer
@@ -108,6 +114,17 @@ public class Project {
         this.tileStorage = new TileStorage(databasePath);
         tileStorage.initialize();
 
+        partialFactory = new RenderedPartialFactory(databasePath);
+
+    }
+
+    /**
+     * Return container where are stored map rendered map partials, for display purposes
+     *
+     * @return
+     */
+    public RenderedPartialFactory getPartialFactory() {
+        return partialFactory;
     }
 
     /**
@@ -410,7 +427,7 @@ public class Project {
 
             // optionally add tile outlines
             content.addLayer(layer.getInternalLayer());
-            if(includeTileOutlines && layer instanceof TileLayer){
+            if (includeTileOutlines && layer instanceof TileLayer) {
                 content.addLayer(((TileLayer) layer).getOutlineLayer());
             }
         }
@@ -421,7 +438,7 @@ public class Project {
     /**
      * Show a project for debug purposes
      */
-    public void showForDebug(boolean includeTileOutlines)  {
+    public void showForDebug(boolean includeTileOutlines) {
 
         SwingUtilities.invokeLater(() -> {
 

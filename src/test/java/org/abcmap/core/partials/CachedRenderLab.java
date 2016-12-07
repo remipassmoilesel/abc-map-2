@@ -101,7 +101,9 @@ public class CachedRenderLab {
 
         SwingUtilities.invokeLater(() -> {
 
-            CachedMapPane pane = new CachedMapPane(mapContent);
+            Path p = Paths.get("tmp/database.db");
+            RenderedPartialFactory factory = new RenderedPartialFactory(p);
+            CachedMapPane pane = new CachedMapPane(factory, mapContent);
 
             //pane.setWorldBounds(start);
             pane.setWorldPosition(start);

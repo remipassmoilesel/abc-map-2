@@ -97,7 +97,7 @@ public class ConfigurationConstants {
     /**
      * Upper case mandatory
      */
-    public static final String SQL_TABLE_PREFIX = "ABCMAP_";
+    public static final String SQL_TABLE_PREFIX = "ABM_";
 
 
     public static final Params[] SURF_PARAMS = new Params[]{
