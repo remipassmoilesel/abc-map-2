@@ -41,9 +41,6 @@ public class RenderedPartialFactory {
      */
     private final String layerId;
 
-
-    private static BufferedImage waitingImage;
-
     /**
      * Associated map content
      */
@@ -68,32 +65,6 @@ public class RenderedPartialFactory {
         this.store = store;
         this.mapContent = content;
         this.layerId = layerId;
-
-        if (waitingImage == null) {
-            createWaitingImage();
-        }
-    }
-
-    private void createWaitingImage() {
-
-        waitingImage = new BufferedImage(partialSidePx, partialSidePx, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2d = (Graphics2D) waitingImage.getGraphics();
-
-        // no transparency here, because the are possibly several layers
-        //g2d.setComposite(GuiUtils.createTransparencyComposite(0.3f));
-
-        // draw a rectangle
-        g2d.setColor(new Color(0xF0EEEE));
-        int w = waitingImage.getWidth();
-        int h = waitingImage.getHeight();
-        g2d.fillRect(0, 0, w, h);
-
-        // draw tree points in rectangle
-        g2d.setColor(Color.blue);
-        g2d.setFont(new Font("Dialog", Font.BOLD, 50));
-        g2d.drawString("...", w / 2 - 20, h / 2);
-
     }
 
     /**
@@ -163,7 +134,8 @@ public class RenderedPartialFactory {
 
             // check if partial already exist and is already loaded
             RenderedPartial part = store.searchInLoadedList(layerId, area);
-            if (part != null && part.getImage() != null) {
+
+            if (RenderedPartial.isLoaded(part) || PartialRenderingQueue.isRenderInProgress(part)) {
                 rsparts.add(part);
                 loadedPartialsReused++;
             }
@@ -171,26 +143,18 @@ public class RenderedPartialFactory {
             // partial does not exist or image is not loaded, create it
             else {
 
-                // partial processing has already been scheduled
-                if (part != null && PartialRenderingQueue.isRenderInProgress(part)) {
-                    rsparts.add(part);
+                // create a new partial
+                RenderedPartial newPart = new RenderedPartial(RenderedPartial.getWaitingImage(), area, partialSidePx, partialSidePx, layerId);
+                store.addInLoadedList(newPart);
+                rsparts.add(newPart);
+
+                // Create a queue if needed. In most case, it is not needed.
+                if (renderingTasks == null) {
+                    renderingTasks = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toNotifyWhenPartialsCome);
                 }
 
-                // partial processing have to be scheduled
-                else {
-                    // create a new partial
-                    RenderedPartial newPart = new RenderedPartial(waitingImage, area, partialSidePx, partialSidePx, layerId);
-                    store.addInLoadedList(newPart);
-                    rsparts.add(newPart);
-
-                    // Create a queue if needed. In most case, it is not needed.
-                    if (renderingTasks == null) {
-                        renderingTasks = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toNotifyWhenPartialsCome);
-                    }
-
-                    // create a task to retrieve or renderer image from map
-                    renderingTasks.addTask(newPart);
-                }
+                // create a task to retrieve or renderer image from map
+                renderingTasks.addTask(newPart);
 
             }
 
