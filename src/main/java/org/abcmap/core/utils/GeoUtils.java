@@ -1,5 +1,6 @@
 package org.abcmap.core.utils;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
@@ -20,6 +21,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.style.ContrastMethod;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 
 /**
  * Created by remipassmoilesel on 10/11/16.
@@ -190,4 +192,7 @@ public class GeoUtils {
         return renderer;
     }
 
+    public static Point2D coordinateToPoint2D(Coordinate coordinate) {
+        return new Point2D.Double(coordinate.x, coordinate.y);
+    }
 }

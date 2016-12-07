@@ -65,7 +65,7 @@ public class CachedMapPaneMouseController extends MouseAdapter {
             zoomUnit = -zoomUnit;
         }
 
-        pane.setPartialSideDg(pane.getPartialSideDg() + zoomUnit);
+        pane.setPartialSideWu(pane.getPartialSideDg() + zoomUnit);
         pane.refreshMap();
     }
 }

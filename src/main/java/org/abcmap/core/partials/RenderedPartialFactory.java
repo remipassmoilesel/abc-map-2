@@ -7,8 +7,6 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.nio.file.Path;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -23,9 +21,11 @@ import java.util.ArrayList;
 public class RenderedPartialFactory {
 
     /**
-     * Minimal size in degree of rendered map on partial
+     * Minimal size in world unit of rendered map on partial
+     *
+     * This value should prevent partial side to be negative
      */
-    private static final double MIN_PARTIAL_SIDE_DG = 0.05d;
+    private static final double MIN_PARTIAL_SIDE_WU = 0.05d;
 
     private static long loadedPartialsReused = 0;
 
@@ -42,25 +42,16 @@ public class RenderedPartialFactory {
     /**
      * Zoom level of current rendering
      */
-    private double partialSideDg = 2d;
+    private double partialSideWu = 2d;
 
     /**
      * Default size in px of each partial
      */
     private int partialSidePx = 500;
 
-
-    public RenderedPartialFactory(Path databasePath) {
-
-        try {
-            store = new RenderedPartialStore(databasePath);
-        } catch (SQLException e) {
-            throw new RuntimeException("Unable to initialize database: " + e.getMessage(), e);
-        }
-    }
-
-    public void setMapContent(MapContent mapContent) {
-        this.mapContent = mapContent;
+    public RenderedPartialFactory(RenderedPartialStore store, MapContent content) {
+        this.store = store;
+        this.mapContent = content;
     }
 
     /**
@@ -73,8 +64,8 @@ public class RenderedPartialFactory {
     public RenderedPartialQueryResult intersect(Point2D ulc, Dimension pixelDimension, CoordinateReferenceSystem crs, Runnable toNotifyWhenPartialsCome) {
 
         // get width and height in decimal dg
-        double wdg = partialSideDg * pixelDimension.width / partialSidePx;
-        double hdg = partialSideDg * pixelDimension.height / partialSidePx;
+        double wdg = partialSideWu * pixelDimension.width / partialSidePx;
+        double hdg = partialSideWu * pixelDimension.height / partialSidePx;
 
         // create a new envelope
         double x1 = ulc.getX();
@@ -100,11 +91,11 @@ public class RenderedPartialFactory {
         }
 
         // keep the same value until end of rendering process, even if value is changed by setter
-        double partialSideDg = this.partialSideDg;
+        double partialSideDg = this.partialSideWu;
 
         // Side value in decimal degree of each partial
-        if (partialSideDg < MIN_PARTIAL_SIDE_DG) {
-            partialSideDg = MIN_PARTIAL_SIDE_DG;
+        if (partialSideDg < MIN_PARTIAL_SIDE_WU) {
+            partialSideDg = MIN_PARTIAL_SIDE_WU;
         }
 
         ArrayList<RenderedPartial> rsparts = new ArrayList<>();
@@ -212,9 +203,9 @@ public class RenderedPartialFactory {
      */
     public double getStartPointFrom(double coord) {
 
-        double mod = coord % partialSideDg;
+        double mod = coord % partialSideWu;
         if (mod < 0) {
-            mod += partialSideDg;
+            mod += partialSideWu;
         }
 
         double rslt = coord - mod;
@@ -233,14 +224,18 @@ public class RenderedPartialFactory {
     }
 
     /**
-     * @param sideDg
+     * Set rendered partial size in world unit
+     * <p>
+     * Partial size can be used as a "zoom" value
+     *
+     * @param
      */
-    public void setPartialSideDg(double sideDg) {
+    public void setPartialSideWu(double sideDg) {
 
-        this.partialSideDg = sideDg;
+        this.partialSideWu = sideDg;
 
-        if (partialSideDg < MIN_PARTIAL_SIDE_DG) {
-            partialSideDg = MIN_PARTIAL_SIDE_DG;
+        if (partialSideWu < MIN_PARTIAL_SIDE_WU) {
+            partialSideWu = MIN_PARTIAL_SIDE_WU;
         }
 
     }
@@ -249,8 +244,15 @@ public class RenderedPartialFactory {
         return partialSidePx;
     }
 
-    public double getPartialSideDg() {
-        return partialSideDg;
+    /**
+     * Get rendered partial size in world unit
+     * <p>
+     * Partial size can be used as a "zoom" value
+     *
+     * @param
+     */
+    public double getPartialSideWu() {
+        return partialSideWu;
     }
 
     public static long getLoadedPartialsReused() {

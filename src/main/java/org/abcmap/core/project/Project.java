@@ -3,6 +3,7 @@ package org.abcmap.core.project;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.partials.RenderedPartialFactory;
+import org.abcmap.core.partials.RenderedPartialStore;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
@@ -55,7 +56,7 @@ public class Project {
     /**
      * Where are stored map rendered map partials, for display purposes
      */
-    private final RenderedPartialFactory partialFactory;
+    private final RenderedPartialStore partialStore;
 
     /**
      * Only one layer is alterable at a time, the active layer
@@ -114,17 +115,12 @@ public class Project {
         this.tileStorage = new TileStorage(databasePath);
         tileStorage.initialize();
 
-        partialFactory = new RenderedPartialFactory(databasePath);
+        try {
+            partialStore = new RenderedPartialStore(databasePath);
+        } catch (SQLException e) {
+            throw new IOException("Unable to initialize database: " + e.getMessage(), e);
+        }
 
-    }
-
-    /**
-     * Return container where are stored map rendered map partials, for display purposes
-     *
-     * @return
-     */
-    public RenderedPartialFactory getPartialFactory() {
-        return partialFactory;
     }
 
     /**
@@ -453,5 +449,9 @@ public class Project {
 
         });
 
+    }
+
+    public RenderedPartialStore getPartialStore() {
+        return partialStore;
     }
 }

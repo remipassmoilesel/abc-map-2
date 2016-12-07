@@ -3,6 +3,7 @@ package org.abcmap.gui.components.map;
 import org.abcmap.core.partials.RenderedPartial;
 import org.abcmap.core.partials.RenderedPartialFactory;
 import org.abcmap.core.partials.RenderedPartialQueryResult;
+import org.abcmap.core.partials.RenderedPartialStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 
@@ -49,7 +50,7 @@ public class CachedMapPane extends JPanel {
     /**
      * If set to true, the partial grid is displayed
      */
-    private boolean showGrid = true;
+    private boolean showGrid = false;
 
     /**
      * Manage and create partials of a map
@@ -61,12 +62,12 @@ public class CachedMapPane extends JPanel {
      */
     private RenderedPartialQueryResult currentPartials;
 
-    public CachedMapPane(RenderedPartialFactory factory, MapContent map) {
+    public CachedMapPane(RenderedPartialStore store, MapContent map) {
 
         setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 
         this.map = map;
-        this.partialFactory = factory;
+        this.partialFactory = new RenderedPartialFactory(store, map);
         this.lock = new ReentrantLock();
 
         this.addComponentListener(new RefreshMapComponentListener());
@@ -213,14 +214,14 @@ public class CachedMapPane extends JPanel {
     }
 
     /**
-     * Set the size in degrees of the map rendered on each partial
+     * Set the size in world unit of the map rendered on each partial
      * <p>
      * It can be used as a "zoom" value
      *
-     * @param partialSideDg
+     * @param side
      */
-    public void setPartialSideDg(double partialSideDg) {
-        partialFactory.setPartialSideDg(partialSideDg);
+    public void setPartialSideWu(double side) {
+        partialFactory.setPartialSideWu(side);
     }
 
     /**
@@ -229,7 +230,7 @@ public class CachedMapPane extends JPanel {
      * It can be used as a "zoom" value
      */
     public double getPartialSideDg() {
-        return partialFactory.getPartialSideDg();
+        return partialFactory.getPartialSideWu();
     }
 
     /**
