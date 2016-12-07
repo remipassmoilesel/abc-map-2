@@ -25,7 +25,7 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class TileComposerTest {
 
-    private static final boolean SHOW_IN_WINDOW = false;
+    private static final boolean SHOW_IN_WINDOW = true;
 
     @BeforeClass
     public static void beforeTests() throws IOException {

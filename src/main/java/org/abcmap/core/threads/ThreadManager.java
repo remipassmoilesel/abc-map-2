@@ -17,7 +17,7 @@ public class ThreadManager {
     /**
      * Thread max length
      */
-    private static final int THREAD_POOL_LENGHT = 20;
+    private static final int THREAD_POOL_LENGHT = 4;
 
 
     /**
