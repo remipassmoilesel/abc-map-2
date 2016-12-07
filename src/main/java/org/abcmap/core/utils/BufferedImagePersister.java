@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 /**
- * Allow to persist image in database. Used to improve render computing time, and to keep distant resources in database.
+ * Allow to persist image in database. Used to improve renderer computing time, and to keep distant resources in database.
  */
 public class BufferedImagePersister extends ByteArrayType {
 

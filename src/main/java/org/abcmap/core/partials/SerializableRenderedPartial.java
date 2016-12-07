@@ -17,7 +17,7 @@ import java.util.Objects;
  * Portion of rendered map, serializable version. Contains:
  */
 @DatabaseTable(tableName = SerializableRenderedPartial.TABLE_NAME)
-public class SerializableRenderedPartial implements DataModel{
+public class SerializableRenderedPartial implements DataModel {
 
     public static final String TABLE_NAME = ConfigurationConstants.SQL_TABLE_PREFIX + "PARTIALS";
     public static final String PARTIAL_ID_FIELD_NAME = "ID";
@@ -27,6 +27,7 @@ public class SerializableRenderedPartial implements DataModel{
     public static final String PARTIAL_Y1_FIELD_NAME = "Y1";
     public static final String PARTIAL_Y2_FIELD_NAME = "Y2";
     public static final String PARTIAL_CRS_FIELD_NAME = "CRS";
+    public static final String PARTIAL_LAYERID_FIELD_NAME = "LAYERID";
 
 
     @DatabaseField(generatedId = true, columnName = PARTIAL_ID_FIELD_NAME)
@@ -39,29 +40,38 @@ public class SerializableRenderedPartial implements DataModel{
     private BufferedImage image;
 
     /**
-     * World coordinate BLC
+     * World unit, from bottom left corner
      */
     @DatabaseField(columnName = PARTIAL_X1_FIELD_NAME)
     private double x1;
 
     /**
-     * World coordinate
+     * World unit, from bottom left corner
      */
     @DatabaseField(columnName = PARTIAL_X2_FIELD_NAME)
     private double x2;
 
     /**
-     * World coordinate
+     * World unit, from bottom left corner
      */
     @DatabaseField(columnName = PARTIAL_Y1_FIELD_NAME)
     private double y1;
 
     /**
-     * World coordinate
+     * World unit, from bottom left corner
      */
     @DatabaseField(columnName = PARTIAL_Y2_FIELD_NAME)
     private double y2;
 
+    /**
+     * Identifier of layer
+     */
+    @DatabaseField(columnName = PARTIAL_LAYERID_FIELD_NAME)
+    private String layerId;
+
+    /**
+     * Identifier of Coordinate Reference System
+     */
     @DatabaseField(columnName = PARTIAL_CRS_FIELD_NAME)
     private String crsId;
 
@@ -70,20 +80,21 @@ public class SerializableRenderedPartial implements DataModel{
     }
 
     public SerializableRenderedPartial(RenderedPartial part) {
-        this(part.getImage(), part.getEnvelope());
+        this(part.getImage(), part.getEnvelope(), part.getLayerId());
     }
 
-    public SerializableRenderedPartial(BufferedImage img, ReferencedEnvelope ev) {
-        this(img, ev.getMinX(), ev.getMaxX(), ev.getMinY(), ev.getMaxY(), crsToId(ev.getCoordinateReferenceSystem()));
+    public SerializableRenderedPartial(BufferedImage img, ReferencedEnvelope ev, String layerId) {
+        this(img, ev.getMinX(), ev.getMaxX(), ev.getMinY(), ev.getMaxY(), crsToId(ev.getCoordinateReferenceSystem()), layerId);
     }
 
-    public SerializableRenderedPartial(BufferedImage img, double x1, double x2, double y1, double y2, String crsId) {
+    public SerializableRenderedPartial(BufferedImage img, double x1, double x2, double y1, double y2, String crsId, String layerId) {
         this.image = img;
         this.x1 = x1;
         this.x2 = x2;
         this.y1 = y1;
         this.y2 = y2;
         this.crsId = crsId;
+        this.layerId = layerId;
     }
 
     public void setImage(BufferedImage img) {

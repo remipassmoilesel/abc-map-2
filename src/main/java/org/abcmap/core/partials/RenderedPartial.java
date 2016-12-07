@@ -4,6 +4,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import java.awt.image.BufferedImage;
 import java.lang.ref.SoftReference;
+import java.util.Objects;
 
 /**
  * Rendered partial that can be used to display a map.
@@ -32,9 +33,16 @@ public class RenderedPartial {
      */
     private ReferencedEnvelope envelope;
 
-    public RenderedPartial(BufferedImage image, ReferencedEnvelope envelope, int renderedWidth, int renderedHeight) {
+    /**
+     * Identifier of layer owner
+     */
+    private String layerId;
+
+
+    public RenderedPartial(BufferedImage image, ReferencedEnvelope envelope, int renderedWidth, int renderedHeight, String layerId) {
         setImage(image, renderedWidth, renderedHeight);
         this.envelope = envelope;
+        this.layerId = layerId;
     }
 
     /**
@@ -73,10 +81,20 @@ public class RenderedPartial {
         return new ReferencedEnvelope(envelope);
     }
 
+    /**
+     * Return pixel size of partial
+     *
+     * @return
+     */
     public int getRenderedHeight() {
         return renderedHeight;
     }
 
+    /**
+     * Return pixel size of partial
+     *
+     * @return
+     */
     public int getRenderedWidth() {
         return renderedWidth;
     }
@@ -89,5 +107,39 @@ public class RenderedPartial {
                 ", renderedHeight=" + renderedHeight +
                 ", envelope=" + envelope +
                 '}';
+    }
+
+    /**
+     * Return layer identifier to which this partial belong
+     *
+     * @return
+     */
+    public String getLayerId() {
+        return layerId;
+    }
+
+    /**
+     * Set layer identifier to which this partial belong
+     *
+     * @param layerId
+     */
+    public void setLayerId(String layerId) {
+        this.layerId = layerId;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        RenderedPartial that = (RenderedPartial) o;
+        return renderedWidth == that.renderedWidth &&
+                renderedHeight == that.renderedHeight &&
+                Objects.equals(envelope, that.envelope) &&
+                Objects.equals(layerId, that.layerId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(renderedWidth, renderedHeight, envelope, layerId);
     }
 }

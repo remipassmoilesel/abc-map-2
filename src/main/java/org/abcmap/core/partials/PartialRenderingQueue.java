@@ -2,6 +2,7 @@ package org.abcmap.core.partials;
 
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.lite.StreamingRenderer;
@@ -14,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Represent a succession of partial rendering operations
  * <p>
- * Each time a map is render, all partial rendering operations are stored in this object to be executed in a separated thread.
+ * Each time a map is renderer, all partial rendering operations are stored in this object to be executed in a separated thread.
  * <p>
  * Each queue have his own StreamingRenderer to avoid multi-threading issues
  */
@@ -27,17 +28,18 @@ class PartialRenderingQueue {
 
     private static long loadedFromDatabase = 0;
     private static long renderedPartials = 0;
+    private final MapContent mapContent;
 
     /**
      * Return true if specified partial should be processed soon
      *
-     * @param area
+     * @param toCheck
      * @return
      */
-    public static boolean isRenderInProgress(ReferencedEnvelope area) {
+    public static boolean isRenderInProgress(RenderedPartial toCheck) {
 
         for (RenderedPartial part : partialsInProgress) {
-            if (part.getEnvelope().equals(area)) {
+            if (part.equals(toCheck)) {
                 return true;
             }
         }
@@ -45,7 +47,7 @@ class PartialRenderingQueue {
         return false;
     }
 
-    public static int getWaitingPartialsNumber(){
+    public static int getWaitingPartialsNumber() {
         return partialsInProgress.size();
     }
 
@@ -63,9 +65,9 @@ class PartialRenderingQueue {
         this.renderedWidthPx = renderedWidthPx;
         this.renderedHeightPx = renderedHeightPx;
         this.toNotifyWhenPartialsCome = toNotifyWhenPartialsCome;
-
+        this.mapContent = content;
         this.renderer = GeoUtils.buildRenderer();
-        renderer.setMapContent(content);
+        renderer.setMapContent(mapContent);
     }
 
     /**
@@ -79,46 +81,51 @@ class PartialRenderingQueue {
 
         this.tasks.add(() -> {
 
-            // try to find existing partial in database
-            boolean exist = false;
             try {
-                exist = store.updatePartialFromDatabase(part);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            if(exist == true){
-                loadedFromDatabase++;
-            }
-
-            // or create a new one
-            else {
-
-                renderedPartials++;
-
-                ReferencedEnvelope bounds = part.getEnvelope();
-
-                // create an image, and render map
-                BufferedImage img = new BufferedImage(renderedWidthPx, renderedHeightPx, BufferedImage.TYPE_INT_ARGB);
-
-                renderer.paint((Graphics2D) img.getGraphics(), new Rectangle(renderedWidthPx, renderedHeightPx), bounds);
-
-                // keep image
-                part.setImage(img, renderedWidthPx, renderedHeightPx);
-
+                // try to find existing partial in database
+                boolean exist = false;
                 try {
-                    store.addPartial(part);
+                    exist = store.updatePartialFromDatabase(part);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
 
-            }
+                if (exist == true) {
+                    loadedFromDatabase++;
+                }
 
-            partialsInProgress.remove(part);
+                // or create a new one
+                else {
 
-            // notify of new tile arrival
-            if (toNotifyWhenPartialsCome != null) {
-                toNotifyWhenPartialsCome.run();
+                    renderedPartials++;
+
+                    ReferencedEnvelope bounds = part.getEnvelope();
+
+                    // create an image, and renderer map
+                    BufferedImage img = new BufferedImage(renderedWidthPx, renderedHeightPx, BufferedImage.TYPE_INT_ARGB);
+
+                    renderer.paint((Graphics2D) img.getGraphics(), new Rectangle(renderedWidthPx, renderedHeightPx), bounds);
+
+                    // keep image
+                    part.setImage(img, renderedWidthPx, renderedHeightPx);
+
+                    try {
+                        store.addPartial(part);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                    //GuiUtils.showImage(img);
+
+                }
+
+            } finally {
+                partialsInProgress.remove(part);
+
+                // notify of new tile arrival
+                if (toNotifyWhenPartialsCome != null) {
+                    toNotifyWhenPartialsCome.run();
+                }
             }
 
         });

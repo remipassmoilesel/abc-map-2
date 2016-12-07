@@ -8,6 +8,8 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.map.Layer;
+import org.geotools.map.MapContent;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.RenderListener;
@@ -194,5 +196,15 @@ public class GeoUtils {
 
     public static Point2D coordinateToPoint2D(Coordinate coordinate) {
         return new Point2D.Double(coordinate.x, coordinate.y);
+    }
+
+    public static boolean isMapContains(MapContent map, Layer layer) {
+        for (Layer lay : map.layers()) {
+            if (lay.equals(layer)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

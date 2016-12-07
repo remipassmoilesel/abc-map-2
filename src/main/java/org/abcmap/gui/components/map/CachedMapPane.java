@@ -3,7 +3,9 @@ package org.abcmap.gui.components.map;
 import org.abcmap.core.partials.RenderedPartial;
 import org.abcmap.core.partials.RenderedPartialFactory;
 import org.abcmap.core.partials.RenderedPartialQueryResult;
-import org.abcmap.core.partials.RenderedPartialStore;
+import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 
@@ -13,6 +15,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -25,7 +29,22 @@ public class CachedMapPane extends JPanel {
     /**
      * Lock to prevent too much thread rendering
      */
-    private final ReentrantLock lock;
+    private final ReentrantLock renderLock;
+
+    /**
+     * Project associated with this panel
+     */
+    private final Project project;
+
+    /**
+     * List of factories employed to renderer map. Each factory renderer one layer
+     */
+    private final HashMap<String, RenderedPartialFactory> partialFactories;
+
+    /**
+     * List of map content associated with layers
+     */
+    private final HashMap<String, MapContent> layerMapContents;
 
     /**
      * Last time of rendering in ms
@@ -38,14 +57,9 @@ public class CachedMapPane extends JPanel {
     private long renderMinIntervalMs = 50;
 
     /**
-     * ULC point to start render map from
+     * ULC point to start renderer map from
      */
     private Point2D worldPosition;
-
-    /**
-     * Map to render
-     */
-    private MapContent map;
 
     /**
      * If set to true, the partial grid is displayed
@@ -53,27 +67,31 @@ public class CachedMapPane extends JPanel {
     private boolean showGrid = false;
 
     /**
-     * Manage and create partials of a map
-     */
-    private RenderedPartialFactory partialFactory;
-
-    /**
      * Current set of partials that have to be painted
      */
-    private RenderedPartialQueryResult currentPartials;
+    private HashMap<String, RenderedPartialQueryResult> currentPartials;
 
     /**
      * Various mouse listeners which allow user to control map with mouse
      */
     private CachedMapPaneMouseController mouseControl;
 
-    public CachedMapPane(RenderedPartialStore store, MapContent map) {
+    /**
+     * Current value of rendered map in partials. In world unit.
+     */
+    private double partialSideWu;
+
+    public CachedMapPane(Project project) {
 
         setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
 
-        this.map = map;
-        this.partialFactory = new RenderedPartialFactory(store, map);
-        this.lock = new ReentrantLock();
+        this.project = project;
+        this.renderLock = new ReentrantLock();
+        this.partialFactories = new HashMap<>();
+        this.layerMapContents = new HashMap<>();
+        this.currentPartials = new HashMap<>();
+
+        this.partialSideWu = 5;
 
         this.addComponentListener(new RefreshMapComponentListener());
 
@@ -83,48 +101,48 @@ public class CachedMapPane extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // nothing to display
-        if (currentPartials == null) {
-            return;
-        }
-
         Graphics2D g2d = (Graphics2D) g;
 
-        // get affine transform to set position of partials
-        AffineTransform worldToScreen = currentPartials.getWorldToScreenTransform();
+        for (AbstractLayer lay : project.getLayersList()) {
 
-        if (showGrid) {
-            g2d.setColor(Color.darkGray);
-        }
+            RenderedPartialQueryResult partials = currentPartials.get(lay.getId());
 
-        // iterate current partials
-        for (RenderedPartial part : currentPartials.getPartials()) {
-
-            // compute position of tile on map
-            ReferencedEnvelope ev = part.getEnvelope();
-            Point2D.Double worldPos = new Point2D.Double(ev.getMinX(), ev.getMaxY());
-            Point2D screenPos = worldToScreen.transform(worldPos, null);
-
-            int x = (int) Math.round(screenPos.getX());
-            int y = (int) Math.round(screenPos.getY());
-            int w = part.getRenderedWidth();
-            int h = part.getRenderedHeight();
-
-            // draw partial
-            g2d.drawImage(part.getImage(), x, y, w, h, null);
+            // get affine transform to set position of partials
+            AffineTransform worldToScreen = partials.getWorldToScreenTransform();
 
             if (showGrid) {
-                g2d.drawRect(x, y, w, h);
+                g2d.setColor(Color.darkGray);
             }
 
-        }
+            // iterate current partials
+            for (RenderedPartial part : partials.getPartials()) {
 
-        // draw maximums bounds asked if necessary
-        if (showGrid) {
-            Point2D wp = worldToScreen.transform(worldPosition, null);
-            g2d.setStroke(new BasicStroke(2));
-            g2d.setColor(Color.red);
-            g2d.drawRect((int) wp.getX(), (int) wp.getY(), 3, 3);
+                // compute position of tile on map
+                ReferencedEnvelope ev = part.getEnvelope();
+                Point2D.Double worldPos = new Point2D.Double(ev.getMinX(), ev.getMaxY());
+                Point2D screenPos = worldToScreen.transform(worldPos, null);
+
+                int x = (int) Math.round(screenPos.getX());
+                int y = (int) Math.round(screenPos.getY());
+                int w = part.getRenderedWidth();
+                int h = part.getRenderedHeight();
+
+                // draw partial
+                g2d.drawImage(part.getImage(), x, y, w, h, null);
+
+                if (showGrid) {
+                    g2d.drawRect(x, y, w, h);
+                }
+
+            }
+
+            // draw maximums bounds asked if necessary
+            if (showGrid) {
+                Point2D wp = worldToScreen.transform(worldPosition, null);
+                g2d.setStroke(new BasicStroke(2));
+                g2d.setColor(Color.red);
+                g2d.drawRect((int) wp.getX(), (int) wp.getY(), 3, 3);
+            }
         }
 
     }
@@ -139,8 +157,8 @@ public class CachedMapPane extends JPanel {
             return;
         }
 
-        // on thread at a time render map for now
-        if (lock.tryLock() == false) {
+        // on thread at a time renderer map for now
+        if (renderLock.tryLock() == false) {
             System.err.println("Already rendering !");
             return;
         }
@@ -153,22 +171,68 @@ public class CachedMapPane extends JPanel {
             Dimension dim = CachedMapPane.this.getSize();
 
             if (dim.width < 1 || dim.height < 1) {
-                System.out.println("Screen bounds too small");
                 return;
             }
 
-            // search which partials are necessary to display
-            currentPartials = partialFactory.intersect(worldPosition, dim, map.getCoordinateReferenceSystem(),
-                    () -> {
-                        // each time a partial come, map will be repaint
-                        CachedMapPane.this.repaint();
-                    });
+            // iterate layers, sorted by z-index
+            for (AbstractLayer lay : project.getLayersList()) {
+
+                String layId = lay.getId();
+
+                // TODO update map contents if needed: e.g. when TileLayer are updated, the internal layer change
+                // TODO Can we use factory.setMapContent ? Will it disturb current rendering operations ?
+
+                // retrieve map content associated with layer
+
+                // if map does no exist, create one
+                MapContent map = layerMapContents.get(layId);
+                if (map == null){
+                    map = lay.buildMapContent();
+                    layerMapContents.put(layId, map);
+                }
+
+                // retrieve partial factory associated with layer
+                RenderedPartialFactory factory = partialFactories.get(layId);
+                if (factory == null) {
+                    factory = new RenderedPartialFactory(project.getRenderedPartialsStore(), map, layId);
+                    factory.setPartialSideWu(partialSideWu);
+                    partialFactories.put(layId, factory);
+                }
+
+                // if map is not up to date, create a new one and invalidate cache
+                if(GeoUtils.isMapContains(map, lay.getInternalLayer()) == false){
+
+                    System.out.println("Invalidated ! " + layId);
+
+                    map = lay.buildMapContent();
+                    layerMapContents.put(layId, map);
+                    factory.setMapContent(map);
+
+                    // TODO: do that in Thread ?
+                    try {
+                        project.getRenderedPartialsStore().deletePartialsFrom(layId);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+
+                // search which partials are necessary to display
+                RenderedPartialQueryResult partials = factory.intersect(worldPosition, dim, map.getCoordinateReferenceSystem(),
+                        () -> {
+                            // each time a partial come, map will be repaint
+                            CachedMapPane.this.repaint();
+                        });
+
+                // store it to draw it later
+                currentPartials.put(layId, partials);
+            }
 
             // repaint component
             repaint();
 
         } finally {
-            lock.unlock();
+            renderLock.unlock();
         }
 
     }
@@ -215,7 +279,7 @@ public class CachedMapPane extends JPanel {
      * It can be used as a "zoom" value
      */
     public int getPartialSidePx() {
-        return partialFactory.getPartialSidePx();
+        return RenderedPartialFactory.DEFAULT_PARTIAL_SIDE_PX;
     }
 
     /**
@@ -223,19 +287,23 @@ public class CachedMapPane extends JPanel {
      * <p>
      * It can be used as a "zoom" value
      *
-     * @param side
+     * @param value
      */
-    public void setPartialSideWu(double side) {
-        partialFactory.setPartialSideWu(side);
+    public void setPartialSideWu(double value) {
+        partialSideWu = RenderedPartialFactory.normalizeWorldUnitSideValue(value);
+        for (RenderedPartialFactory factory : partialFactories.values()) {
+            factory.setPartialSideWu(partialSideWu);
+        }
     }
 
     /**
      * Get the size in degrees of the map rendered on each partial
      * <p>
      * It can be used as a "zoom" value
+     * <p>
      */
     public double getPartialSideWu() {
-        return partialFactory.getPartialSideWu();
+        return partialSideWu;
     }
 
     /**

@@ -11,7 +11,7 @@ import java.awt.geom.Point2D;
  */
 public class CachedMapPaneMouseController extends MouseAdapter {
 
-    private static final double ZOOM_ORIGINAL_INCREMENT = 5;
+    private static final double ZOOM_ORIGINAL_INCREMENT = 20;
     private final CachedMapPane pane;
     private Point lastPosition;
 

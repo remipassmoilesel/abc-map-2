@@ -22,12 +22,22 @@ public class RenderedPartialFactory {
 
     /**
      * Minimal size in world unit of rendered map on partial
-     *
+     * <p>
      * This value should prevent partial side to be negative
      */
-    private static final double MIN_PARTIAL_SIDE_WU = 0.05d;
+    public static final double MIN_PARTIAL_SIDE_WU = 0.05d;
+
+    /**
+     * Default size in pixel of each partial
+     */
+    public static final int DEFAULT_PARTIAL_SIDE_PX = 500;
 
     private static long loadedPartialsReused = 0;
+
+    /**
+     * Id of layer associated with partials
+     */
+    private final String layerId;
 
     /**
      * Associated map content
@@ -47,11 +57,12 @@ public class RenderedPartialFactory {
     /**
      * Default size in px of each partial
      */
-    private int partialSidePx = 500;
+    private int partialSidePx = DEFAULT_PARTIAL_SIDE_PX;
 
-    public RenderedPartialFactory(RenderedPartialStore store, MapContent content) {
+    public RenderedPartialFactory(RenderedPartialStore store, MapContent content, String layerId) {
         this.store = store;
         this.mapContent = content;
+        this.layerId = layerId;
     }
 
     /**
@@ -73,8 +84,10 @@ public class RenderedPartialFactory {
         double x2 = ulc.getX() + wdg;
         double y2 = ulc.getY();
 
+        ReferencedEnvelope env = new ReferencedEnvelope(x1, x2, y1, y2, crs);
+
         // create a new envelope
-        return intersect(new ReferencedEnvelope(x1, x2, y1, y2, crs), toNotifyWhenPartialsCome);
+        return intersect(env, toNotifyWhenPartialsCome);
 
     }
 
@@ -87,16 +100,11 @@ public class RenderedPartialFactory {
     public RenderedPartialQueryResult intersect(ReferencedEnvelope worldBounds, Runnable toNotifyWhenPartialsCome) {
 
         if (mapContent == null) {
-            throw new NullPointerException("Noting to render, map content is null");
+            throw new NullPointerException("Noting to renderer, map content is null");
         }
 
         // keep the same value until end of rendering process, even if value is changed by setter
-        double partialSideDg = this.partialSideWu;
-
-        // Side value in decimal degree of each partial
-        if (partialSideDg < MIN_PARTIAL_SIDE_WU) {
-            partialSideDg = MIN_PARTIAL_SIDE_WU;
-        }
+        double partialSideWu = normalizeWorldUnitSideValue(this.partialSideWu);
 
         ArrayList<RenderedPartial> rsparts = new ArrayList<>();
 
@@ -109,9 +117,9 @@ public class RenderedPartialFactory {
         double x = getStartPointFrom(worldBounds.getMinX());
         double y = getStartPointFrom(worldBounds.getMinY());
 
-        PartialRenderingQueue pr = null;
+        PartialRenderingQueue renderingTasks = null;
 
-        // iterate area to render from bottom left corner to upper right corner
+        // iterate area to renderer from bottom left corner to upper right corner
         while (y < worldBounds.getMaxY()) {
 
             // count horizontal partials only on the first line
@@ -120,10 +128,10 @@ public class RenderedPartialFactory {
             }
 
             // compute needed area for next partial
-            ReferencedEnvelope area = new ReferencedEnvelope(x, round(x + partialSideDg), y, round(y + partialSideDg), DefaultGeographicCRS.WGS84);
+            ReferencedEnvelope area = new ReferencedEnvelope(x, round(x + partialSideWu), y, round(y + partialSideWu), DefaultGeographicCRS.WGS84);
 
             // check if partial already exist and is already loaded
-            RenderedPartial part = store.searchInLoadedList(area);
+            RenderedPartial part = store.searchInLoadedList(layerId, area);
             if (part != null && part.getImage() != null) {
                 rsparts.add(part);
                 loadedPartialsReused++;
@@ -133,34 +141,34 @@ public class RenderedPartialFactory {
             else {
 
                 // partial processing has already been scheduled
-                if (PartialRenderingQueue.isRenderInProgress(area) && part != null) {
+                if (part != null && PartialRenderingQueue.isRenderInProgress(part)) {
                     rsparts.add(part);
                 }
 
                 // partial processing have to be scheduled
                 else {
                     // create a new partial
-                    RenderedPartial newPart = new RenderedPartial(null, area, partialSidePx, partialSidePx);
+                    RenderedPartial newPart = new RenderedPartial(null, area, partialSidePx, partialSidePx, layerId);
                     store.addInLoadedList(newPart);
                     rsparts.add(newPart);
 
                     // Create a queue if needed. In most case, it is not needed.
-                    if (pr == null) {
-                        pr = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toNotifyWhenPartialsCome);
+                    if (renderingTasks == null) {
+                        renderingTasks = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toNotifyWhenPartialsCome);
                     }
 
-                    // create a task to retrieve or render image from map
-                    pr.addTask(newPart);
+                    // create a task to retrieve or renderer image from map
+                    renderingTasks.addTask(newPart);
                 }
 
             }
 
             // go to next
-            x += partialSideDg;
+            x += partialSideWu;
 
             // change line when finished
             if (x > worldBounds.getMaxX()) {
-                y += partialSideDg;
+                y += partialSideWu;
                 tileNumberH++;
 
                 // reset x except the last loop
@@ -172,8 +180,8 @@ public class RenderedPartialFactory {
         }
 
         // launch tasks to retrieve or produce partial in a separated thread, if needed
-        if (pr != null) {
-            pr.start();
+        if (renderingTasks != null) {
+            renderingTasks.start();
         }
 
         // if not enough tiles, return null to avoid errors on transformations
@@ -187,8 +195,8 @@ public class RenderedPartialFactory {
         // compute real screen bounds of asked world area
         // given that we used fixed size partials, area can be larger than asked one
         Rectangle screenBounds = new Rectangle(0, 0,
-                (int) Math.round(w * partialSidePx / partialSideDg),
-                (int) Math.round(h * partialSidePx / partialSideDg));
+                (int) Math.round(w * partialSidePx / partialSideWu),
+                (int) Math.round(h * partialSidePx / partialSideWu));
 
         return new RenderedPartialQueryResult(rsparts, worldBounds, screenBounds, tileNumberW, tileNumberH);
     }
@@ -231,13 +239,7 @@ public class RenderedPartialFactory {
      * @param
      */
     public void setPartialSideWu(double sideDg) {
-
-        this.partialSideWu = sideDg;
-
-        if (partialSideWu < MIN_PARTIAL_SIDE_WU) {
-            partialSideWu = MIN_PARTIAL_SIDE_WU;
-        }
-
+        this.partialSideWu = normalizeWorldUnitSideValue(sideDg);
     }
 
     public int getPartialSidePx() {
@@ -261,5 +263,18 @@ public class RenderedPartialFactory {
 
     public RenderedPartialStore getStore() {
         return store;
+    }
+
+    public static double normalizeWorldUnitSideValue(double value) {
+
+        if (value < MIN_PARTIAL_SIDE_WU) {
+            value = MIN_PARTIAL_SIDE_WU;
+        }
+
+        return value;
+    }
+
+    public void setMapContent(MapContent mapContent) {
+        this.mapContent = mapContent;
     }
 }

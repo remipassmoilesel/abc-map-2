@@ -5,6 +5,7 @@ import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.stmt.SelectArg;
+import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -28,6 +29,8 @@ public class RenderedPartialStore {
 
     /**
      * List of partials already used. They can be complete (with an image loaded) or not.
+     *
+     * This list is not synchronized because it is a bad idea so iterate only copies
      */
     private ArrayList<RenderedPartial> loadedPartials;
 
@@ -59,12 +62,12 @@ public class RenderedPartialStore {
      * @param env
      * @return
      */
-    public RenderedPartial searchInLoadedList(ReferencedEnvelope env) {
-        for (RenderedPartial part : loadedPartials) {
-            if (part.getEnvelope().equals(env) == false) {
-                continue;
+    public RenderedPartial searchInLoadedList(String layerId, ReferencedEnvelope env) {
+        // iterate a copy to avoid Concurrent modification exception
+        for (RenderedPartial part : new ArrayList<>(loadedPartials)) {
+            if (part.getLayerId().equals(layerId) && part.getEnvelope().equals(env)) {
+                return part;
             }
-            return part;
         }
         return null;
     }
@@ -80,18 +83,22 @@ public class RenderedPartialStore {
 
         // check if partial is in database
         ReferencedEnvelope area = part.getEnvelope();
-        List<SerializableRenderedPartial> results = dao.queryBuilder().where().raw(
+        Where<SerializableRenderedPartial, ?> statement = dao.queryBuilder().where().raw(
                 "ABS(" + SerializableRenderedPartial.PARTIAL_X1_FIELD_NAME + " - ?) < " + PRECISION + " "
                         + "AND ABS(" + SerializableRenderedPartial.PARTIAL_X2_FIELD_NAME + " - ?) < " + PRECISION + " "
                         + "AND ABS(" + SerializableRenderedPartial.PARTIAL_Y1_FIELD_NAME + " - ?) < " + PRECISION + " "
                         + "AND ABS(" + SerializableRenderedPartial.PARTIAL_Y2_FIELD_NAME + " - ?) < " + PRECISION + " "
-                        + "AND CRS=?;",
+                        + "AND " + SerializableRenderedPartial.PARTIAL_CRS_FIELD_NAME + "=? "
+                        + "AND " + SerializableRenderedPartial.PARTIAL_LAYERID_FIELD_NAME + "=? ",
 
                 new SelectArg(SqlType.DOUBLE, area.getMinX()),
                 new SelectArg(SqlType.DOUBLE, area.getMaxX()),
                 new SelectArg(SqlType.DOUBLE, area.getMinY()),
                 new SelectArg(SqlType.DOUBLE, area.getMaxY()),
-                new SelectArg(SqlType.STRING, SerializableRenderedPartial.crsToId(area.getCoordinateReferenceSystem()))).query();
+                new SelectArg(SqlType.STRING, SerializableRenderedPartial.crsToId(area.getCoordinateReferenceSystem())),
+                new SelectArg(SqlType.STRING, part.getLayerId())
+        );
+        List<SerializableRenderedPartial> results = statement.query();
 
         // no results found
         if (results.size() < 1) {
@@ -110,9 +117,21 @@ public class RenderedPartialStore {
         part.setImage(img, w, h);
 
         // update in memory partial
-        loadedPartials.add(part);
+        addInLoadedList(part);
 
         return true;
+
+    }
+
+    public void deletePartialsFrom(String layerId) throws SQLException {
+
+        Where<SerializableRenderedPartial, ?> statement = dao.deleteBuilder().where().raw(
+                SerializableRenderedPartial.PARTIAL_X2_FIELD_NAME + "=? ",
+
+                new SelectArg(SqlType.STRING, layerId)
+        );
+
+        statement.query();
 
     }
 
@@ -149,6 +168,7 @@ public class RenderedPartialStore {
     }
 
     public ArrayList<RenderedPartial> getLoadedPartials() {
-        return loadedPartials;
+        return new ArrayList<>(loadedPartials);
     }
+
 }

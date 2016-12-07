@@ -3,33 +3,20 @@ package org.abcmap.core.partials;
 
 import junit.framework.TestCase;
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.shapes.DrawManagerException;
-import org.abcmap.core.shapes.LineBuilder;
-import org.abcmap.core.shapes.PointBuilder;
-import org.abcmap.core.shapes.PolygonBuilder;
-import org.abcmap.core.utils.FeatureUtils;
-import org.abcmap.tileanalyzer.TileComposerTest;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opengis.feature.simple.SimpleFeature;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.PrimitiveIterator;
-import java.util.Random;
 
 import static org.junit.Assert.assertTrue;
 
@@ -47,7 +34,7 @@ public class PartialStoreTest {
 
         // get partial store
         Project project = MainManager.getProjectManager().getProject();
-        RenderedPartialStore store = project.getPartialStore();
+        RenderedPartialStore store = project.getRenderedPartialsStore();
 
         ArrayList<RenderedPartial> partials = new ArrayList<>();
 
@@ -61,7 +48,7 @@ public class PartialStoreTest {
             TestCase.assertTrue("Image reading: " + imgPath, img != null);
 
             ReferencedEnvelope ev = new ReferencedEnvelope(i, i + 1, i + 2, i + 3, DefaultGeographicCRS.WGS84);
-            RenderedPartial part = new RenderedPartial(img, ev, img.getWidth(), img.getHeight());
+            RenderedPartial part = new RenderedPartial(img, ev, img.getWidth(), img.getHeight(), "layer1");
 
             partials.add(part);
 

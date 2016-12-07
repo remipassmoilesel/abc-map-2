@@ -73,7 +73,7 @@ public class ProjectReaderWriterTest {
         assertTrue("AbstractLayer index test", lidao.readAllEntries().size() == 3);
 
         // add layer elements
-        FeatureLayer l = (FeatureLayer) newProject.getLayers().get(0);
+        FeatureLayer l = (FeatureLayer) newProject.getLayersList().get(0);
         for (int i = 0; i < 100; i++) {
             l.addShape(geom.createPoint(new Coordinate(i, i)));
         }
@@ -99,8 +99,8 @@ public class ProjectReaderWriterTest {
         assertTrue("Metadata reading test 1", newProject.getMetadataContainer().equals(p1.getMetadataContainer()));
         assertTrue("Metadata reading test 2", p1.getMetadataContainer().equals(p2.getMetadataContainer()));
 
-        assertTrue("Layers reading test 1", newProject.getLayers().equals(p1.getLayers()));
-        assertTrue("Layers reading test 2", p1.getLayers().equals(p2.getLayers()));
+        assertTrue("Layers reading test 1", newProject.getLayersList().equals(p1.getLayersList()));
+        assertTrue("Layers reading test 2", p1.getLayersList().equals(p2.getLayersList()));
 
         assertTrue("Project reading test 1", newProject.equals(p1));
         assertTrue("Project reading test 2", p1.equals(p2));
@@ -119,7 +119,7 @@ public class ProjectReaderWriterTest {
         Project p4 = reader.read(openProjectTempDirectory4, savedProject);
 
         assertTrue("Metadata reading test 3", p1.getMetadataContainer().equals(p2.getMetadataContainer()));
-        assertTrue("Layers reading test 3", p1.getLayers().equals(p2.getLayers()));
+        assertTrue("Layers reading test 3", p1.getLayersList().equals(p2.getLayersList()));
         assertTrue("Project reading test 3", p1.equals(p2));
 
     }

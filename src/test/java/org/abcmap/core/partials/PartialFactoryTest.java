@@ -6,7 +6,6 @@ import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layer.TileLayer;
-import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.junit.BeforeClass;
@@ -28,7 +27,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class PartialFactoryTest {
 
-    private static final boolean SHOW_IN_WINDOW = false;
+    private static final boolean SHOW_IN_WINDOW = true;
 
     @BeforeClass
     public static void beforeTests() throws IOException, InterruptedException {
@@ -46,7 +45,7 @@ public class PartialFactoryTest {
         // create a tile layer
         TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 0);
 
-        // TODO: get more realistics coordinates
+        // TODO: get more realistic coordinates
         ArrayList<Coordinate> positions = new ArrayList();
         positions.add(new Coordinate(2000, 1000));
         positions.add(new Coordinate(1478.6803359985352, 982.1077270507812));
@@ -69,20 +68,21 @@ public class PartialFactoryTest {
         int partialSideWu = 700;
         Dimension dimensionsPx = new Dimension(1200, 1200);
 
-        RenderedPartialFactory factory = new RenderedPartialFactory(project.getPartialStore(), project.buildMapContent(true));
-        final int[] renderedTiles = {0};
-        RenderedPartialQueryResult queryResult = factory.intersect(worldPosition, dimensionsPx, DefaultEngineeringCRS.GENERIC_2D, () -> {
-            System.out.println("New partial added: " + renderedTiles[0]);
-            renderedTiles[0]++;
-        });
-
-        // test partial creation
-        int expected = 9;
-        int partialNumber = queryResult.getPartials().size();
-        assertTrue("Partial creation test: " + partialNumber + " / " + expected, partialNumber == expected);
-
         // test partial rendering
         if (SHOW_IN_WINDOW == false) {
+
+            // build partials for a fake layer map content
+            RenderedPartialFactory factory = new RenderedPartialFactory(project.getRenderedPartialsStore(), project.buildGlobalMapContent(true), "layer1");
+            final int[] renderedTiles = {0};
+            RenderedPartialQueryResult queryResult = factory.intersect(worldPosition, dimensionsPx, DefaultEngineeringCRS.GENERIC_2D, () -> {
+                renderedTiles[0]++;
+            });
+
+            // test partial creation
+            int expected = 9;
+            int partialNumber = queryResult.getPartials().size();
+            assertTrue("Partial creation test: " + partialNumber + " / " + expected, partialNumber == expected);
+
 
             // wait until partials have been rendered
             int waitTime = 100;
@@ -103,24 +103,33 @@ public class PartialFactoryTest {
 
             layer.refreshCoverage();
 
-            CachedMapPane pane = new CachedMapPane(project.getPartialStore(), project.buildMapContent(true));
+            Runnable runWindow = () -> {
 
-            //pane.setWorldBounds(start);
-            pane.setWorldPosition(worldPosition);
-            pane.setPartialSideWu(partialSideWu);
-            pane.setShowGrid(true);
-            pane.setMouseManagementEnabled(true);
+                CachedMapPane pane = new CachedMapPane(project);
 
-            JFrame frame = new JFrame();
-            frame.setContentPane(pane);
-            frame.setSize(dimensionsPx);
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                //pane.setWorldBounds(start);
+                pane.setWorldPosition(worldPosition);
+                pane.setPartialSideWu(partialSideWu);
+                pane.setShowGrid(true);
+                pane.setMouseManagementEnabled(true);
 
-            frame.setVisible(true);
+                JFrame frame = new JFrame();
+                frame.setContentPane(pane);
+                frame.setSize(dimensionsPx);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-            pane.initializeMap();
+                frame.setVisible(true);
 
-            Thread.sleep(50000);
+                pane.initializeMap();
+
+            };
+
+            SwingUtilities.invokeLater(runWindow);
+            SwingUtilities.invokeLater(runWindow);
+            SwingUtilities.invokeLater(runWindow);
+
+            Thread.sleep(100000);
+
         }
 
     }
