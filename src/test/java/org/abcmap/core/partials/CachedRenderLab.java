@@ -102,8 +102,14 @@ public class CachedRenderLab {
         SwingUtilities.invokeLater(() -> {
 
             Path p = Paths.get("tmp/database.db");
-            RenderedPartialFactory factory = new RenderedPartialFactory(p);
-            CachedMapPane pane = new CachedMapPane(factory, mapContent);
+            RenderedPartialStore store;
+            try {
+                store = new RenderedPartialStore(p);
+            } catch (SQLException e) {
+                throw new RuntimeException("Unable to create store");
+            }
+
+            CachedMapPane pane = new CachedMapPane(store, mapContent);
 
             //pane.setWorldBounds(start);
             pane.setWorldPosition(start);

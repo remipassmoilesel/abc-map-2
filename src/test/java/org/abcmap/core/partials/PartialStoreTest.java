@@ -47,7 +47,7 @@ public class PartialStoreTest {
 
         // get partial store
         Project project = MainManager.getProjectManager().getProject();
-        RenderedPartialStore store = project.getPartialFactory().getStore();
+        RenderedPartialStore store = project.getPartialStore();
 
         ArrayList<RenderedPartial> partials = new ArrayList<>();
 
