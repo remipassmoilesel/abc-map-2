@@ -15,7 +15,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -208,12 +207,7 @@ public class CachedMapPane extends JPanel {
                     layerMapContents.put(layId, map);
                     factory.setMapContent(map);
 
-                    // TODO: do that in Thread ?
-                    try {
-                        project.getRenderedPartialsStore().deletePartialsFrom(layId);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+                    project.getRenderedPartialsStore().deletePartialsForLayer(layId);
 
                 }
 

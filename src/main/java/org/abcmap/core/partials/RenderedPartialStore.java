@@ -7,6 +7,7 @@ import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableUtils;
+import org.abcmap.core.threads.ThreadManager;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import java.awt.image.BufferedImage;
@@ -29,7 +30,7 @@ public class RenderedPartialStore {
 
     /**
      * List of partials already used. They can be complete (with an image loaded) or not.
-     *
+     * <p>
      * This list is not synchronized because it is a bad idea so iterate only copies
      */
     private ArrayList<RenderedPartial> loadedPartials;
@@ -123,18 +124,6 @@ public class RenderedPartialStore {
 
     }
 
-    public void deletePartialsFrom(String layerId) throws SQLException {
-
-        Where<SerializableRenderedPartial, ?> statement = dao.deleteBuilder().where().raw(
-                SerializableRenderedPartial.PARTIAL_X2_FIELD_NAME + "=? ",
-
-                new SelectArg(SqlType.STRING, layerId)
-        );
-
-        statement.query();
-
-    }
-
     /**
      * Add partial only in loaded list (RAM)
      *
@@ -171,4 +160,21 @@ public class RenderedPartialStore {
         return new ArrayList<>(loadedPartials);
     }
 
+    public void deletePartialsForLayer(String layerId) {
+
+        ThreadManager.runLater(() -> {
+            try {
+                Where<SerializableRenderedPartial, ?> statement = dao.deleteBuilder().where().raw(
+                        SerializableRenderedPartial.PARTIAL_X2_FIELD_NAME + "=? ",
+
+                        new SelectArg(SqlType.STRING, layerId)
+                );
+
+                statement.query();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+
+        });
+    }
 }

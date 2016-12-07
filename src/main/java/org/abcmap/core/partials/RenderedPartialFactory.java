@@ -1,5 +1,6 @@
 package org.abcmap.core.partials;
 
+import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -7,6 +8,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
@@ -39,6 +41,9 @@ public class RenderedPartialFactory {
      */
     private final String layerId;
 
+
+    private static BufferedImage waitingImage;
+
     /**
      * Associated map content
      */
@@ -63,6 +68,32 @@ public class RenderedPartialFactory {
         this.store = store;
         this.mapContent = content;
         this.layerId = layerId;
+
+        if (waitingImage == null) {
+            createWaitingImage();
+        }
+    }
+
+    private void createWaitingImage() {
+
+        waitingImage = new BufferedImage(partialSidePx, partialSidePx, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2d = (Graphics2D) waitingImage.getGraphics();
+
+        // no transparency here, because the are possibly several layers
+        //g2d.setComposite(GuiUtils.createTransparencyComposite(0.3f));
+
+        // draw a rectangle
+        g2d.setColor(new Color(0xF0EEEE));
+        int w = waitingImage.getWidth();
+        int h = waitingImage.getHeight();
+        g2d.fillRect(0, 0, w, h);
+
+        // draw tree points in rectangle
+        g2d.setColor(Color.blue);
+        g2d.setFont(new Font("Dialog", Font.BOLD, 50));
+        g2d.drawString("...", w / 2 - 20, h / 2);
+
     }
 
     /**
@@ -148,7 +179,7 @@ public class RenderedPartialFactory {
                 // partial processing have to be scheduled
                 else {
                     // create a new partial
-                    RenderedPartial newPart = new RenderedPartial(null, area, partialSidePx, partialSidePx, layerId);
+                    RenderedPartial newPart = new RenderedPartial(waitingImage, area, partialSidePx, partialSidePx, layerId);
                     store.addInLoadedList(newPart);
                     rsparts.add(newPart);
 
