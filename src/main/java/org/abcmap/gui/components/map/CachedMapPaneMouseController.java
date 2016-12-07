@@ -11,8 +11,8 @@ import java.awt.geom.Point2D;
  */
 public class CachedMapPaneMouseController extends MouseAdapter {
 
+    private static final double ZOOM_ORIGINAL_INCREMENT = 5;
     private final CachedMapPane pane;
-    private double move = 0.1;
     private Point lastPosition;
 
     public CachedMapPaneMouseController(CachedMapPane pane) {
@@ -34,19 +34,30 @@ public class CachedMapPaneMouseController extends MouseAdapter {
         double my = lastPosition.getY() - m.getY();
 
         // scale it
-        int psx = pane.getPartialSidePx();
-        double psd = pane.getPartialSideDg();
-        mx = mx * psd / psx;
-        my = my * psd / psx;
+        mx = scaleValue(mx);
+        my = scaleValue(my);
 
         // adapt world position
         Point2D p = pane.getWorldPosition();
+
         pane.setWorldPosition(new Point2D.Double(p.getX() + mx, p.getY() - my));
 
         pane.refreshMap();
 
         lastPosition = m;
 
+    }
+
+    /**
+     * Scale a distance from panel unit to world unit
+     *
+     * @param val
+     * @return
+     */
+    public double scaleValue(double val) {
+        int psx = pane.getPartialSidePx();
+        double psw = pane.getPartialSideWu();
+        return val * psw / psx;
     }
 
     @Override
@@ -59,13 +70,13 @@ public class CachedMapPaneMouseController extends MouseAdapter {
     public void mouseWheelMoved(MouseWheelEvent e) {
         super.mouseWheelMoved(e);
 
-        double zoomUnit = 0.3;
+        double zoomUnit = scaleValue(ZOOM_ORIGINAL_INCREMENT);
 
         if (e.getWheelRotation() < 0) {
             zoomUnit = -zoomUnit;
         }
 
-        pane.setPartialSideWu(pane.getPartialSideDg() + zoomUnit);
+        pane.setPartialSideWu(pane.getPartialSideWu() + zoomUnit);
         pane.refreshMap();
     }
 }

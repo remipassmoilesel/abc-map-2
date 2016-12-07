@@ -62,6 +62,11 @@ public class CachedMapPane extends JPanel {
      */
     private RenderedPartialQueryResult currentPartials;
 
+    /**
+     * Various mouse listeners which allow user to control map with mouse
+     */
+    private CachedMapPaneMouseController mouseControl;
+
     public CachedMapPane(RenderedPartialStore store, MapContent map) {
 
         setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
@@ -229,7 +234,7 @@ public class CachedMapPane extends JPanel {
      * <p>
      * It can be used as a "zoom" value
      */
-    public double getPartialSideDg() {
+    public double getPartialSideWu() {
         return partialFactory.getPartialSideWu();
     }
 
@@ -265,6 +270,37 @@ public class CachedMapPane extends JPanel {
         @Override
         public void componentHidden(ComponentEvent e) {
 
+        }
+    }
+
+    /**
+     * Enable or disable mouse control of map, in order to allow user to move or zoom map
+     */
+    public void setMouseManagementEnabled(boolean enabled) {
+
+        if (enabled == true) {
+
+            if (this.mouseControl != null) {
+                return;
+            }
+
+            this.mouseControl = new CachedMapPaneMouseController(this);
+
+            this.addMouseListener(mouseControl);
+            this.addMouseMotionListener(mouseControl);
+            this.addMouseWheelListener(mouseControl);
+
+        } else {
+
+            if (this.mouseControl == null) {
+                return;
+            }
+
+            this.removeMouseListener(mouseControl);
+            this.removeMouseMotionListener(mouseControl);
+            this.removeMouseWheelListener(mouseControl);
+
+            mouseControl = null;
         }
     }
 }
