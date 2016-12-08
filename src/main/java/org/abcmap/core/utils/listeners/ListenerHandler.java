@@ -2,8 +2,8 @@ package org.abcmap.core.utils.listeners;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.gui.toProcess.gui.comps.color.ColorEvent;
-import org.abcmap.gui.toProcess.gui.comps.color.ColorEventListener;
+import org.abcmap.gui.components.color.ColorEvent;
+import org.abcmap.gui.components.color.ColorEventListener;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +19,10 @@ import java.util.Iterator;
 public class ListenerHandler<T> implements Iterable<T> {
 
     private static final CustomLogger logger = LogManager.getLogger(ListenerHandler.class);
+
+    /**
+     * List of all listeners
+     */
     private ArrayList<T> listeners = new ArrayList<T>();
 
     /**
