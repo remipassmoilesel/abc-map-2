@@ -27,7 +27,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class PartialFactoryTest {
 
-    private static final boolean SHOW_IN_WINDOW = true;
+    private static final boolean SHOW_IN_WINDOW = false;
 
     @BeforeClass
     public static void beforeTests() throws IOException, InterruptedException {
@@ -128,7 +128,7 @@ public class PartialFactoryTest {
             SwingUtilities.invokeLater(runWindow);
             SwingUtilities.invokeLater(runWindow);
 
-            Thread.sleep(10000000);
+            Thread.sleep(50000);
 
         }
 

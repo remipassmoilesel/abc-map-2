@@ -30,6 +30,14 @@ public class RenderedPartialStore {
     private static final Double PRECISION = 0.001d;
 
     /**
+     * Maximum number of partials which can be stored in RAM
+     * <p>
+     * This is a theorical value, only a few partials will be really loaded (with image) and
+     * just the most recent partials are used
+     */
+    private static final int MAX_LOADED_LIST_SIZE = 1000;
+
+    /**
      * List of partials already used. They can be complete (with an image loaded) or not.
      * <p>
      * This list is not synchronized because it is a bad idea so iterate only copies
@@ -143,7 +151,17 @@ public class RenderedPartialStore {
      * @param part
      */
     public void addInLoadedList(RenderedPartial part) {
+
         loadedPartials.add(part);
+
+        // limit size of loaded list in order to avoid too much research time
+        int toRemove = loadedPartials.size() - MAX_LOADED_LIST_SIZE;
+        if (toRemove > 0) {
+            for (int i = 0; i < toRemove; i++) {
+                loadedPartials.remove(0);
+            }
+        }
+
     }
 
     /**
