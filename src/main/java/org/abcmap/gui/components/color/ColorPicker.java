@@ -1,12 +1,12 @@
 package org.abcmap.gui.components.color;
 
-import abcmap.gui.comps.textfields.DecimalTextField;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.utils.listeners.HasListenerHandler;
 import org.abcmap.core.utils.listeners.ListenerHandler;
 import org.abcmap.gui.GuiStyle;
+import org.abcmap.gui.components.textfields.DecimalTextField;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.KeyAdapter;
 
