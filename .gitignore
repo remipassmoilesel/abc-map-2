@@ -1,7 +1,10 @@
 .idea
 *.iml
+*.swp
 target/*
 log/*
 tmp/*
 tests-playground/*
 src/main/abcmap-old
+
+src/main/java/org/abcmap/gui/toProcess/
