@@ -430,10 +430,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
     }
 
     /**
-     * Vérifie que le porjet soit bien initialisé, et retourne la calque actif.
-     * <p>
-     * Si le projet n'est pas initialisé affiche un message d'erreur et retourne
-     * null.
+     * Check if project is initialized and return active layer. If project is not initialized, display an error message to user.
      *
      * @return
      */
