@@ -2,6 +2,8 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.notifications.HasNotificationManager;
 import org.abcmap.core.notifications.NotificationManager;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +15,7 @@ public class MapManager implements HasNotificationManager {
 
     private final NotificationManager notifm;
 
-    public MapManager(){
+    public MapManager() {
         notifm = new NotificationManager(MapManager.this);
     }
 
@@ -36,5 +38,13 @@ public class MapManager implements HasNotificationManager {
 
     public Point getScaledPoint(Point point) {
         return point;
+    }
+
+    public CoordinateReferenceSystem getCRS(String code) {
+        return DefaultGeographicCRS.WGS84;
+    }
+
+    public static String getEpsgCode(CoordinateReferenceSystem system) {
+        return "";
     }
 }
