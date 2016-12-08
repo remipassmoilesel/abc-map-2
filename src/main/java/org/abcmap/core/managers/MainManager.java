@@ -27,6 +27,7 @@ public class MainManager {
     private static DrawManager drawManager;
     private static CancelManager cancelManager;
     private static GuiManager guiManager;
+    private static MapManager mapManager;
 
     /**
      * Initialize all managers
@@ -48,6 +49,7 @@ public class MainManager {
         drawManager = new DrawManager();
         guiManager = new GuiManager();
         cancelManager = new CancelManager();
+        mapManager = new MapManager();
 
         setInitialized(true);
     }
@@ -98,5 +100,9 @@ public class MainManager {
 
     public static GuiManager getGuiManager() {
         return guiManager;
+    }
+
+    public static MapManager getMapManager() {
+        return mapManager;
     }
 }

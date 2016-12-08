@@ -1,11 +1,8 @@
 package org.abcmap.core.managers;
 
+import org.abcmap.core.draw.*;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.draw.DrawManagerException;
-import org.abcmap.core.draw.LineBuilder;
-import org.abcmap.core.draw.PointBuilder;
-import org.abcmap.core.draw.PolygonBuilder;
 import org.abcmap.core.styles.StyleContainer;
 
 import java.awt.*;
@@ -123,11 +120,31 @@ public class DrawManager {
         return new ArrayList<>();
     }
 
-    public Font getSymbolSetFont(String setName) throws DrawManagerException{
+    public Font getSymbolSetFont(String setName) throws DrawManagerException {
         return new Font("Dialog", Font.PLAIN, 20);
     }
 
     public ArrayList<Integer> getAvailableSymbolCodesFor(String setName) {
         return new ArrayList<>();
+    }
+
+    public Object getCurrentTool() {
+        return new Object();
+    }
+
+    public LayerElement getFirstSelectedElement() {
+        return getFirstSelectedElement((Class) null);
+    }
+
+    public LayerElement getFirstSelectedElement(Class filter) {
+        return new LayerElement();
+    }
+
+    public LayerElement getFirstSelectedElement(ArrayList<? extends Class> filter) {
+        return new LayerElement();
+    }
+
+    public String getReadableNameFor(Class<? extends LayerElement> aClass) {
+        return "Readable name";
     }
 }
