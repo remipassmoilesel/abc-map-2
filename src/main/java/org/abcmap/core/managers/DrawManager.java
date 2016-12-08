@@ -9,6 +9,7 @@ import org.abcmap.core.draw.PolygonBuilder;
 import org.abcmap.core.styles.StyleContainer;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
  * Here are managed all operations around drawing draw on map
@@ -116,5 +117,17 @@ public class DrawManager {
 
         return (FeatureLayer) layer;
 
+    }
+
+    public ArrayList<String> getAvailableSymbolSets() {
+        return new ArrayList<>();
+    }
+
+    public Font getSymbolSetFont(String setName) throws DrawManagerException{
+        return new Font("Dialog", Font.PLAIN, 20);
+    }
+
+    public ArrayList<Integer> getAvailableSymbolCodesFor(String setName) {
+        return new ArrayList<>();
     }
 }
