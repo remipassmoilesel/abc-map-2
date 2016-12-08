@@ -25,6 +25,8 @@ public class MainManager {
     private static TempFilesManager tempFilesManager;
     private static ProjectManager projectManager;
     private static DrawManager drawManager;
+    private static CancelManager cancelManager;
+    private static GuiManager guiManager;
 
     /**
      * Initialize all managers
@@ -44,6 +46,8 @@ public class MainManager {
         tempFilesManager = new TempFilesManager();
         projectManager = new ProjectManager();
         drawManager = new DrawManager();
+        guiManager = new GuiManager();
+        cancelManager = new CancelManager();
 
         setInitialized(true);
     }
@@ -86,5 +90,13 @@ public class MainManager {
 
     private static void setInitialized(boolean initialized) {
         MainManager.initialized = initialized;
+    }
+
+    public static CancelManager getCancelManager() {
+        return cancelManager;
+    }
+
+    public static GuiManager getGuiManager() {
+        return guiManager;
     }
 }
