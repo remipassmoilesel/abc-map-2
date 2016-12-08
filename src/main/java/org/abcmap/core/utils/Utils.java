@@ -513,33 +513,29 @@ public class Utils {
     }
 
     /**
-     * @param unsortMap
+     * @param unsortedMap
      * @return
      */
-    public static Map<String, Integer> sortByComparator(
-            Map<String, Integer> unsortMap) {
-
-        return sortByComparator(unsortMap, true);
+    public static Map<Object, Integer> sortByComparator(Map<Object, Integer> unsortedMap) {
+        return sortByComparator(unsortedMap, true);
     }
 
     /**
      * Sort a map
      *
-     * @param unsortMap
+     * @param unsortedMap
      * @param croissant
      * @return
      */
-    public static Map<String, Integer> sortByComparator(
-            Map<String, Integer> unsortMap, final boolean croissant) {
+    public static Map<Object, Integer> sortByComparator(Map<Object, Integer> unsortedMap, final boolean croissant) {
 
         // Convert Map to List
-        List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(
-                unsortMap.entrySet());
+        List<Map.Entry<Object, Integer>> list = new LinkedList<>(unsortedMap.entrySet()) ;
 
         // Sort list with comparator, to compare the Map values
-        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-            public int compare(Map.Entry<String, Integer> o1,
-                               Map.Entry<String, Integer> o2) {
+        Collections.sort(list, new Comparator<Map.Entry<Object, Integer>>() {
+            public int compare(Map.Entry<Object, Integer> o1,
+                               Map.Entry<Object, Integer> o2) {
                 if (croissant) {
                     return (o1.getValue()).compareTo(o2.getValue());
                 } else {
@@ -549,10 +545,10 @@ public class Utils {
         });
 
         // Convert sorted map back to a Map
-        Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
-        for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it
+        Map<Object, Integer> sortedMap = new LinkedHashMap<Object, Integer>();
+        for (Iterator<Map.Entry<Object, Integer>> it = list.iterator(); it
                 .hasNext(); ) {
-            Map.Entry<String, Integer> entry = it.next();
+            Map.Entry<Object, Integer> entry = it.next();
             sortedMap.put(entry.getKey(), entry.getValue());
         }
         return sortedMap;
