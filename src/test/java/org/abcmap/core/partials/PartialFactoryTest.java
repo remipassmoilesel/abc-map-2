@@ -110,7 +110,7 @@ public class PartialFactoryTest {
                 //pane.setWorldBounds(start);
                 pane.setWorldPosition(worldPosition);
                 pane.setPartialSideWu(partialSideWu);
-                pane.setShowGrid(true);
+                pane.setDebugMode(true);
                 pane.setMouseManagementEnabled(true);
 
                 JFrame frame = new JFrame();
@@ -128,7 +128,7 @@ public class PartialFactoryTest {
             SwingUtilities.invokeLater(runWindow);
             SwingUtilities.invokeLater(runWindow);
 
-            Thread.sleep(100000);
+            Thread.sleep(10000000);
 
         }
 

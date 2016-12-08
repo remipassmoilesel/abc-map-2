@@ -8,6 +8,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.referencing.CRS;
@@ -24,6 +25,7 @@ import org.opengis.style.ContrastMethod;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.util.HashMap;
 
 /**
  * Created by remipassmoilesel on 10/11/16.
@@ -194,10 +196,23 @@ public class GeoUtils {
         return renderer;
     }
 
+    /**
+     * Transform a coordinate object in a point 2D
+     *
+     * @param coordinate
+     * @return
+     */
     public static Point2D coordinateToPoint2D(Coordinate coordinate) {
         return new Point2D.Double(coordinate.x, coordinate.y);
     }
 
+    /**
+     * Return true if specified map content contain specified layer
+     *
+     * @param map
+     * @param layer
+     * @return
+     */
     public static boolean isMapContains(MapContent map, Layer layer) {
         for (Layer lay : map.layers()) {
             if (lay.equals(layer)) {
@@ -207,4 +222,36 @@ public class GeoUtils {
 
         return false;
     }
+
+    public static boolean compareEnvelopes(ReferencedEnvelope env1, ReferencedEnvelope env2, double v) {
+
+        if (env1 == env2) {
+            return true;
+        }
+
+        double[] val1 = new double[]{
+                env1.getMinX(),
+                env1.getMinY(),
+                env1.getMaxX(),
+                env1.getMaxY()
+        };
+
+        double[] val2 = new double[]{
+                env2.getMinX(),
+                env2.getMinY(),
+                env2.getMaxX(),
+                env2.getMaxY()
+        };
+
+        for (int i = 0; i < val1.length; i++) {
+            double diff = Math.abs(val1[i] - val2[i]);
+            if (diff > v) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
 }

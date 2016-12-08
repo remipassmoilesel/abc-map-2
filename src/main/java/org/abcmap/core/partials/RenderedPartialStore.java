@@ -8,6 +8,7 @@ import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableUtils;
 import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import java.awt.image.BufferedImage;
@@ -26,7 +27,7 @@ public class RenderedPartialStore {
     /**
      * Precision used when search existing partials by area in database
      */
-    private static final Double PRECISION = 0.0001d;
+    private static final Double PRECISION = 0.001d;
 
     /**
      * List of partials already used. They can be complete (with an image loaded) or not.
@@ -64,12 +65,22 @@ public class RenderedPartialStore {
      * @return
      */
     public RenderedPartial searchInLoadedList(String layerId, ReferencedEnvelope env) {
+
+        if (layerId == null) {
+            throw new NullPointerException("Layer id is null");
+        }
+
+        if (env == null) {
+            throw new NullPointerException("Envelope is null");
+        }
+
         // iterate a copy to avoid Concurrent modification exception
         for (RenderedPartial part : new ArrayList<>(loadedPartials)) {
-            if (part.getLayerId().equals(layerId) && part.getEnvelope().equals(env)) {
+            if (GeoUtils.compareEnvelopes(part.getEnvelope(), env, PRECISION) && part.getLayerId().equals(layerId)) {
                 return part;
             }
         }
+
         return null;
     }
 
@@ -107,6 +118,8 @@ public class RenderedPartialStore {
         }
 
         // too much results, show error
+        // several partials covering the same area can be added from different threads
+        // and unfortunately, ORM lite doesn't support multiple column primary key.
         if (results.size() > 1) {
             new SQLException("More than one result found: " + results.size()).printStackTrace();
         }

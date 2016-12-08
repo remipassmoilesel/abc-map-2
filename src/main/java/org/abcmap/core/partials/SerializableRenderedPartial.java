@@ -7,6 +7,7 @@ import org.abcmap.core.dao.DataModel;
 import org.abcmap.core.utils.BufferedImagePersister;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -106,6 +107,9 @@ public class SerializableRenderedPartial implements DataModel {
     }
 
     public static String crsToId(CoordinateReferenceSystem crs) {
+        if(crs == null){
+            crs = DefaultEngineeringCRS.GENERIC_2D;
+        }
         String authority = crs.getName().getAuthority() != null ? crs.getName().getAuthority() + ":" : "";
         return authority + crs.getName().getCode();
     }

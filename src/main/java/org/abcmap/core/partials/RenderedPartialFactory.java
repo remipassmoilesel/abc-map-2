@@ -1,14 +1,11 @@
 package org.abcmap.core.partials;
 
-import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
@@ -61,10 +58,16 @@ public class RenderedPartialFactory {
      */
     private int partialSidePx = DEFAULT_PARTIAL_SIDE_PX;
 
+    private boolean debugMode = false;
+
     public RenderedPartialFactory(RenderedPartialStore store, MapContent content, String layerId) {
         this.store = store;
         this.mapContent = content;
         this.layerId = layerId;
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
     }
 
     /**
@@ -119,7 +122,8 @@ public class RenderedPartialFactory {
         double x = getStartPointFrom(worldBounds.getMinX());
         double y = getStartPointFrom(worldBounds.getMinY());
 
-        PartialRenderingQueue renderingTasks = null;
+        PartialRenderingQueue renderingQueue = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toNotifyWhenPartialsCome);
+        renderingQueue.setDebugMode(debugMode);
 
         // iterate area to renderer from bottom left corner to upper right corner
         while (y < worldBounds.getMaxY()) {
@@ -130,7 +134,7 @@ public class RenderedPartialFactory {
             }
 
             // compute needed area for next partial
-            ReferencedEnvelope area = new ReferencedEnvelope(x, round(x + partialSideWu), y, round(y + partialSideWu), DefaultGeographicCRS.WGS84);
+            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, mapContent.getCoordinateReferenceSystem());
 
             // check if partial already exist and is already loaded
             RenderedPartial part = store.searchInLoadedList(layerId, area);
@@ -143,18 +147,15 @@ public class RenderedPartialFactory {
             // partial does not exist or image is not loaded, create it
             else {
 
-                // create a new partial
-                RenderedPartial newPart = new RenderedPartial(RenderedPartial.getWaitingImage(), area, partialSidePx, partialSidePx, layerId);
-                store.addInLoadedList(newPart);
-                rsparts.add(newPart);
-
-                // Create a queue if needed. In most case, it is not needed.
-                if (renderingTasks == null) {
-                    renderingTasks = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toNotifyWhenPartialsCome);
+                // create a new partial if needed
+                if (part == null) {
+                    part = new RenderedPartial(RenderedPartial.getWaitingImage(), area, partialSidePx, partialSidePx, layerId);
+                    store.addInLoadedList(part);
+                    rsparts.add(part);
                 }
 
                 // create a task to retrieve or renderer image from map
-                renderingTasks.addTask(newPart);
+                renderingQueue.addTask(part);
 
             }
 
@@ -175,8 +176,8 @@ public class RenderedPartialFactory {
         }
 
         // launch tasks to retrieve or produce partial in a separated thread, if needed
-        if (renderingTasks != null) {
-            renderingTasks.start();
+        if (renderingQueue.size() > 0) {
+            renderingQueue.start();
         }
 
         // if not enough tiles, return null to avoid errors on transformations
@@ -213,17 +214,7 @@ public class RenderedPartialFactory {
 
         double rslt = coord - mod;
 
-        return round(rslt);
-    }
-
-    /**
-     * Round values to 6 decimal, in order to normalize coordinates and have reusable partials
-     *
-     * @param coord
-     * @return
-     */
-    public double round(double coord) {
-        return Math.round(coord * 1000000.0) / 1000000.0;
+        return Math.round(rslt * 10000.0) / 10000.0;
     }
 
     /**
@@ -260,6 +251,12 @@ public class RenderedPartialFactory {
         return store;
     }
 
+    /**
+     * Check if a side value for partial (in world unit) is greater than the minimum value
+     *
+     * @param value
+     * @return
+     */
     public static double normalizeWorldUnitSideValue(double value) {
 
         if (value < MIN_PARTIAL_SIDE_WU) {

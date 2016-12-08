@@ -2,7 +2,6 @@ package org.abcmap.core.partials;
 
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
-import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.lite.StreamingRenderer;
@@ -30,6 +29,11 @@ class PartialRenderingQueue {
     private static long renderedPartials = 0;
     private final MapContent mapContent;
 
+    private boolean debugMode = true;
+    private static int debugFontSize = 12;
+    private static int debugIncr = debugFontSize + 5;
+    private static Font debugFont = new Font("Dialog", Font.BOLD, debugFontSize);
+
     /**
      * Return true if specified partial should be processed soon
      *
@@ -38,7 +42,11 @@ class PartialRenderingQueue {
      */
     public static boolean isRenderInProgress(RenderedPartial toCheck) {
 
-        for (RenderedPartial part : partialsInProgress) {
+        if(toCheck == null){
+            return false;
+        }
+
+        for (RenderedPartial part : new ArrayList<>(partialsInProgress)) {
             if (part.equals(toCheck)) {
                 return true;
             }
@@ -119,6 +127,36 @@ class PartialRenderingQueue {
 
                 }
 
+                // display informations on tile if needed
+                if (debugMode) {
+
+                    BufferedImage img = part.getImage();
+                    ReferencedEnvelope bounds = part.getEnvelope();
+                    Graphics g2d = img.getGraphics();
+
+                    String[] lines = new String[]{
+                            String.valueOf(part.getId()),
+                            "Image id:" + System.identityHashCode(part.getImage()),
+                            "MinX: " + bounds.getMinX(),
+                            "MinY: " + bounds.getMinY(),
+                            "MaxX: " + bounds.getMaxX(),
+                            "MaxY: " + bounds.getMaxY(),
+                    };
+
+                    g2d.setColor(Color.WHITE);
+                    g2d.fillRect(0, 0, renderedWidthPx - 20, debugIncr * (lines.length + 1));
+
+                    g2d.setColor(Color.black);
+                    g2d.setFont(debugFont);
+
+                    int i = debugIncr;
+                    for (String l : lines) {
+                        g2d.drawString(l, 20, i);
+                        i += debugIncr;
+                    }
+
+                }
+
             } finally {
                 partialsInProgress.remove(part);
 
@@ -152,5 +190,13 @@ class PartialRenderingQueue {
 
     public static long getRenderedPartials() {
         return renderedPartials;
+    }
+
+    public int size() {
+        return tasks.size();
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
     }
 }

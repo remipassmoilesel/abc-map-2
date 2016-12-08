@@ -15,6 +15,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -61,11 +62,6 @@ public class CachedMapPane extends JPanel {
     private Point2D worldPosition;
 
     /**
-     * If set to true, the partial grid is displayed
-     */
-    private boolean showGrid = false;
-
-    /**
      * Current set of partials that have to be painted
      */
     private HashMap<String, RenderedPartialQueryResult> currentPartials;
@@ -79,6 +75,8 @@ public class CachedMapPane extends JPanel {
      * Current value of rendered map in partials. In world unit.
      */
     private double partialSideWu;
+
+    private boolean debugMode = false;
 
     public CachedMapPane(Project project) {
 
@@ -98,6 +96,12 @@ public class CachedMapPane extends JPanel {
 
     @Override
     protected void paintComponent(Graphics g) {
+
+        if(renderLock.isLocked()){
+            System.out.println("Render in progress ...");
+            return;
+        }
+
         super.paintComponent(g);
 
         Graphics2D g2d = (Graphics2D) g;
@@ -109,7 +113,7 @@ public class CachedMapPane extends JPanel {
             // get affine transform to set position of partials
             AffineTransform worldToScreen = partials.getWorldToScreenTransform();
 
-            if (showGrid) {
+            if (debugMode) {
                 g2d.setColor(Color.darkGray);
             }
 
@@ -129,14 +133,14 @@ public class CachedMapPane extends JPanel {
                 // draw partial
                 g2d.drawImage(part.getImage(), x, y, w, h, null);
 
-                if (showGrid) {
+                if (debugMode) {
                     g2d.drawRect(x, y, w, h);
                 }
 
             }
 
             // draw maximums bounds asked if necessary
-            if (showGrid) {
+            if (debugMode) {
                 Point2D wp = worldToScreen.transform(worldPosition, null);
                 g2d.setStroke(new BasicStroke(2));
                 g2d.setColor(Color.red);
@@ -164,8 +168,6 @@ public class CachedMapPane extends JPanel {
 
         try {
 
-            //System.out.println("Render task launched");
-
             // get component size
             Dimension dim = CachedMapPane.this.getSize();
 
@@ -178,14 +180,11 @@ public class CachedMapPane extends JPanel {
 
                 String layId = lay.getId();
 
-                // TODO update map contents if needed: e.g. when TileLayer are updated, the internal layer change
-                // TODO Can we use factory.setMapContent ? Will it disturb current rendering operations ?
-
                 // retrieve map content associated with layer
 
                 // if map does no exist, create one
                 MapContent map = layerMapContents.get(layId);
-                if (map == null){
+                if (map == null) {
                     map = lay.buildMapContent();
                     layerMapContents.put(layId, map);
                 }
@@ -195,13 +194,14 @@ public class CachedMapPane extends JPanel {
                 if (factory == null) {
                     factory = new RenderedPartialFactory(project.getRenderedPartialsStore(), map, layId);
                     factory.setPartialSideWu(partialSideWu);
+                    factory.setDebugMode(debugMode);
                     partialFactories.put(layId, factory);
                 }
 
                 // if map is not up to date, create a new one and invalidate cache
-                if(GeoUtils.isMapContains(map, lay.getInternalLayer()) == false){
+                if (GeoUtils.isMapContains(map, lay.getInternalLayer()) == false) {
 
-                    System.out.println("Invalidated ! " + layId);
+                    System.out.println("Cache invalidated ! " + layId);
 
                     map = lay.buildMapContent();
                     layerMapContents.put(layId, map);
@@ -212,14 +212,14 @@ public class CachedMapPane extends JPanel {
                 }
 
                 // search which partials are necessary to display
-                RenderedPartialQueryResult partials = factory.intersect(worldPosition, dim, map.getCoordinateReferenceSystem(),
+                RenderedPartialQueryResult newPartials = factory.intersect(worldPosition, dim, map.getCoordinateReferenceSystem(),
                         () -> {
                             // each time a partial come, map will be repaint
                             CachedMapPane.this.repaint();
                         });
 
                 // store it to draw it later
-                currentPartials.put(layId, partials);
+                currentPartials.put(layId, newPartials);
             }
 
             // repaint component
@@ -301,15 +301,6 @@ public class CachedMapPane extends JPanel {
     }
 
     /**
-     * Set to true to show partial grid and marks
-     *
-     * @param showGrid
-     */
-    public void setShowGrid(boolean showGrid) {
-        this.showGrid = showGrid;
-    }
-
-    /**
      * Observe this component and refresh map when needed
      */
     public class RefreshMapComponentListener implements ComponentListener {
@@ -365,4 +356,10 @@ public class CachedMapPane extends JPanel {
             mouseControl = null;
         }
     }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+
+
 }
