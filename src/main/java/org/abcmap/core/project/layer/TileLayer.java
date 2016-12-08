@@ -109,6 +109,13 @@ public class TileLayer extends AbstractLayer {
         refreshCoverage();
     }
 
+    /**
+     * Refresh present coverage by building a new one.
+     * <p>
+     * This method should be called after very modification: add, move, ...
+     *
+     * @throws IOException
+     */
     public void refreshCoverage() throws IOException {
         buildCoverageLayer(databasePath, coverageName, crsCode);
     }
@@ -117,6 +124,8 @@ public class TileLayer extends AbstractLayer {
      * Add a tile to this layer, and return its id.
      * <p>
      * Return null if an error occur
+     * <p>
+     * To see changes, call refreshCoverage()
      *
      * @param imagePath
      * @param position
@@ -138,6 +147,8 @@ public class TileLayer extends AbstractLayer {
      * Add a tile to this layer, and return its id.
      * <p>
      * Return null if an error occur
+     * <p>
+     * To see changes, call refreshCoverage()
      *
      * @param container
      */
@@ -149,6 +160,8 @@ public class TileLayer extends AbstractLayer {
      * Add a tile to this layer, and return its id.
      * <p>
      * Return null if an error occur
+     * <p>
+     * To see changes, call refreshCoverage()
      *
      * @param image
      * @param position
@@ -183,6 +196,8 @@ public class TileLayer extends AbstractLayer {
 
     /**
      * Remove tiles from layer
+     * <p>
+     * To see changes, call refreshCoverage()
      *
      * @param ids
      */

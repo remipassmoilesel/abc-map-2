@@ -98,7 +98,7 @@ public class ProjectReader {
         }
 
         // check if ther is at least one layer
-        if (newProject.getLayers().size() < 1) {
+        if (newProject.getLayersList().size() < 1) {
             throw new IOException("Invalid project, no layers found");
         }
 

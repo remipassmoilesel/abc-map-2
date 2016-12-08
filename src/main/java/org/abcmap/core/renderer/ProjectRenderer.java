@@ -1,4 +1,4 @@
-package org.abcmap.core.render;
+package org.abcmap.core.renderer;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Renderer specially designed for projects
+ * Renderer designed for Abc-Map projects
+ *
+ * Not used for display, only for exports or printing
  */
 public class ProjectRenderer {
 
@@ -36,20 +38,16 @@ public class ProjectRenderer {
      */
     private Dimension renderedDimensions;
     /**
-     * Map location to render
+     * Map location to renderer
      */
     private ReferencedEnvelope mapBoundsToRender;
     /**
-     * If set to true, time needed to render each layer will be logged
+     * If set to true, time needed to renderer each layer will be logged
      */
     private boolean logStats = true;
-    /**
-     * Lock used to avoid uneeded call of renderer
-     */
-    private ReentrantLock renderLock;
 
     /**
-     * Geotools streaming renderer, sed to render layers
+     * Geotools streaming renderer, sed to renderer layers
      */
     private StreamingRenderer renderer;
 
@@ -64,7 +62,6 @@ public class ProjectRenderer {
     public ProjectRenderer() {
         this.pman = MainManager.getProjectManager();
         this.project = pman.getProject();
-        this.renderLock = new ReentrantLock();
         this.renderer = GeoUtils.buildRenderer();
 
         renderedImages = new ArrayList<>();
@@ -84,19 +81,19 @@ public class ProjectRenderer {
         /**
          * Here we have to build a map content at each time, to avoid synchronization problems on layer visibility
          */
-        MapContent mapContent = project.buildMapContent(includeTileOutlines);
+        MapContent mapContent = project.buildGlobalMapContent(includeTileOutlines);
         List<Layer> geotoolsLayers = mapContent.layers();
 
         // monitor time of rendering
         long startRender = System.currentTimeMillis();
 
-        // Hide other layers to optimize render time
+        // Hide other layers to optimize renderer time
 
         // Two kin of index are used because some AbcMap layers can contains many geotools layers,
         // for example TileLayer that have one raster layer and one shape layer
         int abcmapIndex = 0;
         int geotoolsIndex = 0;
-        for (AbstractLayer lay : project.getLayers()) {
+        for (AbstractLayer lay : project.getLayersList()) {
 
             Layer glay = geotoolsLayers.get(geotoolsIndex);
 
@@ -161,7 +158,7 @@ public class ProjectRenderer {
      */
     public void renderAllLayersLater(Runnable whenFinished) {
         ThreadManager.runLater(() -> {
-            for (int i = 0; i < project.getLayers().size(); i++) {
+            for (int i = 0; i < project.getLayersList().size(); i++) {
                 renderLayer(i);
             }
 
@@ -200,7 +197,7 @@ public class ProjectRenderer {
     }
 
     /**
-     * Set to true to include outlines of tile layers in render
+     * Set to true to include outlines of tile layers in renderer
      *
      * @param includeTileOutlines
      */
@@ -209,7 +206,7 @@ public class ProjectRenderer {
     }
 
     /**
-     * Set the map bounds to render
+     * Set the map bounds to renderer
      *
      * @param mapBoundsToRender
      */

@@ -8,6 +8,8 @@ import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.Layer;
+import org.geotools.map.MapContent;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.opengis.filter.FilterFactory;
@@ -26,7 +28,7 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
 
     protected final String crsCode;
     protected CoordinateReferenceSystem crs;
-    protected org.geotools.map.Layer internalLayer;
+    protected Layer internalLayer;
     protected LayerIndexEntry indexEntry;
     protected Style layerStyle;
 
@@ -48,8 +50,6 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
 
     /**
      * Return the actual bounds of the layer, namely its lower left corner and upper right corner.
-     *
-     *
      *
      * @return
      */
@@ -118,6 +118,18 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
         this.crs = crs;
     }
 
+    /**
+     * Create a map content with this layer as a single layer.
+     * <p>
+     * This kind of map content are used to render each layer at a time
+     *
+     * @return
+     */
+    public MapContent buildMapContent() {
+        MapContent content = new MapContent();
+        content.addLayer(internalLayer);
+        return content;
+    }
 
     @Override
     public boolean equals(Object o) {

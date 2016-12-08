@@ -2,6 +2,7 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.partials.RenderedPartialStore;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
@@ -28,9 +29,9 @@ import java.util.Objects;
 
 /**
  * Represent a serializable project. Projects are stored in Geopakages, some kind of sqlite
- * database. All layers are read directly on the database.
+ * database. All mainLayersList are read directly on the database.
  * <p>
- * Project are strongly dependant of database because layers read data directly in database
+ * Project are strongly dependant of database because mainLayersList read data directly in database
  */
 public class Project {
 
@@ -52,6 +53,11 @@ public class Project {
     private final TileStorage tileStorage;
 
     /**
+     * Where are stored map rendered map partials, for display purposes
+     */
+    private final RenderedPartialStore partialStore;
+
+    /**
      * Only one layer is alterable at a time, the active layer
      */
     private AbstractLayer activeLayer;
@@ -69,9 +75,9 @@ public class Project {
     private Path databasePath;
 
     /**
-     * List of layers. Layers wrap Geotools layers.
+     * List of mainLayersList. Layers wrap Geotools mainLayersList.
      */
-    private ArrayList<AbstractLayer> layers;
+    private ArrayList<AbstractLayer> mainLayersList;
 
     /**
      * Metadata about project
@@ -99,7 +105,7 @@ public class Project {
 
         this.tempDirectory = databasePath.getParent();
         this.metadataContainer = new ProjectMetadata();
-        this.layers = new ArrayList();
+        this.mainLayersList = new ArrayList();
         this.crs = GeoUtils.GENERIC_2D;
         this.finalPath = null;
 
@@ -107,6 +113,12 @@ public class Project {
 
         this.tileStorage = new TileStorage(databasePath);
         tileStorage.initialize();
+
+        try {
+            partialStore = new RenderedPartialStore(databasePath);
+        } catch (SQLException e) {
+            throw new IOException("Unable to initialize database: " + e.getMessage(), e);
+        }
 
     }
 
@@ -148,12 +160,16 @@ public class Project {
     }
 
     /**
-     * Get all layers
+     * Get a shallow copy of mainLayersList list
+     * <p>
+     * List is sorted by zindex, from lowest to highest
      *
      * @return
      */
-    public ArrayList<AbstractLayer> getLayers() {
-        return layers;
+    public ArrayList<AbstractLayer> getLayersList() {
+        ArrayList<AbstractLayer> list = new ArrayList<>(mainLayersList);
+        Collections.sort(list);
+        return list;
     }
 
     /**
@@ -201,13 +217,13 @@ public class Project {
      * @return
      */
     protected AbstractLayer addLayer(AbstractLayer layer) {
-        layers.add(layer);
+        mainLayersList.add(layer);
         return layer;
     }
 
     /**
      * Set the project coordinate reference system
-     * // TODO: generalize to layers ?
+     * // TODO: generalize to mainLayersList ?
      *
      * @param crs
      */
@@ -288,7 +304,7 @@ public class Project {
      * @param index
      */
     public void setActiveLayer(int index) {
-        this.activeLayer = layers.get(index);
+        this.activeLayer = mainLayersList.get(index);
     }
 
     /**
@@ -341,7 +357,7 @@ public class Project {
      */
     protected ArrayList<LayerIndexEntry> getLayerIndexEntries() {
         ArrayList<LayerIndexEntry> indexes = new ArrayList<>();
-        for (AbstractLayer layer : getLayers()) {
+        for (AbstractLayer layer : getLayersList()) {
             indexes.add(layer.getIndexEntry());
         }
         return indexes;
@@ -354,14 +370,14 @@ public class Project {
         Project project = (Project) o;
         return Objects.equals(styleLibrary, project.styleLibrary) &&
                 Objects.equals(finalPath, project.finalPath) &&
-                Objects.equals(layers, project.layers) &&
+                Objects.equals(mainLayersList, project.mainLayersList) &&
                 Objects.equals(metadataContainer, project.metadataContainer) &&
                 Objects.equals(crs, project.crs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(styleLibrary, finalPath, layers, metadataContainer, crs);
+        return Objects.hash(styleLibrary, finalPath, mainLayersList, metadataContainer, crs);
     }
 
     public StyleContainer getStyle(Color activeForeground, Color activeBackground, int activeThick) {
@@ -395,22 +411,23 @@ public class Project {
 
     /**
      * Build a Geotools map content with available layers
+     * <p>
+     * This kind of map content is used only for debug purpose for now
      *
      * @return
      */
-    public MapContent buildMapContent(boolean includeTileOutlines) {
+    public MapContent buildGlobalMapContent(boolean includeTileOutlines) {
 
         MapContent content = new MapContent();
 
-        // sort layers by zindex
-        Collections.sort(layers);
+        ArrayList<AbstractLayer> layers = getLayersList();
 
-        // add layers
+        // add mainLayersList
         for (AbstractLayer layer : layers) {
 
             // optionally add tile outlines
             content.addLayer(layer.getInternalLayer());
-            if(includeTileOutlines && layer instanceof TileLayer){
+            if (includeTileOutlines && layer instanceof TileLayer) {
                 content.addLayer(((TileLayer) layer).getOutlineLayer());
             }
         }
@@ -421,12 +438,12 @@ public class Project {
     /**
      * Show a project for debug purposes
      */
-    public void showForDebug(boolean includeTileOutlines)  {
+    public void showForDebug(boolean includeTileOutlines) {
 
         SwingUtilities.invokeLater(() -> {
 
             // Create a JMapFrame with a menu to choose the display style for the
-            JMapFrame frame = new JMapFrame(buildMapContent(includeTileOutlines));
+            JMapFrame frame = new JMapFrame(buildGlobalMapContent(includeTileOutlines));
             frame.setSize(800, 600);
             frame.enableStatusBar(true);
             frame.enableTool(JMapFrame.Tool.ZOOM, JMapFrame.Tool.PAN, JMapFrame.Tool.RESET);
@@ -436,5 +453,9 @@ public class Project {
 
         });
 
+    }
+
+    public RenderedPartialStore getRenderedPartialsStore() {
+        return partialStore;
     }
 }
