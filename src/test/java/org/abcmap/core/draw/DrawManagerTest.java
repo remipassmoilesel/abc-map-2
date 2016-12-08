@@ -6,10 +6,6 @@ import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.shapes.DrawManagerException;
-import org.abcmap.core.shapes.LineBuilder;
-import org.abcmap.core.shapes.PointBuilder;
-import org.abcmap.core.shapes.PolygonBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -83,7 +79,7 @@ public class DrawManagerTest {
             plbuilder.terminateLine(TestUtils.getRandomPoint());
         }
 
-        // check that all shapes have a style id
+        // check that all draw have a style id
         final int[] shapeCount = {0};
         activeLayer.executeVisit((SimpleFeature f) -> {
 
@@ -100,7 +96,7 @@ public class DrawManagerTest {
         dm.setActiveBackground(Color.black);
         dm.getActiveStyle();
 
-        // test number of shapes
+        // test number of draw
         assertTrue("Shape number test", shapeCount[0] == pointNumber + lineNumber + polygonNumber);
 
         // test number of created styles

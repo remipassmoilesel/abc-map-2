@@ -1,11 +1,8 @@
-package org.abcmap.core.shapes;
+package org.abcmap.core.draw;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layer.FeatureLayer;
-
-import java.util.ArrayList;
 
 /**
  * Tool to draw lines

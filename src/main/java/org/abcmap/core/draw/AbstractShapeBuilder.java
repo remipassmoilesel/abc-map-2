@@ -1,11 +1,10 @@
-package org.abcmap.core.shapes;
+package org.abcmap.core.draw;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
-import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.opengis.feature.simple.SimpleFeature;
 

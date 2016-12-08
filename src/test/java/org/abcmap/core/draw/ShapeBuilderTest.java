@@ -1,4 +1,4 @@
-package org.abcmap.core.shapes;
+package org.abcmap.core.draw;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import static junit.framework.TestCase.assertTrue;
 
 /**
- * Test on shapes builder
+ * Test on draw builder
  */
 public class ShapeBuilderTest {
 

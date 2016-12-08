@@ -3,7 +3,7 @@ package org.abcmap.core.styles;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
+import org.abcmap.core.draw.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;

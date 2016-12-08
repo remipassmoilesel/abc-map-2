@@ -2,16 +2,16 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.shapes.DrawManagerException;
-import org.abcmap.core.shapes.LineBuilder;
-import org.abcmap.core.shapes.PointBuilder;
-import org.abcmap.core.shapes.PolygonBuilder;
+import org.abcmap.core.draw.DrawManagerException;
+import org.abcmap.core.draw.LineBuilder;
+import org.abcmap.core.draw.PointBuilder;
+import org.abcmap.core.draw.PolygonBuilder;
 import org.abcmap.core.styles.StyleContainer;
 
 import java.awt.*;
 
 /**
- * Here are managed all operations around drawing shapes on map
+ * Here are managed all operations around drawing draw on map
  */
 public class DrawManager {
 

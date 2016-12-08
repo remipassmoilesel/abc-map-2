@@ -1,4 +1,4 @@
-package org.abcmap.core.shapes.feature;
+package org.abcmap.core.draw.feature;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.feature.simple.SimpleFeatureBuilder;

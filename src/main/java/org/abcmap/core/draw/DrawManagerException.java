@@ -1,4 +1,4 @@
-package org.abcmap.core.shapes;
+package org.abcmap.core.draw;
 
 /**
  * Created by remipassmoilesel on 16/11/16.

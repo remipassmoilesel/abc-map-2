@@ -1,9 +1,7 @@
 package org.abcmap.core.utils;
 
-import org.abcmap.core.project.layer.AbstractLayer;
-import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
-import org.abcmap.core.shapes.feature.TileFeatureBuilder;
+import org.abcmap.core.draw.feature.DefaultFeatureBuilder;
+import org.abcmap.core.draw.feature.TileFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
 import org.geotools.data.FeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
@@ -13,7 +11,6 @@ import org.geotools.filter.identity.FeatureIdImpl;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;

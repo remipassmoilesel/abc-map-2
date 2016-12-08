@@ -4,7 +4,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
-import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
+import org.abcmap.core.draw.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.Utils;
 import org.geotools.styling.*;

@@ -25,9 +25,9 @@ public class ConfigurationConstants {
     public static final String PLUGINS_PACKAGE_ROOT = "org.abcmap.plugins";
 
     /**
-     * Packages where are stored shapes
+     * Packages where are stored draw
      */
-    public final static String DRAW_PACKAGE = "abcmap.draw.shapes";
+    public final static String DRAW_PACKAGE = "abcmap.draw.draw";
 
     public static final String SOFTWARE_NAME = "Abc-Map";
     public static final String SOFTWARE_VERSION = "2.00";

@@ -1,7 +1,6 @@
-package org.abcmap.core.shapes;
+package org.abcmap.core.draw;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.opengis.feature.simple.SimpleFeature;
 
