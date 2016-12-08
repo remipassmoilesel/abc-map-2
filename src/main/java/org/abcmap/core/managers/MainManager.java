@@ -28,6 +28,10 @@ public class MainManager {
     private static CancelManager cancelManager;
     private static GuiManager guiManager;
     private static MapManager mapManager;
+    private static ShortcutManager shortcutManager;
+    private static RecentManager recentManager;
+    private static ClipboardManager clipboardManager;
+    private static ImportManager importManager;
 
     /**
      * Initialize all managers
@@ -50,6 +54,10 @@ public class MainManager {
         guiManager = new GuiManager();
         cancelManager = new CancelManager();
         mapManager = new MapManager();
+        shortcutManager = new ShortcutManager();
+        recentManager = new RecentManager();
+        clipboardManager = new ClipboardManager();
+        importManager = new ImportManager();
 
         setInitialized(true);
     }
@@ -104,5 +112,21 @@ public class MainManager {
 
     public static MapManager getMapManager() {
         return mapManager;
+    }
+
+    public static ShortcutManager getShortcutManager() {
+        return shortcutManager;
+    }
+
+    public static RecentManager getRecentManager() {
+        return recentManager;
+    }
+
+    public static ClipboardManager getClipboardManager() {
+        return clipboardManager;
+    }
+
+    public static ImportManager getImportManager() {
+        return importManager;
     }
 }
