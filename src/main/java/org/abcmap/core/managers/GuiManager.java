@@ -1,7 +1,5 @@
 package org.abcmap.core.managers;
 
-import org.abcmap.gui.components.windows.AbstractCustomWindow;
-
 import java.awt.*;
 
 /**

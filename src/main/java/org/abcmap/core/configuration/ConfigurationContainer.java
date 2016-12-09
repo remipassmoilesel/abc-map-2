@@ -77,6 +77,8 @@ public class ConfigurationContainer implements Serializable {
 
     public Integer ROBOT_IMPORT_CAPTURE_DELAY = 2000;
 
+    public String ROBOT_IMPORT_MODE = "ROBOT_IMPORT_MODE";
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

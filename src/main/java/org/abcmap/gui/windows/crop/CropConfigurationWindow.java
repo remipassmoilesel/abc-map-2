@@ -1,4 +1,4 @@
-package org.abcmap.gui.components.crop;
+package org.abcmap.gui.windows.crop;
 
 import org.abcmap.core.events.ConfigurationEvent;
 import org.abcmap.core.managers.ConfigurationManager;
@@ -10,7 +10,7 @@ import org.abcmap.core.notifications.Notification;
 import org.abcmap.core.notifications.NotificationManager;
 import org.abcmap.core.notifications.UpdatableByNotificationManager;
 import org.abcmap.core.threads.ThreadManager;
-import org.abcmap.gui.components.windows.FullScreenPictureWindow;
+import org.abcmap.gui.windows.FullScreenPictureWindow;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;

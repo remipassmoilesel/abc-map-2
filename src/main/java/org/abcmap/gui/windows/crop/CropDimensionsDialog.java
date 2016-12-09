@@ -1,4 +1,4 @@
-package org.abcmap.gui.components.crop;
+package org.abcmap.gui.windows.crop;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.managers.ConfigurationManager;
@@ -10,7 +10,7 @@ import org.abcmap.gui.components.InvalidInputException;
 import org.abcmap.gui.components.color.ColorDialogButton;
 import org.abcmap.gui.components.color.ColorEvent;
 import org.abcmap.gui.components.color.ColorEventListener;
-import org.abcmap.gui.toProcess.gui.comps.importation.CropDimensionsPanel;
+import org.abcmap.gui.components.importation.CropDimensionsPanel;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.KeyAdapter;
 

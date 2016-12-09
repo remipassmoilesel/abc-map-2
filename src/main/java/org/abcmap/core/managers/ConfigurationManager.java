@@ -132,4 +132,8 @@ public class ConfigurationManager implements HasNotificationManager{
     public boolean isCroppingEnabled() {
         return true;
     }
+
+    public void setCroppingEnabled(boolean croppingEnabled) {
+
+    }
 }

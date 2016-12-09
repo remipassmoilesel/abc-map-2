@@ -1,4 +1,4 @@
-package org.abcmap.gui.components.windows;
+package org.abcmap.gui.windows;
 
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.utils.GuiUtils;
@@ -59,7 +59,7 @@ public class FullScreenPictureWindow extends AbstractCustomWindow {
 
         this.setUndecorated(true);
         this.setResizable(false);
-        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 
         JPanel contentPane = new JPanel();
         contentPane.setBackground(backgroundColor);

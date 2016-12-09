@@ -1,4 +1,4 @@
-package org.abcmap.gui.components.windows;
+package org.abcmap.gui.windows;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.configuration.ConfigurationConstants;

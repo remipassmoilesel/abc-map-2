@@ -1,8 +1,8 @@
-package org.abcmap.gui.components.crop;
+package org.abcmap.gui.windows.crop;
 
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.gui.shape.Handle;
+import org.abcmap.gui.shapes.Handle;
 
 import java.awt.*;
 import java.awt.geom.Area;

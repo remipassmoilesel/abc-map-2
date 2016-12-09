@@ -1,4 +1,4 @@
-package org.abcmap.gui.shape;
+package org.abcmap.gui.shapes;
 
 import java.awt.BasicStroke;
 import java.awt.Color;

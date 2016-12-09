@@ -1,4 +1,4 @@
-package org.abcmap.gui.components.windows;
+package org.abcmap.gui.windows;
 
 import javax.swing.JFrame;
 

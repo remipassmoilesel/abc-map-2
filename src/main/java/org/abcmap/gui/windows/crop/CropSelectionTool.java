@@ -1,6 +1,6 @@
-package org.abcmap.gui.components.crop;
+package org.abcmap.gui.windows.crop;
 
-import org.abcmap.gui.shape.Handle;
+import org.abcmap.gui.shapes.Handle;
 
 import javax.swing.*;
 import java.awt.*;
