@@ -4,6 +4,7 @@ import org.abcmap.gui.GuiCursor;
 import org.abcmap.gui.windows.DetachedWindow;
 import org.abcmap.gui.windows.MainWindowMode;
 
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -33,5 +34,9 @@ public class GuiManager {
 
     public DetachedWindow getWizardDetachedWindow() {
         return new DetachedWindow();
+    }
+
+    public Window getMainWindow() {
+        return new JDialog();
     }
 }
