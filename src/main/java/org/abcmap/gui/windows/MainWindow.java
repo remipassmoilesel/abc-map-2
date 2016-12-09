@@ -5,7 +5,7 @@ import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.StatusBar;
-import org.abcmap.gui.toProcess.gui.dock.comps.Dock;
+import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.toProcess.gui.ie.program.QuitProgram;
 import org.abcmap.gui.utils.GuiUtils;
 

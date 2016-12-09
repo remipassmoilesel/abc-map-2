@@ -1,9 +1,12 @@
 package org.abcmap.core.managers;
 
+import org.abcmap.gui.GuiCursor;
+import org.abcmap.gui.windows.MainWindowMode;
+
 import java.awt.*;
 
 /**
- * Created by remipassmoilesel on 08/12/16.
+ *
  */
 public class GuiManager {
 
@@ -12,6 +15,18 @@ public class GuiManager {
     }
 
     public void setWindowIconFor(Window windowIconFor) {
+
+    }
+
+    public void setMainWindowMode(MainWindowMode mainWindowMode) {
+
+    }
+
+    public Cursor getClickableCursor() {
+        return GuiCursor.HAND_CURSOR;
+    }
+
+    public void showGroupInDock(Class clss) {
 
     }
 }
