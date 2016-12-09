@@ -147,4 +147,8 @@ public class DrawManager {
     public String getReadableNameFor(Class<? extends LayerElement> aClass) {
         return "Readable name";
     }
+
+    public int getInteractionAreaMargin() {
+        return 5;
+    }
 }

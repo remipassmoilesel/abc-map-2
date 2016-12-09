@@ -4,7 +4,10 @@ import com.labun.surf.Params;
 import com.thoughtworks.xstream.XStream;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.configuration.ConfigurationContainer;
+import org.abcmap.core.notifications.HasNotificationManager;
+import org.abcmap.core.notifications.NotificationManager;
 
+import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,15 +15,18 @@ import java.nio.file.Path;
 /**
  * Manage configuration of software. Here you can store and use settings.
  */
-public class ConfigurationManager {
+public class ConfigurationManager implements HasNotificationManager{
 
     private final XStream xmlSerializer;
+    private final NotificationManager notifm;
     private ConfigurationContainer currentConfiguration;
 
     ConfigurationManager() throws IOException {
         // load default configuration
         this.currentConfiguration = new ConfigurationContainer();
         this.xmlSerializer = new XStream();
+
+        this.notifm = new NotificationManager(ConfigurationManager.this);
 
         initializeConfiguration();
     }
@@ -111,4 +117,19 @@ public class ConfigurationManager {
     }
 
 
+    public Rectangle getCropRectangle() {
+        return new Rectangle();
+    }
+
+    @Override
+    public NotificationManager getNotificationManager() {
+        return notifm;
+    }
+
+    public void setCropRectangle(Rectangle cropRectangle) {
+    }
+
+    public boolean isCroppingEnabled() {
+        return true;
+    }
 }
