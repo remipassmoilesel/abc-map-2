@@ -1,6 +1,7 @@
 package org.abcmap.core.managers;
 
 import org.abcmap.gui.GuiCursor;
+import org.abcmap.gui.windows.DetachedWindow;
 import org.abcmap.gui.windows.MainWindowMode;
 
 import java.awt.*;
@@ -28,5 +29,9 @@ public class GuiManager {
 
     public void showGroupInDock(Class clss) {
 
+    }
+
+    public DetachedWindow getWizardDetachedWindow() {
+        return new DetachedWindow();
     }
 }

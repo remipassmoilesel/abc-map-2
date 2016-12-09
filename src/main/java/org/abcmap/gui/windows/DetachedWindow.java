@@ -89,6 +89,8 @@ public class DetachedWindow extends AbstractCustomWindow implements HasNotificat
     @Override
     public void displayComponent(JComponent displayable) {
         this.displayable = displayable;
+        reconstruct();
+        refresh();
     }
 
     public void displayComponent(InteractionElementGroup group) {

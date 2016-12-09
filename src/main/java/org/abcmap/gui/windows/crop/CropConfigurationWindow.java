@@ -28,7 +28,7 @@ public class CropConfigurationWindow extends FullScreenPictureWindow implements 
     private NotificationManager observer;
 
     private WindowListener closeWL;
-    private CropDimensionsDialog dialog;
+    private org.abcmap.gui.windows.crop.CropDimensionsDialog dialog;
     private ConfigurationManager configm;
     private CropSelectionRectangle selection;
     private CropSelectionTool selectionTool;
