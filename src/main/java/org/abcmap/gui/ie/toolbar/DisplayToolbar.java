@@ -6,10 +6,10 @@ import abcmap.gui.ie.display.zoom.ZoomIn;
 import abcmap.gui.ie.display.zoom.ZoomOut;
 import abcmap.gui.toolbar.Toolbar;
 import org.abcmap.gui.components.toolbar.Toolbar;
-import org.abcmap.gui.toProcess.gui.ie.display.windowmode.WindowModeSelector;
-import org.abcmap.gui.toProcess.gui.ie.display.zoom.ResetZoom;
-import org.abcmap.gui.toProcess.gui.ie.display.zoom.ZoomIn;
-import org.abcmap.gui.toProcess.gui.ie.display.zoom.ZoomOut;
+import org.abcmap.gui.ie.display.windowmode.WindowModeSelector;
+import org.abcmap.gui.ie.display.zoom.ResetZoom;
+import org.abcmap.gui.ie.display.zoom.ZoomIn;
+import org.abcmap.gui.ie.display.zoom.ZoomOut;
 
 public class DisplayToolbar extends Toolbar {
 

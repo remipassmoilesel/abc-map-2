@@ -2,8 +2,8 @@ package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.toProcess.gui.ie.draw.SelectColors;
-import org.abcmap.gui.toProcess.gui.ie.draw.SelectDrawCaracteristics;
+import org.abcmap.gui.ie.draw.SelectColors;
+import org.abcmap.gui.ie.draw.SelectDrawCaracteristics;
 
 public class GroupDrawingPalette extends InteractionElementGroup {
 

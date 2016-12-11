@@ -7,7 +7,7 @@ import abcmap.gui.ie.position.MoveElementsByZOrder;
 import abcmap.gui.iegroup.InteractionElementGroup;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.toProcess.gui.ie.align.AlignAndDistribute;
+import org.abcmap.gui.ie.align.AlignAndDistribute;
 import org.abcmap.gui.toProcess.gui.ie.position.MoveElementsByCoordinates;
 import org.abcmap.gui.toProcess.gui.ie.position.MoveElementsByZOrder;
 

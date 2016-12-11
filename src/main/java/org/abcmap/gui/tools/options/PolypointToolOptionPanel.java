@@ -32,7 +32,7 @@ public class PolypointToolOptionPanel extends ToolOptionPanel {
 		toolModeGroup = new ButtonGroup();
 
 		// boutons de selection de mode de fonctionnement
-		GuiUtils.addLabel("Mode de fonctionnement: ", this, "wrap");
+		GuiUtils.addLabel("AnalyseMode de fonctionnement: ", this, "wrap");
 
 		ToolModeAL toolModeAL = new ToolModeAL();
 

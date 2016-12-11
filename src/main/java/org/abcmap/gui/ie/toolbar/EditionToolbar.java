@@ -1,12 +1,12 @@
 package org.abcmap.gui.ie.toolbar;
 
 import org.abcmap.gui.components.toolbar.Toolbar;
-import org.abcmap.gui.toProcess.gui.ie.analyse.AnalyseSelectedTiles;
-import org.abcmap.gui.toProcess.gui.ie.copy.Copy;
-import org.abcmap.gui.toProcess.gui.ie.copy.Paste;
-import org.abcmap.gui.toProcess.gui.ie.copy.PasteAsTile;
-import org.abcmap.gui.toProcess.gui.ie.edition.DeleteSelectedElements;
-import org.abcmap.gui.toProcess.gui.ie.edition.Duplicate;
+import org.abcmap.gui.ie.analyse.AnalyseSelectedTiles;
+import org.abcmap.gui.ie.copy.Copy;
+import org.abcmap.gui.ie.copy.Paste;
+import org.abcmap.gui.ie.copy.PasteAsTile;
+import org.abcmap.gui.ie.edition.DeleteSelectedElements;
+import org.abcmap.gui.ie.edition.Duplicate;
 import org.abcmap.gui.toProcess.gui.ie.position.MoveElementsBottom;
 import org.abcmap.gui.toProcess.gui.ie.position.MoveElementsDown;
 import org.abcmap.gui.toProcess.gui.ie.position.MoveElementsTop;

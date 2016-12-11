@@ -2,7 +2,7 @@ package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.toProcess.gui.ie.export.*;
+import org.abcmap.gui.ie.export.*;
 
 public class GroupExport extends InteractionElementGroup {
 

@@ -3,9 +3,9 @@ package org.abcmap.gui.components.geo;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.GuiCursor;
-import org.abcmap.gui.toProcess.gui.ie.display.zoom.ResetZoom;
-import org.abcmap.gui.toProcess.gui.ie.display.zoom.ZoomIn;
-import org.abcmap.gui.toProcess.gui.ie.display.zoom.ZoomOut;
+import org.abcmap.gui.ie.display.zoom.ResetZoom;
+import org.abcmap.gui.ie.display.zoom.ZoomIn;
+import org.abcmap.gui.ie.display.zoom.ZoomOut;
 
 import javax.swing.*;
 import java.awt.*;

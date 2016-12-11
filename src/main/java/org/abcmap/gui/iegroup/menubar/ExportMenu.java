@@ -1,9 +1,9 @@
 package org.abcmap.gui.iegroup.menubar;
 
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.toProcess.gui.ie.export.ExportLayoutFrames;
-import org.abcmap.gui.toProcess.gui.ie.export.ExportMapToPng;
-import org.abcmap.gui.toProcess.gui.ie.export.PrintLayouts;
+import org.abcmap.gui.ie.export.ExportLayoutFrames;
+import org.abcmap.gui.ie.export.ExportMapToPng;
+import org.abcmap.gui.ie.export.PrintLayouts;
 
 public class ExportMenu extends InteractionElementGroup {
 

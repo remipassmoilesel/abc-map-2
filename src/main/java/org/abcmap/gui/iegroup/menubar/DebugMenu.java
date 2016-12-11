@@ -1,7 +1,7 @@
 package org.abcmap.gui.iegroup.menubar;
 
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.toProcess.gui.ie.debug.ShowLastEvents;
+import org.abcmap.gui.ie.debug.ShowLastEvents;
 
 public class DebugMenu extends InteractionElementGroup {
 

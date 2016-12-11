@@ -1,6 +1,6 @@
 package org.abcmap.gui.wizards;
 
-import org.abcmap.gui.toProcess.gui.ie.draw.SelectLayer;
+import org.abcmap.gui.ie.draw.SelectLayer;
 import org.abcmap.gui.toProcess.gui.ie.importation.SelectCropAreaForScreen;
 import org.abcmap.gui.toProcess.gui.ie.importation.SelectPictureAnalyseMode;
 import org.abcmap.gui.toProcess.gui.ie.importation.robot.LaunchRobotImport;

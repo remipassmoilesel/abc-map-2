@@ -33,6 +33,7 @@ public class DrawManager implements HasNotificationManager {
      */
     private Color activeBackground;
     private NotificationManager notifm;
+    private ToolContainer currentToolContainer;
 
     public DrawManager() {
 
@@ -166,5 +167,9 @@ public class DrawManager implements HasNotificationManager {
 
     public void setCurrentTool(ToolContainer currentTool) {
 
+    }
+
+    public ToolContainer getCurrentToolContainer() {
+        return currentToolContainer;
     }
 }
