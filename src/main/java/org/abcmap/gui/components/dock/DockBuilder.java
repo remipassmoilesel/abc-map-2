@@ -1,6 +1,6 @@
 package org.abcmap.gui.components.dock;
 
-import org.abcmap.gui.toProcess.gui.iegroup.InteractionElementGroup;
+import org.abcmap.gui.ie.InteractionElementGroup;
 
 import javax.swing.JComponent;
 import java.util.List;

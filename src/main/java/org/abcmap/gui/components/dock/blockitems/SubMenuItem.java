@@ -12,7 +12,7 @@ import abcmap.utils.gui.GuiUtils;
 import org.abcmap.gui.GuiCursor;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.components.dock.Dock;
-import org.abcmap.gui.toProcess.gui.iegroup.InteractionElementGroup;
+import org.abcmap.gui.ie.InteractionElementGroup;
 import org.abcmap.gui.utils.GuiUtils;
 
 public class SubMenuItem extends SimpleBlockItem {

@@ -6,6 +6,7 @@ import org.abcmap.core.notifications.NotificationManager;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
+import org.abcmap.gui.tools.ToolContainer;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -161,5 +162,9 @@ public class DrawManager implements HasNotificationManager {
     @Override
     public NotificationManager getNotificationManager() {
         return notifm;
+    }
+
+    public void setCurrentTool(ToolContainer currentTool) {
+
     }
 }

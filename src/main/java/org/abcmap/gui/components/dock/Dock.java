@@ -3,7 +3,7 @@ package org.abcmap.gui.components.dock;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.gui.toProcess.gui.iegroup.InteractionElementGroup;
+import org.abcmap.gui.ie.InteractionElementGroup;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.HasDisplayableSpace;
 

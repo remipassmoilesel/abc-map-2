@@ -9,7 +9,7 @@ import org.abcmap.gui.toProcess.gui.ie.importation.robot.SelectRobotImportOption
 import org.abcmap.gui.toProcess.gui.ie.project.NewProject;
 import org.abcmap.gui.toProcess.gui.ie.project.OpenProject;
 import org.abcmap.gui.toProcess.gui.ie.ressources.GoToOpenStreetMap;
-import org.abcmap.gui.toProcess.gui.iegroup.docks.GroupImportation;
+import org.abcmap.gui.iegroup.docks.GroupImportation;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -23,7 +23,7 @@ import org.abcmap.gui.components.CustomComponent;
 import org.abcmap.gui.components.buttons.HtmlLabel;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.components.dock.blockitems.DockMenuPanel;
-import org.abcmap.gui.toProcess.gui.iegroup.InteractionElementGroup;
+import org.abcmap.gui.ie.InteractionElementGroup;
 import org.abcmap.gui.windows.MainWindowMode;
 
 /**

@@ -12,7 +12,7 @@ import org.abcmap.gui.components.progressbar.HasProgressbarManager;
 import org.abcmap.gui.components.progressbar.ProgressbarManager;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.toProcess.gui.ie.display.window.ShowMainWindow;
-import org.abcmap.gui.toProcess.gui.iegroup.InteractionElementGroup;
+import org.abcmap.gui.ie.InteractionElementGroup;
 import org.abcmap.gui.utils.HasDisplayableSpace;
 
 import java.awt.Color;

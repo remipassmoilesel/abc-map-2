@@ -458,4 +458,8 @@ public class Project {
     public RenderedPartialStore getRenderedPartialsStore() {
         return partialStore;
     }
+
+    public void setAllElementsSelected(boolean allElementsSelected) {
+
+    }
 }
