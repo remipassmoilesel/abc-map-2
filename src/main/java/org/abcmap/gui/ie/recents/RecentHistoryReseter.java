@@ -44,7 +44,7 @@ public class RecentHistoryReseter implements ActionListener {
             recentsm.saveHistory();
         } catch (IOException e1) {
             logger.debug(e1);
-            guim.showErrorInBox("Erreur lors de la réinitialisation de l'historique.");
+            guim.getDialogManager().showErrorInBox("Erreur lors de la réinitialisation de l'historique.");
         }
 
     }

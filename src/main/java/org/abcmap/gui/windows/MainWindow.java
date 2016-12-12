@@ -1,9 +1,12 @@
 package org.abcmap.gui.windows;
 
+import org.abcmap.core.events.GuiManagerEvent;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.Utils;
+import org.abcmap.core.utils.listeners.HasListenerHandler;
+import org.abcmap.core.utils.listeners.ListenerHandler;
 import org.abcmap.gui.components.StatusBar;
 import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.ie.program.QuitProgram;
@@ -18,8 +21,9 @@ import java.util.HashMap;
 /**
  * Main window of software
  */
-public class MainWindow extends AbstractCustomWindow {
+public class MainWindow extends AbstractCustomWindow implements HasListenerHandler<GuiManagerEvent> {
 
+    private final ListenerHandler<GuiManagerEvent> listenerHandler;
     /**
      * Current display mode of window
      */
@@ -83,10 +87,16 @@ public class MainWindow extends AbstractCustomWindow {
         contentPane = new JPanel(new BorderLayout());
         this.setContentPane(contentPane);
 
-
         statusBar = new StatusBar();
         contentPane.add(statusBar, BorderLayout.SOUTH);
 
+        listenerHandler = new ListenerHandler<>();
+
+    }
+
+    @Override
+    public ListenerHandler<GuiManagerEvent> getListenerHandler() {
+        return null;
     }
 
     /**
@@ -130,7 +140,7 @@ public class MainWindow extends AbstractCustomWindow {
     }
 
     /**
-     * Change window mode. Use instead Gui manager method
+     * Change window mode and notify observers.
      *
      * @param mode
      */
@@ -139,7 +149,7 @@ public class MainWindow extends AbstractCustomWindow {
         GuiUtils.throwIfNotOnEDT();
 
         if (modesAndComps == null) {
-            mapModesAndComponents();
+            updateModesAndComponents();
         }
         Component comp = modesAndComps.get(mode);
 
@@ -165,12 +175,14 @@ public class MainWindow extends AbstractCustomWindow {
         this.revalidate();
         this.repaint();
 
+        notifyWindowModeChanged();
+
     }
 
     /**
      * Lazy initialization of components
      */
-    private void mapModesAndComponents() {
+    private void updateModesAndComponents() {
 
         modesAndComps = new HashMap<>();
         modesAndComps.put(MainWindowMode.SHOW_MAP, mapPanel);
@@ -179,30 +191,72 @@ public class MainWindow extends AbstractCustomWindow {
 
     }
 
+    /**
+     * Notify observers of window mode changes
+     */
+    private void notifyWindowModeChanged() {
+        listenerHandler.fireEvent(new GuiManagerEvent(GuiManagerEvent.WINDOW_MODE_CHANGED, null));
+    }
+
+    /**
+     * Return current window mode: MAP, REFUSED_TILES or LAYOUTS
+     *
+     * @return
+     */
     public MainWindowMode getWindowMode() {
         return windowMode;
     }
 
+    /**
+     * Return status bar of window, where are displayed coordinates, scale, ...
+     *
+     * @return
+     */
     public StatusBar getStatusBar() {
         return statusBar;
     }
 
+    /**
+     * Set map panel of window
+     *
+     * @param map
+     */
     public void setMapPanel(JPanel map) {
         this.mapPanel = map;
     }
 
+    /**
+     * Set refused tiles panel of window
+     *
+     * @param refusedTilesPanel
+     */
     public void setRefusedTilesPanel(JPanel refusedTilesPanel) {
         this.refusedTilesPanel = refusedTilesPanel;
     }
 
+    /**
+     * Set layout panel of window
+     *
+     * @param layoutPanel
+     */
     public void setLayoutPanel(JPanel layoutPanel) {
         this.layoutPanel = layoutPanel;
     }
 
+    /**
+     * Return east dock of window
+     *
+     * @return
+     */
     public Dock getEastDock() {
         return dockE;
     }
 
+    /**
+     * Return west dock of window
+     *
+     * @return
+     */
     public Dock getWestDock() {
         return dockW;
     }

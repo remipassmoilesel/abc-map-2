@@ -32,7 +32,7 @@ public class WindowModeSelector extends InteractionElement {
             @Override
             public void notificationReceived(Notification arg) {
                 if (GuiManagerEvent.isWindowModeNotification(arg)) {
-                    selector.setSelectedItem(guim.getMainWindowMode());
+                    selector.setSelectedItem(guim.getMainWindow().getWindowMode());
                 }
             }
         });

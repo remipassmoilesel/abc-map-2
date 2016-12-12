@@ -12,6 +12,9 @@ import java.awt.event.MouseEvent;
 
 /**
  * Display a message on screen to inform user. Message disappear after a little time.
+ *
+ * // TODO: handle multiple Threads: what happen if multiple simultaneous call ?
+ *
  */
 public class MessageBoxManager {
 

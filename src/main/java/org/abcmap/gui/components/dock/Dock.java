@@ -256,7 +256,7 @@ public class Dock extends JPanel implements HasDisplayableSpace {
                 if (className.equals(mw.getInteractionElementGroup().getClass().getSimpleName())) {
 
                     // change window mode if necessary
-                    guim.setMainWindowMode(mw.getInteractionElementGroup().getWindowMode());
+                    guim.getMainWindow().setWindowMode(mw.getInteractionElementGroup().getWindowMode());
 
                     // afficher l'espace
                     showWidgetspace(mw.getMenuPanel());

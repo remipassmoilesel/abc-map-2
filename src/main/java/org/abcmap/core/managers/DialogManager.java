@@ -1,0 +1,162 @@
+package org.abcmap.core.managers;
+
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.gui.GuiColors;
+import org.abcmap.gui.components.messagebox.MessageBoxManager;
+import org.abcmap.gui.dialogs.SupportProjectDialog;
+import org.abcmap.gui.dialogs.simple.InformationTextFieldDialog;
+import org.abcmap.gui.dialogs.simple.SimpleErrorDialog;
+import org.abcmap.gui.utils.GuiUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
+
+public class DialogManager {
+
+    private static final CustomLogger logger = LogManager.getLogger(DialogManager.class);
+
+    /**
+     * Utility used to display messages in boxes on main window
+     * <p>
+     * These boxes are less invasive than dialogs which require user click to disappear
+     */
+    private MessageBoxManager messagebox;
+
+    /**
+     * Display an message in box
+     *
+     * @param message
+     */
+    public void showMessageInBox(String message) {
+        showMessageInBox(null, message, GuiColors.INFO_BOX_BACKGROUND);
+    }
+
+    /**
+     * Display an message in box
+     *
+     * @param message
+     */
+    public void showErrorInBox(String message) {
+        showMessageInBox(null, message, GuiColors.ERROR_BOX_BACKGROUND);
+    }
+
+    /**
+     * Display an message in box
+     * <p>
+     * If timeMilliSec is specified, message will disappear after this time. If not, default time will be used.
+     *
+     * @param message
+     */
+    public void showMessageInBox(Integer timeMilliSec, String message, Color background) {
+
+        if (messagebox == null) {
+            messagebox = new MessageBoxManager(MainManager.getGuiManager().getMainWindow());
+        }
+
+        if (timeMilliSec == null) {
+            timeMilliSec = messagebox.getDefaultTime();
+        }
+
+        messagebox.setBackgroundColor(background);
+        messagebox.showMessage(timeMilliSec, message);
+    }
+
+    /**
+     * Show a dialog box
+     *
+     * @param parent
+     */
+    public void showSupportDialog(Window parent) {
+
+        GuiUtils.throwIfNotOnEDT();
+
+        SupportProjectDialog dial = new SupportProjectDialog(parent);
+        dial.setVisible(true);
+
+    }
+
+    /**
+     * Show a support dialog of project
+     *
+     * @param parent
+     */
+    public void showSupportDialogAndWait(final Window parent) {
+
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    showSupportDialog(parent);
+                }
+            });
+        } catch (InvocationTargetException | InterruptedException e) {
+            logger.error(e);
+        }
+
+    }
+
+    /**
+     * Predefined error message
+     */
+    public void showProfileWritingError() {
+        showErrorInBox("Erreur lors de l'enregistrement du profil de configuration.");
+    }
+
+    /**
+     * Predefined error message
+     */
+    public void showProjectWritingError() {
+        showErrorInBox("Erreur lors de l'enregistrement du projet.");
+    }
+
+    /**
+     * Predefined error message
+     */
+    public void showProjectNonInitializedError() {
+        String message = "Vous devez d'abord créer ou ouvrir un projet avant de poursuivre.";
+        showErrorInBox(message);
+    }
+
+    /**
+     * Predefined error message
+     */
+    public void showOperationAlreadyRunningError() {
+        String message = "Cette opération est déjà en cours. Veuillez patienter.";
+        showErrorInBox(message);
+    }
+
+    /**
+     * Predefined error message
+     */
+    public void showProjectWithoutLayoutError() {
+        String message = "Vous devez d'abord mettre en page votre projet avant de pouvoir continuer.";
+        showErrorInBox(message);
+    }
+
+    /**
+     * Predefined error message
+     */
+    public void showErrorInDialog(Window parent, String message, boolean wait) {
+
+        if (wait) {
+            GuiUtils.throwIfOnEDT();
+            SimpleErrorDialog.showAndWait(parent, message);
+        } else {
+            SimpleErrorDialog.showLater(null, message);
+        }
+
+    }
+
+    /**
+     * Afficher un dialogue d'information
+     *
+     * @param parent
+     * @param message
+     * @param textFieldValue
+     */
+    public void showInformationTextFieldDialog(Window parent, String message, String textFieldValue) {
+        InformationTextFieldDialog.showLater(parent, message, textFieldValue);
+    }
+
+}

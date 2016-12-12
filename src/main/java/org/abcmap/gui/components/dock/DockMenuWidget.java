@@ -82,7 +82,7 @@ public class DockMenuWidget extends CustomComponent {
 
             dock.setMenuSelected(DockMenuWidget.this);
 
-            guim.setMainWindowMode(windowMode);
+            guim.getMainWindow().setWindowMode(windowMode);
         }
     }
 
