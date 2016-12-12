@@ -21,14 +21,26 @@ import java.awt.event.ActionListener;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 /**
- * Interaction element represent a possible action in this software. This action can be accessible then in menu bar, in docks, or in command search.
+ * Interaction element represent a possible action in this software.
+ * <p>
+ * This action can be accessible then in menu bar, in docks, or in command search.
+ * <p>
+ * This abstract class contains many utility used to execute user actions.
  */
 public abstract class InteractionElement implements Runnable, ActionListener, HasNotificationManager {
 
-    private static final CustomLogger logger = LogManager.getLogger(TempFilesManager.class);
+    protected static final CustomLogger logger = LogManager.getLogger(TempFilesManager.class);
+
+    /**
+     * General purpose userActionLock
+     * <p>
+     * Use getUserLockOrDisplayMessage() to userActionLock it and display a message if userActionLock is refused
+     */
+    private final ReentrantLock userActionLock;
 
     /**
      * Name of element
@@ -109,6 +121,8 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
      */
     protected boolean hiddenInDetachedWIndows;
 
+    protected NotificationManager notifm;
+
     protected String wrap15 = "wrap 15, ";
     protected String gapLeft = "gapleft 15px, ";
 
@@ -122,7 +136,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
     protected ClipboardManager clipboardm;
     protected CancelManager cancelm;
     protected ImportManager importm;
-    protected NotificationManager notifm;
+    protected DialogManager dialm;
 
     protected InteractionElement() {
 
@@ -136,6 +150,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
         clipboardm = MainManager.getClipboardManager();
         cancelm = MainManager.getCancelManager();
         importm = MainManager.getImportManager();
+        dialm = guim.getDialogManager();
 
         this.label = "no label";
         this.help = null;
@@ -148,22 +163,39 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
         // display as a simple clickable element by default
         this.displaySimplyInSearch = true;
 
-        // gestionnaire d'evenements
         this.notifm = new NotificationManager(this);
 
-        /**
-         // gestion des accés aux opérations longues
-         this.threadAccess = new ThreadAccessControl();
-         threadAccess.setDefaultAccessTimeOut(10000);
-         threadAccess.setRefusedAccessAction(new Runnable() {
-        @Override public void run() {
-        guim.showErrorInBox("Cette opération est déjà en cours, veuillez patienter.");
-        }
-        });
-         */
+        this.userActionLock = new ReentrantLock();
 
     }
 
+    /**
+     * Try to get userActionLock. If locked, return true. If not return false and show a message to user.
+     *
+     * @return
+     */
+    protected boolean getUserLockOrDisplayMessage() {
+
+        if (userActionLock.tryLock() == false) {
+            dialm.showErrorInBox("Cette opération est déjà en cours, veuillez patienter.");
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Release user lock.
+     */
+    protected void releaseUserLock() {
+        userActionLock.unlock();
+    }
+
+    /**
+     * If return true, this element should be available only in debug mode
+     *
+     * @return
+     */
     public boolean isOnlyDebugMode() {
         return onlyDebugMode;
     }
@@ -173,7 +205,9 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
     }
 
     /**
-     * Return a simple GUI, without container
+     * Return a simple GUI, without any container
+     *
+     * This GUI should be wrapped in search result, dock container, ...
      *
      * @return
      */

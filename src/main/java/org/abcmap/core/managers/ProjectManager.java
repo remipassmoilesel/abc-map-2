@@ -82,7 +82,7 @@ public class ProjectManager implements HasNotificationManager {
     /**
      * Close the current project and delete temprorary files
      */
-    public void closeProjet() throws IOException {
+    public void closeProject() throws IOException {
 
         if (isInitialized() == false) {
             logger.debug("Cannot close project, it was not initialized.");

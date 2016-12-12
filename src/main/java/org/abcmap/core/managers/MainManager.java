@@ -127,4 +127,8 @@ public class MainManager {
     public static boolean isInitialized() {
         return initialized;
     }
+
+    public static void enableBackgroundWorker(boolean b) {
+
+    }
 }

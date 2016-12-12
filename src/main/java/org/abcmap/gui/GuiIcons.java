@@ -210,7 +210,6 @@ public class GuiIcons {
 	 */
 
     public static final ImageIcon SPLASH_SCREEN = getIcon(SPLASH_DIR + "splash_screen.png");
-    public static final ImageIcon QUIT_PROGRAM = DEFAULT_GROUP_ICON;
     public static final ImageIcon ATTENTION = getIcon(ROOT + "attention.png");
 
 	/*

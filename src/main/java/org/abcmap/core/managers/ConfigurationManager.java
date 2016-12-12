@@ -11,6 +11,7 @@ import java.awt.*;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Manage configuration of software. Here you can store and use settings.
@@ -21,7 +22,7 @@ public class ConfigurationManager implements HasNotificationManager{
     private final NotificationManager notifm;
     private ConfigurationContainer currentConfiguration;
 
-    ConfigurationManager() throws IOException {
+    public ConfigurationManager() throws IOException {
         // load default configuration
         this.currentConfiguration = new ConfigurationContainer();
         this.xmlSerializer = new XStream();
@@ -150,5 +151,13 @@ public class ConfigurationManager implements HasNotificationManager{
     }
 
     public void setSurfMode(int surfMode) {
+    }
+
+    public boolean isSaveProfileWhenQuit() {
+        return false;
+    }
+
+    public void saveCurrentProfile() throws IOException {
+        saveConfiguration(currentConfiguration, Paths.get(currentConfiguration.PROFILE_PATH));
     }
 }

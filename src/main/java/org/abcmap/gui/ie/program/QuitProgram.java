@@ -1,8 +1,11 @@
 package org.abcmap.gui.ie.program;
 
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.gui.GuiIcons;
+import org.abcmap.gui.dialogs.QuestionResult;
 import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.gui.ie.project.SaveProject;
+
+import java.io.IOException;
 
 public class QuitProgram extends InteractionElement {
 
@@ -10,88 +13,83 @@ public class QuitProgram extends InteractionElement {
 
         this.label = "Quitter";
         this.help = "Cliquez ici pour quitter le programme.";
-        this.menuIcon = GuiIcons.QUIT_PROGRAM;
         this.accelerator = MainManager.getShortcutManager().QUIT_PROGRAM;
     }
 
     @Override
     public void run() {
 
-		/*
-        // eviter les appels intempestifs
-		if (threadAccess.askAccess() == false) {
-			return;
-		}
+        if (getUserLockOrDisplayMessage() == false) {
+            return;
+        }
 
-		// threadAccess.releaseAccess();
+        try{
 
-		// verifier si le projet doit être enregistré
-		if (MainManager.isDebugMode() == false && projectm.isInitialized()) {
+            // Check if project should be saved
+            // If softare is in debug mode, configmations are not shown
+            if (MainManager.isDebugMode() == false && projectm.isInitialized()) {
 
-			QuestionResult cc = ClosingConfirmationDialog
-					.showProjectConfirmationAndWait(guim.getMainWindow());
+                QuestionResult cc = dialm.showProjectConfirmationDialog(guim.getMainWindow());
 
-			// cas ou l'utilisateur annule
-			if (cc.isAnswerCancel()) {
-				threadAccess.releaseAccess();
-				return;
-			}
+                // user canceled action
+                if (cc.isAnswerCancel()) {
+                    return;
+                }
 
-			else if (cc.isAnswerYes()) {
-				SaveProject saver = new SaveProject();
-				saver.run();
-			}
-		}
+                // user want to save
+                else if (cc.isAnswerYes()) {
+                    SaveProject saver = new SaveProject();
+                    saver.run();
+                }
+            }
 
-		// montrer le dialog de support du projet
-		if (MainManager.isDebugMode() == false) {
-			guim.showSupportDialogAndWait(guim.getMainWindow());
-		}
+            // show support project dialog
+            if (MainManager.isDebugMode() == false) {
+                dialm.showSupportDialogAndWait(guim.getMainWindow());
+            }
 
-		// masquer les fenêtres
-		try {
-			MainManager.getGuiManager().setAllWindowVisibles(false);
-		} catch (InvocationTargetException | InterruptedException e2) {
-			Log.error(e2);
-		}
+            // close project
+            try {
+                projectm.closeProject();
+            } catch (IOException e1) {
+                logger.error(e1);
+            }
 
-		// femeture du projet
-		try {
-			projectm.closeProject();
-		} catch (IOException e1) {
-			Log.error(e1);
-		}
+            // hide all windows
+            guim.setAllWindowVisibles(false);
 
-		// sauvegarde de l'historique
-		try {
-			MainManager.getRecentManager().saveHistory();
-		} catch (IOException e) {
-			Log.error(e);
-		}
+            // save project
+            try {
+                recentsm.saveHistory();
+            } catch (IOException e) {
+                logger.error(e);
+            }
 
-		// sauvegarde du profil de conf
-		if (configm.isSaveProfileWhenQuit()) {
-			try {
-				configm.saveProfile();
-			} catch (IOException e) {
-				Log.error(e);
-			}
-		}
+            // save configuration
+            if (configm.isSaveProfileWhenQuit()) {
+                try {
+                    configm.saveCurrentProfile();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }
 
-		// arret de l'enregistrement de fond
-		MainManager.enableBackgroundWorker(false);
+            MainManager.enableBackgroundWorker(false);
 
-		// attente avant fermeture
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			Log.error(e);
-		}
+            // wait a little before quit
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                logger.error(e);
+            }
 
-		// quitter
-		System.exit(0);
+            // exit JVM, tchao !
+            System.exit(0);
 
-		*/
+
+        } finally {
+            releaseUserLock();
+        }
 
     }
 

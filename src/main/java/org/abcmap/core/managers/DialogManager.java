@@ -3,6 +3,8 @@ package org.abcmap.core.managers;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.gui.GuiColors;
 import org.abcmap.gui.components.messagebox.MessageBoxManager;
+import org.abcmap.gui.dialogs.ClosingConfirmationDialog;
+import org.abcmap.gui.dialogs.QuestionResult;
 import org.abcmap.gui.dialogs.SupportProjectDialog;
 import org.abcmap.gui.dialogs.simple.InformationTextFieldDialog;
 import org.abcmap.gui.dialogs.simple.SimpleErrorDialog;
@@ -159,4 +161,15 @@ public class DialogManager {
         InformationTextFieldDialog.showLater(parent, message, textFieldValue);
     }
 
+    /**
+     * Show a confirmation which ask user if he wants to save project
+     * <p>
+     * This confirmation stop current thread.
+     *
+     * @param parent
+     * @return
+     */
+    public QuestionResult showProjectConfirmationDialog(Window parent) {
+        return ClosingConfirmationDialog.showProjectConfirmationAndWait(parent);
+    }
 }

@@ -207,7 +207,7 @@ public class GuiManager implements HasNotificationManager {
      * @throws InvocationTargetException
      * @throws InterruptedException
      */
-    public void setAllWindowVisibles(final boolean val) throws InvocationTargetException, InterruptedException {
+    public void setAllWindowVisibles(final boolean val)  {
 
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -221,6 +221,7 @@ public class GuiManager implements HasNotificationManager {
                 }
             });
         } catch (InvocationTargetException | InterruptedException e) {
+            // should never happen
             logger.error(e);
         }
 
