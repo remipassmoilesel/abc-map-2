@@ -83,7 +83,6 @@ public class PartialFactoryTest {
             int partialNumber = queryResult.getPartials().size();
             assertTrue("Partial creation test: " + partialNumber + " / " + expected, partialNumber == expected);
 
-
             // wait until partials have been rendered
             int waitTime = 100;
             int maxTime = 3000;
