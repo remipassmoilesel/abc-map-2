@@ -359,7 +359,7 @@ public class GuiManager implements HasNotificationManager {
      * <p>
      * If nothing is found, throw an exeption
      *
-     * @param className
+     * @param clss
      */
     public void showGroupInDock(Class clss) {
         showGroupInDock(clss.toString());

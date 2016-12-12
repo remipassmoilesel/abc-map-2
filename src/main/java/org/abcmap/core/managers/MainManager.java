@@ -15,7 +15,7 @@ public class MainManager {
 
     private static final CustomLogger logger = LogManager.getLogger(MainManager.class);
 
-    private static final boolean DEBUG_MODE = true;
+    private static boolean debugMode = false;
     private static boolean initialized = false;
 
     private static ConfigurationManager configurationManager;
@@ -68,7 +68,11 @@ public class MainManager {
     }
 
     public static boolean isDebugMode() {
-        return DEBUG_MODE;
+        return debugMode;
+    }
+
+    public static void setDebugMode(boolean val) {
+        debugMode = val;
     }
 
     public static ConfigurationManager getConfigurationManager() {
