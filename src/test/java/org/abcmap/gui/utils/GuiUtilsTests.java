@@ -1,6 +1,5 @@
-package org.abcmap.gui.tests;
+package org.abcmap.gui.utils;
 
-import org.abcmap.gui.utils.GuiUtils;
 import org.junit.Assert;
 import org.junit.Test;
 

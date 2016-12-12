@@ -1,4 +1,4 @@
-package org.abcmap.gui.tests;
+package org.abcmap.gui.utils;
 
 import javax.swing.event.*;
 import java.awt.event.ActionEvent;
