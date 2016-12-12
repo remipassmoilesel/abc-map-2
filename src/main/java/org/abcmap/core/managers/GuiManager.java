@@ -2,8 +2,8 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.notifications.HasNotificationManager;
 import org.abcmap.core.notifications.NotificationManager;
-import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.gui.GuiCursor;
+import org.abcmap.gui.Windows;
 import org.abcmap.gui.windows.DetachedWindow;
 import org.abcmap.gui.windows.MainWindowMode;
 
@@ -40,6 +40,10 @@ public class GuiManager implements HasNotificationManager {
         return GuiCursor.HAND_CURSOR;
     }
 
+    public void showGroupInDock(String classname) {
+
+    }
+
     public void showGroupInDock(Class clss) {
 
     }
@@ -74,6 +78,10 @@ public class GuiManager implements HasNotificationManager {
     }
 
     public void showErrorInBox(String s) {
+
+    }
+
+    public void registerWindow(Windows main, Window win) {
 
     }
 }

@@ -50,7 +50,7 @@ public abstract class AbstractPaste extends InteractionElement {
 
 		// récuperation des elements du presse papier
 		// En tant que tuile
-		if (Mode.PASTE_AS_TILE.equals(mode)) {
+		if (GoToWebsiteMode.PASTE_AS_TILE.equals(mode)) {
 
 			try {
 				Tile t = clipboardm.getClipboardContentAsTile();
@@ -111,7 +111,7 @@ public abstract class AbstractPaste extends InteractionElement {
 			projectm.fireElementsChanged();
 
 			// changement d'outil en fonction du type de collage
-			if (Mode.PASTE_AS_TILE.equals(mode)) {
+			if (GoToWebsiteMode.PASTE_AS_TILE.equals(mode)) {
 				drawm.setCurrentTool(ToolLibrary.TILE_TOOL);
 			} else {
 				drawm.setCurrentTool(ToolLibrary.SELECTION_TOOL);

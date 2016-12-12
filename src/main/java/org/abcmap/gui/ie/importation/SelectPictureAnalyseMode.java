@@ -16,7 +16,7 @@ public class SelectPictureAnalyseMode extends InteractionElement {
     private JSlider slider;
 
     public SelectPictureAnalyseMode() {
-        label = "Mode d'analyse d'image";
+        label = "GoToWebsiteMode d'analyse d'image";
         help = "...";
 
         displaySimplyInSearch = false;

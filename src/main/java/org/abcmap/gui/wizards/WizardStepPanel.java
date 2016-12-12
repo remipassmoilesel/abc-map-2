@@ -1,247 +1,214 @@
 package org.abcmap.gui.wizards;
 
-import java.awt.Component;
+import net.miginfocom.swing.MigLayout;
+import org.abcmap.core.managers.GuiManager;
+import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.gui.GuiIcons;
+import org.abcmap.gui.GuiStyle;
+import org.abcmap.gui.HtmlLabel;
+import org.abcmap.gui.components.buttons.HtmlButton;
+import org.abcmap.gui.components.dock.Dock;
+import org.abcmap.gui.ie.InteractionElement;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.JButton;
-import javax.swing.JPanel;
-
-import abcmap.managers.stub.MainManager;
-import net.miginfocom.swing.MigLayout;
-import abcmap.gui.GuiIcons;
-import abcmap.gui.GuiStyle;
-import abcmap.gui.comps.buttons.HtmlButton;
-import abcmap.gui.comps.buttons.HtmlLabel;
-import abcmap.gui.dock.comps.Dock;
-import abcmap.gui.ie.InteractionElement;
-import abcmap.managers.GuiManager;
-import abcmap.managers.ProjectManager;
-import abcmap.utils.Refreshable;
-
 /**
- * Panneau d'étape d'assistant. Un assistant est composé de plusieurs étapes.
- * Comporte un bouton précédent, suivant, et un bouton retour au menu des
- * assistants.
- * 
- * @author remipassmoilesel
- *
+ * Step of assistant. Has next and preivous button.
  */
-public class WizardStepPanel extends JPanel implements Refreshable {
+public class WizardStepPanel extends JPanel {
 
-	/**
-	 * Marque indiquant que la chaine correspond à un group d'interaction.
-	 * Utilisée dans les liste d'objets passées en paramètres dans addElements()
-	 */
-	protected static final String IE_GROUP_MARK = "#";
+    /**
+     * Mark significating that it is a group element
+     */
+    protected static final String IE_GROUP_MARK = "#";
+    private String stepName;
+    private Wizard parent;
+    private JButton btnPrevious;
+    private JButton btnNext;
 
-	/** Le nom de l'étape */
-	private String stepName;
+    private boolean btnNextEnabled;
+    private boolean btnPreviousEnabled;
 
-	/** Le wizard parent */
-	private Wizard parent;
+    protected GuiManager guim;
+    protected ProjectManager projectm;
 
-	/** Le bouton suivant */
-	private JButton btnPrevious;
+    private List elements;
 
-	/** Le bouton précédent */
-	private JButton btnNext;
+    public WizardStepPanel(Wizard wizard) {
+        super(new MigLayout("fillx, insets 5 10 5 5"));
 
-	private boolean btnNextEnabled;
-	private boolean btnPreviousEnabled;
+        guim = MainManager.getGuiManager();
+        projectm = MainManager.getProjectManager();
 
-	protected GuiManager guim;
-	protected ProjectManager projectm;
+        parent = wizard;
+        stepName = "";
 
-	private List elements;
+        btnNextEnabled = true;
+        btnPreviousEnabled = true;
 
-	public WizardStepPanel(Wizard wizard) {
-		super(new MigLayout("fillx, insets 5 10 5 5"));
+    }
 
-		guim = MainManager.getGuiManager();
-		projectm = MainManager.getProjectManager();
+    public void reconstruct() {
 
-		parent = wizard;
-		stepName = "";
+        removeAll();
 
-		btnNextEnabled = true;
-		btnPreviousEnabled = true;
+        // wizard title
+        HtmlLabel title = new HtmlLabel(parent.getTitle());
+        title.setStyle(GuiStyle.DOCK_MENU_TITLE_1);
+        addItem(title);
 
-	}
+        // step title
+        HtmlLabel lblStepName = new HtmlLabel(stepName);
+        lblStepName.setStyle(GuiStyle.WIZARD_STEP_NAME);
+        addItem(lblStepName);
 
-	@Override
-	public void reconstruct() {
+        String[] toolTips = new String[]{"Etape suivante",
+                "Revenir à la liste des assistants", "Ouvrir dans une fenêtre",
+                "Etape précédente",};
 
-		removeAll();
+        btnPrevious = new JButton(GuiIcons.WIZARD_PREVIOUS);
+        btnPrevious.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.previousStep();
+            }
+        });
+        btnPrevious.setEnabled(btnPreviousEnabled);
 
-		// titre de l'assitant
-		HtmlLabel title = new HtmlLabel(parent.getTitle());
-		title.setStyle(GuiStyle.DOCK_MENU_TITLE_1);
-		addItem(title);
+        btnNext = new JButton(GuiIcons.WIZARD_NEXT);
+        btnNext.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.nextStep();
+            }
+        });
+        btnNext.setEnabled(btnNextEnabled);
 
-		// titre de l'étape
-		HtmlLabel lblStepName = new HtmlLabel(stepName);
-		lblStepName.setStyle(GuiStyle.WIZARD_STEP_NAME);
-		addItem(lblStepName);
+        JButton btnHome = new JButton(GuiIcons.WIZARD_HOME);
+        btnHome.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.showWizardHome();
+            }
+        });
 
-		String[] toolTips = new String[] { "Etape suivante",
-				"Revenir à la liste des assistants", "Ouvrir dans une fenêtre",
-				"Etape précédente", };
+        JButton btnOpenWindow = new JButton(GuiIcons.WIZARD_NEW_WINDOW);
+        btnOpenWindow.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                parent.showInDetachedWindow();
+            }
+        });
 
-		// bouton suivant / précédent / home
-		btnPrevious = new JButton(GuiIcons.WIZARD_PREVIOUS);
-		btnPrevious.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				parent.previousStep();
-			}
-		});
-		btnPrevious.setEnabled(btnPreviousEnabled);
+        // new window button
+        btnOpenWindow.setEnabled(parent.isNewWindowButtonEnabled());
 
-		btnNext = new JButton(GuiIcons.WIZARD_NEXT);
-		btnNext.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				parent.nextStep();
-			}
-		});
-		btnNext.setEnabled(btnNextEnabled);
+        // separated panel for buttons
+        JPanel pan = new JPanel(new MigLayout("insets 5, gap 5"));
+        String btnDim = "width 30!, height 30!";
 
-		JButton btnHome = new JButton(GuiIcons.WIZARD_HOME);
-		btnHome.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				parent.showWizardHome();
-			}
-		});
+        JButton[] btns = new JButton[]{btnPrevious, btnHome, btnOpenWindow,
+                btnNext};
+        for (int i = 0; i < btns.length; i++) {
+            JButton btn = btns[i];
+            btn.setToolTipText(toolTips[i]);
+            pan.add(btn, btnDim);
+        }
+        add(pan, "align center, wrap");
 
-		JButton btnOpenWindow = new JButton(GuiIcons.WIZARD_NEW_WINDOW);
-		btnOpenWindow.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				parent.showInDetachedWindow();
-			}
-		});
+        // add step objects
+        for (Object o : elements) {
 
-		// activer ou desactiver le bouton de nouvelle fenêtre
-		btnOpenWindow.setEnabled(parent.isNewWindowButtonEnabled());
+            // l'element est un composant graphique, ajout tel quel
+            if (o instanceof Component) {
+                addItem((Component) o);
+            }
 
-		// affichage des boutons
-		JPanel pan = new JPanel(new MigLayout("insets 5, gap 5"));
-		String btnDim = "width 30!, height 30!";
+            // l'element est une chaine spéciale de la forme
+            // #GroupClass#Description
+            // créer un bouton d'affichage de groupe d'interaction
+            else if (o instanceof String && o.toString().substring(0, 1).equals(IE_GROUP_MARK)) {
 
-		JButton[] btns = new JButton[] { btnPrevious, btnHome, btnOpenWindow,
-				btnNext };
-		for (int i = 0; i < btns.length; i++) {
-			JButton btn = btns[i];
-			btn.setToolTipText(toolTips[i]);
-			pan.add(btn, btnDim);
-		}
-		add(pan, "align center, wrap");
+                // séparer le nom de la clase et le texte du bouton
+                String[] parts = o.toString().split(IE_GROUP_MARK);
+                if (parts.length < 3) {
+                    throw new IllegalStateException("Invalid format: '" + o.toString() + "'. Expected: #GroupClass#Description");
+                }
 
-		// ajout des objets de l'étape
-		for (Object o : elements) {
+                final String className = parts[1];
+                String buttonText = parts[2];
 
-			// l'element est un composant graphique, ajout tel quel
-			if (o instanceof Component) {
-				addItem((Component) o);
-			}
+                HtmlButton bt = new HtmlButton(buttonText);
+                bt.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        guim.showGroupInDock(className);
+                    }
+                });
 
-			// l'element est une chaine spéciale de la forme
-			// #GroupClass#Description
-			// créer un bouton d'affichage de groupe d'interaction
-			else if (o instanceof String
-					&& o.toString().substring(0, 1).equals(IE_GROUP_MARK)) {
+                addItem(bt);
+            }
 
-				// séparer le nom de la clase et le texte du bouton
-				String[] parts = o.toString().split(IE_GROUP_MARK);
-				if (parts.length < 3) {
-					throw new IllegalStateException("Invalid format: '"
-							+ o.toString()
-							+ "'. Expected: #GroupClass#Description");
-				}
+            // interation element
+            else if (o instanceof InteractionElement) {
 
-				final String className = parts[1];
-				String buttonText = parts[2];
+                InteractionElement ie = (InteractionElement) o;
+                HtmlButton btn = new HtmlButton(ie.getLabel());
+                if (ie.getMenuIcon() != null) {
+                    btn.setIcon(ie.getMenuIcon());
+                }
 
-				HtmlButton bt = new HtmlButton(buttonText);
-				bt.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-						guim.showGroupInDock(className);
-					}
-				});
+                btn.addActionListener(ie);
 
-				addItem(bt);
-			}
+                addItem(btn);
 
-			// l'element est un groupe d'interaction
-			else if (o instanceof InteractionElement) {
+            }
 
-				InteractionElement ie = (InteractionElement) o;
-				HtmlButton btn = new HtmlButton(ie.getLabel());
-				if (ie.getMenuIcon() != null) {
-					btn.setIcon(ie.getMenuIcon());
-				}
+            // simple text
+            else {
+                addItem(new HtmlLabel(o.toString()));
+            }
 
-				btn.addActionListener(ie);
+        }
 
-				addItem(btn);
+    }
 
-			}
+    private void addItem(Component c) {
+        super.add(c, "width " + (Dock.MENU_ITEM_WIDTH - 5) + "!, wrap 15px");
+    }
 
-			// l'element est de type texte
-			else {
-				addItem(new HtmlLabel(o.toString()));
-			}
+    public void setNextButtonEnabled(boolean val) {
+        btnNextEnabled = val;
+    }
 
-		}
+    public void setPreviousButtonEnabled(boolean val) {
+        btnPreviousEnabled = val;
+    }
 
-	}
+    public String getName() {
+        return stepName;
+    }
 
-	private void addItem(Component c) {
-		super.add(c, "width " + (Dock.MENU_ITEM_WIDTH - 5) + "!, wrap 15px");
-	}
+    public void setName(String name) {
+        this.stepName = name;
+    }
 
-	public void setNextButtonEnabled(boolean val) {
-		btnNextEnabled = val;
-	}
+    public void refresh() {
+        this.validate();
+        this.repaint();
+    }
+    
+    public void addElements(List elements) {
+        this.elements = elements;
+    }
 
-	public void setPreviousButtonEnabled(boolean val) {
-		btnPreviousEnabled = val;
-	}
-
-	public String getName() {
-		return stepName;
-	}
-
-	public void setName(String name) {
-		this.stepName = name;
-	}
-
-	@Override
-	public void refresh() {
-		this.validate();
-		this.repaint();
-	}
-
-	/**
-	 * Ajouter des éléments au panneau d'étape, dans l'ordre dans lequel ils
-	 * sont donnés.
-	 * <p>
-	 * Si l'élément est de type String, un panneau avec JLabel sera créé.
-	 * <p>
-	 * Si l'élément est de type Component, alors il sera ajouté tel quel.
-	 * 
-	 * @param elements
-	 */
-	public void addElements(List elements) {
-		this.elements = elements;
-	}
-
-	public List<Object> getElements() {
-		return elements;
-	}
+    public List<Object> getElements() {
+        return elements;
+    }
 
 }

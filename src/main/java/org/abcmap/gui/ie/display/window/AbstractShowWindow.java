@@ -56,15 +56,15 @@ public abstract class AbstractShowWindow extends InteractionElement {
 			@Override
 			public void run() {
 
-				if (Mode.MAIN.equals(action)) {
+				if (GoToWebsiteMode.MAIN.equals(action)) {
 					guim.showOnlyWindow(guim.getMainWindow());
 				}
 
-				else if (Mode.MANUAL_IMPORT.equals(action)) {
+				else if (GoToWebsiteMode.MANUAL_IMPORT.equals(action)) {
 					guim.showOnlyWindow(guim.getManualImportWindow());
 				}
 
-				else if (Mode.AUTO_IMPORT.equals(action)) {
+				else if (GoToWebsiteMode.AUTO_IMPORT.equals(action)) {
 					guim.showOnlyWindow(guim.getAutoImportWindow());
 				}
 			}

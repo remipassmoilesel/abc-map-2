@@ -2,6 +2,7 @@ package org.abcmap.gui.iegroup.menubar;
 
 import org.abcmap.gui.ie.InteractionElementGroup;
 import org.abcmap.gui.ie.program.ShowAboutDialog;
+import org.abcmap.gui.ie.ressources.*;
 
 public class HelpMenu extends InteractionElementGroup {
 

@@ -1,28 +1,26 @@
 package org.abcmap.gui.tools.options;
 
-import javax.swing.JButton;
+import org.abcmap.gui.components.buttons.HtmlCheckbox;
+import org.abcmap.gui.utils.GuiUtils;
 
-import abcmap.gui.comps.buttons.HtmlCheckbox;
-import abcmap.utils.gui.GuiUtils;
+import javax.swing.*;
 
 public class TileToolOptionPanel extends ToolOptionPanel {
 
-	public TileToolOptionPanel() {
+    public TileToolOptionPanel() {
 
-		GuiUtils.throwIfNotOnEDT();
+        GuiUtils.throwIfNotOnEDT();
 
-		// bouton de reanalyse de tuiles
-		GuiUtils.addLabel("Analyse de tuiles: ", this, "wrap");
+        GuiUtils.addLabel("Analyse de tuiles: ", this, "wrap");
 
-		JButton btnAnalyseTiles = new JButton(
-				"Analyser les tuiles sélectionnées");
-		add(btnAnalyseTiles, gapLeft + largeWrap);
+        JButton btnAnalyseTiles = new JButton(
+                "Analyser les tuiles sélectionnées");
+        add(btnAnalyseTiles, gapLeft + largeWrap);
 
-		// montrer les points d'interet
-		HtmlCheckbox chkDisplayIpts = new HtmlCheckbox(
-				"Afficher les points d'interet");
-		add(chkDisplayIpts, largeWrap);
 
-	}
+        HtmlCheckbox chkDisplayIpts = new HtmlCheckbox("Afficher les points d'interet");
+        add(chkDisplayIpts, largeWrap);
+
+    }
 
 }

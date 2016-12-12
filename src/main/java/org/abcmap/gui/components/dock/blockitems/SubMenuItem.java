@@ -1,19 +1,13 @@
 package org.abcmap.gui.components.dock.blockitems;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import abcmap.gui.GuiCursor;
-import abcmap.gui.dock.comps.Dock;
-import abcmap.gui.ie.InteractionElement;
-import abcmap.gui.iegroup.InteractionElementGroup;
-import abcmap.utils.Refreshable;
-import abcmap.utils.gui.GuiUtils;
 import org.abcmap.gui.GuiCursor;
-import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.components.dock.Dock;
+import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.ie.InteractionElementGroup;
 import org.abcmap.gui.utils.GuiUtils;
+
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class SubMenuItem extends SimpleBlockItem {
 

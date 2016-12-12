@@ -1,30 +1,19 @@
 package org.abcmap.gui.components.dock;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-
 import net.miginfocom.swing.MigLayout;
-import abcmap.gui.GuiIcons;
-import abcmap.gui.comps.CustomComponent;
-import abcmap.gui.comps.buttons.HtmlLabel;
-import abcmap.gui.dock.comps.blockitems.DockMenuPanel;
-import abcmap.gui.ie.InteractionElement;
-import abcmap.gui.iegroup.InteractionElementGroup;
-import abcmap.gui.windows.MainWindowMode;
-import abcmap.managers.GuiManager;
-import abcmap.managers.stub.MainManager;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.components.CustomComponent;
 import org.abcmap.gui.components.buttons.HtmlLabel;
-import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.components.dock.blockitems.DockMenuPanel;
+import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.ie.InteractionElementGroup;
 import org.abcmap.gui.windows.MainWindowMode;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  * COmponent designed to be used in dock. Click on it open side menu.
@@ -128,7 +117,7 @@ public class DockMenuWidget extends CustomComponent {
         // description
         menuPanel.setMenuDescription(ieg.getHelp());
 
-        // add components
+        // add elements
         for (InteractionElement e : ieg.getElements()) {
 
             // add separator
@@ -136,7 +125,7 @@ public class DockMenuWidget extends CustomComponent {
                 menuPanel.addMenuElement(new HtmlLabel(" "));
             }
 
-            // or add component
+            // or add element
             else {
                 menuPanel.addMenuElement(e);
             }

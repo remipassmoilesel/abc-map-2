@@ -1,28 +1,5 @@
 package org.abcmap.gui.components.dock;
 
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-
-import abcmap.draw.basicshapes.DrawProperties;
-import abcmap.draw.tools.containers.ToolContainer;
-import abcmap.events.DrawManagerEvent;
-import abcmap.gui.comps.color.ColorButton;
-import abcmap.gui.iegroup.docks.GroupDrawingPalette;
-import abcmap.gui.iegroup.docks.GroupDrawingTools;
-import abcmap.managers.DrawManager;
-import abcmap.managers.GuiManager;
-import abcmap.managers.stub.MainManager;
-import abcmap.utils.Refreshable;
-import abcmap.utils.notifications.Notification;
-import abcmap.utils.notifications.HasNotificationManager;
-import abcmap.utils.notifications.NotificationManager;
-import abcmap.utils.notifications.UpdatableByNotificationManager;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.DrawManagerEvent;
 import org.abcmap.core.managers.DrawManager;
@@ -33,6 +10,13 @@ import org.abcmap.core.notifications.Notification;
 import org.abcmap.core.notifications.NotificationManager;
 import org.abcmap.core.notifications.UpdatableByNotificationManager;
 import org.abcmap.gui.components.color.ColorButton;
+import org.abcmap.gui.iegroup.docks.GroupDrawingPalette;
+import org.abcmap.gui.iegroup.docks.GroupDrawingTools;
+import org.abcmap.gui.tools.ToolContainer;
+
+import javax.swing.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Dock widget that show current tool and active colors
@@ -107,6 +91,7 @@ public class DrawIndicatorWidget extends JPanel implements HasNotificationManage
 
         add(toolLabel, "alignx center, wrap");
 
+        /*
         DrawProperties st = drawm.getNewStroke();
 
         fgColor.setColor(st.getFgColor());
@@ -117,7 +102,7 @@ public class DrawIndicatorWidget extends JPanel implements HasNotificationManage
 
         add(fgColor, "width 80%!, alignx center, wrap");
         add(bgColor, "width 80%!, alignx center, wrap");
-
+        */
 
         fgColor.revalidate();
         fgColor.repaint();
@@ -151,7 +136,7 @@ public class DrawIndicatorWidget extends JPanel implements HasNotificationManage
         public void mouseReleased(MouseEvent e) {
 
             Dock parent = Dock.getDockParentForComponent(DrawIndicatorWidget.this);
-            if (parent == null){
+            if (parent == null) {
                 return;
             }
 

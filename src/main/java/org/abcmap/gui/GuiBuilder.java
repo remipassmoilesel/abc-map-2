@@ -1,54 +1,34 @@
 package org.abcmap.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
+import org.abcmap.core.managers.GuiManager;
+import org.abcmap.core.managers.MainManager;
+import org.abcmap.gui.components.dock.Dock;
+import org.abcmap.gui.components.dock.DockBuilder;
+import org.abcmap.gui.components.dock.DockOrientation;
+import org.abcmap.gui.components.dock.DrawIndicatorWidget;
+import org.abcmap.gui.ie.importation.manual.MenuImportManualCapture;
+import org.abcmap.gui.ie.importation.robot.MenuRobotImport;
+import org.abcmap.gui.ie.toolbar.DisplayToolbar;
+import org.abcmap.gui.ie.toolbar.EditionToolbar;
+import org.abcmap.gui.ie.toolbar.FileToolbar;
+import org.abcmap.gui.iegroup.docks.*;
+import org.abcmap.gui.iegroup.docks.GroupLayout;
+import org.abcmap.gui.iegroup.menubar.GuiMenuBar;
+import org.abcmap.gui.toolbars.SearchToolbar;
+import org.abcmap.gui.toolbars.ToolbarSupport;
+import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.gui.windows.DetachedWindow;
+import org.abcmap.gui.windows.MainWindow;
+import org.abcmap.gui.windows.crop.CropConfigurationWindow;
+
+import javax.swing.*;
+import java.awt.*;
 import java.util.ArrayList;
-
-import javax.swing.JMenuBar;
-import javax.swing.JPanel;
-
-import abcmap.gui.comps.geo.MapPanel;
-import abcmap.gui.comps.layout.LayoutScrollPanel;
-import abcmap.gui.dock.DockBuilder;
-import abcmap.gui.dock.comps.Dock;
-import abcmap.gui.dock.comps.Dock.DockOrientation;
-import abcmap.gui.dock.comps.DrawIndicatorWidget;
-import abcmap.gui.ie.importation.manual.MenuImportManualCapture;
-import abcmap.gui.ie.importation.robot.MenuRobotImport;
-import abcmap.gui.iegroup.docks.GroupConfigProfile;
-import abcmap.gui.iegroup.docks.GroupDrawingPalette;
-import abcmap.gui.iegroup.docks.GroupDrawingTools;
-import abcmap.gui.iegroup.docks.GroupExport;
-import abcmap.gui.iegroup.docks.GroupGeoreferencement;
-import abcmap.gui.iegroup.docks.GroupImportation;
-import abcmap.gui.iegroup.docks.GroupLayersAndDimensions;
-import abcmap.gui.iegroup.docks.GroupLayout;
-import abcmap.gui.iegroup.docks.GroupObjectPosition;
-import abcmap.gui.iegroup.docks.GroupPlugins;
-import abcmap.gui.iegroup.docks.GroupProject;
-import abcmap.gui.iegroup.docks.GroupSettings;
-import abcmap.gui.iegroup.docks.GroupWizard;
-import abcmap.gui.iegroup.menubar.GuiMenuBar;
-import abcmap.gui.iegroup.toolbar.DisplayToolbar;
-import abcmap.gui.iegroup.toolbar.EditionToolbar;
-import abcmap.gui.iegroup.toolbar.FileToolbar;
-import abcmap.gui.toolbar.SearchToolbar;
-import abcmap.gui.toolbar.ToolbarSupport;
-import abcmap.gui.windows.DetachedWindow;
-import abcmap.gui.windows.MainWindow;
-import abcmap.gui.windows.crop.CropConfigurationWindow;
-import abcmap.managers.GuiManager;
-import abcmap.managers.GuiManager.Windows;
-import abcmap.managers.stub.MainManager;
-import abcmap.utils.gui.GuiUtils;
 
 public class GuiBuilder {
 
     private MainWindow mainWindow;
 
-    private MapPanel mapPanel;
 
     private DetachedWindow robotWindow;
 
@@ -163,18 +143,10 @@ public class GuiBuilder {
         refusedTilesPanel.setBackground(Color.RED);
         mainWindow.setRefusedTilesPanel(refusedTilesPanel);
 
-        LayoutScrollPanel layoutPanel = new LayoutScrollPanel();
-        mainWindow.setLayoutPanel(layoutPanel);
-
-        mapPanel = new MapPanel();
-
-        mapPanel = new MapPanel();
-        mainWindow.setMapPanel(mapPanel);
-
     }
 
     public Component getMap() {
-        return mapPanel;
+        return new JPanel();
     }
 
     public void registerWindows() {

@@ -33,7 +33,7 @@ public abstract class AbstractUndoRedo extends InteractionElement {
 
 		/*
         // mode annuler
-		if (Mode.UNDO.equals(mode)) {
+		if (GoToWebsiteMode.UNDO.equals(mode)) {
 			cancelm.undo();
 		}
 

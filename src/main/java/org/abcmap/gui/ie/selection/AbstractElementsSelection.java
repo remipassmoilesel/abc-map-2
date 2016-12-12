@@ -48,7 +48,7 @@ public abstract class AbstractElementsSelection extends InteractionElement {
         }
 
         // valeur de la selection
-        boolean value = mode.equals(Mode.SELECT_ALL);
+        boolean value = mode.equals(GoToWebsiteMode.SELECT_ALL);
 
         // appliquer les changements
         for (LayerElement elmt : layer.getAllElementsReversed()) {

@@ -1,22 +1,21 @@
 package org.abcmap.gui.iegroup.docks;
 
-import abcmap.gui.GuiIcons;
-import abcmap.gui.ie.draw.SelectDrawingTool;
-import abcmap.gui.ie.draw.ShowToolHelp;
-import abcmap.gui.ie.draw.ShowToolOptionPanel;
-import abcmap.gui.iegroup.InteractionElementGroup;
-import abcmap.utils.gui.Lng;
+import org.abcmap.gui.GuiIcons;
+import org.abcmap.gui.ie.InteractionElementGroup;
+import org.abcmap.gui.ie.draw.SelectDrawingTool;
+import org.abcmap.gui.ie.draw.ShowToolHelp;
+import org.abcmap.gui.ie.draw.ShowToolOptionPanel;
 
 public class GroupDrawingTools extends InteractionElementGroup {
 
-	public GroupDrawingTools() {
-		label = Lng.get("draw menu");
-		blockIcon = GuiIcons.GROUP_DRAW;
+    public GroupDrawingTools() {
+        label = "Dessin";
+        blockIcon = GuiIcons.GROUP_DRAW;
 
-		addInteractionElement(new SelectDrawingTool());
-		addInteractionElement(new ShowToolHelp());
-		addInteractionElement(new ShowToolOptionPanel());
+        addInteractionElement(new SelectDrawingTool());
+        addInteractionElement(new ShowToolHelp());
+        addInteractionElement(new ShowToolOptionPanel());
 
-	}
+    }
 
 }

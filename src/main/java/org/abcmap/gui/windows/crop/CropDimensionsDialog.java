@@ -10,6 +10,7 @@ import org.abcmap.gui.components.InvalidInputException;
 import org.abcmap.gui.components.color.ColorDialogButton;
 import org.abcmap.gui.components.color.ColorEvent;
 import org.abcmap.gui.components.color.ColorEventListener;
+import org.abcmap.gui.components.importation.CropDimensionsPanel;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.KeyAdapter;
 

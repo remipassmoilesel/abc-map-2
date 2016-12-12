@@ -1,18 +1,11 @@
 package org.abcmap.gui.shapes;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-import java.util.Arrays;
-
-import abcmap.managers.DrawManager;
-import abcmap.managers.stub.MainManager;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
+
+import java.awt.*;
+import java.awt.geom.Ellipse2D;
+import java.util.Arrays;
 
 /**
  * Handle which show on map that interactions are possible.

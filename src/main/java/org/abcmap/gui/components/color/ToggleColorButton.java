@@ -1,15 +1,9 @@
 package org.abcmap.gui.components.color;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-
-import javax.swing.JToggleButton;
-
-import abcmap.gui.GuiCursor;
 import org.abcmap.gui.GuiCursor;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
  * Selectable color button

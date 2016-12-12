@@ -1,17 +1,5 @@
 package org.abcmap.gui.components;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.draw.LayerElement;
 import org.abcmap.core.managers.MainManager;
@@ -21,14 +9,19 @@ import org.abcmap.core.notifications.NotificationManager;
 import org.abcmap.core.utils.listeners.HasListenerHandler;
 import org.abcmap.core.utils.listeners.ListenerHandler;
 import org.abcmap.gui.utils.FormUpdater;
-import org.abcmap.gui.utils.Refreshable;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 /**
  * Display a sample of first object selected
  *
  * @author remipassmoilesel
  */
-public class SelectedObjectPanel extends JPanel implements HasNotificationManager, HasListenerHandler<ActionListener>, Refreshable{
+public class SelectedObjectPanel extends JPanel implements HasNotificationManager, HasListenerHandler<ActionListener> {
 
     /**
      * Panel where are drawn samples
@@ -144,19 +137,19 @@ public class SelectedObjectPanel extends JPanel implements HasNotificationManage
             this.sample = sample;
 
             /**
-            if (sample != null) {
+             if (sample != null) {
 
-                // center shape
-                sample.refreshShape();
-                Rectangle maxBounds = sample.getMaximumBounds();
+             // center shape
+             sample.refreshShape();
+             Rectangle maxBounds = sample.getMaximumBounds();
 
-                int px = (int) ((this.getWidth() - maxBounds.width) / 2f);
-                int py = (int) ((this.getHeight() - maxBounds.height) / 2f);
+             int px = (int) ((this.getWidth() - maxBounds.width) / 2f);
+             int py = (int) ((this.getHeight() - maxBounds.height) / 2f);
 
 
-                sample.setPosition(px, py);
-                sample.refreshShape();
-            }*/
+             sample.setPosition(px, py);
+             sample.refreshShape();
+             }*/
         }
 
     }
@@ -170,7 +163,6 @@ public class SelectedObjectPanel extends JPanel implements HasNotificationManage
         return notifm;
     }
 
-    @Override
     public void refresh() {
 
         sampleDisplayer.revalidate();
@@ -183,13 +175,9 @@ public class SelectedObjectPanel extends JPanel implements HasNotificationManage
         this.repaint();
     }
 
-    @Override
-    public void reconstruct() {
-        refresh();
-    }
-
     /**
      * Add element filter
+     *
      * @param class1
      */
     public void addFilter(Class<? extends LayerElement> class1) {

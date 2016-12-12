@@ -1,9 +1,9 @@
 package org.abcmap.gui.components;
 
-import abcmap.gui.GuiColors;
-import abcmap.utils.gui.FocusPainter;
 import net.miginfocom.swing.MigLayout;
+import org.abcmap.gui.GuiColors;
 import org.abcmap.gui.GuiCursor;
+import org.abcmap.gui.utils.FocusPainter;
 
 import javax.swing.*;
 import java.awt.*;

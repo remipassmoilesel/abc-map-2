@@ -1,31 +1,21 @@
 package org.abcmap.gui.components.fileselection;
 
-import java.awt.Color;
-import java.awt.Component;
+import net.miginfocom.swing.MigLayout;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Collection;
-
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-
-import net.miginfocom.swing.MigLayout;
-import org.abcmap.gui.utils.Refreshable;
 
 /**
  * Panel which show a file list and allow user to select them
  *
  * @author remipassmoilesel
  */
-public class FileSelectionPanel extends JPanel implements Refreshable {
+public class FileSelectionPanel extends JPanel {
 
     private DefaultListModel<File> filesModel;
     private JList<File> jlist;
@@ -134,16 +124,9 @@ public class FileSelectionPanel extends JPanel implements Refreshable {
         return activeFile;
     }
 
-
-    @Override
     public void refresh() {
         revalidate();
         repaint();
     }
 
-    @Override
-    public void reconstruct() {
-        revalidate();
-        repaint();
-    }
 }

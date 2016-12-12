@@ -7,17 +7,20 @@ import org.abcmap.core.notifications.HasNotificationManager;
 import org.abcmap.core.notifications.NotificationManager;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.gui.components.dock.blockitems.ClickableBlockItem;
+import org.abcmap.gui.components.dock.blockitems.HideableBlockItem;
+import org.abcmap.gui.components.dock.blockitems.SimpleBlockItem;
+import org.abcmap.gui.menu.ClickableMenuItem;
+import org.abcmap.gui.menu.DialogMenuItem;
 import org.reflections.Reflections;
 
-import java.awt.Component;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Set;
-
-import javax.swing.ImageIcon;
-import javax.swing.KeyStroke;
 
 
 /**

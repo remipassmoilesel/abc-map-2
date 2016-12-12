@@ -1,15 +1,5 @@
 package org.abcmap.gui.wizards;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import abcmap.gui.HasDisplayableSpace;
-import abcmap.gui.iegroup.InteractionElementGroup;
-import abcmap.gui.iegroup.docks.GroupWizard;
-import abcmap.gui.windows.DetachedWindow;
-import abcmap.managers.GuiManager;
-import abcmap.managers.stub.MainManager;
-import abcmap.utils.gui.GuiUtils;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.gui.ie.InteractionElementGroup;
@@ -17,6 +7,9 @@ import org.abcmap.gui.iegroup.docks.GroupWizard;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.HasDisplayableSpace;
 import org.abcmap.gui.windows.DetachedWindow;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Software wizard

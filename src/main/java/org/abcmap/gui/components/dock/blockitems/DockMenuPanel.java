@@ -3,7 +3,7 @@ package org.abcmap.gui.components.dock.blockitems;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.gui.GuiStyle;
 import org.abcmap.gui.components.dock.Dock;
-import org.abcmap.gui.toProcess.gui.ie.InteractionElement;
+import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;

@@ -1,19 +1,5 @@
 package org.abcmap.gui.components;
 
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
-
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.SwingUtilities;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.MapEvent;
@@ -26,9 +12,16 @@ import org.abcmap.core.notifications.HasNotificationManager;
 import org.abcmap.core.notifications.Notification;
 import org.abcmap.core.notifications.NotificationManager;
 import org.abcmap.core.notifications.UpdatableByNotificationManager;
-import org.abcmap.gui.toProcess.gui.comps.progressbar.HasProgressbarManager;
-import org.abcmap.gui.toProcess.gui.comps.progressbar.ProgressbarManager;
+import org.abcmap.gui.components.progressbar.HasProgressbarManager;
+import org.abcmap.gui.components.progressbar.ProgressbarManager;
 import org.abcmap.gui.utils.GuiUtils;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 public class StatusBar extends JPanel implements HasNotificationManager, HasProgressbarManager {
 

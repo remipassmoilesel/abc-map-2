@@ -1,8 +1,5 @@
 package org.abcmap.gui.iegroup.docks;
 
-import abcmap.gui.GuiStyle;
-import abcmap.gui.dock.comps.Dock;
-import abcmap.utils.gui.GuiUtils;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.GuiStyle;
