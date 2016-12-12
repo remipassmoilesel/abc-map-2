@@ -51,7 +51,7 @@ public class Wizard {
     public Wizard() {
         guim = MainManager.getGuiManager();
 
-        this.steps = new ArrayList<WizardStepPanel>();
+        this.steps = new ArrayList<>();
         this.currentStep = 0;
         this.title = "no name";
         this.description = "no description";
@@ -109,16 +109,13 @@ public class Wizard {
      *
      * @return
      */
-    protected void addNewSteps(ArrayList<String> titles,
-                               ArrayList<List> elements) {
+    protected void addNewSteps(ArrayList<String> titles, ArrayList<List> elements) {
 
         int ts = titles.size();
         int es = elements.size();
 
         if ((ts + es) / 2 != ts) {
-            throw new IllegalStateException(
-                    "Invalids arguments, lists must have the same size: " + ts
-                            + " " + es);
+            throw new IllegalStateException("Invalids arguments, lists must have the same size: " + ts + " " + es);
         }
 
         for (int i = 0; i < titles.size(); i++) {
@@ -229,8 +226,17 @@ public class Wizard {
         guim.showGroupInDock(GroupWizard.class);
     }
 
-    protected Object createShowGroupString(Class<? extends InteractionElementGroup> class1, String desc) {
-        return WizardStepPanel.IE_GROUP_MARK + class1.getSimpleName() + WizardStepPanel.IE_GROUP_MARK + desc;
+    /**
+     * Create a string representing a link to a group of interaction element.
+     * <p>
+     * From this string a button will be created, button which can show a group in interface
+     *
+     * @param class1
+     * @param desc
+     * @return
+     */
+    protected String createShowGroupString(Class<? extends InteractionElementGroup> class1, String desc) {
+        return WizardStepPanel.IE_GROUP_LINK_MARK + class1.getSimpleName() + WizardStepPanel.IE_GROUP_LINK_MARK + desc;
     }
 
 }

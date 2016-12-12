@@ -8,7 +8,6 @@ import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.GuiStyle;
 import org.abcmap.gui.HtmlLabel;
 import org.abcmap.gui.components.buttons.HtmlButton;
-import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.ie.InteractionElement;
 
 import javax.swing.*;
@@ -23,9 +22,10 @@ import java.util.List;
 public class WizardStepPanel extends JPanel {
 
     /**
-     * Mark significating that it is a group element
+     * Tag used to do link to interaction groups
      */
-    protected static final String IE_GROUP_MARK = "#";
+    protected static final String IE_GROUP_LINK_MARK = "#";
+
     private String stepName;
     private Wizard parent;
     private JButton btnPrevious;
@@ -124,18 +124,17 @@ public class WizardStepPanel extends JPanel {
         // add step objects
         for (Object o : elements) {
 
-            // l'element est un composant graphique, ajout tel quel
+            // element is a graphical Swing component, add it as it is
             if (o instanceof Component) {
                 addItem((Component) o);
             }
 
-            // l'element est une chaine spéciale de la forme
-            // #GroupClass#Description
-            // créer un bouton d'affichage de groupe d'interaction
-            else if (o instanceof String && o.toString().substring(0, 1).equals(IE_GROUP_MARK)) {
+            // element is a formatted string like this: #GroupClass#Description
+            // This represent a link to a group, create button and add it
+            else if (o instanceof String && o.toString().substring(0, 1).equals(IE_GROUP_LINK_MARK)) {
 
                 // séparer le nom de la clase et le texte du bouton
-                String[] parts = o.toString().split(IE_GROUP_MARK);
+                String[] parts = o.toString().split(IE_GROUP_LINK_MARK);
                 if (parts.length < 3) {
                     throw new IllegalStateException("Invalid format: '" + o.toString() + "'. Expected: #GroupClass#Description");
                 }
@@ -154,7 +153,7 @@ public class WizardStepPanel extends JPanel {
                 addItem(bt);
             }
 
-            // interation element
+            // interaction element
             else if (o instanceof InteractionElement) {
 
                 InteractionElement ie = (InteractionElement) o;
@@ -179,7 +178,7 @@ public class WizardStepPanel extends JPanel {
     }
 
     private void addItem(Component c) {
-        super.add(c, "width " + (Dock.MENU_ITEM_WIDTH - 5) + "!, wrap 15px");
+        super.add(c, "width 90%!, wrap 15px");
     }
 
     public void setNextButtonEnabled(boolean val) {
@@ -202,7 +201,7 @@ public class WizardStepPanel extends JPanel {
         this.validate();
         this.repaint();
     }
-    
+
     public void addElements(List elements) {
         this.elements = elements;
     }

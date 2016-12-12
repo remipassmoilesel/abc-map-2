@@ -8,9 +8,11 @@ import java.awt.*;
 import java.util.ArrayList;
 
 /**
- * Main panel of dock menu. Contain navigation bar and menu space. Keep history of all components displayed.
+ * Extended panel of a dock, maskable. Allow dock components to show larger components as menu, ...
+ * <p>
+ * Keep history of shown components, to allow user to come back to previous display.
  */
-public class DockWidgetSpacePanel extends JPanel {
+public class DockWidgetSpaceSupport extends JPanel {
 
     /**
      * History of displayed components
@@ -26,7 +28,7 @@ public class DockWidgetSpacePanel extends JPanel {
     private DockOrientation orientation;
     private ArrayList<DockNavButton> buttons;
 
-    public DockWidgetSpacePanel(DockOrientation orientation) {
+    public DockWidgetSpaceSupport(DockOrientation orientation) {
 
         this.orientation = orientation;
 
@@ -60,7 +62,6 @@ public class DockWidgetSpacePanel extends JPanel {
         }
 
         add(header, "span, grow, push, wrap 5px");
-
 
         Border lineBorder = BorderFactory.createLineBorder(new Color(210, 210, 210));
         header.setBorder(lineBorder);
@@ -158,7 +159,7 @@ public class DockWidgetSpacePanel extends JPanel {
         sp.getVerticalScrollBar().setUnitIncrement(Dock.VERTICAL_SCROLLBAR_UNIT_INCREMENT);
         sp.setBorder(null);
 
-        add(sp, "grow, height max, wrap");
+        add(sp, "width 100%, height max, wrap");
 
         checkButtonsValidity();
 

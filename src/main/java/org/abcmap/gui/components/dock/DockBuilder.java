@@ -5,7 +5,9 @@ import org.abcmap.gui.ie.InteractionElementGroup;
 import javax.swing.JComponent;
 import java.util.List;
 
-
+/**
+ * Utility to build docks from groups of interaction elements
+ */
 public class DockBuilder {
 
     private List<Object> widgets;

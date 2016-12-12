@@ -13,10 +13,17 @@ import java.util.Arrays;
 
 public class Dock extends JPanel implements HasDisplayableSpace {
 
-    public static final int DOCK_WIDTH = 60;
-    public static final int MENU_ITEM_WIDTH = 260;
     public static final int VERTICAL_SCROLLBAR_UNIT_INCREMENT = 50;
-    public static final Color DOCK_BACKGROUND = new Color(240, 240, 240);
+
+    /**
+     * Width of folded dock, with only icons where user can clic
+     */
+    private int foldedDockWidthPx = 60;
+
+    /**
+     * Width in pixel of side space which can be extended to show more control components
+     */
+    private int extendedSpaceWidth = 260;
 
     /**
      * Panel where are displayed widgets, e.g: button to open side panel
@@ -26,7 +33,7 @@ public class Dock extends JPanel implements HasDisplayableSpace {
     /**
      * Where are displayed menu elements
      */
-    private DockWidgetSpacePanel widgetSpacePanel;
+    private DockWidgetSpaceSupport widgetSpaceSupport;
 
     /**
      * Dock orientation: E / W
@@ -48,21 +55,22 @@ public class Dock extends JPanel implements HasDisplayableSpace {
         widgetIconsPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
 
         String place = orientation.equals(DockOrientation.WEST) ? "dock west" : "dock east";
-        add(widgetIconsPanel, "grow, width " + DOCK_WIDTH + ", " + place);
+        add(widgetIconsPanel, "grow, width " + foldedDockWidthPx + ", " + place);
 
-        widgetSpacePanel = new DockWidgetSpacePanel(orientation);
+        widgetSpaceSupport = new DockWidgetSpaceSupport(orientation);
+
     }
 
-    public DockWidgetSpacePanel getWidgetSpacePanel() {
-        return widgetSpacePanel;
+    public DockWidgetSpaceSupport getWidgetSpaceSupport() {
+        return widgetSpaceSupport;
     }
 
     public void displayNextWidgetspaceAvailable() {
-        widgetSpacePanel.displayNext();
+        widgetSpaceSupport.displayNext();
     }
 
     public void displayPreviousWidgetspaceAvailable() {
-        widgetSpacePanel.displayPrevious();
+        widgetSpaceSupport.displayPrevious();
     }
 
     /**
@@ -72,19 +80,20 @@ public class Dock extends JPanel implements HasDisplayableSpace {
      */
     public void showWidgetspace(Component widgetsp) {
 
-        widgetSpacePanel.displayNew(widgetsp);
-
-        boolean alreadyHere = Arrays.asList(getComponents()).contains(
-                widgetSpacePanel);
-
+        // add support for panel to display if necessary
+        boolean alreadyHere = Arrays.asList(getComponents()).contains(widgetSpaceSupport);
         if (alreadyHere == false) {
-            add(widgetSpacePanel, "dock center");
+            add(widgetSpaceSupport, "dock center, width " + extendedSpaceWidth + "px!");
         }
 
+        // display component
+        widgetSpaceSupport.displayNew(widgetsp);
+
+        // update all
         widgetsp.revalidate();
         widgetsp.repaint();
 
-        widgetSpacePanel.refresh();
+        widgetSpaceSupport.refresh();
 
         refresh();
 
@@ -99,7 +108,7 @@ public class Dock extends JPanel implements HasDisplayableSpace {
 
         GuiUtils.throwIfNotOnEDT();
 
-        remove(widgetSpacePanel);
+        remove(widgetSpaceSupport);
 
         setAllMenuSelected(false);
 
@@ -212,17 +221,6 @@ public class Dock extends JPanel implements HasDisplayableSpace {
 
         }
     }
-
-    /**
-     * Retrouve et afficher le premier menu de dock correspondant à la classe du
-     * groupe d'interaction passé en paramètre, ou retourne faux si aucun menu
-     * n'est trouvé.
-     * <p>
-     * Le mode de la fenêtre principale sera modifié en conséquence.
-     *
-     * @param iegClass
-     * @return
-     */
 
     /**
      * Find and show first panel composed of specified class.

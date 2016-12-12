@@ -61,8 +61,8 @@ public class DockNavButton extends JLabel {
                 return;
         }
 
-        int i = dockParent.getWidgetSpacePanel().getIndex();
-        int h = dockParent.getWidgetSpacePanel().getHistorySize();
+        int i = dockParent.getWidgetSpaceSupport().getIndex();
+        int h = dockParent.getWidgetSpaceSupport().getHistorySize();
 
         if (PREVIOUS.equals(type)) {
             this.setEnabled(i > 0);
@@ -85,7 +85,7 @@ public class DockNavButton extends JLabel {
 
             if (widgetSpace == null) {
                 widgetSpace = (Container) GuiUtils.searchParentOf(DockNavButton.this,
-                        DockWidgetSpacePanel.class);
+                        DockWidgetSpaceSupport.class);
                 if (widgetSpace == null)
                     return;
             }

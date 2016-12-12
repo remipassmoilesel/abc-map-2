@@ -128,7 +128,7 @@ public class DetachedWindow extends AbstractCustomWindow implements HasNotificat
         progressbarManager.setComponentsVisible(false);
 
         // scroll pane
-        viewportView = new JPanel(new MigLayout("insets 5, gap 5"));
+        viewportView = new JPanel(new MigLayout("insets 5, gap 5, debug"));
 
         JScrollPane scrollPane = new JScrollPane(viewportView);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -157,7 +157,7 @@ public class DetachedWindow extends AbstractCustomWindow implements HasNotificat
 
         // component is a Swing element
         else if (displayable instanceof Component) {
-            viewportView.add((Component) displayable);
+            viewportView.add((Component) displayable, "width 95%!");
         }
 
         // unknown component

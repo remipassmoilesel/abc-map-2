@@ -2,7 +2,6 @@ package org.abcmap.gui.components.dock.blockitems;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.gui.GuiStyle;
-import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
 
@@ -11,6 +10,11 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class DockMenuPanel extends JPanel {
+
+    /**
+     * Width in percent of items inserted in panel
+     */
+    private int menuItemWidthPercent = 95;
 
     protected ArrayList<Object> elements;
 
@@ -34,16 +38,13 @@ public class DockMenuPanel extends JPanel {
 
         JPanel metadatas = new JPanel(new MigLayout("insets 5"));
 
-
         GuiUtils.addLabel(title, metadatas, "width 95%!, wrap", GuiStyle.DOCK_MENU_TITLE_1);
 
         if (description != null && description.isEmpty() == false) {
 
-            JEditorPane desc = new JEditorPane("text/html", "<html>"
-                    + description + "</html>");
+            JEditorPane desc = new JEditorPane("text/html", "<html>" + description + "</html>");
 
-            desc.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES,
-                    Boolean.TRUE);
+            desc.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
             desc.setOpaque(false);
             desc.setEditable(false);
             GuiStyle.applyStyleTo(GuiStyle.DOCK_MENU_DESCRIPTION, desc);
@@ -51,7 +52,7 @@ public class DockMenuPanel extends JPanel {
             metadatas.add(desc, "width 95%!");
         }
 
-        add(metadatas, "width " + Dock.MENU_ITEM_WIDTH + "!, wrap");
+        addItem(metadatas);
 
         for (Object o : elements) {
 
@@ -68,7 +69,7 @@ public class DockMenuPanel extends JPanel {
 
 
     private void addItem(Component c) {
-        super.add(c, "width " + Dock.MENU_ITEM_WIDTH + "!, wrap");
+        super.add(c, "width " + menuItemWidthPercent + "%!, wrap");
     }
 
     public void addMenuElement(InteractionElement o) {
