@@ -104,7 +104,7 @@ public class CropConfigurator {
 
             // unknown mode
             else {
-                throw new IllegalArgumentException("Invalid mode: " + mode);
+                throw new IllegalArgumentException("Invalid crop configuration mode: " + mode);
             }
 
             // enregistrer une taille image plus petite si necesaire

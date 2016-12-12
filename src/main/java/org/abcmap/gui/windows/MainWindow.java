@@ -158,8 +158,8 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
         Component comp = modesAndComps.get(mode);
 
         if (comp == null) {
-            //throw new NullPointerException("Invalid mode: " + mode);
-            logger.warning("Invalid mode: " + mode);
+            //throw new NullPointerException("Invalid main window mode: " + mode);
+            logger.warning("Invalid main window mode: " + mode);
         }
 
         // no changes needed, return
