@@ -58,6 +58,7 @@ public class CropSelectionRectangle {
         this.stroke = new BasicStroke(thickness);
         this.bounds = new Rectangle();
 
+        this.handles = new ArrayList<>();
         this.handles.add(new Handle(Handle.FOR_MOVING));
         this.handles.add(new Handle(Handle.FOR_RESIZING));
         this.handles.add(new Handle(Handle.FOR_RESIZING));

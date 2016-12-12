@@ -4,38 +4,44 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import java.io.IOException;
+import javax.swing.*;
 
 public class GuiIcons {
 
     private static final CustomLogger logger = LogManager.getLogger(GuiIcons.class);
 
-    public static final String ROOT = "icons/";
-    public static final String BUTTONS_DIR = ROOT + "buttons/";
-    public static final String GROUPS_DIR = ROOT + "groups/";
-    public static final String LAYERS_DIR = ROOT + "layers/";
-    public static final String WIZARD_DIR = ROOT + "wizard/";
-    public static final String TOOLS_DIR = ROOT + "tools/";
-    public static final String INTERACTIONS_DIR = ROOT + "interactions/";
-    public static final String SMALLS_DIR = ROOT + "smalls/";
-    public static final String VOTE_DIR = ROOT + "vote/";
-    public static final String SOCIAL_NET_DIR = ROOT + "social_networks/";
-    public static final String SPLASH_DIR = ROOT + "splash/";
-    public static final String DIALOG_DIR = ROOT + "dialog/";
-    public static final String MAP_DIR = ROOT + "map/";
-    public static final String GEOLOC_DIR = ROOT + "geoloc/";
-    public static final String IMPORT_DIR = ROOT + "import/";
-    public static final String ZORDER_DIR = ROOT + "zorder/";
-    public static final String ALIGN_DIR = ROOT + "align/";
-    public static final String EDITION_DIR = ROOT + "edition/";
-    public static final String DISPLAY_DIR = ROOT + "display/";
-    public static final String PROJECTS_DIR = ROOT + "projects/";
+    private static final String ROOT = "icons/";
+    private static final String BUTTONS_DIR = ROOT + "buttons/";
+    private static final String GROUPS_DIR = ROOT + "groups/";
+    private static final String LAYERS_DIR = ROOT + "layers/";
+    private static final String WIZARD_DIR = ROOT + "wizard/";
+    private static final String TOOLS_DIR = ROOT + "tools/";
+    private static final String INTERACTIONS_DIR = ROOT + "interactions/";
+    private static final String SMALLS_DIR = ROOT + "smalls/";
+    private static final String VOTE_DIR = ROOT + "vote/";
+    private static final String SOCIAL_NET_DIR = ROOT + "social_networks/";
+    private static final String SPLASH_DIR = ROOT + "splash/";
+    private static final String DIALOG_DIR = ROOT + "dialog/";
+    private static final String MAP_DIR = ROOT + "map/";
+    private static final String GEOLOC_DIR = ROOT + "geoloc/";
+    private static final String IMPORT_DIR = ROOT + "import/";
+    private static final String ZORDER_DIR = ROOT + "zorder/";
+    private static final String ALIGN_DIR = ROOT + "align/";
+    private static final String EDITION_DIR = ROOT + "edition/";
+    private static final String DISPLAY_DIR = ROOT + "display/";
+    private static final String PROJECTS_DIR = ROOT + "projects/";
 
-    public static ImageIcon getIcon(String ressourcePath) {
+    /**
+     * Return icon at specified path or if not found an empty icon
+     *
+     * @param ressourcePath
+     * @return
+     */
+    private static ImageIcon getIcon(String ressourcePath) {
+
         try {
             return new ImageIcon(ImageIO.read(ClassLoader.getSystemResource(ressourcePath)));
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e);
         }
 
@@ -92,10 +98,10 @@ public class GuiIcons {
     public static final ImageIcon LAYER_RENAME = getIcon(LAYERS_DIR + "layer_rename.png");
     public static final ImageIcon LAYER_UP = getIcon(LAYERS_DIR + "layer_up.png");
     public static final ImageIcon LAYER_DOWN = getIcon(LAYERS_DIR + "layer_down.png");
-    public static final ImageIcon LAYER_TOP = getIcon(LAYERS_DIR + "layer_top.png");
-    public static final ImageIcon LAYER_BOTTOM = getIcon(LAYERS_DIR + "layer_bottom.png");
-    public static final ImageIcon LAYER_IS_VISIBLE = getIcon(LAYERS_DIR + "layer_is_visible.png");
-    public static final ImageIcon LAYER_IS_INVISIBLE = getIcon(LAYERS_DIR + "layer_is_invisible.png");
+//    public static final ImageIcon LAYER_TOP = getIcon(LAYERS_DIR + "layer_top.png");
+//    public static final ImageIcon LAYER_BOTTOM = getIcon(LAYERS_DIR + "layer_bottom.png");
+//    public static final ImageIcon LAYER_IS_VISIBLE = getIcon(LAYERS_DIR + "layer_is_visible.png");
+//    public static final ImageIcon LAYER_IS_INVISIBLE = getIcon(LAYERS_DIR + "layer_is_invisible.png");
     public static final ImageIcon LAYER_VISIBILITY_BUTTON = getIcon(LAYERS_DIR + "layer_visibility_button.png");
 
 	/*
@@ -108,7 +114,7 @@ public class GuiIcons {
     public static final ImageIcon WIZARD_PREVIOUS = getIcon(WIZARD_DIR + "wizard_previous.png");
 
 	/*
-	 * 
+     *
 	 */
 
     public static final ImageIcon TOOL_SELECTION = getIcon(TOOLS_DIR + "tool_selection.png");
@@ -125,7 +131,7 @@ public class GuiIcons {
     public static final ImageIcon TOOL_LEGEND = getIcon(TOOLS_DIR + "tool_legend.png");
 
 	/*
-	 * 
+     *
 	 */
 
     public static final ImageIcon INTERACTION_SIMPLECLICK = getIcon(INTERACTIONS_DIR + "interaction_simpleclick.png");
@@ -136,10 +142,10 @@ public class GuiIcons {
     public static final ImageIcon LINK_MARK = getIcon(INTERACTIONS_DIR + "link_mark.png");
 
 	/*
-	 * 
+     *
 	 */
 
-    public static final ImageIcon DEFAULT_TOOLBAR_BUTTON_ICON = getIcon(SMALLS_DIR + "default_toolbar_group_icon.png");
+    public static final ImageIcon DEFAULT_TOOLBAR_BUTTON_ICON = getIcon(ROOT + "default_toolbar_group_icon.png");
 
     public static final ImageIcon SMALLICON_NEWPROJECT = getIcon(PROJECTS_DIR + "smallicon_newproject.png");
     public static final ImageIcon SMALLICON_OPENPROJECT = getIcon(PROJECTS_DIR + "smallicon_openproject.png");
@@ -177,7 +183,7 @@ public class GuiIcons {
     public static final ImageIcon DISTRIBUTE_VERTICAL = getIcon(ALIGN_DIR + "distribute_vertical.png");
 
 	/*
-	 * 
+     *
 	 */
 
     public static final ImageIcon WINDOW_ICON = getIcon(ROOT + "window_icon.png");
@@ -204,7 +210,7 @@ public class GuiIcons {
 	 */
 
     public static final ImageIcon SPLASH_SCREEN = getIcon(SPLASH_DIR + "splash_screen.png");
-    public static final ImageIcon QUIT_PROGRAM = null;
+    public static final ImageIcon QUIT_PROGRAM = DEFAULT_GROUP_ICON;
     public static final ImageIcon ATTENTION = getIcon(ROOT + "attention.png");
 
 	/*

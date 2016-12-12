@@ -1,7 +1,9 @@
 package org.abcmap.gui.windows;
 
 import org.abcmap.core.events.GuiManagerEvent;
+import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.GuiManager;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.Utils;
@@ -22,6 +24,8 @@ import java.util.HashMap;
  * Main window of software
  */
 public class MainWindow extends AbstractCustomWindow implements HasListenerHandler<GuiManagerEvent> {
+
+    private static final CustomLogger logger = LogManager.getLogger(MainWindow.class);
 
     private final ListenerHandler<GuiManagerEvent> listenerHandler;
     /**
@@ -154,7 +158,8 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
         Component comp = modesAndComps.get(mode);
 
         if (comp == null) {
-            throw new NullPointerException("Invalid mode: " + mode);
+            //throw new NullPointerException("Invalid mode: " + mode);
+            logger.warning("Invalid mode: " + mode);
         }
 
         // no changes needed, return

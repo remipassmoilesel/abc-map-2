@@ -50,9 +50,9 @@ public class ToolSelectionPanel extends JPanel {
     }
 
     public void addActionListener(ActionListener listener) {
-        for (JToggleButton btn : buttons) {
-            btn.addActionListener(listener);
-        }
+//        for (JToggleButton btn : buttons) {
+//            btn.addActionListener(listener);
+//        }
     }
 
 }

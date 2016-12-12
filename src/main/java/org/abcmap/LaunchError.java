@@ -54,11 +54,11 @@ public class LaunchError {
                     dial.dispose();
                 };
 
-                // open web browser
+                // open web browser and close window
                 ActionListener websiteAL = (e) -> {
                     try {
-                        Desktop.getDesktop()
-                                .browse(new URI(ConfigurationConstants.WEBSITE_URL));
+                        Desktop.getDesktop().browse(new URI(ConfigurationConstants.WEBSITE_URL));
+                        dial.dispose();
                     } catch (Exception e1) {
                         String enError = "<p>Unable to open your web browser. Website is available at: " + ConfigurationConstants.WEBSITE_URL + ".</p>";
                         String frError = "<p>Impossible d'ouvrir votre navigateur. Le site est disponible à l'adresse: " + ConfigurationConstants.WEBSITE_URL + "</p>";

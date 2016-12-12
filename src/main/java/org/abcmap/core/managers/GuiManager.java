@@ -178,7 +178,7 @@ public class GuiManager implements HasNotificationManager {
      * @throws InvocationTargetException
      * @throws InterruptedException
      */
-    public void constructAndShowGui() throws InvocationTargetException, InterruptedException {
+    public void constructAndShowGui() throws Exception {
 
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
@@ -188,6 +188,7 @@ public class GuiManager implements HasNotificationManager {
                 runIntialisationOperations();
             }
         });
+
     }
 
 

@@ -29,9 +29,9 @@ public class SelectDirectoryToImport extends InteractionElement {
 
 //        this.memoryPanelUpdater = new MemoryPanelUpdater();
 
-        TextFieldDelayedAction.delayedActionFor(txtPath, memoryPanelUpdater, false);
+        //TextFieldDelayedAction.delayedActionFor(txtPath, memoryPanelUpdater, false);
 
-        TextFieldDelayedAction.delayedActionFor(txtPath, textFieldListener, false);
+        //TextFieldDelayedAction.delayedActionFor(txtPath, textFieldListener, false);
 
         JPanel panel = new JPanel(new MigLayout("insets 0"));
 
@@ -51,7 +51,7 @@ public class SelectDirectoryToImport extends InteractionElement {
         ThreadManager.runLater(new Runnable() {
             @Override
             public void run() {
-                memoryPanelUpdater.run();
+                //memoryPanelUpdater.run();
             }
         });
 

@@ -31,7 +31,7 @@ public class SetProfileTitle extends InteractionElement {
         notifm.setDefaultUpdatableObject(profileListener);
         configm.getNotificationManager().addObserver(this);
 
-        TextFieldDelayedAction.delayedActionFor(textField, new TextFieldListener(), false);
+        //TextFieldDelayedAction.delayedActionFor(textField, new TextFieldListener(), false);
 
         profileListener.run();
 

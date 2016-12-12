@@ -32,7 +32,7 @@ public class SetProfileComment extends InteractionElement {
         notifm.setDefaultUpdatableObject(profileListener);
         configm.getNotificationManager().addObserver(this);
 
-        TextFieldDelayedAction.delayedActionFor(textField, new CommentListener(), false);
+        //TextFieldDelayedAction.delayedActionFor(textField, new CommentListener(), false);
 
         profileListener.run();
 

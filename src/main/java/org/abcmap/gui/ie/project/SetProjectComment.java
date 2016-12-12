@@ -34,7 +34,7 @@ public class SetProjectComment extends InteractionElement {
         notifm.setDefaultUpdatableObject(projectListener);
         projectm.getNotificationManager().addObserver(this);
 
-        TextFieldDelayedAction.delayedActionFor(textField, new TextFieldListener(), false);
+        //TextFieldDelayedAction.delayedActionFor(textField, new TextFieldListener(), false);
 
         projectListener.run();
 

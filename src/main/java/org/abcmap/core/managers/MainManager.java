@@ -13,14 +13,11 @@ import java.io.IOException;
  */
 public class MainManager {
 
+    private static final CustomLogger logger = LogManager.getLogger(MainManager.class);
+
     private static final boolean DEBUG_MODE = true;
     private static boolean initialized = false;
 
-    /**
-     * Here it is the only logger directly instantiated
-     * Use LogManager.getLogger() instead.
-     */
-    private static final CustomLogger log = new CustomLogger(MainManager.class);
     private static ConfigurationManager configurationManager;
     private static TempFilesManager tempFilesManager;
     private static ProjectManager projectManager;
@@ -39,11 +36,11 @@ public class MainManager {
     public static void init() throws IOException {
 
         if (isInitialized() != false) {
-            log.warning("Main manager already initialized");
+            logger.warning("Main manager already initialized");
             return;
         }
 
-        configureTierceLibraries();
+        configureLibraries();
 
         ThreadManager.init();
 
@@ -62,7 +59,7 @@ public class MainManager {
         setInitialized(true);
     }
 
-    private static void configureTierceLibraries() {
+    private static void configureLibraries() {
 
         // deacrease database log
         System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY, "ERROR");
@@ -88,14 +85,6 @@ public class MainManager {
 
     public static DrawManager getDrawManager() {
         return drawManager;
-    }
-
-    /**
-     * Return true if the main manager is initialized
-     * @return
-     */
-    public static boolean isInitialized() {
-        return initialized;
     }
 
     private static void setInitialized(boolean initialized) {
@@ -128,5 +117,14 @@ public class MainManager {
 
     public static ImportManager getImportManager() {
         return importManager;
+    }
+
+    /**
+     * Return true if the main manager is initialized
+     *
+     * @return
+     */
+    public static boolean isInitialized() {
+        return initialized;
     }
 }
