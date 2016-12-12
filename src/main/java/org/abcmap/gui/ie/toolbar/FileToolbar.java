@@ -1,7 +1,6 @@
 package org.abcmap.gui.ie.toolbar;
 
 import org.abcmap.gui.components.toolbar.Toolbar;
-import org.abcmap.gui.toProcess.gui.ie.project.*;
 
 public class FileToolbar extends Toolbar {
 

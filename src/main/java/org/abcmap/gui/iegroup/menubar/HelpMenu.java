@@ -1,8 +1,7 @@
 package org.abcmap.gui.iegroup.menubar;
 
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.toProcess.gui.ie.program.ShowAboutDialog;
-import org.abcmap.gui.toProcess.gui.ie.ressources.*;
+import org.abcmap.gui.ie.program.ShowAboutDialog;
 
 public class HelpMenu extends InteractionElementGroup {
 

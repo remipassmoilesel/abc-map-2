@@ -72,5 +72,9 @@ public class GuiManager implements HasNotificationManager {
     public Window getCropWindow() {
         return null;
     }
+
+    public void showErrorInBox(String s) {
+
+    }
 }
 

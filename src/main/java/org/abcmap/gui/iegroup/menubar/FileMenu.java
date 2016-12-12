@@ -1,9 +1,8 @@
 package org.abcmap.gui.iegroup.menubar;
 
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.toProcess.gui.ie.program.QuitProgram;
-import org.abcmap.gui.toProcess.gui.ie.project.*;
-import org.abcmap.gui.toProcess.gui.ie.recents.OpenRecentProject;
+import org.abcmap.gui.ie.program.QuitProgram;
+import org.abcmap.gui.ie.recents.OpenRecentProject;
 
 public class FileMenu extends InteractionElementGroup {
 

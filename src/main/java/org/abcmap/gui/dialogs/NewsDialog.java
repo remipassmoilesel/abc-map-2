@@ -15,7 +15,7 @@ import abcmap.gui.ie.ressources.GoToAskFormPage;
 import abcmap.gui.ie.ressources.GoToWebSite;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.configuration.ConfigurationConstants;
-import org.abcmap.gui.toProcess.gui.ie.ressources.GoToWebSite;
+import org.abcmap.gui.ie.ressources.GoToWebSite;
 
 public class NewsDialog extends JDialog {
 
