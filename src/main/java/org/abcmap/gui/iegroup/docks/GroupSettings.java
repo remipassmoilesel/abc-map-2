@@ -3,7 +3,7 @@ package org.abcmap.gui.iegroup.docks;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.ie.InteractionElementGroup;
 import org.abcmap.gui.ie.analyse.AnalyseSelectedTiles;
-import org.abcmap.gui.toProcess.gui.ie.importation.SelectPictureAnalyseMode;
+import org.abcmap.gui.ie.importation.SelectPictureAnalyseMode;
 
 public class GroupSettings extends InteractionElementGroup {
 

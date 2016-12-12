@@ -1,11 +1,11 @@
 package org.abcmap.gui.wizards;
 
 import org.abcmap.gui.ie.draw.SelectLayer;
-import org.abcmap.gui.toProcess.gui.ie.importation.SelectCropAreaForScreen;
-import org.abcmap.gui.toProcess.gui.ie.importation.SelectPictureAnalyseMode;
-import org.abcmap.gui.toProcess.gui.ie.importation.robot.LaunchRobotImport;
-import org.abcmap.gui.toProcess.gui.ie.importation.robot.SelectCaptureArea;
-import org.abcmap.gui.toProcess.gui.ie.importation.robot.SelectRobotImportOptions;
+import org.abcmap.gui.ie.importation.SelectCropAreaForScreen;
+import org.abcmap.gui.ie.importation.SelectPictureAnalyseMode;
+import org.abcmap.gui.ie.importation.robot.LaunchRobotImport;
+import org.abcmap.gui.ie.importation.robot.SelectCaptureArea;
+import org.abcmap.gui.ie.importation.robot.SelectRobotImportOptions;
 import org.abcmap.gui.toProcess.gui.ie.project.NewProject;
 import org.abcmap.gui.toProcess.gui.ie.project.OpenProject;
 import org.abcmap.gui.toProcess.gui.ie.ressources.GoToOpenStreetMap;

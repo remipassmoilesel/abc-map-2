@@ -3,6 +3,8 @@ package org.abcmap.core.managers;
 import org.abcmap.core.notifications.HasNotificationManager;
 import org.abcmap.core.notifications.NotificationManager;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 /**
@@ -27,5 +29,14 @@ public class ImportManager implements HasNotificationManager {
 
     public ArrayList<String> getDataImportCurrentHeaders() {
         return new ArrayList<>();
+    }
+
+
+    public boolean isValidExtensionsForTile(String ext) {
+        return false;
+    }
+
+    public BufferedImage catchScreen(ArrayList<Component> visibleFrames, boolean b) {
+        return null;
     }
 }

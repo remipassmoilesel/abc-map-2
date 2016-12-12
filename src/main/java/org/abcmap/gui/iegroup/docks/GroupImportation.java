@@ -2,11 +2,11 @@ package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.toProcess.gui.ie.importation.data.MenuDataImport;
-import org.abcmap.gui.toProcess.gui.ie.importation.directory.MenuImportFromDirectory;
-import org.abcmap.gui.toProcess.gui.ie.importation.document.MenuImportFromDocument;
-import org.abcmap.gui.toProcess.gui.ie.importation.manual.MenuImportManualCapture;
-import org.abcmap.gui.toProcess.gui.ie.importation.robot.MenuRobotImport;
+import org.abcmap.gui.ie.importation.data.MenuDataImport;
+import org.abcmap.gui.ie.importation.directory.MenuImportFromDirectory;
+import org.abcmap.gui.ie.importation.document.MenuImportFromDocument;
+import org.abcmap.gui.ie.importation.manual.MenuImportManualCapture;
+import org.abcmap.gui.ie.importation.robot.MenuRobotImport;
 
 public class GroupImportation extends InteractionElementGroup {
 

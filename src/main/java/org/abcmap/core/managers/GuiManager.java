@@ -2,12 +2,15 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.notifications.HasNotificationManager;
 import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.gui.GuiCursor;
 import org.abcmap.gui.windows.DetachedWindow;
 import org.abcmap.gui.windows.MainWindowMode;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  *
@@ -15,6 +18,7 @@ import java.awt.*;
 public class GuiManager implements HasNotificationManager {
 
     private final NotificationManager notifm;
+    private ArrayList<Component> visibleWindows;
 
     public GuiManager() {
         notifm = new NotificationManager(GuiManager.this);
@@ -55,6 +59,18 @@ public class GuiManager implements HasNotificationManager {
     @Override
     public NotificationManager getNotificationManager() {
         return notifm;
+    }
+
+    public ArrayList<Component> getVisibleWindows() {
+        return new ArrayList<>();
+    }
+
+    public void showCropWindow(BufferedImage finalBg) {
+
+    }
+
+    public Window getCropWindow() {
+        return null;
     }
 }
 

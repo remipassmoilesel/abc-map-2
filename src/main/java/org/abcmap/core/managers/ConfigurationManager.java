@@ -136,4 +136,19 @@ public class ConfigurationManager implements HasNotificationManager{
     public void setCroppingEnabled(boolean croppingEnabled) {
 
     }
+
+    public String getDirectoryImportPath() {
+        return ".";
+    }
+
+    public long getWindowHidingDelay() {
+        return 0;
+    }
+
+    public int getSurfMode() {
+        return 0;
+    }
+
+    public void setSurfMode(int surfMode) {
+    }
 }
