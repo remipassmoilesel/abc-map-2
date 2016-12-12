@@ -1,6 +1,8 @@
 package org.abcmap.gui.ie.debug;
 
+import org.abcmap.core.notifications.monitoringtool.NotificationManagerTool;
 import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.gui.utils.GuiUtils;
 
 public class ShowLastEvents extends InteractionElement {
 
@@ -14,12 +16,10 @@ public class ShowLastEvents extends InteractionElement {
     @Override
     public void run() {
 
-		/*
-        // pas d'envoi dans l'EDT
-		GuiUtils.throwIfOnEDT();
+        GuiUtils.throwIfOnEDT();
 
-		NotificationManagerTool.showLastEventsTransmitted();
-		*/
+        NotificationManagerTool.showLastEventsTransmitted();
+
     }
 
 }
