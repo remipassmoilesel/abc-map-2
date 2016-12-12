@@ -193,7 +193,7 @@ public abstract class AbstractOrmDAO {
         super.finalize();
 
         if (connectionSource != null) {
-            logger.warning("Database connection was not closed: " + this + " / " + connectionSource);
+            logger.debug("Database connection was not closed: " + this + " / " + connectionSource);
             close();
         }
 

@@ -52,7 +52,7 @@ public class TestUtils {
 
         // close previous project if necessary
         if (pman.isInitialized()) {
-            pman.closeProjet();
+            pman.closeProject();
         }
 
         // wait a litle between create too much projects

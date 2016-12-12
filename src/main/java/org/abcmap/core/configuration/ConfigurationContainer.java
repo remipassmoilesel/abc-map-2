@@ -1,7 +1,5 @@
 package org.abcmap.core.configuration;
 
-import com.labun.surf.Params;
-
 import java.io.Serializable;
 
 /**
@@ -10,6 +8,8 @@ import java.io.Serializable;
  * Only use serializable objects.
  */
 public class ConfigurationContainer implements Serializable {
+
+    public static final String LANGUAGE = "fr";
 
 
 	/*
@@ -36,7 +36,7 @@ public class ConfigurationContainer implements Serializable {
     /*
      * Import settings
      */
-    
+
     public Boolean IMPORT_ENABLE_CROPPING = true;
 
     public Integer IMPORT_CROP_AREA_SELECTION_X = 50;
@@ -76,6 +76,8 @@ public class ConfigurationContainer implements Serializable {
     public Integer ROBOT_IMPORT_MOVING_DELAY = 1000;
 
     public Integer ROBOT_IMPORT_CAPTURE_DELAY = 2000;
+
+    public String ROBOT_IMPORT_MODE = "ROBOT_IMPORT_MODE";
 
     @Override
     public boolean equals(Object o) {

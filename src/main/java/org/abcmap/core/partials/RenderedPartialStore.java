@@ -7,11 +7,14 @@ import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableUtils;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -23,6 +26,8 @@ import java.util.List;
  * Partials should contains only soft links to images, in order to free memory when needed
  */
 public class RenderedPartialStore {
+
+    private static final CustomLogger logger = LogManager.getLogger(RenderedPartialStore.class);
 
     /**
      * Precision used when search existing partials by area in database
@@ -208,4 +213,33 @@ public class RenderedPartialStore {
 
         });
     }
+
+    /**
+     * Close resource if needed
+     *
+     * @throws Throwable
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+
+        if (connectionSource != null) {
+            logger.debug("Database connection was not closed: " + this + " / " + connectionSource);
+            close();
+        }
+
+    }
+
+    public void close() throws IOException {
+
+        if (connectionSource != null) {
+            connectionSource.close();
+        }
+
+        if (dao != null) {
+            dao.closeLastIterator();
+        }
+
+    }
+
 }

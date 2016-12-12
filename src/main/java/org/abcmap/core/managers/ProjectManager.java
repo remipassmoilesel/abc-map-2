@@ -2,6 +2,8 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.notifications.HasNotificationManager;
+import org.abcmap.core.notifications.NotificationManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.backup.ProjectBackupInterval;
 import org.abcmap.core.project.ProjectReader;
@@ -11,12 +13,13 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * Here are managed all operations around projects
+ * Here are managed all operations concerning projects
  */
-public class ProjectManager {
+public class ProjectManager implements HasNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(ProjectManager.class);
     private final ProjectBackupInterval backupTimer;
+    private final NotificationManager notificationManager;
     private Project currentProject;
     private final TempFilesManager tempMan;
 
@@ -24,6 +27,8 @@ public class ProjectManager {
 
         this.currentProject = null;
         tempMan = MainManager.getTempFilesManager();
+
+        notificationManager = new NotificationManager(ProjectManager.this);
 
         backupTimer = new ProjectBackupInterval(ConfigurationConstants.BACKUP_INTERVAL);
     }
@@ -77,7 +82,7 @@ public class ProjectManager {
     /**
      * Close the current project and delete temprorary files
      */
-    public void closeProjet() throws IOException {
+    public void closeProject() throws IOException {
 
         if (isInitialized() == false) {
             logger.debug("Cannot close project, it was not initialized.");
@@ -155,4 +160,8 @@ public class ProjectManager {
         return currentProject;
     }
 
+    @Override
+    public NotificationManager getNotificationManager() {
+        return notificationManager;
+    }
 }

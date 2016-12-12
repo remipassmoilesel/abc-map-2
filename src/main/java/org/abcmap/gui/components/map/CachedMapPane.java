@@ -23,6 +23,8 @@ import java.util.concurrent.locks.ReentrantLock;
  * Display a map by using a partial cache system
  * <p>
  * Cache is managed by a RenderedPartialFactory. This partial factory produce portions of map and store it in database.
+ *
+ * // TODO: Manage notifications of partial arrival between multiple panels
  */
 public class CachedMapPane extends JPanel {
 

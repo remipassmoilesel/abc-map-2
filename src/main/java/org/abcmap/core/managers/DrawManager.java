@@ -1,19 +1,20 @@
 package org.abcmap.core.managers;
 
+import org.abcmap.core.draw.*;
+import org.abcmap.core.notifications.HasNotificationManager;
+import org.abcmap.core.notifications.NotificationManager;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.shapes.DrawManagerException;
-import org.abcmap.core.shapes.LineBuilder;
-import org.abcmap.core.shapes.PointBuilder;
-import org.abcmap.core.shapes.PolygonBuilder;
 import org.abcmap.core.styles.StyleContainer;
+import org.abcmap.gui.tools.ToolContainer;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 /**
- * Here are managed all operations around drawing shapes on map
+ * Here are managed all operations around drawing draw on map
  */
-public class DrawManager {
+public class DrawManager implements HasNotificationManager {
 
     private final ProjectManager projectMan;
 
@@ -31,6 +32,8 @@ public class DrawManager {
      * Active color used to draw, if a new builder is returned
      */
     private Color activeBackground;
+    private NotificationManager notifm;
+    private ToolContainer currentToolContainer;
 
     public DrawManager() {
 
@@ -39,7 +42,10 @@ public class DrawManager {
         this.activeBackground = Color.green;
         this.activeThick = 5;
 
+        notifm = new NotificationManager(DrawManager.this);
+
     }
+
 
     /**
      * Get a line builder, to draw lines on current project
@@ -116,5 +122,54 @@ public class DrawManager {
 
         return (FeatureLayer) layer;
 
+    }
+
+    public ArrayList<String> getAvailableSymbolSets() {
+        return new ArrayList<>();
+    }
+
+    public Font getSymbolSetFont(String setName) throws DrawManagerException {
+        return new Font("Dialog", Font.PLAIN, 20);
+    }
+
+    public ArrayList<Integer> getAvailableSymbolCodesFor(String setName) {
+        return new ArrayList<>();
+    }
+
+    public Object getCurrentTool() {
+        return new Object();
+    }
+
+    public LayerElement getFirstSelectedElement() {
+        return getFirstSelectedElement((Class) null);
+    }
+
+    public LayerElement getFirstSelectedElement(Class filter) {
+        return new LayerElement();
+    }
+
+    public LayerElement getFirstSelectedElement(ArrayList<? extends Class> filter) {
+        return new LayerElement();
+    }
+
+    public String getReadableNameFor(Class<? extends LayerElement> aClass) {
+        return "Readable name";
+    }
+
+    public int getInteractionAreaMargin() {
+        return 5;
+    }
+
+    @Override
+    public NotificationManager getNotificationManager() {
+        return notifm;
+    }
+
+    public void setCurrentTool(ToolContainer currentTool) {
+
+    }
+
+    public ToolContainer getCurrentToolContainer() {
+        return currentToolContainer;
     }
 }

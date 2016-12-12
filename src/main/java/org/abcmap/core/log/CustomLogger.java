@@ -1,7 +1,5 @@
 package org.abcmap.core.log;
 
-import org.abcmap.core.managers.LogManager;
-
 import java.util.logging.Level;
 
 /**

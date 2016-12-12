@@ -173,7 +173,7 @@ public class Project {
     }
 
     /**
-     * Add a new feature layer, where can be stored shapes
+     * Add a new feature layer, where can be stored draw
      *
      * @param name
      * @param visible
@@ -457,5 +457,9 @@ public class Project {
 
     public RenderedPartialStore getRenderedPartialsStore() {
         return partialStore;
+    }
+
+    public void setAllElementsSelected(boolean allElementsSelected) {
+
     }
 }

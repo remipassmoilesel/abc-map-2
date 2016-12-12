@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.Polygon;
 import org.abcmap.core.tiles.TileContainer;
 import org.abcmap.core.tiles.TileStorage;
 import org.abcmap.core.tiles.TileStorageQueries;
-import org.abcmap.core.shapes.feature.TileFeatureBuilder;
+import org.abcmap.core.draw.feature.TileFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLUtils;
@@ -46,7 +46,7 @@ import java.util.List;
  * <p>
  * This object wrap two layers:
  * - The effective coverage layer, with tiles
- * - A feature layer with shapes to do geometric researches
+ * - A feature layer with draw to do geometric researches
  */
 public class TileLayer extends AbstractLayer {
 
@@ -339,7 +339,7 @@ public class TileLayer extends AbstractLayer {
     }
 
     /**
-     * Return a feature layer containing shapes that are outlines of real tiles.
+     * Return a feature layer containing draw that are outlines of real tiles.
      *
      * @return
      */

@@ -62,7 +62,7 @@ public class ProjectManagerTest {
         // close the project
         boolean closed = false;
         try {
-            pman.closeProjet();
+            pman.closeProject();
             closed = Files.exists(Paths.get(newproj.getDatabasePath().toString() + ".data.db")) == false;
         } catch (IOException e) {
             e.printStackTrace();

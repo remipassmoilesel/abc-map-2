@@ -15,6 +15,9 @@ import java.util.logging.*;
  */
 public class LogManager {
 
+    // example:
+    // private static final CustomLogger logger = LogManager.getLogger(Project.class);
+
     private static LogManager instance;
     private static final Level DEFAULT_LOG_LEVEL = Level.INFO;
 
@@ -63,9 +66,6 @@ public class LogManager {
         rootLogger.addHandler(fileTxt);
 
         return new LogManager();
-    }
-
-    LogManager() {
     }
 
     private CustomLogger createLogger(Class<?> owner) {

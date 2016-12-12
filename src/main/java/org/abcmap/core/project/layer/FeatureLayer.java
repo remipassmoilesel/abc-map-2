@@ -1,7 +1,7 @@
 package org.abcmap.core.project.layer;
 
 import com.vividsolutions.jts.geom.Geometry;
-import org.abcmap.core.shapes.feature.DefaultFeatureBuilder;
+import org.abcmap.core.draw.feature.DefaultFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.simple.SimpleFeatureIterator;
