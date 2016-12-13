@@ -1,7 +1,6 @@
 package org.abcmap.gui.ie.project;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.gui.components.textfields.TextFieldDelayedAction;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.utils.FormUpdater;
 
@@ -30,7 +29,7 @@ public class SetProjectTitle extends InteractionElement {
 
         projectListener = new ProjectListener();
 
-        notifm.setDefaultUpdatableObject(projectListener);
+        notifm.setDefaultListener(projectListener);
         projectm.getNotificationManager().addObserver(this);
 
         //TextFieldDelayedAction.delayedActionFor(textField, new TextFieldListener(), false);

@@ -1,7 +1,6 @@
 package org.abcmap.gui.ie.importation;
 
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.*;
 import org.abcmap.gui.components.importation.SurfModePanel;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
@@ -31,7 +30,7 @@ public class SelectPictureAnalyseMode extends InteractionElement {
         slider.addChangeListener(new SliderListener());
 
         SliderUpdater sliderUpdater = new SliderUpdater();
-        notifm.setDefaultUpdatableObject(sliderUpdater);
+        notifm.setDefaultListener(sliderUpdater);
         configm.getNotificationManager().addObserver(this);
 
         sliderUpdater.run();
@@ -55,10 +54,10 @@ public class SelectPictureAnalyseMode extends InteractionElement {
 
     }
 
-    private class SliderUpdater implements UpdatableByNotificationManager, Runnable {
+    private class SliderUpdater implements EventListener, Runnable {
 
         @Override
-        public void notificationReceived(Notification arg) {
+        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
             SwingUtilities.invokeLater(this);
         }
 

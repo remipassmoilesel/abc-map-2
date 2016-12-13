@@ -5,8 +5,8 @@ import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.MapManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.Event;
+import org.abcmap.core.events.manager.EventListener;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.buttons.HtmlCheckbox;
 import org.abcmap.gui.components.color.ColorButton;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
  *
  * @author remipassmoilesel
  */
-public class FormUpdater implements UpdatableByNotificationManager, Runnable, ActionListener {
+public class FormUpdater implements EventListener, Runnable, ActionListener {
 
     /**
      * Event filter: block notifications by event type
@@ -115,7 +115,7 @@ public class FormUpdater implements UpdatableByNotificationManager, Runnable, Ac
     }
 
     @Override
-    public void notificationReceived(Notification arg) {
+    public void notificationReceived(Event arg) {
 
         // filter les arguments
         if (eventFilters.size() > 0) {

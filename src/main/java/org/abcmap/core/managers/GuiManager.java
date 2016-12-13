@@ -2,12 +2,10 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.*;
 import org.abcmap.gui.*;
 import org.abcmap.gui.components.dock.Dock;
+import org.abcmap.gui.components.map.CachedMapPane;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.windows.DetachedWindow;
 import org.abcmap.gui.windows.MainWindow;
@@ -16,6 +14,7 @@ import org.abcmap.gui.windows.crop.CropConfigurationWindow;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -25,7 +24,7 @@ import java.util.HashMap;
 /**
  * Manage all operations around GUI. Some can be delegated to others managers like DialogManager.
  */
-public class GuiManager implements HasNotificationManager {
+public class GuiManager implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(GuiManager.class);
 
@@ -45,15 +44,16 @@ public class GuiManager implements HasNotificationManager {
     private HashMap<Windows, JFrame> registeredWindows;
 
     private ProjectManager projectm;
-    private NotificationManager notifm;
+    private EventNotificationManager notifm;
     private Window wizardDetachedWindow;
+    private ArrayList<CachedMapPane> mapPanes;
 
     public GuiManager() {
 
         this.projectm = MainManager.getProjectManager();
 
-        this.notifm = new NotificationManager(this);
-        notifm.setDefaultUpdatableObject(new GuiUpdater());
+        this.notifm = new EventNotificationManager(this);
+        notifm.setDefaultListener(new GuiUpdater());
 
         // listen project manager events
         projectm.getNotificationManager().addObserver(this);
@@ -71,10 +71,10 @@ public class GuiManager implements HasNotificationManager {
     /**
      * Update GUI regarding to various events
      */
-    private class GuiUpdater implements UpdatableByNotificationManager {
+    private class GuiUpdater implements EventListener {
 
         @Override
-        public void notificationReceived(Notification arg) {
+        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
 
             // rename main window when project change
             if (ProjectEvent.isNewProjectLoadedEvent(arg)) {
@@ -207,7 +207,7 @@ public class GuiManager implements HasNotificationManager {
      * @throws InvocationTargetException
      * @throws InterruptedException
      */
-    public void setAllWindowVisibles(final boolean val)  {
+    public void setAllWindowVisibles(final boolean val) {
 
         try {
             SwingUtilities.invokeAndWait(new Runnable() {
@@ -389,8 +389,27 @@ public class GuiManager implements HasNotificationManager {
         throw new IllegalStateException("Unable to show: " + className);
     }
 
+    /**
+     * Create a map component associated with a project, register it and return it. A map component
+     * must be registered to be repainted when partial stores of project are updated
+     *
+     * @return
+     */
+    public CachedMapPane createMapComponent() {
+
+        CachedMapPane pane = new CachedMapPane(projectm.getProject());
+        pane.setWorldPosition(new Point2D.Double(0, 0));
+        pane.setDebugMode(false);
+        pane.setMouseManagementEnabled(true);
+
+        mapPanes.add(pane);
+
+        return pane;
+
+    }
+
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 }

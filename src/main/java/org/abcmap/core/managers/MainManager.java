@@ -42,8 +42,6 @@ public class MainManager {
 
         configureLibraries();
 
-        ThreadManager.init();
-
         configurationManager = new ConfigurationManager();
         tempFilesManager = new TempFilesManager();
         projectManager = new ProjectManager();

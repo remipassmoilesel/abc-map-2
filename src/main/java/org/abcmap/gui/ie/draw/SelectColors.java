@@ -1,7 +1,6 @@
 package org.abcmap.gui.ie.draw;
 
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.*;
 import org.abcmap.gui.components.color.ColorPicker;
 import org.abcmap.gui.ie.InteractionElement;
 
@@ -28,7 +27,7 @@ public class SelectColors extends InteractionElement {
 
 //        colorPicker.getListenerHandler().add(new Performer());
 
-        notifm.setDefaultUpdatableObject(new ColorPickerUpdater());
+        notifm.setDefaultListener(new ColorPickerUpdater());
         drawm.getNotificationManager().addObserver(this);
 
         return colorPicker;
@@ -64,10 +63,10 @@ public class SelectColors extends InteractionElement {
     /**
      * @author remipassmoilesel
      */
-    private class ColorPickerUpdater implements UpdatableByNotificationManager {
+    private class ColorPickerUpdater implements EventListener {
 
         @Override
-        public void notificationReceived(Notification arg) {
+        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
 
 			/*
 			// filtrer les evenements

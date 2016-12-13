@@ -1,8 +1,8 @@
 package org.abcmap.core.managers;
 
 import org.abcmap.core.draw.*;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
@@ -14,7 +14,7 @@ import java.util.ArrayList;
 /**
  * Here are managed all operations around drawing draw on map
  */
-public class DrawManager implements HasNotificationManager {
+public class DrawManager implements HasEventNotificationManager {
 
     private final ProjectManager projectMan;
 
@@ -32,7 +32,7 @@ public class DrawManager implements HasNotificationManager {
      * Active color used to draw, if a new builder is returned
      */
     private Color activeBackground;
-    private NotificationManager notifm;
+    private EventNotificationManager notifm;
     private ToolContainer currentToolContainer;
 
     public DrawManager() {
@@ -42,7 +42,7 @@ public class DrawManager implements HasNotificationManager {
         this.activeBackground = Color.green;
         this.activeThick = 5;
 
-        notifm = new NotificationManager(DrawManager.this);
+        notifm = new EventNotificationManager(DrawManager.this);
 
     }
 
@@ -161,7 +161,7 @@ public class DrawManager implements HasNotificationManager {
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

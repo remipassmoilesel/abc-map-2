@@ -1,8 +1,7 @@
 package org.abcmap.gui.ie.display.windowmode;
 
 import org.abcmap.core.events.GuiManagerEvent;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.*;
 import org.abcmap.gui.components.buttons.DisplayModeSelector;
 import org.abcmap.gui.ie.InteractionElement;
 
@@ -28,9 +27,9 @@ public class WindowModeSelector extends InteractionElement {
 
         selector.addActionListener(new ComboWindowModeListener());
 
-        notifm.setDefaultUpdatableObject(new UpdatableByNotificationManager() {
+        notifm.setDefaultListener(new EventListener() {
             @Override
-            public void notificationReceived(Notification arg) {
+            public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
                 if (GuiManagerEvent.isWindowModeNotification(arg)) {
                     selector.setSelectedItem(guim.getMainWindow().getWindowMode());
                 }

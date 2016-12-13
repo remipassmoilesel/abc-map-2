@@ -2,8 +2,8 @@ package org.abcmap.gui.tools;
 
 import org.abcmap.core.draw.LayerElement;
 import org.abcmap.core.managers.*;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.project.layer.AbstractLayer;
 
 import javax.swing.*;
@@ -11,9 +11,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public abstract class MapTool extends MouseAdapter implements HasNotificationManager {
+public abstract class MapTool extends MouseAdapter implements HasEventNotificationManager {
 
-    protected NotificationManager observer;
+    protected EventNotificationManager observer;
     protected DrawManager drawm;
     protected GuiManager guim;
     protected ProjectManager projectm;
@@ -31,7 +31,7 @@ public abstract class MapTool extends MouseAdapter implements HasNotificationMan
 
         this.mode = null;
 
-        this.observer = new NotificationManager(MapTool.this);
+        this.observer = new EventNotificationManager(MapTool.this);
         MainManager.getDrawManager().getNotificationManager().addObserver(this);
 
     }
@@ -147,7 +147,7 @@ public abstract class MapTool extends MouseAdapter implements HasNotificationMan
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return observer;
     }
 

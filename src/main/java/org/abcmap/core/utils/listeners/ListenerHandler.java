@@ -11,7 +11,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * Light utility to handle observers.
+ * Light utility to handle observers. Typically this utility is used for small components which have few observers (and eventually on EDT)
+ * <p>
+ * This utility is lighter than the Event Manager since it does not oblige
+ * observers to create a specific object of observation. Here events can be
+ * listened to with a simple interface.
+ * <p>
+ * Also events are send on same thread, this allow to send events on Event Dispatch Thread if needed.
  *
  * @param <T>
  * @author remipassmoilesel
@@ -52,7 +58,7 @@ public class ListenerHandler<T> implements Iterable<T> {
 //            ((ImportEventListener) listener).importEventHapened((ImportEvent) e);
 //        }
 
-        // action events
+        // action listeners
         else if (e instanceof ActionEvent && listener instanceof ActionListener) {
             ((ActionListener) listener).actionPerformed((ActionEvent) e);
         }

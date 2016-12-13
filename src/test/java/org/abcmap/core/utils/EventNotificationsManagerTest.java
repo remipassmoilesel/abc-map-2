@@ -1,8 +1,8 @@
 package org.abcmap.core.utils;
 
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.events.manager.Event;
+import org.abcmap.core.events.manager.EventNotificationManager;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -10,21 +10,21 @@ import java.util.ArrayList;
 
 import static org.junit.Assert.assertTrue;
 
-public class NotificationManagerTest {
+public class EventNotificationsManagerTest {
 
-    private static ArrayList<Notification> notificationsReceived = new ArrayList<>();
+    private static ArrayList<Event> notificationsReceived = new ArrayList<>();
 
     @Test
     public void tests() throws IOException, InterruptedException {
 
-        NotificationManager.setDebugMode(true);
+        EventNotificationManager.setDebugMode(true);
 
         // source of events, observed
         NotificationTester source = new NotificationTester();
 
         // create observers
         int observersNumber = 10;
-        ArrayList<HasNotificationManager> list = new ArrayList<>();
+        ArrayList<HasEventNotificationManager> list = new ArrayList<>();
         for (int i = 0; i < observersNumber; i++) {
             NotificationTester tester = new NotificationTester();
             list.add(tester);
@@ -32,27 +32,27 @@ public class NotificationManagerTest {
         }
 
         // launch first event
-        source.getNotificationManager().fireNotification(new Notification("Ding dong !", null));
+        source.getNotificationManager().fireNotification(new Event("Ding dong !", null));
 
         // events are transmitted in other thread, should be less than expected result (probably 0)
         int received = notificationsReceived.size();
-        assertTrue("Notification thread test: " + received, received < observersNumber);
+        assertTrue("Event thread test: " + received, received < observersNumber);
 
         // wait until notifications are transmitted on other threads and check
         waitUntilReceived(observersNumber);
         received = notificationsReceived.size();
-        assertTrue("Notification test 1: " + received, received == observersNumber);
+        assertTrue("Event test 1: " + received, received == observersNumber);
 
         // fire notification from observer, no events should be transmitted here
-        list.get(0).getNotificationManager().fireNotification(new Notification("Ding dong !", null));
+        list.get(0).getNotificationManager().fireNotification(new Event("Ding dong !", null));
         received = notificationsReceived.size();
-        assertTrue("Notification test 2: " + received, received == observersNumber);
+        assertTrue("Event test 2: " + received, received == observersNumber);
 
         // add last observers a second time, no more events should be fired than last time
         source.getNotificationManager().addObservers(list);
         waitUntilReceived(observersNumber);
         received = notificationsReceived.size();
-        assertTrue("Notification test 3: " + received, received == observersNumber);
+        assertTrue("Event test 3: " + received, received == observersNumber);
 
         // add more observers
         for (int i = 0; i < observersNumber; i++) {
@@ -62,16 +62,16 @@ public class NotificationManagerTest {
         }
 
         // Fire event. All previous observers should received it
-        source.getNotificationManager().fireNotification(new Notification("Ding dong !", null));
+        source.getNotificationManager().fireNotification(new Event("Ding dong !", null));
 
         // but not now, just after
         received = notificationsReceived.size();
-        assertTrue("Notification test 4: " + received, received < observersNumber * 3);
+        assertTrue("Event test 4: " + received, received < observersNumber * 3);
 
         // here !
         waitUntilReceived(observersNumber * 3);
         received = notificationsReceived.size();
-        assertTrue("Notification test 5: " + received, received == observersNumber * 3);
+        assertTrue("Event test 5: " + received, received == observersNumber * 3);
     }
 
     /**
@@ -93,9 +93,9 @@ public class NotificationManagerTest {
         }
     }
 
-    private class NotificationTester implements HasNotificationManager {
+    private class NotificationTester implements HasEventNotificationManager {
 
-        private NotificationManager notifm = new NotificationManager(this);
+        private EventNotificationManager notifm = new EventNotificationManager(this);
 
         NotificationTester() {
             notifm.setDefaultListener((notification) -> {
@@ -104,7 +104,7 @@ public class NotificationManagerTest {
         }
 
         @Override
-        public NotificationManager getNotificationManager() {
+        public EventNotificationManager getNotificationManager() {
             return notifm;
         }
     }

@@ -1,7 +1,6 @@
 package org.abcmap.gui.ie.draw;
 
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.*;
 import org.abcmap.gui.components.help.ToolHelpPanel;
 import org.abcmap.gui.ie.InteractionElement;
 
@@ -30,7 +29,7 @@ public class ShowToolHelp extends InteractionElement {
         toolHelpPanel.setMessageNoHelp("<html><i>Aide sur l'outil indisponible.</i></html>");
 
         InteractionUpdater interactionUpdater = new InteractionUpdater();
-        notifm.setDefaultUpdatableObject(interactionUpdater);
+        notifm.setDefaultListener(interactionUpdater);
 
         drawm.getNotificationManager().addObserver(this);
 
@@ -39,7 +38,7 @@ public class ShowToolHelp extends InteractionElement {
         return toolHelpPanel;
     }
 
-    public class InteractionUpdater implements Runnable, UpdatableByNotificationManager {
+    public class InteractionUpdater implements Runnable, EventListener {
 
         @Override
         public void run() {
@@ -60,7 +59,7 @@ public class ShowToolHelp extends InteractionElement {
          * Reception d'un evenement
          */
         @Override
-        public void notificationReceived(Notification arg) {
+        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
             /*
             if (DrawManagerEvent.TOOL_CHANGED.equals(arg.getName())) {
                 SwingUtilities.invokeLater(this);

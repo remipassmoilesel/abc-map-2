@@ -3,8 +3,8 @@ package org.abcmap.core.managers;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
@@ -22,11 +22,11 @@ import java.util.ArrayList;
 /**
  * Here are managed all operations concerning projects
  */
-public class ProjectManager implements HasNotificationManager {
+public class ProjectManager implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(ProjectManager.class);
     private final ProjectBackupInterval backupTimer;
-    private final NotificationManager notificationManager;
+    private final EventNotificationManager notificationManager;
     private Project currentProject;
     private final TempFilesManager tempMan;
 
@@ -35,7 +35,7 @@ public class ProjectManager implements HasNotificationManager {
         this.currentProject = null;
         tempMan = MainManager.getTempFilesManager();
 
-        notificationManager = new NotificationManager(ProjectManager.this);
+        notificationManager = new EventNotificationManager(ProjectManager.this);
 
         backupTimer = new ProjectBackupInterval(ConfigurationConstants.BACKUP_INTERVAL);
     }
@@ -217,7 +217,7 @@ public class ProjectManager implements HasNotificationManager {
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notificationManager;
     }
 }

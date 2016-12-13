@@ -1,8 +1,8 @@
 package org.abcmap.core.events;
 
-import org.abcmap.core.notifications.Notification;
+import org.abcmap.core.events.manager.Event;
 
-public class GuiManagerEvent extends Notification {
+public class GuiManagerEvent extends Event {
 
     public static final String WINDOW_MODE_CHANGED = "WINDOW_MODE_CHANGED";
 
@@ -10,7 +10,7 @@ public class GuiManagerEvent extends Notification {
         super(event, value);
     }
 
-    public static boolean isWindowModeNotification(Notification arg) {
+    public static boolean isWindowModeNotification(Event arg) {
 
         if (arg instanceof GuiManagerEvent == false) {
             return false;

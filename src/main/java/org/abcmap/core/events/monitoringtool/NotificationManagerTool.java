@@ -1,4 +1,4 @@
-package org.abcmap.core.notifications.monitoringtool;
+package org.abcmap.core.events.monitoringtool;
 
 import net.miginfocom.swing.MigLayout;
 

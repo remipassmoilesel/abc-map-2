@@ -181,7 +181,7 @@ public class SelectionToolOptionPanel extends ToolOptionPanel {
 	}
 
 	private class FormUpdater implements Runnable,
-			UpdatableByNotificationManager {
+			NotificationListener {
 
 		@Override
 		public void run() {
@@ -224,14 +224,14 @@ public class SelectionToolOptionPanel extends ToolOptionPanel {
 		 * Reception d'une notification par l'observateur
 
 		@Override
-		public void notificationReceived(Notification arg) {
+		public void notificationReceived(Event arg) {
 			if (arg instanceof DrawManagerEvent)
 				SwingUtilities.invokeLater(this);
 		}
 	}
 
 	@Override
-	public NotificationManager getNotificationManager() {
+	public EventNotificationManager getNotificationManager() {
 		return observer;
 	}
 

@@ -1,8 +1,8 @@
 package org.abcmap.core.events;
 
-import org.abcmap.core.notifications.Notification;
+import org.abcmap.core.events.manager.Event;
 
-public class ProjectEvent extends Notification {
+public class ProjectEvent extends Event {
 
     public static final String NEW_PROJECT_LOADED = "NEW_PROJECT_LOADED";
 
@@ -34,7 +34,7 @@ public class ProjectEvent extends Notification {
      * @param arg
      * @return
      */
-    public static boolean isNewProjectLoadedEvent(Notification arg) {
+    public static boolean isNewProjectLoadedEvent(Event arg) {
         return testEvent(arg, NEW_PROJECT_LOADED);
     }
 
@@ -44,7 +44,7 @@ public class ProjectEvent extends Notification {
      * @param arg
      * @return
      */
-    public static boolean isCloseProjectEvent(Notification arg) {
+    public static boolean isCloseProjectEvent(Event arg) {
         return testEvent(arg, PROJECT_CLOSED);
     }
 
@@ -53,7 +53,7 @@ public class ProjectEvent extends Notification {
      * @param name
      * @return
      */
-    private static boolean testEvent(Notification event, String name) {
+    private static boolean testEvent(Event event, String name) {
 
         if (event == null) {
             return false;

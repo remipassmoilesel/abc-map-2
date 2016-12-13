@@ -1,7 +1,7 @@
-package org.abcmap.core.notifications.monitoringtool;
+package org.abcmap.core.events.monitoringtool;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
@@ -26,7 +26,7 @@ public class LastNotificationsPanel extends JPanel {
         // update all panel
         removeAll();
 
-        List<NotificationHistoryElement> lastEvents = NotificationManager.getLastTransmittedEvents();
+        List<NotificationHistoryElement> lastEvents = EventNotificationManager.getLastTransmittedEvents();
         Collections.reverse(lastEvents);
 
         for (NotificationHistoryElement cehe : lastEvents) {

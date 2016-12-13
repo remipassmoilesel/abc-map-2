@@ -1,8 +1,7 @@
-package org.abcmap.core.notifications.monitoringtool;
+package org.abcmap.core.events.monitoringtool;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.*;
 import org.abcmap.gui.HtmlLabel;
 import org.abcmap.gui.utils.GuiUtils;
 
@@ -15,8 +14,8 @@ import java.util.ArrayList;
 public class NotificationHistoryPanel extends JPanel {
 
     private NotificationHistoryElement elmt;
-    private Notification ev;
-    private NotificationManager om;
+    private org.abcmap.core.events.manager.Event ev;
+    private EventNotificationManager om;
     private Object owner;
 
     public NotificationHistoryPanel(NotificationHistoryElement elmt) {
@@ -57,12 +56,12 @@ public class NotificationHistoryPanel extends JPanel {
      */
     private static class ObserversDisplayPanel extends JPanel implements ActionListener {
 
-        private ArrayList<NotificationManager> observers;
+        private ArrayList<EventNotificationManager> observers;
         private boolean receiversAreShowed;
         private JButton buttonShowReceivers;
         private HtmlLabel labelNbrObservers;
 
-        public ObserversDisplayPanel(ArrayList<NotificationManager> observers) {
+        public ObserversDisplayPanel(ArrayList<EventNotificationManager> observers) {
 
             GuiUtils.throwIfNotOnEDT();
 
@@ -99,7 +98,7 @@ public class NotificationHistoryPanel extends JPanel {
 
                 int i = 0;
 
-                for (NotificationManager om : observers) {
+                for (EventNotificationManager om : observers) {
 
                     String className = om.getClass().getName();
                     String owner = om.getOwner().getClass().getName();

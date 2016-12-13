@@ -4,6 +4,7 @@ package org.abcmap;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.gui.GuiColors;
 
 import java.io.IOException;
@@ -41,6 +42,8 @@ public class Launcher {
         }
 
         MainManager.setDebugMode(devMode);
+
+        EventNotificationManager.setDebugMode(devMode);
 
         try {
             MainManager.init();

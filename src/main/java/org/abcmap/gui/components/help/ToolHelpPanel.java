@@ -1,7 +1,7 @@
 package org.abcmap.gui.components.help;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
@@ -11,7 +11,7 @@ import javax.swing.*;
  */
 public class ToolHelpPanel extends JPanel {
 
-    private NotificationManager om;
+    private EventNotificationManager om;
     private String messageNoHelp;
 
     public ToolHelpPanel() {

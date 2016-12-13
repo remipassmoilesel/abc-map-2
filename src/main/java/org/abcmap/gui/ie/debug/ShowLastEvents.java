@@ -1,6 +1,6 @@
 package org.abcmap.gui.ie.debug;
 
-import org.abcmap.core.notifications.monitoringtool.NotificationManagerTool;
+import org.abcmap.core.events.monitoringtool.NotificationManagerTool;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
 

@@ -3,8 +3,8 @@ package org.abcmap.gui.ie;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.*;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.dock.blockitems.ClickableBlockItem;
@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * This abstract class contains many utility used to execute user actions.
  */
-public abstract class InteractionElement implements Runnable, ActionListener, HasNotificationManager {
+public abstract class InteractionElement implements Runnable, ActionListener, HasEventNotificationManager {
 
     protected static final CustomLogger logger = LogManager.getLogger(TempFilesManager.class);
 
@@ -121,7 +121,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
      */
     protected boolean hiddenInDetachedWIndows;
 
-    protected NotificationManager notifm;
+    protected EventNotificationManager notifm;
 
     protected String wrap15 = "wrap 15, ";
     protected String gapLeft = "gapleft 15px, ";
@@ -163,7 +163,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
         // display as a simple clickable element by default
         this.displaySimplyInSearch = true;
 
-        this.notifm = new NotificationManager(this);
+        this.notifm = new EventNotificationManager(this);
 
         this.userActionLock = new ReentrantLock();
 
@@ -369,7 +369,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

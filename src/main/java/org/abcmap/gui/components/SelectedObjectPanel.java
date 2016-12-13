@@ -4,8 +4,8 @@ import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.draw.LayerElement;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.utils.listeners.HasListenerHandler;
 import org.abcmap.core.utils.listeners.ListenerHandler;
 import org.abcmap.gui.utils.FormUpdater;
@@ -21,7 +21,7 @@ import java.util.ArrayList;
  *
  * @author remipassmoilesel
  */
-public class SelectedObjectPanel extends JPanel implements HasNotificationManager, HasListenerHandler<ActionListener> {
+public class SelectedObjectPanel extends JPanel implements HasEventNotificationManager, HasListenerHandler<ActionListener> {
 
     /**
      * Panel where are drawn samples
@@ -44,7 +44,7 @@ public class SelectedObjectPanel extends JPanel implements HasNotificationManage
     private int maxSampleWidth;
 
     private ListenerHandler<ActionListener> listenerHandler;
-    private NotificationManager notifm;
+    private EventNotificationManager notifm;
     private ProjectManager projectm;
 
     public SelectedObjectPanel() {
@@ -64,8 +64,8 @@ public class SelectedObjectPanel extends JPanel implements HasNotificationManage
         add(lblTypeOfSample);
 
         SelectionViewUpdater formUpdater = new SelectionViewUpdater();
-        notifm = new NotificationManager(this);
-        notifm.setDefaultUpdatableObject(formUpdater);
+        notifm = new EventNotificationManager(this);
+        notifm.setDefaultListener(formUpdater);
 
         projectm.getNotificationManager().addObserver(this);
 
@@ -159,7 +159,7 @@ public class SelectedObjectPanel extends JPanel implements HasNotificationManage
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

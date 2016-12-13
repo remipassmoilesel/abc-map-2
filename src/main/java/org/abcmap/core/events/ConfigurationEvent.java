@@ -1,8 +1,8 @@
 package org.abcmap.core.events;
 
-import org.abcmap.core.notifications.Notification;
+import org.abcmap.core.events.manager.Event;
 
-public class ConfigurationEvent extends Notification {
+public class ConfigurationEvent extends Event {
 
     public static final String NEW_CONFIGURATION_LOADED = "NEW_CONFIGURATION_LOADED";
     public static final String CONFIGURATION_SAVED = "CONFIGURATION_SAVED";

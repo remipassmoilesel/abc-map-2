@@ -1,8 +1,8 @@
 package org.abcmap.core.events;
 
-import org.abcmap.core.notifications.Notification;
+import org.abcmap.core.events.manager.Event;
 
-public class DrawManagerEvent extends Notification {
+public class DrawManagerEvent extends Event {
 	public static final String TOOL_CHANGED = "TOOL_CHANGED";
 	public static final String DRAW_STROKE_CHANGED = "DRAW_STROKE_CHANGED";
 	public static final String TOOL_MODE_CHANGED = "TOOL_MODE_CHANGED";

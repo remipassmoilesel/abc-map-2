@@ -2,8 +2,8 @@ package org.abcmap.gui.components.data;
 
 import org.abcmap.core.managers.ImportManager;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.utils.FormUpdater;
 import org.abcmap.gui.utils.GuiUtils;
@@ -15,9 +15,9 @@ import java.util.List;
 /**
  * Select headers of current file to import
  */
-public class DataHeadersCombo extends JComboBox<String> implements HasNotificationManager {
+public class DataHeadersCombo extends JComboBox<String> implements HasEventNotificationManager {
 
-    private NotificationManager notifm;
+    private EventNotificationManager notifm;
     private ImportManager importm;
 
     public DataHeadersCombo() {
@@ -29,8 +29,8 @@ public class DataHeadersCombo extends JComboBox<String> implements HasNotificati
 
         // listen import manager
         ComboUpdater cbUpdater = new ComboUpdater();
-        notifm = new NotificationManager(this);
-        notifm.setDefaultUpdatableObject(cbUpdater);
+        notifm = new EventNotificationManager(this);
+        notifm.setDefaultListener(cbUpdater);
         importm.getNotificationManager().addObserver(this);
 
         // first update
@@ -70,7 +70,7 @@ public class DataHeadersCombo extends JComboBox<String> implements HasNotificati
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

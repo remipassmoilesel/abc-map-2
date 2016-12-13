@@ -1,7 +1,7 @@
 package org.abcmap.core.managers;
 
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -11,16 +11,16 @@ import java.awt.*;
 /**
  * Created by remipassmoilesel on 08/12/16.
  */
-public class MapManager implements HasNotificationManager {
+public class MapManager implements HasEventNotificationManager {
 
-    private final NotificationManager notifm;
+    private final EventNotificationManager notifm;
 
     public MapManager() {
-        notifm = new NotificationManager(MapManager.this);
+        notifm = new EventNotificationManager(MapManager.this);
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

@@ -1,7 +1,7 @@
 package org.abcmap.core.managers;
 
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -10,12 +10,12 @@ import java.util.ArrayList;
 /**
  * Created by remipassmoilesel on 08/12/16.
  */
-public class ImportManager implements HasNotificationManager {
+public class ImportManager implements HasEventNotificationManager {
 
-    private final NotificationManager notifm;
+    private final EventNotificationManager notifm;
 
     public ImportManager() {
-        this.notifm = new NotificationManager(ImportManager.this);
+        this.notifm = new EventNotificationManager(ImportManager.this);
     }
 
     public void stopCropConfiguration() {
@@ -23,7 +23,7 @@ public class ImportManager implements HasNotificationManager {
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

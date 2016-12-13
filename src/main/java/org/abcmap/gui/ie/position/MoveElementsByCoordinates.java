@@ -3,9 +3,9 @@ package org.abcmap.gui.ie.position;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.MapEvent;
 import org.abcmap.core.events.ProjectEvent;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.Event;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.EventListener;
 import org.abcmap.gui.components.geo.CoordinatesPanel;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
@@ -63,7 +63,7 @@ public class MoveElementsByCoordinates extends InteractionElement {
         mover = new ElementMover();
 
         updater = new MoveElementsUpdater();
-        notifm.setDefaultUpdatableObject(updater);
+        notifm.setDefaultListener(updater);
 
         projectm.getNotificationManager().addObserver(this);
 
@@ -104,10 +104,10 @@ public class MoveElementsByCoordinates extends InteractionElement {
         }
     }
 
-    private class MoveElementsUpdater implements UpdatableByNotificationManager {
+    private class MoveElementsUpdater implements EventListener {
 
         @Override
-        public void notificationReceived(Notification arg) {
+        public void notificationReceived(Event arg) {
 
             if (arg instanceof MapEvent) {
                 updateDegreeForm();
@@ -146,7 +146,7 @@ public class MoveElementsByCoordinates extends InteractionElement {
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

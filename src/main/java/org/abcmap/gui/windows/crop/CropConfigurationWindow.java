@@ -5,10 +5,7 @@ import org.abcmap.core.managers.ConfigurationManager;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.ImportManager;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.*;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.windows.FullScreenPictureWindow;
 import org.abcmap.gui.utils.GuiUtils;
@@ -22,10 +19,10 @@ import java.awt.geom.Area;
 /**
  * Window used to configure automatic crop for screen capture
  */
-public class CropConfigurationWindow extends FullScreenPictureWindow implements HasNotificationManager {
+public class CropConfigurationWindow extends FullScreenPictureWindow implements HasEventNotificationManager {
 
     private ImportManager importm;
-    private NotificationManager observer;
+    private EventNotificationManager observer;
 
     private WindowListener closeWL;
     private org.abcmap.gui.windows.crop.CropDimensionsDialog dialog;
@@ -61,18 +58,18 @@ public class CropConfigurationWindow extends FullScreenPictureWindow implements 
         dialog.addWindowListener(closeWL);
 
         // listen configuration changes
-        this.observer = new NotificationManager(this);
-        observer.setDefaultUpdatableObject(new CropSelectionUpdater());
+        this.observer = new EventNotificationManager(this);
+        observer.setDefaultListener(new CropSelectionUpdater());
 
     }
 
     /**
      * Update GUI if configuration change
      */
-    private class CropSelectionUpdater implements UpdatableByNotificationManager, Runnable {
+    private class CropSelectionUpdater implements EventListener, Runnable {
 
         @Override
-        public void notificationReceived(Notification arg) {
+        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
             if (arg instanceof ConfigurationEvent) {
                 SwingUtilities.invokeLater(this);
             }
@@ -225,7 +222,7 @@ public class CropConfigurationWindow extends FullScreenPictureWindow implements 
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return observer;
     }
 

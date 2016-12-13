@@ -64,10 +64,10 @@ public class SelectDirectoryToImport extends InteractionElement {
      * @author remipassmoilesel
      *
      *
-    private class TextFieldUpdater implements UpdatableByNotificationManager, Runnable {
+    private class TextFieldUpdater implements NotificationListener, Runnable {
 
 
-    @Override public void notificationReceived(Notification arg) {
+    @Override public void notificationReceived(Event arg) {
     SwingUtilities.invokeLater(this);
     }
 

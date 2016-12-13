@@ -1,16 +1,16 @@
-package org.abcmap.core.notifications.monitoringtool;
+package org.abcmap.core.events.monitoringtool;
 
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.Event;
+import org.abcmap.core.events.manager.EventNotificationManager;
 
 import javax.swing.*;
 import java.util.ArrayList;
 
 public class NotificationHistoryElement {
-	private NotificationManager om;
-	private Notification ev;
+	private EventNotificationManager om;
+	private Event ev;
 	private Object owner;
-	private ArrayList<NotificationManager> receivers;
+	private ArrayList<EventNotificationManager> receivers;
 
 	public NotificationHistoryElement() {
 		this.om = null;
@@ -19,23 +19,23 @@ public class NotificationHistoryElement {
 		this.receivers = new ArrayList<>();
 	}
 
-	public void setReceivers(ArrayList<NotificationManager> observers) {
+	public void setReceivers(ArrayList<EventNotificationManager> observers) {
 		receivers.addAll(observers);
 	}
 
-	public NotificationManager getObserverManager() {
+	public EventNotificationManager getObserverManager() {
 		return om;
 	}
 
-	public void setObserverManager(NotificationManager om) {
+	public void setObserverManager(EventNotificationManager om) {
 		this.om = om;
 	}
 
-	public Notification getNotification() {
+	public Event getNotification() {
 		return ev;
 	}
 
-	public void setNotification(Notification ev) {
+	public void setNotification(Event ev) {
 		this.ev = ev;
 	}
 
@@ -51,7 +51,7 @@ public class NotificationHistoryElement {
 		return new NotificationHistoryPanel(this);
 	}
 
-	public ArrayList<NotificationManager> getObservers() {
+	public ArrayList<EventNotificationManager> getObservers() {
 		return receivers;
 	}
 

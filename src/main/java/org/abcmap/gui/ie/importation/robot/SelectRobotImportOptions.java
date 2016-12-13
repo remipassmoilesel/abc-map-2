@@ -1,7 +1,6 @@
 package org.abcmap.gui.ie.importation.robot;
 
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.*;
 import org.abcmap.gui.components.importation.RobotImportOptionsPanel;
 import org.abcmap.gui.ie.InteractionElement;
 
@@ -27,7 +26,7 @@ public class SelectRobotImportOptions extends InteractionElement {
         robotOptionPanel.getListenerHandler().add(new RobotConfigurationUpdater());
 
         configm.getNotificationManager().addObserver(this);
-        notifm.setDefaultUpdatableObject(new PanelUpdater());
+        notifm.setDefaultListener(new PanelUpdater());
 
         return robotOptionPanel;
 
@@ -51,10 +50,10 @@ public class SelectRobotImportOptions extends InteractionElement {
 
     }
 
-    private class PanelUpdater implements UpdatableByNotificationManager {
+    private class PanelUpdater implements EventListener {
 
         @Override
-        public void notificationReceived(Notification arg) {
+        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
 
             /*
             // récuperer la configuration actuelle

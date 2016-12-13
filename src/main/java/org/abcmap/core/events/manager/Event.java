@@ -1,11 +1,11 @@
-package org.abcmap.core.notifications;
+package org.abcmap.core.events.manager;
 
 import org.abcmap.core.utils.Utils;
 
 /**
  * Event that can be sent by notification manager
  */
-public class Notification {
+public class Event {
 
     public static Integer instances = 0;
 
@@ -14,7 +14,7 @@ public class Notification {
     private String creationTime;
     private Integer instanceNumber;
 
-    public Notification(String name, Object value) {
+    public Event(String name, Object value) {
 
         // count instances
         instances++;

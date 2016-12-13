@@ -25,10 +25,6 @@ public class ThreadManager {
      */
     private static ExecutorService executor;
 
-    public static void init() {
-        executor = Executors.newFixedThreadPool(THREAD_POOL_LENGHT);
-    }
-
     /**
      * Run a task in a separated thread
      *
@@ -88,9 +84,18 @@ public class ThreadManager {
         if (onEDT) {
             SwingUtilities.invokeLater(task);
         } else {
-            executor.execute(task);
+            getExecutor().execute(task);
         }
 
         return task;
+    }
+
+    private static ExecutorService getExecutor() {
+
+        if (executor == null) {
+            executor = Executors.newFixedThreadPool(THREAD_POOL_LENGHT);
+        }
+
+        return executor;
     }
 }

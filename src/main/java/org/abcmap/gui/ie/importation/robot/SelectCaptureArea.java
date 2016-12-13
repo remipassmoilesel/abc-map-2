@@ -28,7 +28,7 @@ public class SelectCaptureArea extends InteractionElement {
 
         formUpdater = new Updater();
         configm.getNotificationManager().addObserver(this);
-        notifm.setDefaultUpdatableObject(formUpdater);
+        notifm.setDefaultListener(formUpdater);
 
         JPanel panel = new JPanel(new MigLayout("insets 0"));
 

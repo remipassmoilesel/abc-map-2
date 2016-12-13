@@ -21,10 +21,10 @@ import javax.swing.event.ListSelectionListener;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.Event;
+import org.abcmap.core.events.manager.EventListener;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GuiUtils;
@@ -34,7 +34,7 @@ import org.abcmap.gui.utils.GuiUtils;
  *
  * @author remipassmoilesel
  */
-public class LayerSelectorPanel extends JPanel implements HasNotificationManager {
+public class LayerSelectorPanel extends JPanel implements HasEventNotificationManager {
 
     private static final int SLIDER_MIN_VALUE = 0;
     private static final int SLIDER_MAX_VALUE = 100;
@@ -44,7 +44,7 @@ public class LayerSelectorPanel extends JPanel implements HasNotificationManager
     private DefaultListModel<AbstractLayer> listModel;
     private JList<AbstractLayer> jlist;
     private JSlider opacitySlider;
-    private NotificationManager notifm;
+    private EventNotificationManager notifm;
     private FormUpdater formUpdater;
     private boolean showExceptions;
 
@@ -60,8 +60,8 @@ public class LayerSelectorPanel extends JPanel implements HasNotificationManager
         this.formUpdater = new FormUpdater();
 
         // listen project
-        this.notifm = new NotificationManager(this);
-        notifm.setDefaultUpdatableObject(new LayerSelectorUpdater());
+        this.notifm = new EventNotificationManager(this);
+        notifm.setDefaultListener(new LayerSelectorUpdater());
         projectm.getNotificationManager().addObserver(this);
 
         // selectable list of layers
@@ -273,15 +273,15 @@ public class LayerSelectorPanel extends JPanel implements HasNotificationManager
 
     }
 
-    private class LayerSelectorUpdater implements UpdatableByNotificationManager {
+    private class LayerSelectorUpdater implements EventListener {
         @Override
-        public void notificationReceived(Notification arg) {
+        public void notificationReceived(Event arg) {
             SwingUtilities.invokeLater(formUpdater);
         }
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

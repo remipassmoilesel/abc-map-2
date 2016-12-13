@@ -8,10 +8,10 @@ import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.MapManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.events.manager.Event;
+import org.abcmap.core.events.manager.EventListener;
 import org.abcmap.gui.components.progressbar.HasProgressbarManager;
 import org.abcmap.gui.components.progressbar.ProgressbarManager;
 import org.abcmap.gui.utils.GuiUtils;
@@ -23,14 +23,14 @@ import java.awt.event.MouseEvent;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
-public class StatusBar extends JPanel implements HasNotificationManager, HasProgressbarManager {
+public class StatusBar extends JPanel implements HasEventNotificationManager, HasProgressbarManager {
 
     /**
      * If true display errors
      */
     private boolean showErrors = false;
 
-    private NotificationManager notifm;
+    private EventNotificationManager notifm;
 
     /**
      * Display degrees coordinates
@@ -114,8 +114,8 @@ public class StatusBar extends JPanel implements HasNotificationManager, HasProg
         this.updater = new Updater();
 
         // watch project and map
-        this.notifm = new NotificationManager(this);
-        notifm.setDefaultUpdatableObject(updater);
+        this.notifm = new EventNotificationManager(this);
+        notifm.setDefaultListener(updater);
 
         projectm.getNotificationManager().addObserver(this);
         mapm.getNotificationManager().addObserver(this);
@@ -165,7 +165,7 @@ public class StatusBar extends JPanel implements HasNotificationManager, HasProg
     /**
      * Update zoom / scale values
      */
-    private class Updater implements Runnable, UpdatableByNotificationManager {
+    private class Updater implements Runnable, EventListener {
 
         private DecimalFormat zoomFormat;
         private DecimalFormat meterFormat;
@@ -184,7 +184,7 @@ public class StatusBar extends JPanel implements HasNotificationManager, HasProg
         }
 
         @Override
-        public void notificationReceived(Notification arg) {
+        public void notificationReceived(Event arg) {
 
             // enable / disable mouse when project change
             if (arg instanceof ProjectEvent) {
@@ -342,7 +342,7 @@ public class StatusBar extends JPanel implements HasNotificationManager, HasProg
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

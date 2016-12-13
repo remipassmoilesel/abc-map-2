@@ -1,7 +1,7 @@
 package org.abcmap.gui.ie.recents;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.notifications.HasNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.gui.components.fileselection.FileSelectionPanel;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.utils.FormUpdater;
@@ -11,7 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class OpenRecentProject extends InteractionElement implements HasNotificationManager {
+public class OpenRecentProject extends InteractionElement implements HasEventNotificationManager {
 
     private FileSelectionPanel fileSelectionPanel;
     private FileViewUpdater fileViewUpdater;
@@ -36,7 +36,7 @@ public class OpenRecentProject extends InteractionElement implements HasNotifica
 
         this.fileViewUpdater = new FileViewUpdater();
 
-        notifm.setDefaultUpdatableObject(fileViewUpdater);
+        notifm.setDefaultListener(fileViewUpdater);
         recentsm.getNotificationManager().addObserver(this);
 
         fileViewUpdater.run();

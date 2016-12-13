@@ -4,8 +4,8 @@ import com.labun.surf.Params;
 import com.thoughtworks.xstream.XStream;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.configuration.ConfigurationContainer;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 
 import java.awt.*;
 import java.io.*;
@@ -16,10 +16,10 @@ import java.nio.file.Paths;
 /**
  * Manage configuration of software. Here you can store and use settings.
  */
-public class ConfigurationManager implements HasNotificationManager{
+public class ConfigurationManager implements HasEventNotificationManager {
 
     private final XStream xmlSerializer;
-    private final NotificationManager notifm;
+    private final EventNotificationManager notifm;
     private ConfigurationContainer currentConfiguration;
 
     public ConfigurationManager() throws IOException {
@@ -27,7 +27,7 @@ public class ConfigurationManager implements HasNotificationManager{
         this.currentConfiguration = new ConfigurationContainer();
         this.xmlSerializer = new XStream();
 
-        this.notifm = new NotificationManager(ConfigurationManager.this);
+        this.notifm = new EventNotificationManager(ConfigurationManager.this);
 
         initializeConfiguration();
     }
@@ -123,7 +123,7 @@ public class ConfigurationManager implements HasNotificationManager{
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

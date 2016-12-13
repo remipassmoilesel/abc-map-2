@@ -4,8 +4,8 @@ import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.gui.components.buttons.HtmlButton;
 import org.abcmap.gui.components.buttons.HtmlCheckbox;
 import org.abcmap.gui.components.progressbar.HasProgressbarManager;
@@ -32,7 +32,7 @@ import javax.swing.JScrollPane;
 /**
  * Smaller window that can be hold components "detached" from main window
  */
-public class DetachedWindow extends AbstractCustomWindow implements HasNotificationManager, HasDisplayableSpace, HasProgressbarManager {
+public class DetachedWindow extends AbstractCustomWindow implements HasEventNotificationManager, HasDisplayableSpace, HasProgressbarManager {
 
     private static final Dimension WINDOW_PREF_SIZE = new Dimension(300, 500);
 
@@ -62,13 +62,13 @@ public class DetachedWindow extends AbstractCustomWindow implements HasNotificat
 
     private GuiManager guim;
     private ProgressbarManager progressbarManager;
-    private NotificationManager notifm;
+    private EventNotificationManager notifm;
 
     public DetachedWindow() {
         super();
 
         this.guim = MainManager.getGuiManager();
-        this.notifm = new NotificationManager(this);
+        this.notifm = new EventNotificationManager(this);
 
         this.setSize(WINDOW_PREF_SIZE);
         this.setResizable(false);
@@ -209,7 +209,7 @@ public class DetachedWindow extends AbstractCustomWindow implements HasNotificat
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 

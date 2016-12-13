@@ -40,7 +40,7 @@ public abstract class AbstractSelectCropArea extends InteractionElement {
 
         textfieldsUpdater = new TextFieldsUpdater();
 
-        notifm.setDefaultUpdatableObject(textfieldsUpdater);
+        notifm.setDefaultListener(textfieldsUpdater);
         configm.getNotificationManager().addObserver(this);
         projectm.getNotificationManager().addObserver(this);
 

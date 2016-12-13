@@ -1,7 +1,6 @@
 package org.abcmap.gui.ie.profiles;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.gui.components.textfields.TextFieldDelayedAction;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.utils.FormUpdater;
 
@@ -28,7 +27,7 @@ public class SetProfileTitle extends InteractionElement {
 
         profileListener = new ProfileListener();
 
-        notifm.setDefaultUpdatableObject(profileListener);
+        notifm.setDefaultListener(profileListener);
         configm.getNotificationManager().addObserver(this);
 
         //TextFieldDelayedAction.delayedActionFor(textField, new TextFieldListener(), false);

@@ -1,19 +1,19 @@
 package org.abcmap.core.managers;
 
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.NotificationManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 
 import java.io.IOException;
 
 /**
  * Created by remipassmoilesel on 08/12/16.
  */
-public class RecentManager implements HasNotificationManager {
-    private final NotificationManager notifm;
+public class RecentManager implements HasEventNotificationManager {
+    private final EventNotificationManager notifm;
 
 
     public RecentManager() {
-        notifm = new NotificationManager(RecentManager.class);
+        notifm = new EventNotificationManager(RecentManager.class);
     }
 
     public void clearProfileHistory() {
@@ -28,7 +28,7 @@ public class RecentManager implements HasNotificationManager {
 
     }
 
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return notifm;
     }
 }

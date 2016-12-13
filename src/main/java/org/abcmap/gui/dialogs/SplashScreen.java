@@ -1,10 +1,10 @@
 package org.abcmap.gui.dialogs;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.EventListener;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.events.manager.Event;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.HtmlLabel;
 
@@ -13,9 +13,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class SplashScreen extends JDialog implements HasNotificationManager {
+public class SplashScreen extends JDialog implements HasEventNotificationManager {
 
-    private NotificationManager om;
+    private EventNotificationManager om;
 
     public SplashScreen() {
         super();
@@ -27,10 +27,10 @@ public class SplashScreen extends JDialog implements HasNotificationManager {
         setSize(new Dimension(400, 400));
         setLocationRelativeTo(null);
 
-        om = new NotificationManager(this);
-        om.setDefaultUpdatableObject(new UpdatableByNotificationManager() {
+        om = new EventNotificationManager(this);
+        om.setDefaultListener(new EventListener() {
             @Override
-            public void notificationReceived(Notification arg) {
+            public void notificationReceived(Event arg) {
                 SplashScreen.this.dispose();
             }
         });
@@ -56,7 +56,7 @@ public class SplashScreen extends JDialog implements HasNotificationManager {
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return om;
     }
 

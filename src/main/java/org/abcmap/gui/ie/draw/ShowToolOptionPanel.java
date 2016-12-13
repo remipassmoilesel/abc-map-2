@@ -38,11 +38,11 @@ public class ShowToolOptionPanel extends InteractionElement {
     }
 
 	/*
-    public class UpdateToolOptionPanel implements UpdatableByNotificationManager, Runnable {
+    public class UpdateToolOptionPanel implements NotificationListener, Runnable {
 
 
 		@Override
-		public void notificationReceived(Notification arg) {
+		public void notificationReceived(Event arg) {
 			if (arg instanceof DrawManagerEvent)
 				SwingUtilities.invokeLater(this);
 		}

@@ -5,10 +5,10 @@ import org.abcmap.core.events.DrawManagerEvent;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.notifications.HasNotificationManager;
-import org.abcmap.core.notifications.Notification;
-import org.abcmap.core.notifications.NotificationManager;
-import org.abcmap.core.notifications.UpdatableByNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.events.manager.Event;
+import org.abcmap.core.events.manager.EventListener;
+import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.gui.components.color.ColorButton;
 import org.abcmap.gui.iegroup.docks.GroupDrawingPalette;
 import org.abcmap.gui.iegroup.docks.GroupDrawingTools;
@@ -21,9 +21,9 @@ import java.awt.event.MouseEvent;
 /**
  * Dock widget that show current tool and active colors
  */
-public class DrawIndicatorWidget extends JPanel implements HasNotificationManager {
+public class DrawIndicatorWidget extends JPanel implements HasEventNotificationManager {
 
-    private NotificationManager om;
+    private EventNotificationManager om;
     private DrawManager drawm;
     private GuiManager guim;
 
@@ -40,10 +40,10 @@ public class DrawIndicatorWidget extends JPanel implements HasNotificationManage
         setBorder(BorderFactory.createEtchedBorder());
 
         // listen draw manager
-        om = new NotificationManager(this);
-        om.setDefaultUpdatableObject(new UpdatableByNotificationManager() {
+        om = new EventNotificationManager(this);
+        om.setDefaultListener(new EventListener() {
             @Override
-            public void notificationReceived(final Notification arg) {
+            public void notificationReceived(final Event arg) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
@@ -117,7 +117,7 @@ public class DrawIndicatorWidget extends JPanel implements HasNotificationManage
     }
 
     @Override
-    public NotificationManager getNotificationManager() {
+    public EventNotificationManager getNotificationManager() {
         return om;
     }
 
