@@ -1,17 +1,12 @@
 package org.abcmap.core.notifications;
 
-import org.abcmap.core.notifications.monitoringtool.NotificationHistoryElement;
 import org.abcmap.core.utils.Utils;
-
-import java.util.ArrayList;
 
 /**
  * Event that can be sent by notification manager
  */
 public class Notification {
 
-    public static final Integer MAX_EVENT_SAVED = 200;
-    private static ArrayList<NotificationHistoryElement> lastCreatedEvents;
     public static Integer instances = 0;
 
     private Object value;
@@ -59,4 +54,15 @@ public class Notification {
         return Utils.toString(this, keys, values);
     }
 
+    /**
+     * Do not override this method, all notifications should be different even if they own same fields,
+     * because same notifications can be fired at different time
+     *
+     * @param obj
+     * @return
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
 }

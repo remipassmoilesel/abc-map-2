@@ -2,7 +2,6 @@ package org.abcmap.core.notifications;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.notifications.monitoringtool.NotificationHistoryElement;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.PrintUtils;
@@ -14,13 +13,15 @@ import java.util.Collection;
 /**
  * Helper to send and receive notifications.
  * <p>
+ * With this utility, an observer can receive several types of notifications.
+ * <p>
  * In order to listen notifications you can:
  * - set default updatable object
  * - or override update method
  *
  * @author remipassmoilesel
  */
-public class NotificationManager implements UpdatableByNotificationManager {
+public class NotificationManager implements NotificationListener {
 
     private static final CustomLogger logger = LogManager.getLogger(NotificationManager.class);
 
@@ -42,59 +43,42 @@ public class NotificationManager implements UpdatableByNotificationManager {
     /**
      * Default object to update
      */
-    protected UpdatableByNotificationManager defaultUpdatableObject;
+    protected NotificationListener defaultListener;
 
     /**
      * The owner of this notification manager
+     * <p>
+     * Owner can be a HasNotificationManager object or not, and can be null.
      */
     protected Object owner;
 
+    private static boolean debugMode = false;
+
     public NotificationManager(Object owner) {
+
+        if (owner == null) {
+            throw new NullPointerException("Owner is null");
+        }
+
         this.owner = owner;
         this.observers = new ArrayList<NotificationManager>(10);
-        this.defaultUpdatableObject = null;
-    }
-
-    public static ArrayList<NotificationHistoryElement> getLastTransmittedEvents() {
-        return new ArrayList<NotificationHistoryElement>(lastTransmittedEvents);
-    }
-
-    private void saveTransmittedEvent(Notification notif) {
-
-        // create list if needed
-        if (lastTransmittedEvents == null) {
-            lastTransmittedEvents = new ArrayList<NotificationHistoryElement>();
-        }
-
-        // create notif history element
-        NotificationHistoryElement cehe = new NotificationHistoryElement();
-        cehe.setNotification(notif);
-        cehe.setOwner(owner);
-        cehe.setReceivers(observers);
-        cehe.setObserverManager(this);
-        lastTransmittedEvents.add(cehe);
-
-        // remove last elements
-        while (lastTransmittedEvents.size() > MAX_EVENT_SAVED_DEBUG) {
-            lastTransmittedEvents.remove(0);
-        }
-
+        this.defaultListener = null;
     }
 
     /**
-     * Notify observers in a different thread
+     * Notify observers in a separated thread
      *
-     * @param event
+     * @param notif
      */
-    public void fireEvent(Notification event) {
+    public void fireNotification(Notification notif) {
 
         // save notification if needed
-        if (MainManager.isDebugMode()) {
-            saveTransmittedEvent(event);
+        if (debugMode) {
+            saveTransmittedEvent(notif);
         }
 
         // notify event in a separated thread
-        Notifier noti = new Notifier(event);
+        Notifier noti = new Notifier(notif);
         ThreadManager.runLater(noti);
 
     }
@@ -102,18 +86,15 @@ public class NotificationManager implements UpdatableByNotificationManager {
     /**
      * Default updatable object.
      *
-     * @param updatable
+     * @param listener
      */
-    public void setDefaultUpdatableObject(
-            UpdatableByNotificationManager updatable) {
+    public void setDefaultListener(NotificationListener listener) {
 
-        if (defaultUpdatableObject == this) {
-            throw new IllegalArgumentException(
-                    "Notifier cannot notify itself. This: " + this
-                            + ", Object: " + updatable);
+        if (defaultListener == this) {
+            throw new IllegalArgumentException("Notifier cannot notify itself. This: " + this + ", Object: " + listener);
         }
 
-        this.defaultUpdatableObject = updatable;
+        this.defaultListener = listener;
     }
 
     /**
@@ -122,8 +103,35 @@ public class NotificationManager implements UpdatableByNotificationManager {
      * @param observer
      */
     public void addObserver(HasNotificationManager observer) {
-        if (observers.contains(observer) == false) {
-            observers.add(observer.getNotificationManager());
+        addObserverIfNecessary(observer.getNotificationManager());
+    }
+
+    /**
+     * Allow to register a simple listener without implementing interface HasNotificationManager
+     *
+     * @param owner
+     * @param listener
+     */
+    public void addSimpleListener(Object owner, NotificationListener listener) {
+
+        if (listener == null) {
+            throw new NullPointerException("Listener is null: " + listener);
+        }
+
+        NotificationManager notifm = new NotificationManager(owner);
+        notifm.setDefaultListener(listener);
+
+        addObserverIfNecessary(notifm);
+    }
+
+    /**
+     * Prevent double event firing by checking if observer is already here before
+     *
+     * @param notifm
+     */
+    private void addObserverIfNecessary(NotificationManager notifm) {
+        if (observers.contains(notifm) == false) {
+            observers.add(notifm);
         }
     }
 
@@ -140,6 +148,8 @@ public class NotificationManager implements UpdatableByNotificationManager {
 
     /**
      * Get the owner of this notification manager
+     * <p>
+     * Owner can be a HasNotificationManager object or not, and can be null.
      *
      * @return
      */
@@ -168,15 +178,13 @@ public class NotificationManager implements UpdatableByNotificationManager {
      */
     public void printObservers() {
         PrintUtils.p("%% Observers: ");
-        PrintUtils.p("Observer owner: " + owner.getClass().getSimpleName()
-                + " --- " + owner);
+        PrintUtils.p("Observer owner: " + owner.getClass().getSimpleName() + " --- " + owner);
         int i = 0;
         for (NotificationManager o : observers) {
             if (o == null) {
                 PrintUtils.p(i + " : " + o);
             } else {
-                PrintUtils.p(i + " : " + o.getClass().getSimpleName() + " --- "
-                        + o);
+                PrintUtils.p(i + " : " + o.getClass().getSimpleName() + " --- " + o);
             }
             i++;
         }
@@ -200,13 +208,13 @@ public class NotificationManager implements UpdatableByNotificationManager {
      */
     @Override
     public void notificationReceived(Notification arg) {
-        if (defaultUpdatableObject != null) {
-            defaultUpdatableObject.notificationReceived(arg);
+        if (defaultListener != null) {
+            defaultListener.notificationReceived(arg);
         }
     }
 
     /**
-     * Notifie les evenements dans un thread séparé.
+     * Notify observers in a separated Thread
      *
      * @author remipassmoilesel
      */
@@ -221,7 +229,7 @@ public class NotificationManager implements UpdatableByNotificationManager {
         @Override
         public void run() {
 
-            // chec we are not in EDT
+            // check we are not in EDT
             GuiUtils.throwIfOnEDT();
 
             // Check notification is not null or throw
@@ -240,6 +248,67 @@ public class NotificationManager implements UpdatableByNotificationManager {
                 }
             }
 
+        }
+
+    }
+
+    /**
+     * Set debug mode for all notification managers
+     * <p>
+     * Debug mode enable event history
+     *
+     * @param val
+     */
+    public static void setDebugMode(boolean val) {
+        debugMode = val;
+    }
+
+    /**
+     * Return true if debug mode is enabled
+     *
+     * @return
+     */
+    public static boolean isDebugMode() {
+        return debugMode;
+    }
+
+    /**
+     * Get list of last transmitted events, for debug purposes
+     *
+     * @return
+     */
+    public static ArrayList<NotificationHistoryElement> getLastTransmittedEvents() {
+
+        if (debugMode == false) {
+            throw new IllegalStateException("Debug mode is disabled, no events are recorded");
+        }
+
+        return new ArrayList<>(lastTransmittedEvents);
+    }
+
+    /**
+     * Save an event in last transmitted list, for debug purposes
+     *
+     * @param notif
+     */
+    private void saveTransmittedEvent(Notification notif) {
+
+        // create list if needed
+        if (lastTransmittedEvents == null) {
+            lastTransmittedEvents = new ArrayList<>();
+        }
+
+        // create notif history element
+        NotificationHistoryElement cehe = new NotificationHistoryElement();
+        cehe.setNotification(notif);
+        cehe.setOwner(owner);
+        cehe.setReceivers(observers);
+        cehe.setObserverManager(this);
+        lastTransmittedEvents.add(cehe);
+
+        // remove last elements
+        while (lastTransmittedEvents.size() > MAX_EVENT_SAVED_DEBUG) {
+            lastTransmittedEvents.remove(0);
         }
 
     }

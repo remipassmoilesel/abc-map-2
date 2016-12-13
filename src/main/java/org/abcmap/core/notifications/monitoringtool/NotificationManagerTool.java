@@ -3,8 +3,6 @@ package org.abcmap.core.notifications.monitoringtool;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Small tool allow to see the lasts transmitted events with several informations
@@ -13,40 +11,36 @@ public class NotificationManagerTool {
 
     public static void showLastEventsTransmitted() {
 
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
+        SwingUtilities.invokeLater(() -> {
 
-                // build window
-                JFrame frame = new JFrame("Last transmitted events");
-                frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                frame.setSize(800, 600);
-                frame.setLocationRelativeTo(null);
+            // build window
+            JFrame frame = new JFrame("Last transmitted events");
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.setSize(800, 600);
+            frame.setLocationRelativeTo(null);
 
-                // get last events
-                final LastNotificationsPanel events = new LastNotificationsPanel();
+            // get last events
+            final LastNotificationsPanel events = new LastNotificationsPanel();
+            events.refresh();
+
+            JScrollPane sp = new JScrollPane(events);
+            sp.getVerticalScrollBar().setUnitIncrement(100);
+
+            // refresh button
+            JButton refresh = new JButton("Refresh");
+            refresh.addActionListener((ev) -> {
                 events.refresh();
+            });
 
-                JScrollPane sp = new JScrollPane(events);
-                sp.getVerticalScrollBar().setUnitIncrement(100);
+            // main panel
+            JPanel content = new JPanel(new MigLayout());
 
-                // refresh button
-                JButton refresh = new JButton("Refresh");
-                refresh.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        events.refresh();
-                    }
-                });
+            content.add(refresh, "wrap");
+            content.add(sp, "width 98%!, height 500");
 
-                // main panel
-                JPanel content = new JPanel(new MigLayout());
+            frame.setContentPane(content);
+            frame.setVisible(true);
 
-                content.add(refresh, "wrap");
-                content.add(sp, "width 98%!, height 500");
-
-                frame.setContentPane(content);
-                frame.setVisible(true);
-            }
         });
     }
 

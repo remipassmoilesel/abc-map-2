@@ -5,10 +5,10 @@ package org.abcmap.core.notifications;
  *
  * @author remipassmoilesel
  */
-public interface UpdatableByNotificationManager {
+public interface NotificationListener {
 
     /**
-     * Reception d'une notification à partir d'un objet observé
+     * Notification come from Observed object
      *
      * @param arg
      */

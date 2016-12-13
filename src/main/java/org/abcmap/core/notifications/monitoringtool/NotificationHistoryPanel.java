@@ -34,26 +34,18 @@ public class NotificationHistoryPanel extends JPanel {
 
         setBorder(BorderFactory.createLineBorder(Color.lightGray));
 
-        GuiUtils.addLabel("<h4>#" + ev.getInstanceNumber() + ": "
-                + ev.getClass().getSimpleName() + " - " + ev.hashCode()
+        GuiUtils.addLabel("<h4>#" + ev.getInstanceNumber() + ": " + ev.getClass().getSimpleName() + " - " + ev.hashCode()
                 + "</h4>", this, "span, wrap");
 
-        GuiUtils.addLabel(
-                "Name - Value: <b>" + ev.getName() + " - " + ev.getValue(),
-                this, "span, wrap");
+        GuiUtils.addLabel("Name - Value: <b>" + ev.getName() + " - " + ev.getValue(), this, "span, wrap");
 
-        GuiUtils.addLabel("Created: " + ev.getCreationTime(), this,
-                "span, wrap");
+        GuiUtils.addLabel("Created: " + ev.getCreationTime(), this, "span, wrap");
 
-        GuiUtils.addLabel("Instance n°: " + ev.getInstanceNumber(), this,
-                "wrap");
+        GuiUtils.addLabel("Instance n°: " + ev.getInstanceNumber(), this, "wrap");
 
-        GuiUtils.addLabel("Owner: "
-                + owner.getClass(), this, "wrap");
+        GuiUtils.addLabel("Owner: " + owner.getClass(), this, "wrap");
 
-        GuiUtils.addLabel(
-                "Transmitted by: " + om.getClass() + " - " + om.hashCode(), this,
-                "wrap");
+        GuiUtils.addLabel("Transmitted by: " + om.getClass() + " - " + om.hashCode(), this, "wrap");
 
         JPanel receivers = new ObserversDisplayPanel(elmt.getObservers());
         add(receivers, "span, width 98%!");
@@ -63,8 +55,7 @@ public class NotificationHistoryPanel extends JPanel {
     /**
      * Display notification destinations
      */
-    private static class ObserversDisplayPanel extends JPanel implements
-            ActionListener {
+    private static class ObserversDisplayPanel extends JPanel implements ActionListener {
 
         private ArrayList<NotificationManager> observers;
         private boolean receiversAreShowed;
@@ -78,11 +69,9 @@ public class NotificationHistoryPanel extends JPanel {
             this.observers = observers;
             this.setLayout(new MigLayout());
 
-            this.labelNbrObservers = new HtmlLabel(observers.size()
-                    + " observers");
+            this.labelNbrObservers = new HtmlLabel(observers.size() + " observers");
 
-            this.buttonShowReceivers = new JButton(
-                    "Show / Hide observers");
+            this.buttonShowReceivers = new JButton("Show / Hide observers");
             buttonShowReceivers.addActionListener(this);
 
             this.receiversAreShowed = false;
