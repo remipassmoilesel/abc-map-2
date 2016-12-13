@@ -389,25 +389,6 @@ public class GuiManager implements HasEventNotificationManager {
         throw new IllegalStateException("Unable to show: " + className);
     }
 
-    /**
-     * Create a map component associated with a project, register it and return it. A map component
-     * must be registered to be repainted when partial stores of project are updated
-     *
-     * @return
-     */
-    public CachedMapPane createMapComponent() {
-
-        CachedMapPane pane = new CachedMapPane(projectm.getProject());
-        pane.setWorldPosition(new Point2D.Double(0, 0));
-        pane.setDebugMode(false);
-        pane.setMouseManagementEnabled(true);
-
-        mapPanes.add(pane);
-
-        return pane;
-
-    }
-
     @Override
     public EventNotificationManager getNotificationManager() {
         return notifm;

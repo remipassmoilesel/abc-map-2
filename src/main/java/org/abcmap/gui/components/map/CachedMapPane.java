@@ -1,5 +1,7 @@
 package org.abcmap.gui.components.map;
 
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.partials.RenderedPartial;
 import org.abcmap.core.partials.RenderedPartialFactory;
 import org.abcmap.core.partials.RenderedPartialQueryResult;
@@ -15,7 +17,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -23,10 +24,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * Display a map by using a partial cache system
  * <p>
  * Cache is managed by a RenderedPartialFactory. This partial factory produce portions of map and store it in database.
- *
+ * <p>
  * // TODO: Manage notifications of partial arrival between multiple panels
  */
 public class CachedMapPane extends JPanel {
+
+    private static final CustomLogger logger = LogManager.getLogger(CachedMapPane.class);
 
     /**
      * Lock to prevent too much thread rendering
@@ -94,17 +97,29 @@ public class CachedMapPane extends JPanel {
 
         this.addComponentListener(new RefreshMapComponentListener());
 
+        // repaint when partials are added in store
+        // TODO: remove observers ?
+        project.getRenderedPartialsStore().getNotificationManager().addSimpleListener(this, (notif) -> {
+            CachedMapPane.this.repaint();
+        });
+
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        // TODO: remove observers ?
+        logger.debug("Cached map pane finalized");
     }
 
     @Override
     protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
 
-        if(renderLock.isLocked()){
-            System.out.println("Render in progress ...");
+        if (renderLock.isLocked()) {
+            logger.debug("Render is in progress, avoid painting");
             return;
         }
-
-        super.paintComponent(g);
 
         Graphics2D g2d = (Graphics2D) g;
 
@@ -169,6 +184,8 @@ public class CachedMapPane extends JPanel {
         }
 
         try {
+
+            logger.debug("Rendering component: " + this);
 
             // get component size
             Dimension dim = CachedMapPane.this.getSize();
@@ -305,7 +322,7 @@ public class CachedMapPane extends JPanel {
     /**
      * Observe this component and refresh map when needed
      */
-    public class RefreshMapComponentListener implements ComponentListener {
+    private class RefreshMapComponentListener implements ComponentListener {
 
         @Override
         public void componentResized(ComponentEvent e) {

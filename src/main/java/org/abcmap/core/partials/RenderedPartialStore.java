@@ -7,8 +7,11 @@ import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableUtils;
+import org.abcmap.core.events.PartialStoreEvent;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -25,7 +28,7 @@ import java.util.List;
  * <p>
  * Partials should contains only soft links to images, in order to free memory when needed
  */
-public class RenderedPartialStore {
+public class RenderedPartialStore implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(RenderedPartialStore.class);
 
@@ -41,6 +44,7 @@ public class RenderedPartialStore {
      * just the most recent partials are used
      */
     private static final int MAX_LOADED_LIST_SIZE = 1000;
+    private final EventNotificationManager notifm;
 
     /**
      * List of partials already used. They can be complete (with an image loaded) or not.
@@ -50,14 +54,12 @@ public class RenderedPartialStore {
     private ArrayList<RenderedPartial> loadedPartials;
 
     private final Dao<SerializableRenderedPartial, ?> dao;
-    private final Path databasePath;
     private final JdbcPooledConnectionSource connectionSource;
     private static long addedInDatabase = 0;
 
     public RenderedPartialStore(Path databasePath) throws SQLException {
 
         this.loadedPartials = new ArrayList<>();
-        this.databasePath = databasePath;
 
         this.connectionSource = new JdbcPooledConnectionSource("jdbc:h2:./" + databasePath, "", "");
         connectionSource.setMaxConnectionAgeMillis(5 * 60 * 1000);
@@ -69,6 +71,8 @@ public class RenderedPartialStore {
 
         // create dao object
         this.dao = DaoManager.createDao(connectionSource, SerializableRenderedPartial.class);
+
+        this.notifm = new EventNotificationManager(this);
     }
 
     /**
@@ -186,6 +190,8 @@ public class RenderedPartialStore {
         addInLoadedList(part);
 
         addedInDatabase++;
+
+        fireNewPartialsAdded();
     }
 
     public static long getAddedInDatabase() {
@@ -242,4 +248,12 @@ public class RenderedPartialStore {
 
     }
 
+    private void fireNewPartialsAdded() {
+        notifm.fireNotification(new PartialStoreEvent(PartialStoreEvent.NEW_PARTIALS_ADDED, null));
+    }
+
+    @Override
+    public EventNotificationManager getNotificationManager() {
+        return notifm;
+    }
 }
