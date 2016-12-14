@@ -16,6 +16,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * All dialogs and message box from software can be called from here.
+ * <p>
+ * This allow to not specify parent window of dialogs, by default main window will be choosed.
+ */
 public class DialogManager {
 
     private static final CustomLogger logger = LogManager.getLogger(DialogManager.class);
@@ -213,5 +218,9 @@ public class DialogManager {
      */
     public BrowseDialogResult browseProjectToOpenDialog() {
         return SimpleBrowseDialog.browseProjectToOpenAndWait(guim.getMainWindow());
+    }
+
+    public QuestionResult showProjectClosingConfirmationDialog() {
+        return ClosingConfirmationDialog.showProjectConfirmationAndWait(guim.getMainWindow());
     }
 }
