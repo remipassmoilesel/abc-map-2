@@ -1,7 +1,9 @@
 package org.abcmap;
 
 import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.GuiManager;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.gui.GuiColors;
@@ -16,6 +18,8 @@ import java.nio.file.Paths;
  * Created by remipassmoilesel on 13/12/16.
  */
 public class Initialization {
+
+    protected static final CustomLogger logger = LogManager.getLogger(Initialization.class);
 
     private static final String PANDA_MODE_ARG = "--panda-mode";
     private static final String CREATE_FAKE_ARG = "--create-fake-project";
@@ -74,7 +78,25 @@ public class Initialization {
 
         // open specified project
         if (projectToOpen != null) {
-            pman.openProject(projectToOpen);
+
+            boolean opened = false;
+            try {
+                pman.openProject(projectToOpen);
+                opened = true;
+            } catch (IOException e) {
+                logger.error(e);
+            }
+
+            // add it to recents files
+            if (opened) {
+                try {
+                    MainManager.getRecentManager().addCurrentProject();
+                    MainManager.getRecentManager().saveHistory();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }
+
         }
         // create a fake project
         else if (createFake) {

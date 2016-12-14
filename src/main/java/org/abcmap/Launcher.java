@@ -14,9 +14,12 @@ public class Launcher {
 
         try {
 
+            // init software
             Initialization.doInit(args);
 
+            // show gui
             MainManager.getGuiManager().showGui();
+
         } catch (Exception e) {
             LaunchError.showErrorAndDie(e);
         }
