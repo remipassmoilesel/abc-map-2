@@ -56,11 +56,12 @@ public class MapNavigationBar extends JPanel {
     public void refreshBoundsFrom(Dimension parentSize) {
 
         // avoid uneeded calls
-        if (Utils.safeEquals(parentSize, lastParentSize)) {
-            return;
-        } else {
-            lastParentSize = parentSize;
-        }
+        // TODO: sometimes comparison block update
+        //if (Utils.safeEquals(parentSize, lastParentSize)) {
+        //    return;
+        //} else {
+        //    lastParentSize = parentSize;
+        //}
 
         Dimension navbarDims = getPreferredSize();
 

@@ -464,4 +464,24 @@ public class CachedMapPane extends JPanel {
     public Project getProject() {
         return project;
     }
+
+    @Override
+    public void repaint(long tm, int x, int y, int width, int height) {
+        super.repaint(tm, x, y, width, height);
+
+        // refresh navigation bar
+        if (navigationBar != null) {
+            navigationBar.refreshBoundsFrom(getSize());
+        }
+    }
+
+    @Override
+    public void revalidate() {
+        super.revalidate();
+
+        // refresh navigation bar
+        if (navigationBar != null) {
+            navigationBar.refreshBoundsFrom(getSize());
+        }
+    }
 }

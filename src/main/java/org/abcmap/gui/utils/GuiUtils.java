@@ -823,8 +823,7 @@ public class GuiUtils {
             fop.printf("%50s : %s\n", obj, UIManager.get(obj));
         }
 
-        System.out.println("UIManager informations write in :"
-                + file.getAbsolutePath());
+        System.out.println("UIManager informations write in :" + file.getAbsolutePath());
     }
 
     /**
