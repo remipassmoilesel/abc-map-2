@@ -13,7 +13,7 @@ import java.util.Objects;
  * Layout is a sheet which can be printed
  */
 @DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "LAYOUTS")
-public class Layout implements DataModel {
+public class LayoutSheet implements DataModel {
 
     private static final String ID_FIELD_NAME = "ID";
     private static final String IS_INDEX_FIELD_NAME = "IS_INDEX";
@@ -46,18 +46,18 @@ public class Layout implements DataModel {
     private double maxy;
 
     @DatabaseField(columnName = WIDTH_MM_FIELD_NAME)
-    private int widthMm;
+    private double widthMm;
 
     @DatabaseField(columnName = HEIGHT_MM_FIELD_NAME)
-    private int heightMm;
+    private double heightMm;
 
     @DatabaseField(columnName = NUMBER_FIELD_NAME)
     private int number;
 
-    public Layout() {
+    public LayoutSheet() {
     }
 
-    public Layout(boolean index, double minx, double miny, double maxx, double maxy, int widthMm, int heightMm, int number) {
+    public LayoutSheet(boolean index, double minx, double miny, double maxx, double maxy, double widthMm, double heightMm, int number) {
         this.index = index;
         this.minx = minx;
         this.miny = miny;
@@ -68,66 +68,167 @@ public class Layout implements DataModel {
         this.number = number;
     }
 
+    /**
+     * Return true if this sheet is an index sheet, if others sheet are painted on map represented in this sheet
+     *
+     * @return
+     */
     public boolean isIndex() {
         return index;
     }
 
+    /**
+     * If set to true, this sheet will paint other sheets envelope in order to show it to users
+     *
+     * @param index
+     */
     public void setIndex(boolean index) {
         this.index = index;
     }
 
+    /**
+     * Get coordinate of sheet envelope
+     * <p>
+     * Values use lower left corner as reference
+     *
+     * @return
+     */
     public double getMinx() {
         return minx;
     }
 
+    /**
+     * Get coordinate of sheet envelope
+     * <p>
+     * Values use lower left corner as reference
+     *
+     * @return
+     */
     public void setMinx(double minx) {
         this.minx = minx;
     }
 
+    /**
+     * Get coordinate of sheet envelope
+     * <p>
+     * Values use lower left corner as reference
+     *
+     * @return
+     */
     public double getMiny() {
         return miny;
     }
 
+    /**
+     * Get coordinate of sheet envelope
+     * <p>
+     * Values use lower left corner as reference
+     *
+     * @return
+     */
     public void setMiny(double miny) {
         this.miny = miny;
     }
 
+    /**
+     * Get coordinate of sheet envelope
+     * <p>
+     * Values use lower left corner as reference
+     *
+     * @return
+     */
     public double getMaxx() {
         return maxx;
     }
 
+    /**
+     * Get coordinate of sheet envelope
+     * <p>
+     * Values use lower left corner as reference
+     *
+     * @return
+     */
     public void setMaxx(double maxx) {
         this.maxx = maxx;
     }
 
+    /**
+     * Get coordinate of sheet envelope
+     * <p>
+     * Values use lower left corner as reference
+     *
+     * @return
+     */
     public double getMaxy() {
         return maxy;
     }
 
+    /**
+     * Get coordinate of sheet envelope
+     * <p>
+     * Values use lower left corner as reference
+     *
+     * @return
+     */
     public void setMaxy(double maxy) {
         this.maxy = maxy;
     }
 
-    public int getWidthMm() {
+    /**
+     * Get width of representation in millimeters
+     * <p>
+     *
+     * @return
+     */
+    public double getWidthMm() {
         return widthMm;
     }
 
+    /**
+     * Set width of representation in millimeters
+     * <p>
+     *
+     * @return
+     */
     public void setWidthMm(int widthMm) {
         this.widthMm = widthMm;
     }
 
-    public int getHeightMm() {
+    /**
+     * Get height of representation in millimeters
+     * <p>
+     *
+     * @return
+     */
+    public double getHeightMm() {
         return heightMm;
     }
 
+
+    /**
+     * Set height of representation in millimeters
+     * <p>
+     *
+     * @return
+     */
     public void setHeightMm(int heightMm) {
         this.heightMm = heightMm;
     }
 
+    /**
+     * Get number of sheet. First is 0.
+     *
+     * @return
+     */
     public int getNumber() {
         return number;
     }
 
+    /**
+     * Set number of sheet. First is 0.
+     *
+     * @return
+     */
     public void setNumber(int number) {
         this.number = number;
     }
@@ -140,7 +241,7 @@ public class Layout implements DataModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Layout layout = (Layout) o;
+        LayoutSheet layout = (LayoutSheet) o;
         return index == layout.index &&
                 Double.compare(layout.minx, minx) == 0 &&
                 Double.compare(layout.miny, miny) == 0 &&

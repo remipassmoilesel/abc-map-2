@@ -1,6 +1,6 @@
 package org.abcmap.core.dao;
 
-import org.abcmap.core.project.layouts.Layout;
+import org.abcmap.core.project.layouts.LayoutSheet;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -13,15 +13,15 @@ import java.util.ArrayList;
 public class LayoutDAO extends AbstractOrmDAO {
 
     public LayoutDAO(Path dbPath) throws IOException {
-        super(dbPath, Layout.class);
+        super(dbPath, LayoutSheet.class);
     }
 
-    public ArrayList<Layout> readAll() {
+    public ArrayList<LayoutSheet> readAll() {
 
-        ArrayList<Layout> list = new ArrayList<>();
+        ArrayList<LayoutSheet> list = new ArrayList<>();
 
         visit((Object o) -> {
-            Layout lay = (Layout) o;
+            LayoutSheet lay = (LayoutSheet) o;
             list.add(lay);
             return true;
         });
@@ -29,12 +29,12 @@ public class LayoutDAO extends AbstractOrmDAO {
         return list;
     }
 
-    public void writeLayouts(ArrayList<Layout> layouts) throws IOException {
+    public void writeLayouts(ArrayList<LayoutSheet> layouts) throws IOException {
 
         // remove old layouts
         deleteAll();
 
-        for (Layout lay : layouts) {
+        for (LayoutSheet lay : layouts) {
             try {
                 dao.create(lay);
             } catch (SQLException e) {

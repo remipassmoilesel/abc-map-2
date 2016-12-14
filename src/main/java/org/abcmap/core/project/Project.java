@@ -7,7 +7,7 @@ import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.project.layers.LayerIndexEntry;
 import org.abcmap.core.project.layers.TileLayer;
-import org.abcmap.core.project.layouts.Layout;
+import org.abcmap.core.project.layouts.LayoutSheet;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.tiles.TileStorage;
@@ -62,7 +62,7 @@ public class Project {
     /**
      * List of layouts, sheets which can be printed
      */
-    private ArrayList<Layout> layouts;
+    private ArrayList<LayoutSheet> layouts;
 
     /**
      * Only one layer is alterable at a time, the active layer
@@ -524,15 +524,27 @@ public class Project {
         return partialStore;
     }
 
-    public void addLayout(Layout lay) {
+    public void addLayout(LayoutSheet lay) {
         layouts.add(lay);
     }
 
-    public ArrayList<Layout> getLayouts() {
-        return layouts;
+    /**
+     * Return a copy of layout list
+     *
+     * @return
+     */
+    public ArrayList<LayoutSheet> getLayouts() {
+        return new ArrayList<>(layouts);
     }
 
-    public void removeLayout(Layout lay) {
+    /**
+     * Remove all sheets from layout list
+     */
+    public void removeAllLayouts() {
+        layouts.clear();
+    }
+
+    public void removeLayout(LayoutSheet lay) {
         layouts.remove(lay);
     }
 
@@ -540,7 +552,7 @@ public class Project {
         //TODO
     }
 
-    public void setLayouts(ArrayList<Layout> layouts) {
+    public void setLayouts(ArrayList<LayoutSheet> layouts) {
         this.layouts = layouts;
     }
 }

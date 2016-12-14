@@ -229,4 +229,11 @@ public class ProjectManager implements HasEventNotificationManager {
     public EventNotificationManager getNotificationManager() {
         return notifm;
     }
+
+    /**
+     * Fire an event meaning that layouts sheets changed
+     */
+    public void fireLayoutListChanged() {
+        notifm.fireEvent(new ProjectEvent(ProjectEvent.LAYOUTS_LIST_CHANGED, null));
+    }
 }

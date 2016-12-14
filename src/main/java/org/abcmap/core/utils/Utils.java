@@ -530,7 +530,7 @@ public class Utils {
     public static Map<Object, Integer> sortByComparator(Map<Object, Integer> unsortedMap, final boolean croissant) {
 
         // Convert Map to List
-        List<Map.Entry<Object, Integer>> list = new LinkedList<>(unsortedMap.entrySet()) ;
+        List<Map.Entry<Object, Integer>> list = new LinkedList<>(unsortedMap.entrySet());
 
         // Sort list with comparator, to compare the Map values
         Collections.sort(list, new Comparator<Map.Entry<Object, Integer>>() {
@@ -931,10 +931,31 @@ public class Utils {
         return rslt.substring(0, length);
     }
 
+    public static int SCREEN_RES = Toolkit.getDefaultToolkit().getScreenResolution();
+
+    /**
+     * Convert pixels to millimeter at specified resolution
+     * <p>
+     * Use SCREEN_RES for screen resolution
+     *
+     * @param pixel
+     * @param dpiRes
+     * @return
+     */
     public static double pixelToMillimeter(double pixel, double dpiRes) {
         return pixel / dpiRes * 25.40d;
     }
 
+
+    /**
+     * Convert millimeter to pixel at specified resolution
+     * <p>
+     * Use SCREEN_RES for screen resolution
+     *
+     * @param millimeter
+     * @param dpiRes
+     * @return
+     */
     public static double millimeterToPixel(double millimeter, double dpiRes) {
         return millimeter / 25.40d * dpiRes;
     }
