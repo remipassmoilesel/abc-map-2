@@ -34,7 +34,7 @@ public class TileStorageQueries {
      * @param conn
      * @throws SQLException
      */
-    public static PreparedStatement createMasterTable(Connection conn) throws SQLException {
+    public static PreparedStatement createMasterTableIfNotExist(Connection conn) throws SQLException {
 
         String req = "CREATE TABLE IF NOT EXISTS " + MASTER_TABLE_NAME + " ("
                 + COVERAGE_NAME_FIELD_NAME + " VARCHAR(128) NOT NULL, "
@@ -117,6 +117,28 @@ public class TileStorageQueries {
                 + TILE_TABLE_NAME_FIELD_NAME + ", "
                 + SPATIAL_TABLE_NAME_FIELD_NAME + ") "
                 + "VALUES (?,?,?);";
+
+        //System.out.println(req);
+
+        return conn.prepareStatement(req);
+
+    }
+
+    /**
+     * Select * in master table
+     *
+     * @param conn
+     * @return
+     * @throws SQLException
+     */
+    public static PreparedStatement selectAllFromMasterTable(Connection conn) throws SQLException {
+
+        // insert a tuple in master table
+        String req = "SELECT "
+                + COVERAGE_NAME_FIELD_NAME + ", "
+                + TILE_TABLE_NAME_FIELD_NAME + ", "
+                + SPATIAL_TABLE_NAME_FIELD_NAME + " " +
+                "FROM " + MASTER_TABLE_NAME;
 
         //System.out.println(req);
 

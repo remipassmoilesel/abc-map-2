@@ -4,6 +4,8 @@ import java.util.Objects;
 
 /**
  * Store information about a tile coverage
+ * <p>
+ * Each coverage entry contains all information to retrieve coverage data: spatial table name, data table name ...
  */
 public class TileCoverageEntry {
 

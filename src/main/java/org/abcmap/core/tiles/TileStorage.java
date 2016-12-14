@@ -24,10 +24,13 @@ import java.util.List;
  * <p>
  * TileStorage can store several named coverage. Why do not use built in Geopackage tile management ? Because
  * we need to set position of tile with eventual overlap.
+ * <p>
+ * // TODO migrate to ORM lite with Byte[] serializer and BufferedImage serializer ?
  */
 public class TileStorage {
 
     public static final String FAKE_TILE_ID = "FAKE_TILE_ID";
+
     /**
      * Path of database file associated with tile store
      */
@@ -35,6 +38,8 @@ public class TileStorage {
 
     /**
      * List of available coverages in store
+     * <p>
+     * Each coverage entry contains all information to retrieve coverage data: spatial table name, data table name ...
      */
     private final HashMap<String, TileCoverageEntry> coverages;
 
@@ -48,6 +53,63 @@ public class TileStorage {
         this.databasePath = p;
         this.coverages = new HashMap<>();
     }
+
+
+    /**
+     * Initialize storage, by creating necessary tables, etc ...
+     */
+    public void initialize() throws IOException {
+
+        try {
+            SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
+
+                PreparedStatement masterStat = TileStorageQueries.createMasterTableIfNotExist(conn);
+                masterStat.execute();
+                masterStat.close();
+
+                return null;
+            });
+        } catch (Exception e) {
+            throw new IOException("Error while initializing tile: ", e);
+        }
+
+        loadExistingCoverages();
+    }
+
+    /**
+     * Load existing coverage entries with: coverage name, spatial table name, etc ...
+     */
+    public void loadExistingCoverages() throws IOException {
+
+        // remove all from coverages
+        coverages.clear();
+
+        // load all entries
+        try {
+
+            SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
+
+                // select from master table
+                PreparedStatement masterEntryStat = TileStorageQueries.selectAllFromMasterTable(conn);
+                ResultSet rs = masterEntryStat.executeQuery();
+
+                while (rs.next()) {
+                    String coverageName = rs.getString(1);
+                    coverages.put(coverageName, new TileCoverageEntry(coverageName));
+                }
+
+                rs.close();
+                masterEntryStat.close();
+
+                return null;
+            });
+
+        } catch (Exception e) {
+            throw new IOException("Error while loading coverages: ", e);
+        }
+
+    }
+
 
     /**
      * Add a tile to specified coverage
@@ -83,6 +145,18 @@ public class TileStorage {
     }
 
     /**
+     * Check if coverage exist or throw execpetion otherwise
+     */
+    private TileCoverageEntry checkCoverageAndReturnEntry(String coverageName) {
+        TileCoverageEntry coverageEntry = coverages.get(coverageName);
+        if (coverageEntry == null) {
+            throw new IllegalArgumentException("Unknown coverage: " + coverageName);
+        }
+
+        return coverageEntry;
+    }
+
+    /**
      * Add a tile to the specified coverage
      *
      * @param coverageName
@@ -95,10 +169,7 @@ public class TileStorage {
     public String addTile(String coverageName, BufferedImage bimg, Coordinate position, String tileId) throws IOException {
 
         // retrieve informations about coverage
-        TileCoverageEntry coverageEntry = coverages.get(coverageName);
-        if (coverageEntry == null) {
-            throw new IllegalArgumentException("Invalid coverage name");
-        }
+        TileCoverageEntry coverageEntry = checkCoverageAndReturnEntry(coverageName);
 
         // get width and height if necessary
         if (tileId == null) {
@@ -167,25 +238,6 @@ public class TileStorage {
      */
     public Connection getDatabaseConnection() throws SQLException {
         return SQLUtils.createH2Connection(databasePath);
-    }
-
-    /**
-     * Initialize storage, by creating necessary tables, etc ...
-     */
-    public void initialize() throws IOException {
-
-        try {
-            SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
-
-                PreparedStatement masterStat = TileStorageQueries.createMasterTable(conn);
-                masterStat.execute();
-                masterStat.close();
-
-                return null;
-            });
-        } catch (Exception e) {
-            throw new IOException("Error while initializing tile: ", e);
-        }
     }
 
     /**
@@ -340,10 +392,8 @@ public class TileStorage {
      */
     public boolean deleteTiles(String coverageName, List<String> ids) throws IOException {
 
-        TileCoverageEntry entry = coverages.get(coverageName);
-        if (entry == null) {
-            throw new IllegalArgumentException("Unknown coverage: " + coverageName);
-        }
+        // check if coverage exist
+        TileCoverageEntry entry = checkCoverageAndReturnEntry(coverageName);
 
         try {
             Object result = SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
@@ -417,10 +467,8 @@ public class TileStorage {
      */
     public boolean moveTiles(String coverageName, List<Object[]> toMove) throws IOException {
 
-        TileCoverageEntry entry = coverages.get(coverageName);
-        if (entry == null) {
-            throw new IllegalArgumentException("Unknown coverage: " + coverageName);
-        }
+        // check if coverage exist
+        TileCoverageEntry entry = checkCoverageAndReturnEntry(coverageName);
 
         try {
             Object result = SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
@@ -465,10 +513,8 @@ public class TileStorage {
 
     public ArrayList<TileContainer> getLastTiles(String coverageName, int offset, int number) throws IOException {
 
-        TileCoverageEntry entry = coverages.get(coverageName);
-        if (entry == null) {
-            throw new IllegalArgumentException("Unknown coverage: " + coverageName);
-        }
+        // check if coverage exist
+        TileCoverageEntry entry = checkCoverageAndReturnEntry(coverageName);
 
         try {
             Object result = SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
@@ -511,11 +557,8 @@ public class TileStorage {
      */
     public ReferencedEnvelope computeCoverageBounds(String coverageName) throws Exception {
 
-        // update tile position
-        TileCoverageEntry entry = coverages.get(coverageName);
-        if (entry == null) {
-            throw new IllegalArgumentException("Unknown coverage: " + coverageName);
-        }
+        // check if coverage exist
+        TileCoverageEntry entry = checkCoverageAndReturnEntry(coverageName);
 
         final double[] d = new double[]{0, 0, 0, 0};
         try {
