@@ -223,7 +223,7 @@ public class Project {
         // create a layer wrapper and store it
         AbstractLayer layer = null;
         try {
-            layer = new FeatureLayer(null, name, visible, zindex, databasePath, true);
+            layer = new FeatureLayer(null, name, visible, zindex, this, true);
         } catch (Exception e) {
             throw new IOException("Error while adding tile layer: ", e);
         }
@@ -242,7 +242,7 @@ public class Project {
     public AbstractLayer addNewTileLayer(String name, boolean visible, int zindex) throws IOException {
         TileLayer layer = null;
         try {
-            layer = new TileLayer(null, name, visible, zindex, databasePath, true);
+            layer = new TileLayer(null, name, visible, zindex, this, true);
         } catch (Exception e) {
             throw new IOException("Error while adding tile layer: ", e);
         }

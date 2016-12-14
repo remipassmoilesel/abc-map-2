@@ -66,7 +66,6 @@ public class ProjectReader {
 
         Project newProject = new Project(newDatabase);
 
-
         // read metadatas
         readMetadatas(newDatabase, newProject);
 
@@ -79,13 +78,13 @@ public class ProjectReader {
 
             // layer contain geometries
             if (LayerType.FEATURES.equals(entry.getType())) {
-                FeatureLayer layer = new FeatureLayer(entry, newDatabase, false);
+                FeatureLayer layer = new FeatureLayer(entry, newProject, false);
                 newProject.addLayer(layer);
             }
 
             // Layer contain tiles
             else if (LayerType.TILES.equals(entry.getType())) {
-                TileLayer layer = new TileLayer(entry, newDatabase, false);
+                TileLayer layer = new TileLayer(entry, newProject, false);
                 newProject.addLayer(layer);
             }
 
