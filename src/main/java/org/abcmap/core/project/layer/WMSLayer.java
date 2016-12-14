@@ -75,6 +75,8 @@ public class WMSLayer extends AbstractLayer {
 
     @Override
     public ReferencedEnvelope getBounds() {
-        return null;
+        // TODO check if it take too much time ?
+        logger.debug("// TODO check if it take too much time ?");
+        return internalLayer.getBounds();
     }
 }

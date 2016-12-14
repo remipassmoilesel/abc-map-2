@@ -1,6 +1,6 @@
 package org.abcmap.gui.windows;
 
-import java.awt.Color;
+import java.awt.*;
 
 /**
  * Main window is displayable in several mode. Each mode have its own color and label.
@@ -11,7 +11,9 @@ public enum MainWindowMode {
 
     SHOW_LAYOUTS(Color.blue, "Feuilles de mise en page"),
 
-    SHOW_REFUSED_TILES(Color.red, "Tuiles refusées");
+    SHOW_REFUSED_TILES(Color.red, "Tuiles refusées"),
+
+    EMPTY(Color.darkGray, "Vide");
 
     private String label;
     private Color fgColor;

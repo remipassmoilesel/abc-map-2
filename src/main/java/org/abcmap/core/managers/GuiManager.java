@@ -1,8 +1,11 @@
 package org.abcmap.core.managers;
 
 import org.abcmap.core.events.ProjectEvent;
+import org.abcmap.core.events.manager.Event;
+import org.abcmap.core.events.manager.EventListener;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.events.manager.*;
 import org.abcmap.gui.*;
 import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.components.map.CachedMapPane;
@@ -14,9 +17,9 @@ import org.abcmap.gui.windows.crop.CropConfigurationWindow;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -74,12 +77,21 @@ public class GuiManager implements HasEventNotificationManager {
     private class GuiUpdater implements EventListener {
 
         @Override
-        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
+        public void notificationReceived(Event arg) {
 
             // rename main window when project change
             if (ProjectEvent.isNewProjectLoadedEvent(arg)) {
-                String name = projectm.getProject().getFinalPath().getFileName().toString();
-                getMainWindow().setTitle(name);
+                Path finalPath = projectm.getProject().getFinalPath();
+                String name;
+                if (finalPath == null) {
+                    name = "Nouveau projet";
+                } else {
+                    name = finalPath.getFileName().toString();
+                }
+
+                if(getMainWindow() != null){
+                    getMainWindow().setTitle(name);
+                }
             }
 
         }
@@ -146,7 +158,7 @@ public class GuiManager implements HasEventNotificationManager {
     /**
      * Execute init operations on EDT
      */
-    private void runIntialisationOperations() {
+    public void runIntializationOperations() {
 
         GuiUtils.throwIfNotOnEDT();
 
@@ -178,14 +190,12 @@ public class GuiManager implements HasEventNotificationManager {
      * @throws InvocationTargetException
      * @throws InterruptedException
      */
-    public void constructAndShowGui() throws Exception {
+    public void showGui() throws Exception {
 
         SwingUtilities.invokeAndWait(new Runnable() {
             @Override
             public void run() {
-                constructGui();
                 getMainWindow().setVisible(true);
-                runIntialisationOperations();
             }
         });
 

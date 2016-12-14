@@ -7,12 +7,13 @@ import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.TileLayer;
-import org.abcmap.core.tiles.TileStorage;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
+import org.abcmap.core.tiles.TileStorage;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLProcessor;
 import org.abcmap.core.utils.SQLUtils;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.swing.JMapFrame;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -172,6 +173,44 @@ public class Project {
         return list;
     }
 
+    public ReferencedEnvelope getMaximumBounds() {
+        double minx = 0.0d;
+        double miny = 0.0d;
+        double maxx = 0.0d;
+        double maxy = 0.0d;
+        boolean firstLoop = true;
+        for (AbstractLayer lay : getLayersList()) {
+            ReferencedEnvelope bounds = lay.getInternalLayer().getBounds();
+
+            if (firstLoop) {
+
+                minx = bounds.getMinX();
+                miny = bounds.getMinY();
+                maxx = bounds.getMaxX();
+                maxy = bounds.getMaxY();
+
+                firstLoop = false;
+                continue;
+            }
+
+            if (bounds.getMinX() < minx) {
+                minx = bounds.getMinX();
+            }
+            if (bounds.getMinY() < miny) {
+                miny = bounds.getMinY();
+            }
+            if (bounds.getMaxX() > maxx) {
+                maxx = bounds.getMaxX();
+            }
+            if (bounds.getMaxY() > maxy) {
+                maxy = bounds.getMaxY();
+            }
+
+        }
+
+        return new ReferencedEnvelope(minx, maxx, miny, maxy, getCrs());
+    }
+
     /**
      * Add a new feature layer, where can be stored draw
      *
@@ -274,7 +313,7 @@ public class Project {
     /**
      * Final path of the project, where the user want to save it.
      * <p>
-     * This location is used only to save project.
+     * This location can be null, and is used only to save project.
      */
     public Path getFinalPath() {
         return finalPath;
@@ -460,6 +499,6 @@ public class Project {
     }
 
     public void setAllElementsSelected(boolean allElementsSelected) {
-
+        //TODO
     }
 }

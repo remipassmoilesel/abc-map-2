@@ -11,12 +11,17 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Navigation bar on bottom right corner of map
+ * Navigation bar on bottom right corner of map, with zoom and reset buttons
+ * <p>
+ * This bar must be added on a panel without layout (absolute positioning),
+ * Position of bar should be updated by calling refreshBoundsFrom()
  */
 public class MapNavigationBar extends JPanel {
 
-    private JPanel dpanel;
-    private Rectangle lastParentBounds;
+    /**
+     * Last parent size, used to avoid unnecessary updates of position
+     */
+    private Dimension lastParentSize;
 
     public MapNavigationBar() {
         super(new MigLayout("insets 2, gap 2px"));
@@ -43,23 +48,24 @@ public class MapNavigationBar extends JPanel {
         center.setCursor(GuiCursor.HAND_CURSOR);
     }
 
-    public void setPanelToControl(JPanel dpanel) {
-        this.dpanel = dpanel;
-    }
-
-    public void refreshBoundsFrom(Rectangle parentBounds) {
+    /**
+     * Refresh position of navigation bar
+     *
+     * @param parentSize
+     */
+    public void refreshBoundsFrom(Dimension parentSize) {
 
         // avoid uneeded calls
-        if (Utils.safeEquals(parentBounds, lastParentBounds)) {
+        if (Utils.safeEquals(parentSize, lastParentSize)) {
             return;
         } else {
-            lastParentBounds = parentBounds;
+            lastParentSize = parentSize;
         }
 
         Dimension navbarDims = getPreferredSize();
 
-        int x = parentBounds.x + parentBounds.width - navbarDims.width;
-        int y = parentBounds.y + parentBounds.height - navbarDims.height;
+        int x = parentSize.width - navbarDims.width;
+        int y = parentSize.height - navbarDims.height;
         int width = navbarDims.width;
         int height = navbarDims.height;
         setBounds(x, y, width, height);

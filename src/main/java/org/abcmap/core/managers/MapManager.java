@@ -2,6 +2,7 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.gui.components.map.CachedMapPane;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -14,14 +15,13 @@ import java.awt.*;
 public class MapManager implements HasEventNotificationManager {
 
     private final EventNotificationManager notifm;
+    private final GuiManager guim;
 
     public MapManager() {
-        notifm = new EventNotificationManager(MapManager.this);
-    }
 
-    @Override
-    public EventNotificationManager getNotificationManager() {
-        return notifm;
+        guim = MainManager.getGuiManager();
+        notifm = new EventNotificationManager(MapManager.this);
+
     }
 
     public JPanel getMapComponent() {
@@ -46,5 +46,56 @@ public class MapManager implements HasEventNotificationManager {
 
     public static String getEpsgCode(CoordinateReferenceSystem system) {
         return "";
+    }
+
+    /**
+     * Return main map panel of software.
+     * <p>
+     * Can be null, and change at least every time project change
+     *
+     * @return
+     */
+    public CachedMapPane getMainMap() {
+        return guim.getMainWindow().getMap();
+    }
+
+    /**
+     * @param scaleStep
+     */
+    public void addToDisplayScale(double scaleStep) {
+
+        if (getMainMap() == null) {
+            return;
+        }
+
+        CachedMapPane pane = getMainMap();
+        pane.setScale(pane.getScale() + scaleStep);
+        pane.refreshMap();
+
+        refreshMapComponent();
+    }
+
+    public void resetDisplay() {
+        if (getMainMap() == null) {
+            return;
+        }
+
+        getMainMap().resetDisplay();
+    }
+
+    public void refreshMapComponent() {
+
+        CachedMapPane map = getMainMap();
+        if (map == null) {
+            return;
+        }
+
+        map.refreshMap();
+        map.repaint();
+    }
+
+    @Override
+    public EventNotificationManager getNotificationManager() {
+        return notifm;
     }
 }

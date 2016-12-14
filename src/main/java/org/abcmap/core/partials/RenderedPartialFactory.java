@@ -24,7 +24,7 @@ public class RenderedPartialFactory {
      * <p>
      * This value should prevent partial side to be negative
      */
-    public static final double MIN_PARTIAL_SIDE_WU = 0.05d;
+    public static final double MIN_PARTIAL_SIDE_WU = 0.1d;
 
     /**
      * Default size in pixel of each partial

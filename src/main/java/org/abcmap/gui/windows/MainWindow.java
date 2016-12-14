@@ -1,16 +1,19 @@
 package org.abcmap.gui.windows;
 
 import org.abcmap.core.events.GuiManagerEvent;
+import org.abcmap.core.events.ProjectEvent;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.core.project.Project;
 import org.abcmap.core.threads.ThreadManager;
-import org.abcmap.core.utils.Utils;
-import org.abcmap.core.utils.listeners.HasListenerHandler;
-import org.abcmap.core.utils.listeners.ListenerHandler;
 import org.abcmap.gui.components.StatusBar;
 import org.abcmap.gui.components.dock.Dock;
+import org.abcmap.gui.components.map.CachedMapPane;
 import org.abcmap.gui.ie.program.QuitProgram;
 import org.abcmap.gui.utils.GuiUtils;
 
@@ -18,16 +21,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.HashMap;
 
 /**
  * Main window of software
  */
-public class MainWindow extends AbstractCustomWindow implements HasListenerHandler<GuiManagerEvent> {
+public class MainWindow extends AbstractCustomWindow implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(MainWindow.class);
 
-    private final ListenerHandler<GuiManagerEvent> listenerHandler;
     /**
      * Current display mode of window
      */
@@ -54,11 +55,6 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
     private JPanel layoutPanel;
 
     /**
-     * Modes and associated content panes
-     */
-    private HashMap<MainWindowMode, Component> modesAndComps;
-
-    /**
      * East dock
      */
     private Dock dockE;
@@ -68,13 +64,24 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
      */
     private Dock dockW;
 
-    private JPanel mapPanel;
+    /**
+     * Current map panel, change every time project change
+     */
+    private CachedMapPane mapPanel;
+
+    /**
+     * Empty panel added when no project are loaded
+     */
+    private JPanel emptyPanel;
 
     private GuiManager guim;
+    private final ProjectManager projectm;
+    private final EventNotificationManager notifm;
 
     public MainWindow() {
 
         guim = MainManager.getGuiManager();
+        projectm = MainManager.getProjectManager();
 
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new MainWindowListener());
@@ -94,13 +101,39 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
         statusBar = new StatusBar();
         contentPane.add(statusBar, BorderLayout.SOUTH);
 
-        listenerHandler = new ListenerHandler<>();
+        emptyPanel = new JPanel();
 
+        // listen project manager to change content when project change
+        notifm = new EventNotificationManager(this);
+        projectm.getNotificationManager().addObserver(this);
+        notifm.setDefaultListener((notif) -> {
+
+            SwingUtilities.invokeLater(() -> {
+
+                // project closed, empty center
+                if (ProjectEvent.isCloseProjectEvent(notif)) {
+                    setWindowMode(MainWindowMode.EMPTY);
+                    logger.debug("Window mode updated");
+                }
+
+                // new project, show map
+                else if (ProjectEvent.isNewProjectLoadedEvent(notif)) {
+                    setWindowMode(MainWindowMode.SHOW_MAP);
+                    logger.debug("Window mode updated");
+                }
+
+            });
+
+        });
     }
 
-    @Override
-    public ListenerHandler<GuiManagerEvent> getListenerHandler() {
-        return null;
+    /**
+     * Return main map panel. Can be null
+     *
+     * @return
+     */
+    public CachedMapPane getMap() {
+        return mapPanel;
     }
 
     /**
@@ -121,7 +154,7 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
     private void setCenterComponent(Component comp) {
 
         if (comp == null) {
-            throw new NullPointerException("Composant cannot be null");
+            throw new NullPointerException("Component cannot be null");
         }
 
         Component centerComp = getCenterComponent();
@@ -152,29 +185,53 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
 
         GuiUtils.throwIfNotOnEDT();
 
-        if (modesAndComps == null) {
-            updateModesAndComponents();
+        windowMode = mode;
+
+        if (projectm.isInitialized()) {
+
+            Project currentProject = projectm.getProject();
+
+            // show map in center of window
+            if (MainWindowMode.SHOW_MAP.equals(mode)) {
+
+                // component is not up to date, create a new one
+                if (mapPanel == null || mapPanel.getProject().equals(currentProject) == false) {
+                    mapPanel = new CachedMapPane(currentProject);
+                    mapPanel.setMouseManagementEnabled(true);
+                    mapPanel.setNavigationBarEnabled(true);
+                }
+                setCenterComponent(mapPanel);
+
+            }
+
+            // show refused tiles in center of window
+            else if (MainWindowMode.SHOW_REFUSED_TILES.equals(mode)) {
+
+                // component is not up to date, create a new one
+                if (refusedTilesPanel == null) {
+                    refusedTilesPanel = new JPanel();
+                }
+                setCenterComponent(refusedTilesPanel);
+            }
+
+            // show layout in center of window
+            else if (MainWindowMode.SHOW_LAYOUTS.equals(mode)) {
+
+                // component is not up to date, create a new one
+                if (layoutPanel == null) {
+                    layoutPanel = new JPanel();
+                }
+                setCenterComponent(layoutPanel);
+            }
+
         }
-        Component comp = modesAndComps.get(mode);
 
-        if (comp == null) {
-            //throw new NullPointerException("Invalid main window mode: " + mode);
-            logger.warning("Invalid main window mode: " + mode);
-        }
-
-        // no changes needed, return
-        if (Utils.safeEquals(getCenterComponent(), comp)) {
-            return;
-        }
-
-        this.windowMode = mode;
-
-        if (MainWindowMode.SHOW_MAP.equals(mode)) {
-            setCenterComponent(mapPanel);
-        } else if (MainWindowMode.SHOW_REFUSED_TILES.equals(mode)) {
-            setCenterComponent(refusedTilesPanel);
-        } else if (MainWindowMode.SHOW_LAYOUTS.equals(mode)) {
-            setCenterComponent(layoutPanel);
+        // project is not initialized, add empty panel
+        else {
+            mapPanel = null;
+            refusedTilesPanel = null;
+            layoutPanel = null;
+            setCenterComponent(emptyPanel);
         }
 
         this.revalidate();
@@ -185,22 +242,10 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
     }
 
     /**
-     * Lazy initialization of components
-     */
-    private void updateModesAndComponents() {
-
-        modesAndComps = new HashMap<>();
-        modesAndComps.put(MainWindowMode.SHOW_MAP, mapPanel);
-        modesAndComps.put(MainWindowMode.SHOW_REFUSED_TILES, refusedTilesPanel);
-        modesAndComps.put(MainWindowMode.SHOW_LAYOUTS, layoutPanel);
-
-    }
-
-    /**
      * Notify observers of window mode changes
      */
     private void notifyWindowModeChanged() {
-        listenerHandler.fireEvent(new GuiManagerEvent(GuiManagerEvent.WINDOW_MODE_CHANGED, null));
+        notifm.fireEvent(new GuiManagerEvent(GuiManagerEvent.WINDOW_MODE_CHANGED, null));
     }
 
     /**
@@ -219,15 +264,6 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
      */
     public StatusBar getStatusBar() {
         return statusBar;
-    }
-
-    /**
-     * Set map panel of window
-     *
-     * @param map
-     */
-    public void setMapPanel(JPanel map) {
-        this.mapPanel = map;
     }
 
     /**
@@ -274,6 +310,12 @@ public class MainWindow extends AbstractCustomWindow implements HasListenerHandl
     public void setEastDock(Dock dockE) {
         this.dockE = dockE;
         getContentPane().add(dockE, BorderLayout.EAST);
+    }
+
+
+    @Override
+    public EventNotificationManager getNotificationManager() {
+        return notifm;
     }
 
 }

@@ -8,6 +8,7 @@ import org.abcmap.core.partials.RenderedPartialQueryResult;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 
@@ -81,11 +82,18 @@ public class CachedMapPane extends JPanel {
      */
     private double partialSideWu;
 
+    /**
+     * Current side of a partial
+     */
+    private int partialSidePx;
+
     private boolean debugMode = false;
+    private MapNavigationBar navigationBar;
+
 
     public CachedMapPane(Project project) {
 
-        setBorder(BorderFactory.createLineBorder(Color.DARK_GRAY));
+        setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
         this.project = project;
         this.renderLock = new ReentrantLock();
@@ -94,6 +102,8 @@ public class CachedMapPane extends JPanel {
         this.currentPartials = new HashMap<>();
 
         this.partialSideWu = 5;
+        this.partialSidePx = RenderedPartialFactory.DEFAULT_PARTIAL_SIDE_PX;
+        this.worldPosition = new Point2D.Double(0, 0);
 
         this.addComponentListener(new RefreshMapComponentListener());
 
@@ -116,6 +126,11 @@ public class CachedMapPane extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        // refresh navigation bar
+        if (navigationBar != null) {
+            navigationBar.refreshBoundsFrom(getSize());
+        }
+
         if (renderLock.isLocked()) {
             logger.debug("Render is in progress, avoid painting");
             return;
@@ -126,6 +141,11 @@ public class CachedMapPane extends JPanel {
         for (AbstractLayer lay : project.getLayersList()) {
 
             RenderedPartialQueryResult partials = currentPartials.get(lay.getId());
+
+            // list of layer changed before refreshMap called
+            if (partials == null) {
+                continue;
+            }
 
             // get affine transform to set position of partials
             AffineTransform worldToScreen = partials.getWorldToScreenTransform();
@@ -292,7 +312,7 @@ public class CachedMapPane extends JPanel {
      * It can be used as a "zoom" value
      */
     public int getPartialSidePx() {
-        return RenderedPartialFactory.DEFAULT_PARTIAL_SIDE_PX;
+        return partialSidePx;
     }
 
     /**
@@ -310,6 +330,58 @@ public class CachedMapPane extends JPanel {
     }
 
     /**
+     * Get current scale in panel
+     *
+     * @return
+     */
+    public double getScale() {
+        return getPartialSideWu() / getPartialSidePx();
+    }
+
+    /**
+     * Set current scale in panel
+     *
+     * @return
+     */
+    public void setScale(double scale) {
+        double partWu = getPartialSidePx() * scale;
+        setPartialSideWu(partWu);
+    }
+
+    public void resetDisplay() {
+
+        // TODO center map at a different scale ?
+        // this can avoid "blank screen"
+        ReferencedEnvelope worldBounds = project.getMaximumBounds();
+
+        Point2D.Double ulc = new Point2D.Double(worldBounds.getMinX(), worldBounds.getMaxY());
+        double compWidth = getSize().getWidth();
+        double worldWidth = worldBounds.getMaxX() - worldBounds.getMinX();
+        double sideWu = worldWidth * getPartialSidePx() / compWidth;
+
+        System.out.println();
+        System.out.println("public void resetDisplay() {");
+
+        for(AbstractLayer lay : project.getLayersList()){
+            System.out.println(lay.getBounds());
+        }
+
+        System.out.println("worldBounds");
+        System.out.println(worldBounds);
+        System.out.println(worldBounds.getMinX());
+        System.out.println(worldBounds.getMaxX());
+        System.out.println(ulc);
+        System.out.println(compWidth);
+        System.out.println(worldWidth);
+        System.out.println(sideWu);
+
+
+        setWorldPosition(ulc);
+        setPartialSideWu(sideWu);
+
+    }
+
+    /**
      * Get the size in degrees of the map rendered on each partial
      * <p>
      * It can be used as a "zoom" value
@@ -317,6 +389,29 @@ public class CachedMapPane extends JPanel {
      */
     public double getPartialSideWu() {
         return partialSideWu;
+    }
+
+    /**
+     * Enable navigation bar with zoom in/out and center button
+     *
+     * @param val
+     */
+    public void setNavigationBarEnabled(boolean val) {
+
+        // add navigation bar
+        if (val) {
+            navigationBar = new MapNavigationBar();
+            add(navigationBar);
+            navigationBar.refreshBoundsFrom(getSize());
+        }
+
+        // remove bar if present
+        else {
+            if (navigationBar != null) {
+                remove(navigationBar);
+                navigationBar = null;
+            }
+        }
     }
 
     /**
@@ -380,5 +475,7 @@ public class CachedMapPane extends JPanel {
         this.debugMode = debugMode;
     }
 
-
+    public Project getProject() {
+        return project;
+    }
 }

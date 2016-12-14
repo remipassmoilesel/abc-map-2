@@ -2,9 +2,10 @@ package org.abcmap.core.managers;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.configuration.ConfigurationConstants;
-import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
@@ -26,7 +27,7 @@ public class ProjectManager implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(ProjectManager.class);
     private final ProjectBackupInterval backupTimer;
-    private final EventNotificationManager notificationManager;
+    private final EventNotificationManager notifm;
     private Project currentProject;
     private final TempFilesManager tempMan;
 
@@ -35,7 +36,7 @@ public class ProjectManager implements HasEventNotificationManager {
         this.currentProject = null;
         tempMan = MainManager.getTempFilesManager();
 
-        notificationManager = new EventNotificationManager(ProjectManager.this);
+        notifm = new EventNotificationManager(ProjectManager.this);
 
         backupTimer = new ProjectBackupInterval(ConfigurationConstants.BACKUP_INTERVAL);
     }
@@ -73,6 +74,8 @@ public class ProjectManager implements HasEventNotificationManager {
             throw new IOException("Error while creating project", e);
         }
 
+        notifm.fireEvent(new ProjectEvent(ProjectEvent.NEW_PROJECT_LOADED));
+
         return currentProject;
 
     }
@@ -108,6 +111,8 @@ public class ProjectManager implements HasEventNotificationManager {
             throw new IOException("Error while deleting temp files", e);
         }
 
+        notifm.fireEvent(new ProjectEvent(ProjectEvent.PROJECT_CLOSED));
+
     }
 
     /**
@@ -134,6 +139,7 @@ public class ProjectManager implements HasEventNotificationManager {
             throw new IOException("Error while reading project", e);
         }
 
+        notifm.fireEvent(new ProjectEvent(ProjectEvent.NEW_PROJECT_LOADED));
     }
 
     /**
@@ -189,10 +195,10 @@ public class ProjectManager implements HasEventNotificationManager {
 
         // TODO: get more realistic coordinates
         ArrayList<Coordinate> positions = new ArrayList();
-        positions.add(new Coordinate(2000, 1000));
-        positions.add(new Coordinate(1478.6803359985352, 982.1077270507812));
-        positions.add(new Coordinate(919.2462692260742, 1257.8359985351562));
-        positions.add(new Coordinate(919.2940902709961, 1032.83740234375));
+        positions.add(new Coordinate(0, 0));
+        positions.add(new Coordinate(-520.4633750915527, -18.264129638671875));
+        positions.add(new Coordinate(-1078.8829231262207, 257.2473449707031));
+        positions.add(new Coordinate(-1078.8697395324707, 32.2457275390625));
 
         int totalToInsert = 4;
         for (int i = 0; i < totalToInsert; i++) {
@@ -210,6 +216,9 @@ public class ProjectManager implements HasEventNotificationManager {
         }
 
         layer.refreshCoverage();
+
+        // second notification sent
+        notifm.fireEvent(new ProjectEvent(ProjectEvent.NEW_PROJECT_LOADED));
     }
 
     public Project getProject() {
@@ -218,6 +227,6 @@ public class ProjectManager implements HasEventNotificationManager {
 
     @Override
     public EventNotificationManager getNotificationManager() {
-        return notificationManager;
+        return notifm;
     }
 }

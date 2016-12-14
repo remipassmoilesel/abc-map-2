@@ -11,12 +11,13 @@ import java.awt.geom.Point2D;
  */
 public class CachedMapPaneMouseController extends MouseAdapter {
 
-    private static final double ZOOM_ORIGINAL_INCREMENT = 20;
     private final CachedMapPane pane;
+    private double zoomUnitIncrement;
     private Point lastPosition;
 
     public CachedMapPaneMouseController(CachedMapPane pane) {
         this.pane = pane;
+        this.zoomUnitIncrement = 0.3;
     }
 
     @Override
@@ -70,13 +71,22 @@ public class CachedMapPaneMouseController extends MouseAdapter {
     public void mouseWheelMoved(MouseWheelEvent e) {
         super.mouseWheelMoved(e);
 
-        double zoomUnit = scaleValue(ZOOM_ORIGINAL_INCREMENT);
+        double zoomUnit = zoomUnitIncrement;
 
         if (e.getWheelRotation() < 0) {
             zoomUnit = -zoomUnit;
         }
 
-        pane.setPartialSideWu(pane.getPartialSideWu() + zoomUnit);
+        pane.setScale(pane.getScale() + zoomUnit);
         pane.refreshMap();
+
+    }
+
+    public void setZoomUnitIncrement(double zoomUnitIncrement) {
+        this.zoomUnitIncrement = zoomUnitIncrement;
+    }
+
+    public double getZoomUnitIncrement() {
+        return zoomUnitIncrement;
     }
 }

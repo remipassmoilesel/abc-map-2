@@ -5,8 +5,7 @@ import org.abcmap.gui.ie.InteractionElement;
 
 public abstract class AbstractZoom extends InteractionElement {
 
-    private static final float RESETED_SCALE = 0.7f;
-    private static final float SCALE_STEP = 0.1f;
+    private static final double SCALE_STEP = 0.2;
 
     protected enum Direction {
         IN, OUT, CENTER
@@ -18,15 +17,22 @@ public abstract class AbstractZoom extends InteractionElement {
 
         this.direction = dir;
 
+        // zoom in
         if (Direction.IN.equals(dir)) {
             label = "Zoom avant";
             help = "Cliquez ici pour zoomer la carte.";
             menuIcon = GuiIcons.SMALLICON_ZOOMIN;
-        } else if (Direction.OUT.equals(dir)) {
+        }
+
+        // zoom out
+        else if (Direction.OUT.equals(dir)) {
             label = "Zoom arrière";
             help = "Cliquez ici pour dézoomer la carte.";
             menuIcon = GuiIcons.SMALLICON_ZOOMOUT;
-        } else if (Direction.CENTER.equals(dir)) {
+        }
+
+        // reset display
+        else if (Direction.CENTER.equals(dir)) {
             label = "Remise à zéro de l'affichage";
             help = "Cliquez ici pour remettre à zéro l'affichage.";
             menuIcon = GuiIcons.MAP_MOVECENTER;
@@ -35,21 +41,24 @@ public abstract class AbstractZoom extends InteractionElement {
 
     @Override
     public void run() {
-        /*
-		if (Direction.IN.equals(direction)) {
-			mapm.addToDisplayScale(SCALE_STEP);
-		}
 
-		else if (Direction.OUT.equals(direction)) {
-			mapm.addToDisplayScale(-SCALE_STEP);
-		}
+        // zoom in
+        if (Direction.IN.equals(direction)) {
+            mapm.addToDisplayScale(-SCALE_STEP);
+        }
 
-		else if (Direction.CENTER.equals(direction)) {
-			mapm.resetDisplay(RESETED_SCALE);
-		}
+        // zoom out
+        else if (Direction.OUT.equals(direction)) {
+            mapm.addToDisplayScale(SCALE_STEP);
+        }
 
-		mapm.refreshMapComponent();
-		*/
+        // reset display
+        else if (Direction.CENTER.equals(direction)) {
+            mapm.resetDisplay();
+        }
+
+        mapm.refreshMapComponent();
+
     }
 
 }
