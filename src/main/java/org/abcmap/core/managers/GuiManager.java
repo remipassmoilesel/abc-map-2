@@ -32,11 +32,6 @@ public class GuiManager implements HasEventNotificationManager {
     private static final CustomLogger logger = LogManager.getLogger(GuiManager.class);
 
     /**
-     * Sub manager used to manage all operations around dialogs.
-     */
-    private final DialogManager dialogManager;
-
-    /**
      * List of operations to launch AFTER gui initialization
      */
     private ArrayList<Runnable> initialisationOperations;
@@ -64,7 +59,6 @@ public class GuiManager implements HasEventNotificationManager {
         initialisationOperations = new ArrayList<>();
         registeredWindows = new HashMap<>();
 
-        dialogManager = new DialogManager();
     }
 
     public DetachedWindow getWizardDetachedWindow() {
@@ -89,21 +83,12 @@ public class GuiManager implements HasEventNotificationManager {
                     name = finalPath.getFileName().toString();
                 }
 
-                if(getMainWindow() != null){
+                if (getMainWindow() != null) {
                     getMainWindow().setTitle(name);
                 }
             }
 
         }
-    }
-
-    /**
-     * Return dialog manager, a utility used to display dialogs and messages to user.
-     *
-     * @return
-     */
-    public DialogManager getDialogManager() {
-        return dialogManager;
     }
 
     /**

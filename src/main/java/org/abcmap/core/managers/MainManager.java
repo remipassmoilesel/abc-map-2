@@ -2,7 +2,6 @@ package org.abcmap.core.managers;
 
 import com.j256.ormlite.logger.LocalLog;
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.threads.ThreadManager;
 
 import java.io.IOException;
 
@@ -29,6 +28,7 @@ public class MainManager {
     private static RecentManager recentManager;
     private static ClipboardManager clipboardManager;
     private static ImportManager importManager;
+    private static DialogManager dialogManager;
 
     /**
      * Initialize all managers
@@ -53,6 +53,7 @@ public class MainManager {
         recentManager = new RecentManager();
         clipboardManager = new ClipboardManager();
         importManager = new ImportManager();
+        dialogManager = new DialogManager();
 
         setInitialized(true);
     }
@@ -119,6 +120,10 @@ public class MainManager {
 
     public static ImportManager getImportManager() {
         return importManager;
+    }
+
+    public static DialogManager getDialogManager() {
+        return dialogManager;
     }
 
     /**

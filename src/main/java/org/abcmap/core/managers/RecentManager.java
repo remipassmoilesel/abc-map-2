@@ -2,6 +2,7 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.project.Project;
 
 import java.io.IOException;
 
@@ -25,6 +26,10 @@ public class RecentManager implements HasEventNotificationManager {
     }
 
     public void saveHistory() throws IOException {
+
+    }
+
+    public void add(Project p) {
 
     }
 

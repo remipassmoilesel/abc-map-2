@@ -6,7 +6,9 @@ import org.abcmap.gui.components.messagebox.MessageBoxManager;
 import org.abcmap.gui.dialogs.ClosingConfirmationDialog;
 import org.abcmap.gui.dialogs.QuestionResult;
 import org.abcmap.gui.dialogs.SupportProjectDialog;
+import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
 import org.abcmap.gui.dialogs.simple.InformationTextFieldDialog;
+import org.abcmap.gui.dialogs.simple.SimpleBrowseDialog;
 import org.abcmap.gui.dialogs.simple.SimpleErrorDialog;
 import org.abcmap.gui.utils.GuiUtils;
 
@@ -17,6 +19,11 @@ import java.lang.reflect.InvocationTargetException;
 public class DialogManager {
 
     private static final CustomLogger logger = LogManager.getLogger(DialogManager.class);
+    private final GuiManager guim;
+
+    public DialogManager() {
+        this.guim = MainManager.getGuiManager();
+    }
 
     /**
      * Utility used to display messages in boxes on main window
@@ -67,6 +74,15 @@ public class DialogManager {
     /**
      * Show a dialog box
      *
+     * @param
+     */
+    public void showSupportDialog() {
+        showSupportDialog(guim.getMainWindow());
+    }
+
+    /**
+     * Show a dialog box
+     *
      * @param parent
      */
     public void showSupportDialog(Window parent) {
@@ -81,8 +97,18 @@ public class DialogManager {
     /**
      * Show a support dialog of project
      *
+     * @param
+     */
+    public void showSupportDialogAndWait() {
+        showSupportDialogAndWait(guim.getMainWindow());
+    }
+
+    /**
+     * Show a support dialog of project
+     *
      * @param parent
      */
+
     public void showSupportDialogAndWait(final Window parent) {
 
         try {
@@ -139,6 +165,13 @@ public class DialogManager {
     /**
      * Predefined error message
      */
+    public void showErrorInDialog(String message, boolean wait) {
+        showErrorInDialog(guim.getMainWindow(), message, wait);
+    }
+
+    /**
+     * Predefined error message
+     */
     public void showErrorInDialog(Window parent, String message, boolean wait) {
 
         if (wait) {
@@ -171,5 +204,14 @@ public class DialogManager {
      */
     public QuestionResult showProjectConfirmationDialog(Window parent) {
         return ClosingConfirmationDialog.showProjectConfirmationAndWait(parent);
+    }
+
+    /**
+     * Show a browse dialog with project file filter
+     *
+     * @return
+     */
+    public BrowseDialogResult browseProjectToOpenDialog() {
+        return SimpleBrowseDialog.browseProjectToOpenAndWait(guim.getMainWindow());
     }
 }
