@@ -24,6 +24,10 @@ public class ProjectEvent extends Event {
 
     public static final String TILE_REFUSED_LIST_UPDATED = "TILE_REFUSED_LIST_UPDATED";
 
+    public ProjectEvent(String name) {
+        this(name, null);
+    }
+
     public ProjectEvent(String name, Object value) {
         super(name, value);
     }

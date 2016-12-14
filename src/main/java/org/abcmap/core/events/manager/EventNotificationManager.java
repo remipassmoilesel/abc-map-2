@@ -71,7 +71,7 @@ public class EventNotificationManager implements EventListener {
      *
      * @param notif
      */
-    public void fireNotification(Event notif) {
+    public void fireEvent(Event notif) {
 
         // save notification if needed
         if (debugMode) {

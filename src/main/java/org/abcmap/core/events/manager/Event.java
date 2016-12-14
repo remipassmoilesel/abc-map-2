@@ -14,6 +14,10 @@ public class Event {
     private String creationTime;
     private Integer instanceNumber;
 
+    public Event(String name) {
+        this(name, null);
+    }
+
     public Event(String name, Object value) {
 
         // count instances
