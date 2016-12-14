@@ -2,9 +2,13 @@ package org.abcmap.gui.ie.project;
 
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.gui.GuiIcons;
+import org.abcmap.gui.dialogs.QuestionResult;
+import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
 import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.gui.utils.GuiUtils;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 
 public class OpenProject extends InteractionElement {
 
@@ -18,73 +22,75 @@ public class OpenProject extends InteractionElement {
     @Override
     public void run() {
 
-		/*
-        // pas d'appels sur l'EDT
-		GuiUtils.throwIfOnEDT();
+        GuiUtils.throwIfOnEDT();
 
-		// eviter les appels intempestifs
-		if (threadAccess.askAccess() == false) {
-			return;
-		}
+        if (getOperationLock() == false) {
+            return;
+        }
 
-		// threadAccess.releaseAccess();
+        try {
 
-		// confirmer la fermeture du projet courant
-		if (MainManager.isDebugMode() == false && projectm.isInitialized()) {
-			QuestionResult cc = ClosingConfirmationDialog
-					.showProjectConfirmationAndWait(guim.getMainWindow());
-			if (cc.isAnswerYes() == false) {
-				threadAccess.releaseAccess();
-				return;
-			}
-		}
+            // confirm project closing
+            if (MainManager.isDebugMode() == false && projectm.isInitialized()) {
+                QuestionResult cc = dialm.showProjectClosingConfirmationDialog();
 
-		// boite de dialogue parcourir
-		Window parent = guim.getMainWindow();
-		BrowseDialogResult result = SimpleBrowseDialog
-				.browseProjectToOpenAndWait(parent);
+                // user respond cancel or no
+                if (cc.isAnswerYes() == false) {
+                    return;
+                }
+            }
 
-		// operation annulée par l'utilisateur
-		if (result.isActionCanceled() == true) {
-			threadAccess.releaseAccess();
-			return;
-		}
+            BrowseDialogResult result = dialm.browseProjectToOpenDialog();
 
-		// ouvrir le projet
-		openProject(result.getFile());
+            // user canceled operation
+            if (result.isActionCanceled()) {
+                return;
+            }
 
-		threadAccess.releaseAccess();
-		*/
+            openProject(result.getPath());
+
+        } finally {
+            releaseOperationLock();
+        }
+
     }
 
-    public void openProject(File file) {
-		/*
-		// fermer le projet
-		try {
-			projectm.closeProject();
-		} catch (IOException e1) {
-			guim.showErrorInBox("Erreur lors de la fermeture du projet.");
-			Log.error(e1);
-		}
+    /**
+     * Open operation available in a public method to be used programmatically
+     *
+     * @param projectToOpen
+     */
+    public void openProject(Path projectToOpen) {
 
-		// ouverture du fichier choisi
-		try {
-			projectm.openProject(file);
+        try {
+            projectm.closeProject();
+        } catch (IOException e1) {
+            dialm.showErrorInBox("Erreur lors de la fermeture du projet.");
+            logger.error(e1);
+        }
 
-			guim.showErrorInBox("Le projet est chargé.");
+        boolean opened = false;
+        try {
+            projectm.openProject(projectToOpen);
+            dialm.showErrorInBox("Le projet a été ouvert");
+            opened = true;
+        }
 
-			// conservation dans les recents
-			recentsm.addProject(file);
-			recentsm.saveHistory();
+        // error while openning project
+        catch (Exception e) {
+            dialm.showErrorInBox("Erreur lors de l'ouverture du projet.");
+            logger.error(e);
+        }
 
-		}
-
-		// erreur lors de l'ouverture
-		catch (Exception e) {
-			guim.showErrorInBox("Erreur lors de l'ouverture du projet.");
-			Log.error(e);
-		}
-		*/
+        // add project in recents
+        if (opened) {
+            try {
+                recentsm.addCurrentProject();
+                recentsm.saveHistory();
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
     }
 
 }

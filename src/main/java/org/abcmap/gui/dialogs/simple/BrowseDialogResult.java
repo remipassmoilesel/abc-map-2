@@ -4,6 +4,7 @@ import org.abcmap.core.utils.Utils;
 
 import javax.swing.*;
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Contains file selection
@@ -32,6 +33,10 @@ public class BrowseDialogResult {
 
     public File getFile() {
         return file;
+    }
+
+    public Path getPath() {
+        return file != null ? file.toPath() : null;
     }
 
     public void setFile(File file) {
