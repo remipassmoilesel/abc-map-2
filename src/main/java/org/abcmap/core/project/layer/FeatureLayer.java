@@ -2,6 +2,7 @@ package org.abcmap.core.project.layer;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.draw.feature.DefaultFeatureBuilder;
+import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.simple.SimpleFeatureIterator;
@@ -16,7 +17,6 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.identity.Identifier;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -41,19 +41,18 @@ public class FeatureLayer extends AbstractLayer {
      * @param title
      * @param visible
      * @param zindex
-     * @param databasePath
+     * @param owner
      * @param create
      * @throws IOException
      */
-    public FeatureLayer(String layerId, String title, boolean visible, int zindex,
-                        Path databasePath, boolean create) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.FEATURES), databasePath, create);
+    public FeatureLayer(String layerId, String title, boolean visible, int zindex, Project owner, boolean create) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.FEATURES), owner, create);
     }
 
-    public FeatureLayer(LayerIndexEntry entry, Path databasePath, boolean create) throws IOException {
-        super(entry);
+    public FeatureLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
+        super(owner, entry);
 
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(databasePath);
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(project.getDatabasePath());
 
         // if true, create a new database entry
         if (create) {

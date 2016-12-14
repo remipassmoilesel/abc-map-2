@@ -1,5 +1,6 @@
 package org.abcmap.core.project.layer;
 
+import org.abcmap.core.project.Project;
 import org.abcmap.core.wms.WMSEntry;
 import org.abcmap.core.wms.WMSException;
 import org.abcmap.core.wms.WMSdao;
@@ -11,7 +12,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,16 +28,16 @@ public class WMSLayer extends AbstractLayer {
      * @param wmsName
      * @param visible
      * @param zindex
-     * @param databasePath
+     * @param owner
      * @throws IOException
      */
-    public WMSLayer(String name, String url, String wmsName, boolean visible, int zindex, Path databasePath) throws IOException, WMSException {
-        super(new LayerIndexEntry(null, name, visible, zindex, LayerType.WMS));
+    public WMSLayer(String name, String url, String wmsName, boolean visible, int zindex, Project owner) throws IOException, WMSException {
+        super(owner, new LayerIndexEntry(null, name, visible, zindex, LayerType.WMS));
 
         // create a wms entry
         wmsEntry = new WMSEntry(indexEntry.getLayerId(), url, wmsName);
 
-        WMSdao dao = new WMSdao(databasePath);
+        WMSdao dao = new WMSdao(project.getDatabasePath());
         dao.create(wmsEntry);
         dao.close();
 

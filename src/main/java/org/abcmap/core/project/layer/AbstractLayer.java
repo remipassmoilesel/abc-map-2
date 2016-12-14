@@ -3,8 +3,7 @@ package org.abcmap.core.project.layer;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -24,7 +23,7 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
     protected final static StyleFactory sf = FeatureUtils.getStyleFactory();
     protected final static FilterFactory ff = FeatureUtils.getFilterFactory();
     protected final static GeometryFactory geom = GeoUtils.getGeometryFactory();
-    protected ProjectManager pman;
+    protected final Project project;
 
     protected final String crsCode;
     protected CoordinateReferenceSystem crs;
@@ -38,8 +37,9 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
      *
      * @param entry
      */
-    public AbstractLayer(LayerIndexEntry entry) {
-        pman = MainManager.getProjectManager();
+    public AbstractLayer(Project owner, LayerIndexEntry entry) {
+
+        this.project = owner;
         this.indexEntry = entry;
         this.layerStyle = sf.createStyle();
         this.crsCode = "EPSG:404000";

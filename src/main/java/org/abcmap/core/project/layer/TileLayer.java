@@ -2,10 +2,11 @@ package org.abcmap.core.project.layer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
+import org.abcmap.core.draw.feature.TileFeatureBuilder;
+import org.abcmap.core.project.Project;
 import org.abcmap.core.tiles.TileContainer;
 import org.abcmap.core.tiles.TileStorage;
 import org.abcmap.core.tiles.TileStorageQueries;
-import org.abcmap.core.draw.feature.TileFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLUtils;
@@ -62,22 +63,20 @@ public class TileLayer extends AbstractLayer {
      */
     private final String coverageName;
     private final FeatureLayer outlineLayer;
-    private final Path databasePath;
     private final Style outlineStyle;
     private FeatureTypeStyle outlineFeatureType;
 
-    public TileLayer(String layerId, String title, boolean visible, int zindex, Path databasePath, boolean create) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), databasePath, create);
+    public TileLayer(String layerId, String title, boolean visible, int zindex, Project owner, boolean create) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), owner, create);
     }
 
-    public TileLayer(LayerIndexEntry entry, Path databasePath, boolean create) throws IOException {
+    public TileLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
 
-        super(entry);
+        super(owner, entry);
 
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(databasePath);
+        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(project.getDatabasePath());
 
-        this.databasePath = databasePath;
-        this.tileStorage = pman.getProject().getTileStorage();
+        this.tileStorage = project.getTileStorage();
 
         // uppercase mandatory
         coverageName = entry.getLayerId().toUpperCase();
@@ -117,7 +116,7 @@ public class TileLayer extends AbstractLayer {
      * @throws IOException
      */
     public void refreshCoverage() throws IOException {
-        buildCoverageLayer(databasePath, coverageName, crsCode);
+        buildCoverageLayer(coverageName, crsCode);
     }
 
     /**
@@ -284,15 +283,14 @@ public class TileLayer extends AbstractLayer {
     }
 
     /**
-     * @param databasePath
      * @param coverageName
      * @param crsCode
      * @throws IOException
      */
-    private Layer buildCoverageLayer(Path databasePath, String coverageName, String crsCode) throws IOException {
+    private Layer buildCoverageLayer(String coverageName, String crsCode) throws IOException {
 
         // retrieve appropriate configuation for jdbc plugin
-        Config config = getConfiguration(databasePath, coverageName, crsCode);
+        Config config = getConfiguration(project.getDatabasePath(), coverageName, crsCode);
 
         // get a coverage reader
         AbstractGridFormat format = GridFormatFinder.findFormat(config);
