@@ -1,10 +1,11 @@
 package org.abcmap.gui.ie;
 
 import org.abcmap.core.configuration.ConfigurationConstants;
-import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.managers.*;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.*;
+import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.dock.blockitems.ClickableBlockItem;
@@ -36,11 +37,11 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
     protected static final CustomLogger logger = LogManager.getLogger(TempFilesManager.class);
 
     /**
-     * General purpose userActionLock
+     * General purpose lock
      * <p>
-     * Use getUserLockOrDisplayMessage() to userActionLock it and display a message if userActionLock is refused
+     * Use getOperationLock() to userActionLock it and display a message if lock is refused
      */
-    private final ReentrantLock userActionLock;
+    private final ReentrantLock operationLock;
 
     /**
      * Name of element
@@ -150,7 +151,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
         clipboardm = MainManager.getClipboardManager();
         cancelm = MainManager.getCancelManager();
         importm = MainManager.getImportManager();
-        dialm = guim.getDialogManager();
+        dialm = MainManager.getDialogManager();
 
         this.label = "no label";
         this.help = null;
@@ -165,7 +166,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
 
         this.notifm = new EventNotificationManager(this);
 
-        this.userActionLock = new ReentrantLock();
+        this.operationLock = new ReentrantLock();
 
     }
 
@@ -174,10 +175,10 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
      *
      * @return
      */
-    protected boolean getUserLockOrDisplayMessage() {
+    protected boolean getOperationLock() {
 
-        if (userActionLock.tryLock() == false) {
-            dialm.showErrorInBox("Cette opération est déjà en cours, veuillez patienter.");
+        if (operationLock.tryLock() == false) {
+            dialm.showErrorInBox("Cette opération est déjà en cours, veuillez patienter...");
             return false;
         }
 
@@ -185,10 +186,27 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
     }
 
     /**
+     * Return current project if initialized.
+     * <p>
+     * If not, show a message to user and return null
+     *
+     * @return
+     */
+    protected Project getCurrentProjectOrShowMessage() {
+
+        if (projectm.isInitialized() == false) {
+            dialm.showErrorInBox("Vous devez d'abord ouvrir ou créer un projet.");
+            return null;
+        }
+
+        return projectm.getProject();
+    }
+
+    /**
      * Release user lock.
      */
-    protected void releaseUserLock() {
-        userActionLock.unlock();
+    protected void releaseOperationLock() {
+        operationLock.unlock();
     }
 
     /**
@@ -206,7 +224,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
 
     /**
      * Return a simple GUI, without any container
-     *
+     * <p>
      * This GUI should be wrapped in search result, dock container, ...
      *
      * @return

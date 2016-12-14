@@ -116,9 +116,10 @@ public class MainWindow extends AbstractCustomWindow implements HasEventNotifica
                     logger.debug("Window mode updated");
                 }
 
-                // new project, show map
+                // new project, show map and reset display
                 else if (ProjectEvent.isNewProjectLoadedEvent(notif)) {
                     setWindowMode(MainWindowMode.SHOW_MAP);
+//                    mapPanel.resetDisplay();
                     logger.debug("Window mode updated");
                 }
 

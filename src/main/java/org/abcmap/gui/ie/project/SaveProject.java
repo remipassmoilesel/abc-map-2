@@ -2,6 +2,9 @@ package org.abcmap.gui.ie.project;
 
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.gui.utils.GuiUtils;
+
+import java.io.IOException;
 
 public class SaveProject extends InteractionElement {
 
@@ -14,46 +17,41 @@ public class SaveProject extends InteractionElement {
 
     @Override
     public void run() {
+        GuiUtils.throwIfOnEDT();
 
-		/*
+        if (getOperationLock() == false) {
+            return;
+        }
 
-		// a utiliser en dehors de l'EDT
-		GuiUtils.throwIfOnEDT();
+        try {
 
-		// eviter les appels intempestifs
-		if (threadAccess.askAccess() == false) {
-			return;
-		}
+            // show work in progress
+            dialm.showMessageInBox("Le projet est en cours d'enregistrement...");
 
-		// threadAccess.releaseAccess();
+            // TODO clean project
+            // projectm.cleanCurrentProject();
 
-		// message de confirmation
-		guim.showMessageInBox("Le projet est en cours d'enregistrement.");
+            // project was never saved
+            if (projectm.getProject().getFinalPath() == null) {
+                // propose save as
+                SaveAsProject sap = new SaveAsProject();
+                sap.run();
+                return;
+            }
 
-		// nettoyer le projet
-		// projectc.cleanCurrentProject();
+            // save project
+            try {
+                projectm.saveProject();
+            }
+            // error while writing project
+            catch (IOException e) {
+                dialm.showProjectWritingError();
+                logger.error(e);
+            }
+        } finally {
+            releaseOperationLock();
+        }
 
-		// enregistrement
-		try {
-			projectm.save();
-		}
-
-		// le projet n'a encore jamais ete enregistre
-		catch (ProjectException e) {
-			// proposition de sauvegarder sous
-			SaveAsProject sap = new SaveAsProject();
-			sap.run();
-		}
-
-		// Erreur lors de l'enregistrement du projet
-		catch (IOException e) {
-			guim.showProjectWritingError();
-			Log.error(e);
-		}
-
-		threadAccess.releaseAccess();
-
-		*/
     }
 
 }

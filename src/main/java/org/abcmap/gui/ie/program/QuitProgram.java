@@ -19,7 +19,7 @@ public class QuitProgram extends InteractionElement {
     @Override
     public void run() {
 
-        if (getUserLockOrDisplayMessage() == false) {
+        if (getOperationLock() == false) {
             return;
         }
 
@@ -88,7 +88,7 @@ public class QuitProgram extends InteractionElement {
 
 
         } finally {
-            releaseUserLock();
+            releaseOperationLock();
         }
 
     }

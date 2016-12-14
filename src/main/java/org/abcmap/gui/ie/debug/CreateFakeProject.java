@@ -22,7 +22,7 @@ public class CreateFakeProject extends InteractionElement {
 
         GuiUtils.throwIfOnEDT();
 
-        if (getUserLockOrDisplayMessage() == false) {
+        if (getOperationLock() == false) {
             return;
         }
 
@@ -33,7 +33,7 @@ public class CreateFakeProject extends InteractionElement {
                 dialm.showErrorInBox("Erreur lors de la création du faux projet");
             }
         } finally {
-            releaseUserLock();
+            releaseOperationLock();
         }
 
 

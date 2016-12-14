@@ -1,7 +1,13 @@
 package org.abcmap.gui.ie.project;
 
+import org.abcmap.core.project.Project;
 import org.abcmap.gui.GuiIcons;
+import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
 import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.gui.utils.GuiUtils;
+
+import java.awt.*;
+import java.io.IOException;
 
 public class SaveAsProject extends InteractionElement {
 
@@ -14,71 +20,57 @@ public class SaveAsProject extends InteractionElement {
 
     @Override
     public void run() {
+        GuiUtils.throwIfOnEDT();
 
-		/*
+        Project project = getCurrentProjectOrShowMessage();
+        if (project == null) {
+            return;
+        }
 
-		// appeler hor de l'EDT
-		GuiUtils.throwIfOnEDT();
+        if (getOperationLock() == false) {
+            return;
+        }
 
-		// eviter les appels intempestifs
-		if (threadAccess.askAccess() == false) {
-			return;
-		}
+        try {
 
-		// threadAccess.releaseAccess();
+            // TODO clean project
+            // projectm.cleanCurrentProject();
 
-		// nettoyer le projet
-		// projectc.cleanCurrentProject();
+            // display browse dialog
+            Window parent = guim.getMainWindow();
+            BrowseDialogResult result = dialm.browseProjectToOpenDialog();
 
-		// afficher une boite parcourir
-		Window parent = guim.getMainWindow();
-		BrowseDialogResult result = SimpleBrowseDialog
-				.browseProjectToOpen(parent);
+            // user cancel action
+            if (result.isActionCanceled() == true) {
+                return;
+            }
 
-		// en cas d'annulation
-		if (result.isActionCanceled() == true) {
-			threadAccess.releaseAccess();
-			return;
-		}
+            // save project
+            boolean saved = false;
+            project.setFinalPath(result.getFile().toPath());
+            try {
+                projectm.saveProject();
+                saved = true;
+            } catch (IOException e) {
+                logger.error(e);
+                dialm.showErrorInBox("Erreur lors de l'enregistrement du projet");
+            }
 
-		// fentre d'attente
-		// dialogManager.launch(this);
+            // keep project in recent history
+            if (saved) {
+                try {
+                    recentsm.add(project);
+                    recentsm.saveHistory();
+                } catch (IOException e) {
+                    logger.error(e);
+                }
+            }
 
-		// enregistrement du fichier
-		try {
-			AbmProjectWriter pw = new AbmProjectWriter();
-			pw.setOverwriting(true);
+            dialm.showMessageInBox("Le projet a été enregistré");
 
-			projectm.setRealPath(result.getFile());
-
-			projectm.save(pw);
-
-			// dialogManager.stopAtNextLoop(this);
-		}
-
-		catch (IOException e) {
-
-			// message d'erreur
-			guim.showProjectWritingError();
-			Log.error(e);
-
-			threadAccess.releaseAccess();
-
-			// dialogManager.stopAtNextLoop(this);
-			return;
-		}
-
-		// enregistrement dans les projets récents
-		try {
-			recentsm.addProject(projectm.getRealPath());
-			recentsm.saveHistory();
-		} catch (IOException e) {
-			Log.error(e);
-		}
-
-		threadAccess.releaseAccess();
-
-		*/
+        } finally {
+            releaseOperationLock();
+        }
 
     }
 

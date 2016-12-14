@@ -1,10 +1,7 @@
 package org.abcmap.gui.ie.recents;
 
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.managers.RecentManager;
+import org.abcmap.core.managers.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,6 +13,7 @@ public class RecentHistoryReseter implements ActionListener {
 
     private RecentManager recentsm;
     private GuiManager guim;
+    private DialogManager dialm;
     private Mode mode;
 
     public RecentHistoryReseter(Mode mode) {
@@ -24,6 +22,7 @@ public class RecentHistoryReseter implements ActionListener {
 
         this.recentsm = MainManager.getRecentManager();
         this.guim = MainManager.getGuiManager();
+        this.dialm = MainManager.getDialogManager();
     }
 
     @Override
@@ -44,7 +43,7 @@ public class RecentHistoryReseter implements ActionListener {
             recentsm.saveHistory();
         } catch (IOException e1) {
             logger.debug(e1);
-            guim.getDialogManager().showErrorInBox("Erreur lors de la réinitialisation de l'historique.");
+            dialm.showErrorInBox("Erreur lors de la réinitialisation de l'historique.");
         }
 
     }

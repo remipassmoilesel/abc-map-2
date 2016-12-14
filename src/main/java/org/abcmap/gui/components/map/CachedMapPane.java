@@ -348,6 +348,9 @@ public class CachedMapPane extends JPanel {
         setPartialSideWu(partWu);
     }
 
+    /**
+     * Reset display to show whole width of map, from upper left corner corner
+     */
     public void resetDisplay() {
 
         // TODO center map at a different scale ?
@@ -358,23 +361,6 @@ public class CachedMapPane extends JPanel {
         double compWidth = getSize().getWidth();
         double worldWidth = worldBounds.getMaxX() - worldBounds.getMinX();
         double sideWu = worldWidth * getPartialSidePx() / compWidth;
-
-        System.out.println();
-        System.out.println("public void resetDisplay() {");
-
-        for(AbstractLayer lay : project.getLayersList()){
-            System.out.println(lay.getBounds());
-        }
-
-        System.out.println("worldBounds");
-        System.out.println(worldBounds);
-        System.out.println(worldBounds.getMinX());
-        System.out.println(worldBounds.getMaxX());
-        System.out.println(ulc);
-        System.out.println(compWidth);
-        System.out.println(worldWidth);
-        System.out.println(sideWu);
-
 
         setWorldPosition(ulc);
         setPartialSideWu(sideWu);
