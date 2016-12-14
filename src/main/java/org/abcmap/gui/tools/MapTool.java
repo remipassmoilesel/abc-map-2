@@ -4,7 +4,7 @@ import org.abcmap.core.draw.LayerElement;
 import org.abcmap.core.managers.*;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.events.manager.EventNotificationManager;
-import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layers.AbstractLayer;
 
 import javax.swing.*;
 import java.awt.*;

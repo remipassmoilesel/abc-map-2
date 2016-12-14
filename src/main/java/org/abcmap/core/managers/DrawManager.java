@@ -3,8 +3,8 @@ package org.abcmap.core.managers;
 import org.abcmap.core.draw.*;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
-import org.abcmap.core.project.layer.AbstractLayer;
-import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.gui.tools.ToolContainer;
 

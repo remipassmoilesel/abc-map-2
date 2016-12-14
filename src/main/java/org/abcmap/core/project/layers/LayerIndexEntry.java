@@ -1,4 +1,4 @@
-package org.abcmap.core.project.layer;
+package org.abcmap.core.project.layers;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

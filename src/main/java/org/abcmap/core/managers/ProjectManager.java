@@ -10,7 +10,7 @@ import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
 import org.abcmap.core.project.backup.ProjectBackupInterval;
-import org.abcmap.core.project.layer.TileLayer;
+import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.imageio.ImageIO;

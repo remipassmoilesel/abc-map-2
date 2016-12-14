@@ -1,4 +1,4 @@
-package org.abcmap.core.project.layer;
+package org.abcmap.core.project.layers;
 
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.log.CustomLogger;

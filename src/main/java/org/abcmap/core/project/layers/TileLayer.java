@@ -1,4 +1,4 @@
-package org.abcmap.core.project.layer;
+package org.abcmap.core.project.layers;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;

@@ -2,7 +2,7 @@ package org.abcmap.core.draw;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.project.layers.FeatureLayer;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.util.ArrayList;

@@ -2,7 +2,7 @@ package org.abcmap.gui.components.layers;
 
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;

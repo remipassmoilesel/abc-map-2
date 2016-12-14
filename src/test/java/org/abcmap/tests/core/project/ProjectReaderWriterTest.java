@@ -10,7 +10,7 @@ import org.abcmap.core.project.PMConstants;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
-import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.project.layouts.Layout;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;

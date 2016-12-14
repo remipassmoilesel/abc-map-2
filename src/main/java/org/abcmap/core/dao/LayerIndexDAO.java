@@ -1,6 +1,6 @@
 package org.abcmap.core.dao;
 
-import org.abcmap.core.project.layer.LayerIndexEntry;
+import org.abcmap.core.project.layers.LayerIndexEntry;
 
 import java.io.IOException;
 import java.nio.file.Path;

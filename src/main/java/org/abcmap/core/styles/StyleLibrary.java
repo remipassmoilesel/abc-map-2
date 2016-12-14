@@ -2,8 +2,8 @@ package org.abcmap.core.styles;
 
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.layer.AbstractLayer;
-import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;

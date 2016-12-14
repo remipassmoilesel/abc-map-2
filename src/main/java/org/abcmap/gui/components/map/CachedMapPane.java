@@ -6,7 +6,7 @@ import org.abcmap.core.partials.RenderedPartial;
 import org.abcmap.core.partials.RenderedPartialFactory;
 import org.abcmap.core.partials.RenderedPartialQueryResult;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.geotools.geometry.jts.ReferencedEnvelope;

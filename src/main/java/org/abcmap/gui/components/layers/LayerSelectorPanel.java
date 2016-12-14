@@ -25,7 +25,7 @@ import org.abcmap.core.events.manager.Event;
 import org.abcmap.core.events.manager.EventListener;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.events.manager.EventNotificationManager;
-import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GuiUtils;
 

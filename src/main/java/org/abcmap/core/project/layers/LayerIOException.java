@@ -1,4 +1,4 @@
-package org.abcmap.core.project.layer;
+package org.abcmap.core.project.layers;
 
 /**
  * Lighter exception thrown when IO errors occurs on layers.

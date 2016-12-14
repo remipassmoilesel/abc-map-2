@@ -7,7 +7,7 @@ import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.partials.RenderedPartialFactory;
 import org.abcmap.core.partials.RenderedPartialQueryResult;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.TileLayer;
+import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.junit.BeforeClass;

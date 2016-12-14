@@ -5,8 +5,8 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.AbstractLayer;
-import org.abcmap.core.project.layer.TileLayer;
+import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -18,7 +18,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Renderer designed for Abc-Map projects

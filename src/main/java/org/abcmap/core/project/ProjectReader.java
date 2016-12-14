@@ -6,10 +6,10 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.dao.ProjectMetadataDAO;
 import org.abcmap.core.dao.StyleDAO;
-import org.abcmap.core.project.layer.FeatureLayer;
-import org.abcmap.core.project.layer.LayerIndexEntry;
-import org.abcmap.core.project.layer.LayerType;
-import org.abcmap.core.project.layer.TileLayer;
+import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.LayerIndexEntry;
+import org.abcmap.core.project.layers.LayerType;
+import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.ZipUtils;
 

@@ -5,7 +5,7 @@ import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.TileLayer;
+import org.abcmap.core.project.layers.TileLayer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.referencing.FactoryException;

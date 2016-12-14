@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.TileLayer;
+import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.core.tileanalyser.TileAnalyseException;
 import org.abcmap.core.tileanalyser.TileComposer;
 import org.abcmap.core.tileanalyser.TileSource;

@@ -6,7 +6,7 @@ import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.*;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layer.AbstractLayer;
+import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.dock.blockitems.ClickableBlockItem;
 import org.abcmap.gui.components.dock.blockitems.HideableBlockItem;

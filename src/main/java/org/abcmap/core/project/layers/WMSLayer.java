@@ -1,4 +1,4 @@
-package org.abcmap.core.project.layer;
+package org.abcmap.core.project.layers;
 
 import org.abcmap.core.project.Project;
 import org.abcmap.core.wms.WMSEntry;

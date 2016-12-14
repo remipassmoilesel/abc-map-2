@@ -1,6 +1,5 @@
-package org.abcmap.core.project.layer;
+package org.abcmap.core.project.layers;
 
-import org.geotools.data.simple.SimpleFeatureCollection;
 import org.opengis.feature.simple.SimpleFeature;
 
 /**
