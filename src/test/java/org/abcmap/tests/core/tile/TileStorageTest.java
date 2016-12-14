@@ -1,4 +1,4 @@
-package org.abcmap.tests.core.project;
+package org.abcmap.tests.core.tile;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;

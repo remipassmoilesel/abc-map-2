@@ -3,11 +3,14 @@ package org.abcmap.tests.core.tile;
 import com.labun.surf.Params;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
-import org.abcmap.core.project.layer.TileLayer;
-import org.abcmap.core.tiles.TileContainer;
-import org.abcmap.core.tileanalyser.*;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layer.TileLayer;
+import org.abcmap.core.tileanalyser.TileAnalyseException;
+import org.abcmap.core.tileanalyser.TileComposer;
+import org.abcmap.core.tileanalyser.TileSource;
+import org.abcmap.core.tileanalyser.TileStorageSource;
+import org.abcmap.core.tiles.TileContainer;
 import org.abcmap.core.utils.Utils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -25,7 +28,7 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class TileComposerTest {
 
-    private static final boolean SHOW_IN_WINDOW = true;
+    private static final boolean SHOW_IN_WINDOW = false;
 
     @BeforeClass
     public static void beforeTests() throws IOException {
@@ -54,13 +57,13 @@ public class TileComposerTest {
         ArrayList<BufferedImage> imgs = new ArrayList<>();
 
         // the first tile have to be placed manually
-        Coordinate firstPosition = new Coordinate(2000, 1000);
+        Coordinate firstPosition = new Coordinate(0, 0);
 
         ArrayList<Coordinate> expected = new ArrayList();
         expected.add(firstPosition);
-        expected.add(new Coordinate(1478.6803359985352, 982.1077270507812));
-        expected.add(new Coordinate(919.2462692260742, 1257.8359985351562));
-        expected.add(new Coordinate(919.2940902709961, 1032.83740234375));
+        expected.add(new Coordinate(-520.4633750915527, -18.264129638671875));
+        expected.add(new Coordinate(-1078.8829231262207, 257.2473449707031));
+        expected.add(new Coordinate(-1078.8697395324707, 32.2457275390625));
 
         ArrayList<Coordinate> computed = new ArrayList();
         computed.add(firstPosition);
@@ -98,6 +101,7 @@ public class TileComposerTest {
             // add tile
             layer.addTile(toStitch);
 
+            System.out.println(position);
         }
 
         // test is rounded here to avoid bad precision errors
@@ -120,6 +124,7 @@ public class TileComposerTest {
             project.showForDebug(true);
             Thread.sleep(50000);
         }
+
 
     }
 

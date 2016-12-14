@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class PartialFactoryTest {
 
-    private static final boolean SHOW_IN_WINDOW = false;
+    private static final boolean SHOW_IN_WINDOW = true;
 
     @BeforeClass
     public static void beforeTests() throws IOException, InterruptedException {

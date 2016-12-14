@@ -55,7 +55,7 @@ public class TestUtils {
             pman.closeProject();
         }
 
-        // wait a litle between create too much projects
+        // wait a little before creating to avoid errors
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {

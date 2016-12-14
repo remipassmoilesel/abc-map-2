@@ -32,7 +32,7 @@ public class EventNotificationsManagerTest {
         }
 
         // launch first event
-        source.getNotificationManager().fireNotification(new Event("Ding dong !", null));
+        source.getNotificationManager().fireEvent(new Event("Ding dong !", null));
 
         // events are transmitted in other thread, should be less than expected result (probably 0)
         int received = notificationsReceived.size();
@@ -44,7 +44,7 @@ public class EventNotificationsManagerTest {
         assertTrue("Event test 1: " + received, received == observersNumber);
 
         // fire notification from observer, no events should be transmitted here
-        list.get(0).getNotificationManager().fireNotification(new Event("Ding dong !", null));
+        list.get(0).getNotificationManager().fireEvent(new Event("Ding dong !", null));
         received = notificationsReceived.size();
         assertTrue("Event test 2: " + received, received == observersNumber);
 
@@ -62,7 +62,7 @@ public class EventNotificationsManagerTest {
         }
 
         // Fire event. All previous observers should received it
-        source.getNotificationManager().fireNotification(new Event("Ding dong !", null));
+        source.getNotificationManager().fireEvent(new Event("Ding dong !", null));
 
         // but not now, just after
         received = notificationsReceived.size();
