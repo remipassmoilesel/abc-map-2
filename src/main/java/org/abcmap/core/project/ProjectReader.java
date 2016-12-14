@@ -1,5 +1,6 @@
 package org.abcmap.core.project;
 
+import org.abcmap.core.dao.LayoutDAO;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.dao.LayerIndexDAO;
@@ -127,6 +128,12 @@ public class ProjectReader {
         StyleDAO stdao = new StyleDAO(source);
         project.getStyleLibrary().setStyleCollection(stdao.readStyles());
         stdao.close();
+
+        // read layouts
+        LayoutDAO ldao = new LayoutDAO(source);
+        project.setLayouts(ldao.readAll());
+        ldao.close();
+
 
     }
 

@@ -3,14 +3,15 @@ package org.abcmap.tests.core.project;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
+import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.project.PMConstants;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
 import org.abcmap.core.project.layer.FeatureLayer;
+import org.abcmap.core.project.layouts.Layout;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.junit.BeforeClass;
@@ -58,8 +59,7 @@ public class ProjectReaderWriterTest {
         Project newProject = pman.createNewProject();
         newProject.getMetadataContainer().updateValue(PMConstants.TITLE, "New title of the death");
 
-        assertTrue("Creation test",
-                Files.isRegularFile(Paths.get(newProject.getDatabasePath().toAbsolutePath().toString() + ".data.db")));
+        assertTrue("Creation test", Files.isRegularFile(Paths.get(newProject.getDatabasePath().toAbsolutePath().toString() + ".data.db")));
 
         // add styles
         for (int i = 1; i < 10; i++) {
@@ -67,8 +67,14 @@ public class ProjectReaderWriterTest {
         }
 
         // add layers
-        newProject.addNewFeatureLayer("Second layer", true, 1);
-        newProject.addNewTileLayer("Third layer", true, 1);
+        newProject.addNewFeatureLayer("Second layer (features)", true, 1);
+        newProject.addNewTileLayer("Third layer (tiles)", true, 1);
+
+        // add layouts
+        for (int i = 0; i < 10; i++) {
+            Layout lay = new Layout(false, i, i + 1, i + 2, i + 3, i + 4, i + 5, i + 6);
+            newProject.addLayout(lay);
+        }
 
         // test layer index writing
         LayerIndexDAO lidao = new LayerIndexDAO(newProject.getDatabasePath());

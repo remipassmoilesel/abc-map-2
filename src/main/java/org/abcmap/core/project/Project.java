@@ -7,6 +7,7 @@ import org.abcmap.core.project.layer.AbstractLayer;
 import org.abcmap.core.project.layer.FeatureLayer;
 import org.abcmap.core.project.layer.LayerIndexEntry;
 import org.abcmap.core.project.layer.TileLayer;
+import org.abcmap.core.project.layouts.Layout;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.tiles.TileStorage;
@@ -59,6 +60,11 @@ public class Project {
     private final RenderedPartialStore partialStore;
 
     /**
+     * List of layouts, sheets which can be printed
+     */
+    private ArrayList<Layout> layouts;
+
+    /**
      * Only one layer is alterable at a time, the active layer
      */
     private AbstractLayer activeLayer;
@@ -106,7 +112,8 @@ public class Project {
 
         this.tempDirectory = databasePath.getParent();
         this.metadataContainer = new ProjectMetadata();
-        this.mainLayersList = new ArrayList();
+        this.mainLayersList = new ArrayList<>();
+        this.layouts = new ArrayList<>();
         this.crs = GeoUtils.GENERIC_2D;
         this.finalPath = null;
 
@@ -402,21 +409,35 @@ public class Project {
         return indexes;
     }
 
+    /**
+     * Informations used: styleLibrary finalPath mainLayersList metadataContainer crs layouts
+     *
+     * @param o
+     * @return
+     */
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Project project = (Project) o;
         return Objects.equals(styleLibrary, project.styleLibrary) &&
+                Objects.equals(layouts, project.layouts) &&
                 Objects.equals(finalPath, project.finalPath) &&
                 Objects.equals(mainLayersList, project.mainLayersList) &&
                 Objects.equals(metadataContainer, project.metadataContainer) &&
                 Objects.equals(crs, project.crs);
     }
 
+    /**
+     * Informations used: styleLibrary finalPath mainLayersList metadataContainer crs layouts
+     *
+     * @return
+     */
     @Override
     public int hashCode() {
-        return Objects.hash(styleLibrary, finalPath, mainLayersList, metadataContainer, crs);
+        return Objects.hash(styleLibrary, layouts, finalPath, mainLayersList, metadataContainer, crs);
     }
 
     public StyleContainer getStyle(Color activeForeground, Color activeBackground, int activeThick) {
@@ -494,11 +515,32 @@ public class Project {
 
     }
 
+    /**
+     * Return database store where are stored rendered partials
+     *
+     * @return
+     */
     public RenderedPartialStore getRenderedPartialsStore() {
         return partialStore;
     }
 
+    public void addLayout(Layout lay) {
+        layouts.add(lay);
+    }
+
+    public ArrayList<Layout> getLayouts() {
+        return layouts;
+    }
+
+    public void removeLayout(Layout lay) {
+        layouts.remove(lay);
+    }
+
     public void setAllElementsSelected(boolean allElementsSelected) {
         //TODO
+    }
+
+    public void setLayouts(ArrayList<Layout> layouts) {
+        this.layouts = layouts;
     }
 }

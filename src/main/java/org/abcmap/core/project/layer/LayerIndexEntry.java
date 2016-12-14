@@ -6,7 +6,7 @@ import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
 
 /**
- * Object that represent layer metadata. They are stored separately in database.
+ * Object representing layer metadata. Metadata is stored separately in database.
  */
 
 @DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "LAYER_INDEX")

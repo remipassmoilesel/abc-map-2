@@ -1,6 +1,7 @@
 package org.abcmap.core.project;
 
 import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.dao.LayoutDAO;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
@@ -131,6 +132,11 @@ public class ProjectWriter {
         sdao.createTableIfNotExist();
         sdao.writeAll(project.getStyleLibrary().getStyleCollection());
         sdao.close();
+
+        // write layouts
+        LayoutDAO ldao = new LayoutDAO(destination);
+        ldao.writeLayouts(project.getLayouts());
+        ldao.close();
 
     }
 
