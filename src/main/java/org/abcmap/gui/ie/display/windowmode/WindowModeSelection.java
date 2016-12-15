@@ -1,23 +1,25 @@
 package org.abcmap.gui.ie.display.windowmode;
 
 import org.abcmap.core.events.GuiManagerEvent;
-import org.abcmap.core.events.manager.*;
+import org.abcmap.core.events.manager.EventListener;
+import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.buttons.DisplayModeSelector;
 import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.gui.windows.MainWindow;
+import org.abcmap.gui.windows.MainWindowMode;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class WindowModeSelector extends InteractionElement {
+public class WindowModeSelection extends InteractionElement {
 
     private DisplayModeSelector selector;
 
-    public WindowModeSelector() {
-
+    public WindowModeSelection() {
         label = "Sélection du mode d'affichage";
         help = "Sélectionnez ici le mode d'affichage de la fenêtre.";
-
     }
 
     @Override
@@ -30,7 +32,9 @@ public class WindowModeSelector extends InteractionElement {
         notifm.setDefaultListener(new EventListener() {
             @Override
             public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
+
                 if (GuiManagerEvent.isWindowModeNotification(arg)) {
+
                     selector.setSelectedItem(guim.getMainWindow().getWindowMode());
                 }
             }
@@ -42,7 +46,7 @@ public class WindowModeSelector extends InteractionElement {
     }
 
     /**
-     * Changer le mode de fenetre en fonction de la saisie de l'utilisateur
+     * Change window mode on user selection
      *
      * @author remipassmoilesel
      */
@@ -51,17 +55,18 @@ public class WindowModeSelector extends InteractionElement {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            /*
-            // récupérer le mode sélectionné
-            JComboBox<MainWindowMode> src = (JComboBox<MainWindowMode>) e
-                    .getSource();
-            MainWindowMode selectedMode = (abcmap.gui.windows.MainWindowMode) src
-                    .getSelectedItem();
+            MainWindow mainWindow = guim.getMainWindow();
 
-            if (Utils.safeEquals(guim.getMainWindowMode(), selectedMode) == false) {
-                guim.setMainWindowMode(selectedMode);
+            if (mainWindow == null) {
+                return;
             }
-            */
+
+            JComboBox<MainWindowMode> src = (JComboBox<MainWindowMode>) e.getSource();
+            MainWindowMode selectedMode = (MainWindowMode) src.getSelectedItem();
+
+            if (Utils.safeEquals(mainWindow.getWindowMode(), selectedMode) == false) {
+                mainWindow.setWindowMode(selectedMode);
+            }
 
         }
 

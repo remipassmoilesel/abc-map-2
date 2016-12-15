@@ -49,7 +49,7 @@ public class Initialization {
                 // open project
                 else {
                     projectToOpen = Paths.get(str);
-                    System.out.println("Project will be opened: " + str);
+                    System.out.println("Project will be open: " + str);
                 }
             }
         }

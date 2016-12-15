@@ -11,7 +11,7 @@ import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
 import org.abcmap.core.project.layers.FeatureLayer;
-import org.abcmap.core.project.layouts.Layout;
+import org.abcmap.core.project.layouts.LayoutSheet;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.junit.BeforeClass;
@@ -72,7 +72,7 @@ public class ProjectReaderWriterTest {
 
         // add layouts
         for (int i = 0; i < 10; i++) {
-            Layout lay = new Layout(false, i, i + 1, i + 2, i + 3, i + 4, i + 5, i + 6);
+            LayoutSheet lay = new LayoutSheet(false, i, i + 1, i + 2, i + 3, i + 4, i + 5, i + 6);
             newProject.addLayout(lay);
         }
 

@@ -304,11 +304,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     public void setUlcWorldPosition(Point2D ulc) {
 
-        Dimension pixelDimension = getSize();
+        Dimension panelDimensionsPx = getSize();
 
-        // get width and height in decimal dg
-        double wdg = partialSideWu * pixelDimension.width / partialSidePx;
-        double hdg = partialSideWu * pixelDimension.height / partialSidePx;
+        // get width and height in world unit
+        double wdg = partialSideWu * panelDimensionsPx.width / partialSidePx;
+        double hdg = partialSideWu * panelDimensionsPx.height / partialSidePx;
 
         // create a new envelope
         double x1 = ulc.getX();
@@ -374,9 +374,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * Reset display to show whole width of map, from upper left corner corner
      */
     public void resetDisplay() {
-
         // TODO center map at a different scale ?
-        // this can avoid "blank screen"
+        // this could avoid "blank screen" when layers are large but empty
         ReferencedEnvelope projectBounds = project.getMaximumBounds();
         setWorldEnvelope(projectBounds, true);
     }
@@ -482,12 +481,17 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         return project;
     }
 
+    /**
+     * Set envelope shown by component
+     *
+     * @param worldEnvelope
+     */
     public void setWorldEnvelope(ReferencedEnvelope worldEnvelope) {
         setWorldEnvelope(worldEnvelope, false);
     }
 
     /**
-     * Set world envelope show by component and if specified, compute optimal partial side value ("scale")
+     * Set world envelope shown by component and if specified, compute optimal partial side value ("scale")
      * to show whole map
      *
      * @param worldEnvelope
@@ -505,6 +509,36 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             computeOptimalPartialSide();
         }
 
+    }
+
+    /**
+     * Get specified world envelope shown. It can be larger or greater than actual map shown
+     *
+     * @return
+     */
+    public ReferencedEnvelope getWorldEnvelope() {
+        return worldEnvelope;
+    }
+
+    /**
+     * Get shown world envelope, corresponding to component size
+     *
+     * @return
+     */
+    public ReferencedEnvelope getActualWorldEnvelope() {
+
+        Dimension panelDimensionsPx = getSize();
+
+        // get width and height in world unit
+        double wdg = partialSideWu * panelDimensionsPx.width / partialSidePx;
+        double hdg = partialSideWu * panelDimensionsPx.height / partialSidePx;
+
+        double x1 = worldEnvelope.getMinX();
+        double x2 = worldEnvelope.getMinX() + wdg;
+        double y1 = worldEnvelope.getMinY();
+        double y2 = worldEnvelope.getMinY() + hdg;
+
+        return new ReferencedEnvelope(x1, x2, y1, y2, project.getCrs());
     }
 
     /**

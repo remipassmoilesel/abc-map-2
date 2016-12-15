@@ -29,7 +29,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class PartialFactoryTest {
 
-    private static final boolean SHOW_IN_WINDOW = true;
+    private static final boolean SHOW_IN_WINDOW = false;
 
     @BeforeClass
     public static void beforeTests() throws IOException, InterruptedException {
@@ -109,7 +109,7 @@ public class PartialFactoryTest {
                 CachedMapPane pane = new CachedMapPane(project);
 
                 //pane.setWorldBounds(start);
-                pane.setWorldPosition(worldPosition);
+                pane.setUlcWorldPosition(worldPosition);
                 pane.setPartialSideWu(partialSideWu);
                 pane.setDebugMode(true);
                 pane.setMouseManagementEnabled(true);

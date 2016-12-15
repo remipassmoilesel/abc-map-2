@@ -233,8 +233,15 @@ public class LayoutSheet implements DataModel {
         this.number = number;
     }
 
-    public ReferencedEnvelope getEnveloppe(CoordinateReferenceSystem crs) {
+    public ReferencedEnvelope getEnvelope(CoordinateReferenceSystem crs) {
         return new ReferencedEnvelope(minx, maxx, miny, maxy, crs);
+    }
+
+    public void setEnvelope(ReferencedEnvelope env) {
+        minx = env.getMinX();
+        maxx = env.getMaxX();
+        miny = env.getMinY();
+        maxy = env.getMaxY();
     }
 
     @Override
@@ -271,4 +278,6 @@ public class LayoutSheet implements DataModel {
                 ", number=" + number +
                 '}';
     }
+
+
 }

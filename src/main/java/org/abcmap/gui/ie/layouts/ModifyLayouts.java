@@ -1,19 +1,23 @@
 package org.abcmap.gui.ie.layouts;
 
 import net.miginfocom.swing.MigLayout;
+import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layouts.LayoutSheet;
 import org.abcmap.gui.components.buttons.HtmlButton;
 import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
 import java.awt.*;
 
 public class ModifyLayouts extends InteractionElement {
 
-    private static final String NEW_PAPER = "NEW_PAPER";
-    private static final String MOVE_PAPERS_UP = "MOVE_PAPERS_UP";
-    private static final String MOVE_PAPERS_DOWN = "MOVE_PAPERS_DOWN";
-    private static final String REMOVE_PAPERS = "REMOVE_PAPERS";
-    private static final String CENTER_PAPERS = "CENTER_PAPERS";
+    private static final String NEW_SHEET = "NEW_SHEET";
+    private static final String MOVE_SHEET_UP = "MOVE_SHEET_UP";
+    private static final String MOVE_SHEET_DOWN = "MOVE_SHEET_DOWN";
+    private static final String REMOVE_SHEET = "REMOVE_SHEET";
+    private static final String CENTER_MAP_IN_SHEET = "CENTER_MAP_IN_SHEET";
+    private static final String REMOVE_ALL = "REMOVE_ALL";
 
     public ModifyLayouts() {
         this.label = "Modifier les feuilles de mise en page";
@@ -31,23 +35,19 @@ public class ModifyLayouts extends InteractionElement {
 
         HtmlButton buttonAdd = new HtmlButton("Ajouter une feuille");
 
-        HtmlButton buttonRemove = new HtmlButton(
-                "Supprimer les feuilles sélectionnées");
+        HtmlButton buttonRemove = new HtmlButton("Supprimer les feuilles sélectionnées");
 
-        HtmlButton buttonMoveUp = new HtmlButton(
-                "Feuilles sélectionnées vers le haut");
+        HtmlButton buttonMoveUp = new HtmlButton("Feuilles sélectionnées vers le haut");
 
-        HtmlButton buttonMoveBottom = new HtmlButton(
-                "Feuilles sélectionnées vers le bas");
+        HtmlButton buttonMoveBottom = new HtmlButton("Feuilles sélectionnées vers le bas");
 
-        HtmlButton buttonCenter = new HtmlButton(
-                "Centrer les feuilles sélectionnées");
+        HtmlButton buttonCenter = new HtmlButton("Centrer les feuilles sélectionnées");
 
-        HtmlButton[] btns = new HtmlButton[]{buttonAdd, buttonRemove,
-                buttonMoveUp, buttonMoveBottom, buttonCenter};
-        String[] cmds = new String[]{NEW_PAPER, REMOVE_PAPERS,
-                MOVE_PAPERS_UP, MOVE_PAPERS_DOWN, CENTER_PAPERS};
+        HtmlButton removeAll = new HtmlButton("Supprimer toutes les feuilles");
 
+        // construct panel and buttons
+        HtmlButton[] btns = new HtmlButton[]{buttonAdd, buttonRemove, buttonMoveUp, buttonMoveBottom, buttonCenter, removeAll};
+        String[] cmds = new String[]{NEW_SHEET, REMOVE_SHEET, MOVE_SHEET_UP, MOVE_SHEET_DOWN, CENTER_MAP_IN_SHEET, REMOVE_ALL};
         for (int i = 0; i < btns.length; i++) {
 
             HtmlButton btn = btns[i];
@@ -64,99 +64,107 @@ public class ModifyLayouts extends InteractionElement {
     @Override
     public void run() {
 
-		/*
         GuiUtils.throwIfOnEDT();
 
-		String action = getLastActionCommand();
-		if (action == null) {
-			return;
-		}
+        if (getOperationLock() == false) {
+            return;
+        }
 
-		// nouvelle feuille
-		if (NEW_PAPER.equals(action)) {
+        try {
 
-			// désactiver toutes les layouts
-			projectm.setAllLayoutsActive(false);
+            Project project = getCurrentProjectOrShowMessage();
 
-			// Créer la feuille
-			LayoutPaper lay = projectm.addNewLayout();
+            String action = getLastActionCommand();
+            if (action == null) {
+                return;
+            }
 
-			// activer la nouvelle
-			lay.setActive(true);
+            // create a new sheet
+            if (NEW_SHEET.equals(action)) {
 
-			// notification
-			projectm.fireLayoutListChanged();
+                //projectm.setAllLayoutsActive(false);
 
-		}
+                LayoutSheet lay = new LayoutSheet(false, 200, 300, 600, 800, 210, 290, 10);
+                project.addLayout(lay);
+            }
 
-		// supprimer les feuilles actives
-		else if (REMOVE_PAPERS.equals(action)) {
+            // remove all sheets
+            else if (REMOVE_ALL.equals(action)) {
+                project.removeAllLayouts();
+            }
 
-			for (LayoutPaper p : projectm.getLayouts()) {
-				if (p.isActive()) {
-					projectm.removeLayout(p);
-				}
-			}
+            // notification
+            projectm.fireLayoutListChanged();
 
-			// pas besoin de notification supplémentaire ici
-			// projectm.fireLayoutListChanged();
+           /* // supprimer les feuilles actives
+            else if (REMOVE_SHEET.equals(action)) {
 
-		}
+                for (LayoutPaper p : projectm.getLayouts()) {
+                    if (p.isActive()) {
+                        projectm.removeLayout(p);
+                    }
+                }
 
-		// supprimer les feuilles actives
-		else if (MOVE_PAPERS_UP.equals(action)
-				|| MOVE_PAPERS_DOWN.equals(action)) {
+                // pas besoin de notification supplémentaire ici
+                // projectm.fireLayoutListChanged();
 
-			// desactiver les notifications
-			projectm.getProject().setNotificationsEnabled(false);
+            }
 
-			ArrayList<LayoutPaper> layouts = projectm.getLayouts();
-			for (int i = 0; i < layouts.size(); i++) {
-				LayoutPaper p = layouts.get(i);
-				if (p.isActive()) {
-					projectm.removeLayout(p);
-					try {
-						int newIndex = i;
-						if (MOVE_PAPERS_UP.equals(action)) {
-							newIndex--;
-						} else {
-							newIndex++;
-						}
+            // supprimer les feuilles actives
+            else if (MOVE_PAPERS_UP.equals(action)
+                    || MOVE_PAPERS_DOWN.equals(action)) {
 
-						if (newIndex < 0)
-							newIndex = 0;
-						if (newIndex > layouts.size() - 1)
-							newIndex = layouts.size() - 1;
+                // desactiver les notifications
+                projectm.getProject().setNotificationsEnabled(false);
 
-						projectm.addLayout(p, newIndex);
-					} catch (LayoutPaperException e) {
-						Log.debug(e);
-					}
-				}
-			}
+                ArrayList<LayoutPaper> layouts = projectm.getLayouts();
+                for (int i = 0; i < layouts.size(); i++) {
+                    LayoutPaper p = layouts.get(i);
+                    if (p.isActive()) {
+                        projectm.removeLayout(p);
+                        try {
+                            int newIndex = i;
+                            if (MOVE_PAPERS_UP.equals(action)) {
+                                newIndex--;
+                            } else {
+                                newIndex++;
+                            }
 
-			// activer à nouveau les notifs
-			projectm.getProject().setNotificationsEnabled(true);
+                            if (newIndex < 0)
+                                newIndex = 0;
+                            if (newIndex > layouts.size() - 1)
+                                newIndex = layouts.size() - 1;
 
-			projectm.fireLayoutListChanged();
+                            projectm.addLayout(p, newIndex);
+                        } catch (LayoutPaperException e) {
+                            Log.debug(e);
+                        }
+                    }
+                }
 
-		}
+                // activer à nouveau les notifs
+                projectm.getProject().setNotificationsEnabled(true);
 
-		// centrer les feuilles
-		else if (CENTER_PAPERS.equals(action)) {
+                projectm.fireLayoutListChanged();
 
-			for (LayoutPaper p : projectm.getLayouts()) {
-				if (p.isActive()) {
-					p.setPositionOnMapCenter();
-				}
-			}
+            }
 
-			// notification
-			projectm.fireLayoutListChanged();
+            // centrer les feuilles
+            else if (CENTER_PAPERS.equals(action)) {
 
-		}
+                for (LayoutPaper p : projectm.getLayouts()) {
+                    if (p.isActive()) {
+                        p.setPositionOnMapCenter();
+                    }
+                }
 
-		*/
+                // notification
+                projectm.fireLayoutListChanged();
+
+            }*/
+        } finally {
+            releaseOperationLock();
+        }
 
     }
 }

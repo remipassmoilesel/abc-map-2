@@ -4,6 +4,6 @@
 # Need pandoc
 # See http://pandoc.org/MANUAL.html#templates
 
-rm ../*.html
+# rm ../*.html
 
 for file in $(ls *.md); do pandoc -f markdown -t html "${file}" --template template.html -s -o "../${file%md}html"; done
