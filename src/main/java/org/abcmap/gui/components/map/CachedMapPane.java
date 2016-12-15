@@ -1,5 +1,7 @@
 package org.abcmap.gui.components.map;
 
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.partials.RenderedPartial;
@@ -26,9 +28,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * Cache is managed by a RenderedPartialFactory. This partial factory produce portions of map and store it in database.
  * <p>
- * // TODO: Manage notifications of partial arrival between multiple panels
+ * //TODO workaround for first component display ? See computeOptimalPartialSide()
  */
-public class CachedMapPane extends JPanel {
+public class CachedMapPane extends JPanel implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(CachedMapPane.class);
 
@@ -53,6 +55,11 @@ public class CachedMapPane extends JPanel {
     private final HashMap<String, MapContent> layerMapContents;
 
     /**
+     * World envelope (positions) of map rendered on panel
+     */
+    private ReferencedEnvelope worldEnvelope;
+
+    /**
      * Last time of rendering in ms
      */
     private long lastRender = -1;
@@ -61,11 +68,6 @@ public class CachedMapPane extends JPanel {
      * Minimum interval between rendering in ms
      */
     private long renderMinIntervalMs = 50;
-
-    /**
-     * ULC point to start renderer map from
-     */
-    private Point2D worldPosition;
 
     /**
      * Current set of partials that have to be painted
@@ -85,11 +87,11 @@ public class CachedMapPane extends JPanel {
     /**
      * Current side of a partial
      */
-    private int partialSidePx;
+    private final double partialSidePx;
 
-    private boolean debugMode = false;
+    private boolean debugMode = true;
     private MapNavigationBar navigationBar;
-
+    private final EventNotificationManager notifm;
 
     public CachedMapPane(Project project) {
 
@@ -101,25 +103,27 @@ public class CachedMapPane extends JPanel {
         this.layerMapContents = new HashMap<>();
         this.currentPartials = new HashMap<>();
 
-        this.partialSideWu = 5;
+        // FIRST set partial side in pixel
         this.partialSidePx = RenderedPartialFactory.DEFAULT_PARTIAL_SIDE_PX;
-        this.worldPosition = new Point2D.Double(0, 0);
+
+        // THEN compute first time display, show whole map
+        setWorldEnvelope(project.getMaximumBounds(), true);
 
         this.addComponentListener(new RefreshMapComponentListener());
 
         // repaint when partials are added in store
-        // TODO: remove observers ?
-        project.getRenderedPartialsStore().getNotificationManager().addSimpleListener(this, (notif) -> {
+        notifm = new EventNotificationManager(this);
+        notifm.setDefaultListener((ev) -> {
             CachedMapPane.this.repaint();
         });
+        project.getRenderedPartialsStore().getNotificationManager().addObserver(this);
 
     }
 
     @Override
     protected void finalize() throws Throwable {
-        super.finalize();
-        // TODO: remove observers ?
-        logger.debug("Cached map pane finalized");
+        // remove observer on finalizing
+        project.getRenderedPartialsStore().getNotificationManager().removeObserver(this);
     }
 
     @Override
@@ -178,7 +182,8 @@ public class CachedMapPane extends JPanel {
 
             // draw maximums bounds asked if necessary
             if (debugMode) {
-                Point2D wp = worldToScreen.transform(worldPosition, null);
+                Point2D.Double ulc = new Point2D.Double(worldEnvelope.getMinX(), worldEnvelope.getMaxY());
+                Point2D wp = worldToScreen.transform(ulc, null);
                 g2d.setStroke(new BasicStroke(2));
                 g2d.setColor(Color.red);
                 g2d.drawRect((int) wp.getX(), (int) wp.getY(), 3, 3);
@@ -251,7 +256,7 @@ public class CachedMapPane extends JPanel {
                 }
 
                 // search which partials are necessary to display
-                RenderedPartialQueryResult newPartials = factory.intersect(worldPosition, dim, map.getCoordinateReferenceSystem(),
+                RenderedPartialQueryResult newPartials = factory.intersect(worldEnvelope,
                         () -> {
                             // each time a partial come, map will be repaint
                             CachedMapPane.this.repaint();
@@ -276,7 +281,11 @@ public class CachedMapPane extends JPanel {
      * @return
      */
     private boolean checkMinimumRenderInterval() {
+
+        // check last rendering time
         boolean render = System.currentTimeMillis() - lastRender > renderMinIntervalMs;
+
+        // save time if needed
         if (render) {
             lastRender = System.currentTimeMillis();
         }
@@ -291,10 +300,23 @@ public class CachedMapPane extends JPanel {
     /**
      * Set the reference position of map at ULC corner of component
      *
-     * @param worldPoint
+     * @param ulc
      */
-    public void setWorldPosition(Point2D worldPoint) {
-        this.worldPosition = worldPoint;
+    public void setUlcWorldPosition(Point2D ulc) {
+
+        Dimension pixelDimension = getSize();
+
+        // get width and height in decimal dg
+        double wdg = partialSideWu * pixelDimension.width / partialSidePx;
+        double hdg = partialSideWu * pixelDimension.height / partialSidePx;
+
+        // create a new envelope
+        double x1 = ulc.getX();
+        double y1 = ulc.getY() - hdg; // to BLC
+        double x2 = ulc.getX() + wdg;
+        double y2 = ulc.getY();
+
+        this.worldEnvelope = new ReferencedEnvelope(x1, x2, y1, y2, project.getCrs());
     }
 
     /**
@@ -302,8 +324,8 @@ public class CachedMapPane extends JPanel {
      *
      * @return
      */
-    public Point2D getWorldPosition() {
-        return new Point2D.Double(worldPosition.getX(), worldPosition.getY());
+    public Point2D getUlcWorldPosition() {
+        return new Point2D.Double(worldEnvelope.getMinX(), worldEnvelope.getMaxY());
     }
 
     /**
@@ -311,7 +333,7 @@ public class CachedMapPane extends JPanel {
      * <p>
      * It can be used as a "zoom" value
      */
-    public int getPartialSidePx() {
+    public double getPartialSidePx() {
         return partialSidePx;
     }
 
@@ -355,16 +377,8 @@ public class CachedMapPane extends JPanel {
 
         // TODO center map at a different scale ?
         // this can avoid "blank screen"
-        ReferencedEnvelope worldBounds = project.getMaximumBounds();
-
-        Point2D.Double ulc = new Point2D.Double(worldBounds.getMinX(), worldBounds.getMaxY());
-        double compWidth = getSize().getWidth();
-        double worldWidth = worldBounds.getMaxX() - worldBounds.getMinX();
-        double sideWu = worldWidth * getPartialSidePx() / compWidth;
-
-        setWorldPosition(ulc);
-        setPartialSideWu(sideWu);
-
+        ReferencedEnvelope projectBounds = project.getMaximumBounds();
+        setWorldEnvelope(projectBounds, true);
     }
 
     /**
@@ -407,16 +421,19 @@ public class CachedMapPane extends JPanel {
 
         @Override
         public void componentResized(ComponentEvent e) {
+            // refresh map if needed
             refreshMap();
         }
 
         @Override
         public void componentMoved(ComponentEvent e) {
+            // refresh map if needed
             refreshMap();
         }
 
         @Override
         public void componentShown(ComponentEvent e) {
+            // refresh map if needed
             refreshMap();
         }
 
@@ -465,6 +482,53 @@ public class CachedMapPane extends JPanel {
         return project;
     }
 
+    public void setWorldEnvelope(ReferencedEnvelope worldEnvelope) {
+        setWorldEnvelope(worldEnvelope, false);
+    }
+
+    /**
+     * Set world envelope show by component and if specified, compute optimal partial side value ("scale")
+     * to show whole map
+     *
+     * @param worldEnvelope
+     * @param computeOptimalPartialSide
+     */
+    public void setWorldEnvelope(ReferencedEnvelope worldEnvelope, boolean computeOptimalPartialSide) {
+
+        if (worldEnvelope.getCoordinateReferenceSystem().equals(project.getCrs()) == false) {
+            throw new IllegalStateException("Cooridnate Reference Systems are different: " + worldEnvelope.getCoordinateReferenceSystem() + " / " + project.getCrs());
+        }
+
+        this.worldEnvelope = worldEnvelope;
+
+        if (computeOptimalPartialSide) {
+            computeOptimalPartialSide();
+        }
+
+    }
+
+    /**
+     * Compute optimal partial size in world unit, in order to show map on whole component.
+     * <p>
+     * If component is not visible, fake size of component will be used and result can look weird
+     */
+    public void computeOptimalPartialSide() {
+
+        double worldWidth = worldEnvelope.getMaxX() - worldEnvelope.getMinX();
+        double compWidth = getSize().getWidth();
+
+        if (compWidth < 1) {
+            logger.debug("Optimal partial size computing: component not shown, use fake width");
+            compWidth = 800;
+        }
+
+        double optimalPartialSideWu = worldWidth * getPartialSidePx() / compWidth;
+
+        setPartialSideWu(optimalPartialSideWu);
+
+    }
+
+
     @Override
     public void repaint(long tm, int x, int y, int width, int height) {
         super.repaint(tm, x, y, width, height);
@@ -484,4 +548,10 @@ public class CachedMapPane extends JPanel {
             navigationBar.refreshBoundsFrom(getSize());
         }
     }
+
+    @Override
+    public EventNotificationManager getNotificationManager() {
+        return notifm;
+    }
+
 }

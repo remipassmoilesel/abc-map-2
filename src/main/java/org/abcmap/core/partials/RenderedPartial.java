@@ -5,7 +5,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.lang.ref.ReferenceQueue;
 import java.lang.ref.SoftReference;
 import java.util.Objects;
 
@@ -192,7 +191,7 @@ public class RenderedPartial {
 
         if (waitingImage == null) {
 
-            int side = RenderedPartialFactory.DEFAULT_PARTIAL_SIDE_PX;
+            int side = (int) RenderedPartialFactory.DEFAULT_PARTIAL_SIDE_PX;
             waitingImage = new BufferedImage(side, side, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D g2d = (Graphics2D) waitingImage.getGraphics();

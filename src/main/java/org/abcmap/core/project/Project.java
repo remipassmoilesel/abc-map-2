@@ -180,14 +180,22 @@ public class Project {
         return list;
     }
 
+    /**
+     * Return maximum bounds of all layers
+     *
+     * @return
+     */
     public ReferencedEnvelope getMaximumBounds() {
+
         double minx = 0.0d;
         double miny = 0.0d;
         double maxx = 0.0d;
         double maxy = 0.0d;
         boolean firstLoop = true;
+
         for (AbstractLayer lay : getLayersList()) {
             ReferencedEnvelope bounds = lay.getInternalLayer().getBounds();
+            // TODO: do not use empty feature layers ?
 
             if (firstLoop) {
 

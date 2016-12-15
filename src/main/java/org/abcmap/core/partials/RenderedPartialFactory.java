@@ -29,7 +29,7 @@ public class RenderedPartialFactory {
     /**
      * Default size in pixel of each partial
      */
-    public static final int DEFAULT_PARTIAL_SIDE_PX = 500;
+    public static final double DEFAULT_PARTIAL_SIDE_PX = 500d;
 
     private static long loadedPartialsReused = 0;
 
@@ -56,7 +56,7 @@ public class RenderedPartialFactory {
     /**
      * Default size in px of each partial
      */
-    private int partialSidePx = DEFAULT_PARTIAL_SIDE_PX;
+    private double partialSidePx = DEFAULT_PARTIAL_SIDE_PX;
 
     private boolean debugMode = false;
 
@@ -72,6 +72,8 @@ public class RenderedPartialFactory {
 
     /**
      * Get partials from Upper Left Corner (world) position with specified dimension
+     * <p>
+     * Using this method involves using setPartialSideWu() to specify 'scale' of each partial
      *
      * @param ulc
      * @param pixelDimension
@@ -98,6 +100,8 @@ public class RenderedPartialFactory {
 
     /**
      * Get partials around a world envelope
+     * <p>
+     * Using this method involves using setPartialSideWu() to specify 'scale' of each partial
      *
      * @param worldBounds
      * @return
@@ -106,6 +110,10 @@ public class RenderedPartialFactory {
 
         if (mapContent == null) {
             throw new NullPointerException("Noting to renderer, map content is null");
+        }
+
+        if (worldBounds == null) {
+            throw new NullPointerException("World bounds are null");
         }
 
         // keep the same value until end of rendering process, even if value is changed by setter
@@ -149,7 +157,7 @@ public class RenderedPartialFactory {
 
                 // create a new partial if needed
                 if (part == null) {
-                    part = new RenderedPartial(RenderedPartial.getWaitingImage(), area, partialSidePx, partialSidePx, layerId);
+                    part = new RenderedPartial(RenderedPartial.getWaitingImage(), area, (int) partialSidePx, (int) partialSidePx, layerId);
                     store.addInLoadedList(part);
                     rsparts.add(part);
                 }
@@ -228,7 +236,7 @@ public class RenderedPartialFactory {
         this.partialSideWu = normalizeWorldUnitSideValue(sideDg);
     }
 
-    public int getPartialSidePx() {
+    public double getPartialSidePx() {
         return partialSidePx;
     }
 

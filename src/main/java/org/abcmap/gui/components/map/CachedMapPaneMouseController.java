@@ -39,9 +39,9 @@ public class CachedMapPaneMouseController extends MouseAdapter {
         my = scaleValue(my);
 
         // adapt world position
-        Point2D p = pane.getWorldPosition();
+        Point2D p = pane.getUlcWorldPosition();
 
-        pane.setWorldPosition(new Point2D.Double(p.getX() + mx, p.getY() - my));
+        pane.setUlcWorldPosition(new Point2D.Double(p.getX() + mx, p.getY() - my));
 
         pane.refreshMap();
 
@@ -56,7 +56,7 @@ public class CachedMapPaneMouseController extends MouseAdapter {
      * @return
      */
     public double scaleValue(double val) {
-        int psx = pane.getPartialSidePx();
+        double psx = pane.getPartialSidePx();
         double psw = pane.getPartialSideWu();
         return val * psw / psx;
     }

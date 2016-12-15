@@ -1,7 +1,11 @@
 package org.abcmap.core.partials;
 
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.core.utils.listeners.ListenerHandler;
+import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.lite.StreamingRenderer;
@@ -25,14 +29,22 @@ class PartialRenderingQueue {
      */
     private static final ArrayList<RenderedPartial> partialsInProgress = new ArrayList<>(10);
 
-    private static long loadedFromDatabase = 0;
-    private static long renderedPartials = 0;
-    private final MapContent mapContent;
+    private static final CustomLogger logger = LogManager.getLogger(ListenerHandler.class);
 
+    private final MapContent mapContent;
+    private final long queueId;
+
+    // debug information
     private boolean debugMode = true;
     private static int debugFontSize = 12;
     private static int debugIncr = debugFontSize + 5;
     private static Font debugFont = new Font("Dialog", Font.BOLD, debugFontSize);
+
+    private static long queueNumber = 0;
+    private static long loadedFromDatabase = 0;
+    private static long renderedPartials = 0;
+    private static long taskNumber = 0;
+
 
     /**
      * Return true if specified partial should be processed soon
@@ -42,7 +54,7 @@ class PartialRenderingQueue {
      */
     public static boolean isRenderInProgress(RenderedPartial toCheck) {
 
-        if(toCheck == null){
+        if (toCheck == null) {
             return false;
         }
 
@@ -62,12 +74,12 @@ class PartialRenderingQueue {
     private final StreamingRenderer renderer;
     private final RenderedPartialStore store;
     private final Runnable toNotifyWhenPartialsCome;
-    private final int renderedWidthPx;
-    private final int renderedHeightPx;
+    private final double renderedWidthPx;
+    private final double renderedHeightPx;
 
     private ArrayList<Runnable> tasks;
 
-    PartialRenderingQueue(MapContent content, RenderedPartialStore store, int renderedWidthPx, int renderedHeightPx, Runnable toNotifyWhenPartialsCome) {
+    PartialRenderingQueue(MapContent content, RenderedPartialStore store, double renderedWidthPx, double renderedHeightPx, Runnable toNotifyWhenPartialsCome) {
         this.tasks = new ArrayList<>();
         this.store = store;
         this.renderedWidthPx = renderedWidthPx;
@@ -76,6 +88,9 @@ class PartialRenderingQueue {
         this.mapContent = content;
         this.renderer = GeoUtils.buildRenderer();
         renderer.setMapContent(mapContent);
+
+        queueNumber++;
+        queueId = queueNumber;
     }
 
     /**
@@ -88,6 +103,14 @@ class PartialRenderingQueue {
         partialsInProgress.add(part);
 
         this.tasks.add(() -> {
+
+            GuiUtils.throwIfOnEDT();
+
+            taskNumber++;
+
+            if (debugMode) {
+                logger.warning("Launching rendering task. Queue:  " + queueId + " Task: " + taskNumber);
+            }
 
             try {
                 // try to find existing partial in database
@@ -110,12 +133,13 @@ class PartialRenderingQueue {
                     ReferencedEnvelope bounds = part.getEnvelope();
 
                     // create an image, and renderer map
-                    BufferedImage img = new BufferedImage(renderedWidthPx, renderedHeightPx, BufferedImage.TYPE_INT_ARGB);
+                    int imgWidth = (int) renderedWidthPx;
+                    BufferedImage img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
 
-                    renderer.paint((Graphics2D) img.getGraphics(), new Rectangle(renderedWidthPx, renderedHeightPx), bounds);
+                    renderer.paint((Graphics2D) img.getGraphics(), new Rectangle(imgWidth, imgWidth), bounds);
 
                     // keep image
-                    part.setImage(img, renderedWidthPx, renderedHeightPx);
+                    part.setImage(img, imgWidth, imgWidth);
 
                     try {
                         store.addPartial(part);
@@ -144,7 +168,7 @@ class PartialRenderingQueue {
                     };
 
                     g2d.setColor(Color.WHITE);
-                    g2d.fillRect(0, 0, renderedWidthPx - 20, debugIncr * (lines.length + 1));
+                    g2d.fillRect(0, 0, (int) (renderedWidthPx - 20), debugIncr * (lines.length + 1));
 
                     g2d.setColor(Color.black);
                     g2d.setFont(debugFont);
