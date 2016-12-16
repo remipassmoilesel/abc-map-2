@@ -5,15 +5,18 @@ import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.rendering.CacheRenderingEngine;
+import org.abcmap.core.rendering.CachedRenderingEngine;
 import org.abcmap.core.rendering.RenderingException;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.renderer.lite.RendererUtilities;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 
 /**
  * Display a map by using a partial cache system
@@ -33,7 +36,17 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     /**
      * Rendering engine associated with pane
      */
-    private final CacheRenderingEngine renderingEngine;
+    private final CachedRenderingEngine renderingEngine;
+
+    /**
+     * Minimum size of map rendered on a partial ("zoom" value)
+     */
+    private final double minimumPartialSideWu;
+
+    /**
+     * Maximum size of map rendered on a partial ("zoom" value)
+     */
+    private final double maximumPartialSideWu;
 
     /**
      * World envelope (positions) of map rendered on panel
@@ -57,19 +70,31 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
     private final EventNotificationManager notifm;
 
+    /**
+     * If set to true, more information are displayed
+     */
+    private boolean debugMode = true;
+
+    private ReferencedEnvelope lastWorldEnvelope;
+    private AffineTransform worldToScreenTransform;
+
     public CachedMapPane(Project p) {
 
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         addComponentListener(new RefreshMapComponentListener());
 
         this.project = p;
-        this.renderingEngine = new CacheRenderingEngine(project);
+        this.renderingEngine = new CachedRenderingEngine(project);
 
         this.partialSideWu = 500;
 
         // first time render whole project
         this.worldEnvelope = project.getMaximumBounds();
         renderingEngine.setParametersToRenderWholeMap();
+
+        // limit minimum scale
+        this.minimumPartialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX()) / 10;
+        this.maximumPartialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX());
 
         // repaint when new partials are ready
         notifm = new EventNotificationManager(this);
@@ -85,12 +110,43 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+
+        if (debugMode) {
+            //logger.warning("Repaint panel: " + this);
+        }
+
         // refresh navigation bar
         if (navigationBar != null) {
             navigationBar.refreshBoundsFrom(getSize());
         }
 
-        renderingEngine.paint((Graphics2D) g);
+
+        Graphics2D g2d = (Graphics2D) g;
+
+        renderingEngine.paint(g2d);
+
+        if (debugMode) {
+
+            if (lastWorldEnvelope == null || lastWorldEnvelope.equals(worldEnvelope) == false) {
+                worldToScreenTransform = RendererUtilities.worldToScreenTransform(worldEnvelope, new Rectangle(getSize()));
+                lastWorldEnvelope = new ReferencedEnvelope(worldEnvelope);
+            }
+
+            Point2D blc = new Point2D.Double(worldEnvelope.getMinX(), worldEnvelope.getMinY());
+            Point2D urc = new Point2D.Double(worldEnvelope.getMaxX(), worldEnvelope.getMaxY());
+            blc = worldToScreenTransform.transform(blc, null);
+            urc = worldToScreenTransform.transform(urc, null);
+
+            int x = (int) blc.getX();
+            int y = (int) urc.getY();
+            int w = (int) Math.abs(urc.getX() - blc.getX());
+            int h = (int) Math.abs(urc.getY() - blc.getY());
+
+            g2d.setColor(Color.blue);
+            int st = 2;
+            g2d.setStroke(new BasicStroke(st));
+            g2d.drawRect(x + st, y + st, w - st * 2, h - st * 2);
+        }
     }
 
 
@@ -132,7 +188,20 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * @return
      */
     public void setScale(double scale) {
-        partialSideWu = renderingEngine.getPartialSidePx() * scale;
+        setPartialSideWu(renderingEngine.getPartialSidePx() * scale);
+    }
+
+    private void setPartialSideWu(double value) {
+
+        // check if value is not too small
+        if (partialSideWu < minimumPartialSideWu) {
+            partialSideWu = minimumPartialSideWu;
+        }
+
+        // check if value is not too big
+        else if (partialSideWu > maximumPartialSideWu) {
+            partialSideWu = maximumPartialSideWu;
+        }
     }
 
     /**
@@ -145,7 +214,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         worldEnvelope = project.getMaximumBounds();
         renderingEngine.setParametersToRenderWholeMap();
-        partialSideWu = renderingEngine.getPartialSideWu();
+        setPartialSideWu(renderingEngine.getPartialSideWu());
     }
 
     /**
@@ -172,6 +241,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     }
 
     public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
         renderingEngine.setDebugMode(debugMode);
     }
 
@@ -291,7 +361,9 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // refresh navigation bar
         if (navigationBar != null) {
-            navigationBar.refreshBoundsFrom(getSize());
+            SwingUtilities.invokeLater(() -> {
+                navigationBar.refreshBoundsFrom(getSize());
+            });
         }
     }
 
@@ -301,7 +373,9 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // refresh navigation bar
         if (navigationBar != null) {
-            navigationBar.refreshBoundsFrom(getSize());
+            SwingUtilities.invokeLater(() -> {
+                navigationBar.refreshBoundsFrom(getSize());
+            });
         }
     }
 

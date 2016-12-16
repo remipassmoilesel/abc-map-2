@@ -151,10 +151,6 @@ public class LayoutPanel extends JPanel {
     }
 
     private void updateLayoutFromMap() {
-
-        System.out.println(mapPane.getWorldEnvelope());
-        System.out.println(mapPane.getActualWorldEnvelope());
-
         layout.setEnvelope(mapPane.getActualWorldEnvelope());
     }
 
