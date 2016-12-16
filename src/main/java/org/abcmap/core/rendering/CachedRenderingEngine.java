@@ -32,7 +32,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      * <p>
      * This value should prevent partial side to be negative
      */
-    public static final double MIN_PARTIAL_SIDE_WU = 1d;
+    public static final double MIN_PARTIAL_SIDE_WU = 0.1d;
 
     /**
      * Default size in pixel of each partial
@@ -79,6 +79,16 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     private double partialSideWu;
 
     /**
+     * Minimum size of map rendered on a partial ("zoom" value)
+     */
+    private final double minimumPartialSideWu;
+
+    /**
+     * Maximum size of map rendered on a partial ("zoom" value)
+     */
+    private final double maximumPartialSideWu;
+
+    /**
      * Lock to prevent too much thread rendering
      */
     private final ReentrantLock renderLock;
@@ -90,9 +100,9 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     private final Project project;
 
     /**
-     * If set to true, additional informations will be displayed on map
+     * If set to true, additional information will be displayed on map
      */
-    private boolean debugMode = true;
+    private boolean debugMode = false;
 
     /**
      * Rendered surface size
@@ -113,13 +123,17 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         this.partialSidePx = DEFAULT_PARTIAL_SIDE_PX;
 
         // default world envelope
-        this.worldEnvelope = new ReferencedEnvelope();
+        this.worldEnvelope = project.getMaximumBounds();
+
+        // limit minimum scale
+        this.minimumPartialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX()) / 10;
+        this.maximumPartialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX());
 
         // first time set fake pixel dimensions
         this.renderedSizePx = new Dimension(800, 800);
 
         // high value first
-        this.partialSideWu = 500;
+        setPartialSideWu(500);
 
         // listen partial store changes
         this.notifm = new EventNotificationManager(this);
@@ -194,7 +208,9 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      *
      * @param ulc
      */
-    public void prepareMap(Point2D ulc, Dimension pixelDim, double partialSideWu) throws RenderingException {
+    public void prepareMap(Point2D ulc, Dimension pixelDim, double scale) throws RenderingException {
+
+        setPartialSideWu(partialSidePx * scale);
 
         // get width and height in world unit
         double wdg = partialSideWu * pixelDim.width / partialSidePx;
@@ -206,10 +222,10 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         double x2 = ulc.getX() + wdg;
         double y2 = ulc.getY();
 
-        prepareMap(new ReferencedEnvelope(x1, x2, y1, y2, project.getCrs()), pixelDim, partialSideWu);
+        prepareMap(new ReferencedEnvelope(x1, x2, y1, y2, project.getCrs()), pixelDim, scale);
     }
 
-    public void prepareMap(ReferencedEnvelope worldEnvelope, Dimension pixelDim, double partialSideWu) throws RenderingException {
+    public void prepareMap(ReferencedEnvelope worldEnvelope, Dimension pixelDim, double scale) throws RenderingException {
 
         /*
         System.out.println();
@@ -237,8 +253,8 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             throw new RenderingException("Coordinate Reference Systems are different: " + worldEnvelope.getCoordinateReferenceSystem() + " / " + project.getCrs());
         }
 
-        if (partialSideWu < MIN_PARTIAL_SIDE_WU || Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
-            throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
+        if (scale < 0 || Double.isInfinite(scale) || Double.isNaN(scale)) {
+            throw new RenderingException("Invalid scale value: " + partialSideWu);
         }
 
         // check if this method have not been called few milliseconds before
@@ -255,7 +271,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         // set essential parameters after verifications
         this.worldEnvelope = worldEnvelope;
         this.renderedSizePx = pixelDim;
-        this.partialSideWu = partialSideWu;
+        setPartialSideWu(partialSidePx * scale);
 
         try {
 
@@ -314,25 +330,15 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     }
 
     /**
-     * Compute optimal partial size in world unit, in order to show map on whole component.
-     * <p>
-     * If component is not visible, fake size of component will be used and result can look weird
-     */
-    public static double getOptimalPartialSideWu(ReferencedEnvelope world, Dimension surfacePx, double partialSidePx) {
-
-        double worldWidth = world.getMaxX() - world.getMinX();
-        double renderedSurfaceWidth = surfacePx.getWidth();
-
-        return worldWidth * partialSidePx / renderedSurfaceWidth;
-
-    }
-
-    /**
      * Adapt rendering parameters to render all map
      */
     public void setParametersToRenderWholeMap() {
         worldEnvelope = project.getMaximumBounds();
-        partialSideWu = getOptimalPartialSideWu(worldEnvelope, renderedSizePx, partialSidePx);
+
+        double worldWidth = worldEnvelope.getMaxX() - worldEnvelope.getMinX();
+        double renderedSurfaceWidth = renderedSizePx.getWidth();
+
+        setPartialSideWu(worldWidth * partialSidePx / renderedSurfaceWidth);
     }
 
     public ReferencedEnvelope getWorldEnvelope() {
@@ -374,5 +380,28 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         return partialSideWu;
     }
 
+    /**
+     * Set size of partial side and check if value is correct
+     *
+     * @param value
+     */
+    private void setPartialSideWu(double value) {
 
+        partialSideWu = value;
+
+        // check if value is not too small
+        if (partialSideWu < minimumPartialSideWu) {
+            partialSideWu = minimumPartialSideWu;
+        }
+
+        // check if value is not too big
+        else if (partialSideWu > maximumPartialSideWu) {
+            partialSideWu = maximumPartialSideWu;
+        }
+
+    }
+
+    public double getScale() {
+        return getPartialSideWu() / getPartialSidePx();
+    }
 }

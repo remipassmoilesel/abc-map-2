@@ -5,6 +5,7 @@ import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
 import org.abcmap.core.utils.BufferedImagePersister;
+import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
@@ -110,12 +111,7 @@ public class SerializableRenderedPartial implements DataModel {
         if(crs == null){
             crs = DefaultEngineeringCRS.GENERIC_2D;
         }
-        String authority = crs.getName().getAuthority() != null ? crs.getName().getAuthority() + ":" : "";
-        return authority + crs.getName().getCode();
-    }
-
-    public static CoordinateReferenceSystem idToCrs(String crsId) throws FactoryException {
-        return CRS.decode(crsId);
+        return GeoUtils.crsToString(crs);
     }
 
     public String getCrsId() {
