@@ -6,6 +6,7 @@ import org.abcmap.gui.GuiCursor;
 import org.abcmap.gui.ie.display.zoom.ResetZoom;
 import org.abcmap.gui.ie.display.zoom.ZoomIn;
 import org.abcmap.gui.ie.display.zoom.ZoomOut;
+import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -55,21 +56,24 @@ public class MapNavigationBar extends JPanel {
      */
     public void refreshBoundsFrom(Dimension parentSize) {
 
+        // call out from EDT disturb positioning
+        GuiUtils.throwIfNotOnEDT();
+
         // avoid uneeded calls
-        // TODO: sometimes comparison block update
-        //if (Utils.safeEquals(parentSize, lastParentSize)) {
-        //    return;
-        //} else {
-        //    lastParentSize = parentSize;
-        //}
+        if (Utils.safeEquals(parentSize, lastParentSize)) {
+            return;
+        } else {
+            lastParentSize = new Dimension(parentSize);
+        }
 
         Dimension navbarDims = getPreferredSize();
 
         int x = parentSize.width - navbarDims.width;
         int y = parentSize.height - navbarDims.height;
-        int width = navbarDims.width;
-        int height = navbarDims.height;
-        setBounds(x, y, width, height);
+        int w = navbarDims.width;
+        int h = navbarDims.height;
+
+        setBounds(x, y, w, h);
 
         repaint();
     }
