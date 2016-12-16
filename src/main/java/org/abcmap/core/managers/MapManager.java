@@ -80,7 +80,9 @@ public class MapManager implements HasEventNotificationManager {
             return;
         }
 
-        getMainMap().resetDisplay();
+        CachedMapPane map = getMainMap();
+        map.resetDisplay();
+        map.repaint();
     }
 
     public void refreshMapComponent() {

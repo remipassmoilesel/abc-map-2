@@ -1,5 +1,9 @@
-package org.abcmap.core.partials;
+package org.abcmap.core.rendering.partials;
 
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.rendering.CacheRenderingEngine;
+import org.abcmap.core.rendering.RenderingException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -19,17 +23,7 @@ import java.util.ArrayList;
  */
 public class RenderedPartialFactory {
 
-    /**
-     * Minimal size in world unit of rendered map on partial
-     * <p>
-     * This value should prevent partial side to be negative
-     */
-    public static final double MIN_PARTIAL_SIDE_WU = 0.1d;
-
-    /**
-     * Default size in pixel of each partial
-     */
-    public static final double DEFAULT_PARTIAL_SIDE_PX = 500d;
+    private static final CustomLogger logger = LogManager.getLogger(RenderedPartialFactory.class);
 
     private static long loadedPartialsReused = 0;
 
@@ -49,21 +43,25 @@ public class RenderedPartialFactory {
     private final RenderedPartialStore store;
 
     /**
-     * Zoom level of current rendering
-     */
-    private double partialSideWu = 2d;
-
-    /**
      * Default size in px of each partial
      */
-    private double partialSidePx = DEFAULT_PARTIAL_SIDE_PX;
+    private double partialSidePx;
 
+    /**
+     * Size of map rendered on partials, in world unit
+     */
+    private double partialSideWu;
+
+    /**
+     * If set to true, additional information will be displayed on partials
+     */
     private boolean debugMode = false;
 
     public RenderedPartialFactory(RenderedPartialStore store, MapContent content, String layerId) {
         this.store = store;
         this.mapContent = content;
         this.layerId = layerId;
+        this.partialSidePx = CacheRenderingEngine.DEFAULT_PARTIAL_SIDE_PX;
     }
 
     public void setDebugMode(boolean debugMode) {
@@ -79,7 +77,21 @@ public class RenderedPartialFactory {
      * @param pixelDimension
      * @return
      */
-    public RenderedPartialQueryResult intersect(Point2D ulc, Dimension pixelDimension, CoordinateReferenceSystem crs, Runnable toNotifyWhenPartialsCome) {
+    public RenderedPartialQueryResult intersect(Point2D ulc, Dimension pixelDimension, double partialSideWu, CoordinateReferenceSystem crs,
+                                                Runnable toNotifyWhenPartialsCome) throws RenderingException {
+
+        // check rendering values
+        if (mapContent == null) {
+            throw new RenderingException("Noting to renderer, map content is null");
+        }
+
+        if (pixelDimension.width < 1 || pixelDimension.height < 1) {
+            throw new RenderingException("Invalid dimensions to render: " + pixelDimension);
+        }
+
+        if (partialSideWu < CacheRenderingEngine.MIN_PARTIAL_SIDE_WU || Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
+            throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
+        }
 
         // get width and height in decimal dg
         double wdg = partialSideWu * pixelDimension.width / partialSidePx;
@@ -94,7 +106,7 @@ public class RenderedPartialFactory {
         ReferencedEnvelope env = new ReferencedEnvelope(x1, x2, y1, y2, crs);
 
         // create a new envelope
-        return intersect(env, toNotifyWhenPartialsCome);
+        return intersect(env, partialSideWu, toNotifyWhenPartialsCome);
 
     }
 
@@ -106,18 +118,23 @@ public class RenderedPartialFactory {
      * @param worldBounds
      * @return
      */
-    public RenderedPartialQueryResult intersect(ReferencedEnvelope worldBounds, Runnable toNotifyWhenPartialsCome) {
+    public RenderedPartialQueryResult intersect(ReferencedEnvelope worldBounds, double partialSideWu,
+                                                Runnable toNotifyWhenPartialsCome) throws RenderingException {
 
+        // check rendering values
         if (mapContent == null) {
-            throw new NullPointerException("Noting to renderer, map content is null");
+            throw new RenderingException("Noting to renderer, map content is null");
         }
 
         if (worldBounds == null) {
-            throw new NullPointerException("World bounds are null");
+            throw new RenderingException("World bounds are null");
         }
 
-        // keep the same value until end of rendering process, even if value is changed by setter
-        double partialSideWu = normalizeWorldUnitSideValue(this.partialSideWu);
+        if (partialSideWu < CacheRenderingEngine.MIN_PARTIAL_SIDE_WU || Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
+            throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
+        }
+
+        this.partialSideWu = partialSideWu;
 
         ArrayList<RenderedPartial> rsparts = new ArrayList<>();
 
@@ -127,8 +144,8 @@ public class RenderedPartialFactory {
 
         // first position to go from
         // position is rounded in order to have partials that can be reused in future display
-        double x = getStartPointFrom(worldBounds.getMinX());
-        double y = getStartPointFrom(worldBounds.getMinY());
+        double x = getStartPointFrom(worldBounds.getMinX(), partialSideWu);
+        double y = getStartPointFrom(worldBounds.getMinY(), partialSideWu);
 
         PartialRenderingQueue renderingQueue = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toNotifyWhenPartialsCome);
         renderingQueue.setDebugMode(debugMode);
@@ -157,7 +174,7 @@ public class RenderedPartialFactory {
 
                 // create a new partial if needed
                 if (part == null) {
-                    part = new RenderedPartial(RenderedPartial.getWaitingImage(), area, (int) partialSidePx, (int) partialSidePx, layerId);
+                    part = new RenderedPartial(null, area, (int) partialSidePx, (int) partialSidePx, layerId);
                     store.addInLoadedList(part);
                     rsparts.add(part);
                 }
@@ -177,7 +194,7 @@ public class RenderedPartialFactory {
 
                 // reset x except the last loop
                 if (y < worldBounds.getMaxY()) {
-                    x = getStartPointFrom(worldBounds.getMinX());
+                    x = getStartPointFrom(worldBounds.getMinX(), partialSideWu);
                 }
             }
 
@@ -213,7 +230,7 @@ public class RenderedPartialFactory {
      * @param coord
      * @return
      */
-    public double getStartPointFrom(double coord) {
+    public double getStartPointFrom(double coord, double partialSideWu) {
 
         double mod = coord % partialSideWu;
         if (mod < 0) {
@@ -225,30 +242,12 @@ public class RenderedPartialFactory {
         return Math.round(rslt * 10000.0) / 10000.0;
     }
 
-    /**
-     * Set rendered partial size in world unit
-     * <p>
-     * Partial size can be used as a "zoom" value
-     *
-     * @param
-     */
-    public void setPartialSideWu(double sideDg) {
-        this.partialSideWu = normalizeWorldUnitSideValue(sideDg);
+    public double getPartialSideWu() {
+        return partialSideWu;
     }
 
     public double getPartialSidePx() {
         return partialSidePx;
-    }
-
-    /**
-     * Get rendered partial size in world unit
-     * <p>
-     * Partial size can be used as a "zoom" value
-     *
-     * @param
-     */
-    public double getPartialSideWu() {
-        return partialSideWu;
     }
 
     public static long getLoadedPartialsReused() {
@@ -257,21 +256,6 @@ public class RenderedPartialFactory {
 
     public RenderedPartialStore getStore() {
         return store;
-    }
-
-    /**
-     * Check if a side value for partial (in world unit) is greater than the minimum value
-     *
-     * @param value
-     * @return
-     */
-    public static double normalizeWorldUnitSideValue(double value) {
-
-        if (value < MIN_PARTIAL_SIDE_WU) {
-            value = MIN_PARTIAL_SIDE_WU;
-        }
-
-        return value;
     }
 
     public void setMapContent(MapContent mapContent) {

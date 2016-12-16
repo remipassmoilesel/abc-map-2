@@ -1,4 +1,4 @@
-package org.abcmap.core.partials;
+package org.abcmap.core.rendering.partials;
 
 import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;

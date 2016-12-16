@@ -1,4 +1,4 @@
-package org.abcmap.core.partials;
+package org.abcmap.core.rendering.partials;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.renderer.lite.RendererUtilities;

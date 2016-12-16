@@ -1,4 +1,4 @@
-package org.abcmap.core.partials;
+package org.abcmap.core.rendering.partials;
 
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -48,6 +48,14 @@ public class RenderedPartial {
      */
     private long partId;
 
+    /**
+     * If image is set to null, a waiting generated image will be used
+     * @param image
+     * @param envelope
+     * @param renderedWidth
+     * @param renderedHeight
+     * @param layerId
+     */
     public RenderedPartial(BufferedImage image, ReferencedEnvelope envelope, int renderedWidth, int renderedHeight, String layerId) {
         id++;
         this.partId = id;
@@ -80,6 +88,11 @@ public class RenderedPartial {
      * @param image
      */
     public void setImage(BufferedImage image, int width, int height) {
+
+        if (image == null) {
+            image = waitingImage;
+        }
+
         this.imageSoftRef = new SoftReference<>(image);
         this.renderedWidth = width;
         this.renderedHeight = height;
@@ -175,7 +188,7 @@ public class RenderedPartial {
             return false;
         }
 
-        if (part.getImage() == getWaitingImage()) {
+        if (part.getImage() == waitingImage) {
             return false;
         }
 
@@ -187,11 +200,11 @@ public class RenderedPartial {
      *
      * @return
      */
-    public static BufferedImage getWaitingImage() {
+    public BufferedImage getWaitingImage() {
 
         if (waitingImage == null) {
 
-            int side = (int) RenderedPartialFactory.DEFAULT_PARTIAL_SIDE_PX;
+            int side = renderedWidth;
             waitingImage = new BufferedImage(side, side, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D g2d = (Graphics2D) waitingImage.getGraphics();

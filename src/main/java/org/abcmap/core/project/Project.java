@@ -2,7 +2,7 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.partials.RenderedPartialStore;
+import org.abcmap.core.rendering.partials.RenderedPartialStore;
 import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.project.layers.LayerIndexEntry;

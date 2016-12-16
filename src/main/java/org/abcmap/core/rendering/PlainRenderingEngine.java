@@ -1,4 +1,4 @@
-package org.abcmap.core.renderer;
+package org.abcmap.core.rendering;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
@@ -16,17 +16,17 @@ import org.geotools.renderer.lite.StreamingRenderer;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Renderer designed for Abc-Map projects
- *
- * Not used for display, only for exports or printing
+ * <p>
+ * Nothing is cached, performances can be low
  */
-public class ProjectRenderer {
+public class PlainRenderingEngine {
 
-    private static final CustomLogger logger = LogManager.getLogger(ProjectRenderer.class);
+    private static final CustomLogger logger = LogManager.getLogger(PlainRenderingEngine.class);
 
     /**
      * If set to true, outlines will be rendered on tiles layers
@@ -58,7 +58,7 @@ public class ProjectRenderer {
     private ProjectManager pman;
     private Project project;
 
-    public ProjectRenderer() {
+    public PlainRenderingEngine() {
         this.pman = MainManager.getProjectManager();
         this.project = pman.getProject();
         this.renderer = GeoUtils.buildRenderer();

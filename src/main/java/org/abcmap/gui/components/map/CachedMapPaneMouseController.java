@@ -1,10 +1,11 @@
 package org.abcmap.gui.components.map;
 
+import org.geotools.geometry.jts.ReferencedEnvelope;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-import java.awt.geom.Point2D;
 
 /**
  * Move map when user drag it on component and change scale when user use mouse wheel
@@ -38,10 +39,10 @@ public class CachedMapPaneMouseController extends MouseAdapter {
         mx = scaleValue(mx);
         my = scaleValue(my);
 
-        // adapt world position
-        Point2D p = pane.getUlcWorldPosition();
-
-        pane.setUlcWorldPosition(new Point2D.Double(p.getX() + mx, p.getY() - my));
+        // adapt world envelope
+        ReferencedEnvelope translated = pane.getWorldEnvelope();
+        translated.translate(mx, -my);
+        pane.setWorldEnvelope(translated);
 
         pane.refreshMap();
 
@@ -56,9 +57,8 @@ public class CachedMapPaneMouseController extends MouseAdapter {
      * @return
      */
     public double scaleValue(double val) {
-        double psx = pane.getPartialSidePx();
-        double psw = pane.getPartialSideWu();
-        return val * psw / psx;
+        double scale = pane.getScale();
+        return val * scale;
     }
 
     @Override

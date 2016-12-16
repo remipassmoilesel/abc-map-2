@@ -1,4 +1,4 @@
-package org.abcmap.core.partials;
+package org.abcmap.core.rendering.partials;
 
 import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
@@ -44,7 +44,6 @@ public class RenderedPartialStore implements HasEventNotificationManager {
      * just the most recent partials are used
      */
     private static final int MAX_LOADED_LIST_SIZE = 1000;
-    private final EventNotificationManager notifm;
 
     /**
      * List of partials already used. They can be complete (with an image loaded) or not.
@@ -52,6 +51,10 @@ public class RenderedPartialStore implements HasEventNotificationManager {
      * This list is not synchronized because it is a bad idea so iterate only copies
      */
     private ArrayList<RenderedPartial> loadedPartials;
+
+
+    private final EventNotificationManager notifm;
+
 
     private final Dao<SerializableRenderedPartial, ?> dao;
     private final JdbcPooledConnectionSource connectionSource;

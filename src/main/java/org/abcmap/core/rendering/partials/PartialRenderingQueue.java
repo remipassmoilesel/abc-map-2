@@ -1,4 +1,4 @@
-package org.abcmap.core.partials;
+package org.abcmap.core.rendering.partials;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
