@@ -4,10 +4,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 import junit.framework.TestCase;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.partials.RenderedPartialFactory;
-import org.abcmap.core.partials.RenderedPartialQueryResult;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.TileLayer;
+import org.abcmap.core.rendering.RenderingException;
+import org.abcmap.core.rendering.partials.RenderedPartialFactory;
+import org.abcmap.core.rendering.partials.RenderedPartialQueryResult;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.junit.BeforeClass;
@@ -37,7 +38,7 @@ public class PartialFactoryTest {
     }
 
     @Test
-    public void tests() throws IOException, SQLException, InterruptedException {
+    public void tests() throws IOException, SQLException, InterruptedException, RenderingException {
 
         String root = "/tiles/osm_";
 
@@ -76,7 +77,7 @@ public class PartialFactoryTest {
             // build partials for a fake layer map content
             RenderedPartialFactory factory = new RenderedPartialFactory(project.getRenderedPartialsStore(), project.buildGlobalMapContent(true), "layer1");
             final int[] renderedTiles = {0};
-            RenderedPartialQueryResult queryResult = factory.intersect(worldPosition, dimensionsPx, DefaultEngineeringCRS.GENERIC_2D, () -> {
+            RenderedPartialQueryResult queryResult = factory.intersect(worldPosition, dimensionsPx, partialSideWu, DefaultEngineeringCRS.GENERIC_2D, () -> {
                 renderedTiles[0]++;
             });
 
@@ -108,9 +109,7 @@ public class PartialFactoryTest {
 
                 CachedMapPane pane = new CachedMapPane(project);
 
-                //pane.setWorldBounds(start);
-                pane.setUlcWorldPosition(worldPosition);
-                pane.setPartialSideWu(partialSideWu);
+                pane.setScale(2); // TODO to check
                 pane.setDebugMode(true);
                 pane.setMouseManagementEnabled(true);
 
@@ -121,7 +120,7 @@ public class PartialFactoryTest {
 
                 frame.setVisible(true);
 
-                pane.initializeMap();
+                pane.refreshMap();
 
             };
 
