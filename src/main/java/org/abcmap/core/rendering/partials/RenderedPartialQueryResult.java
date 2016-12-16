@@ -13,19 +13,23 @@ import java.util.ArrayList;
  */
 public class RenderedPartialQueryResult {
 
-    private int tileNumberWidth;
-    private int tileNumberHeight;
+    private final int partialsLoaded;
+    private final PartialRenderingQueue renderingQueue;
+    private int partialNumberWidth;
+    private int partialNumberHeight;
     private ArrayList<RenderedPartial> partials;
 
     private AffineTransform screenToWorldTransform;
     private AffineTransform worldToScreenTransform;
 
     public RenderedPartialQueryResult(ArrayList<RenderedPartial> partials, ReferencedEnvelope worldBounds, Rectangle screenBounds,
-                                      int tileNumberWidth, int tileNumberHeight) {
+                                      int partialNumberWidth, int partialNumberHeight, int partialsLoaded, PartialRenderingQueue renderingQueue) {
 
-        this.tileNumberWidth = tileNumberWidth;
-        this.tileNumberHeight = tileNumberHeight;
+        this.partialsLoaded = partialsLoaded;
+        this.partialNumberWidth = partialNumberWidth;
+        this.partialNumberHeight = partialNumberHeight;
         this.partials = partials;
+        this.renderingQueue = renderingQueue;
 
         worldToScreenTransform = RendererUtilities.worldToScreenTransform(worldBounds, screenBounds);
         try {
@@ -44,12 +48,21 @@ public class RenderedPartialQueryResult {
         return worldToScreenTransform;
     }
 
-    public int getTileNumberWidth() {
-        return tileNumberWidth;
+
+    public int getPartialNumberHeight() {
+        return partialNumberHeight;
     }
 
-    public int getTileNumberHeight() {
-        return tileNumberHeight;
+    public int getPartialNumberWidth() {
+        return partialNumberWidth;
+    }
+
+    public int getPartialsLoaded() {
+        return partialsLoaded;
+    }
+
+    public boolean isRenderProcessFinished() {
+        return renderingQueue.isFinished();
     }
 
     public ArrayList<RenderedPartial> getPartials() {

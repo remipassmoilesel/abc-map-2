@@ -2,7 +2,7 @@ package org.abcmap.core.rendering.partials;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.rendering.CacheRenderingEngine;
+import org.abcmap.core.rendering.CachedRenderingEngine;
 import org.abcmap.core.rendering.RenderingException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
@@ -61,7 +61,7 @@ public class RenderedPartialFactory {
         this.store = store;
         this.mapContent = content;
         this.layerId = layerId;
-        this.partialSidePx = CacheRenderingEngine.DEFAULT_PARTIAL_SIDE_PX;
+        this.partialSidePx = CachedRenderingEngine.DEFAULT_PARTIAL_SIDE_PX;
     }
 
     public void setDebugMode(boolean debugMode) {
@@ -89,7 +89,7 @@ public class RenderedPartialFactory {
             throw new RenderingException("Invalid dimensions to render: " + pixelDimension);
         }
 
-        if (partialSideWu < CacheRenderingEngine.MIN_PARTIAL_SIDE_WU || Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
+        if (partialSideWu < CachedRenderingEngine.MIN_PARTIAL_SIDE_WU || Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
             throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
         }
 
@@ -130,7 +130,7 @@ public class RenderedPartialFactory {
             throw new RenderingException("World bounds are null");
         }
 
-        if (partialSideWu < CacheRenderingEngine.MIN_PARTIAL_SIDE_WU || Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
+        if (partialSideWu < CachedRenderingEngine.MIN_PARTIAL_SIDE_WU || Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
             throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
         }
 
@@ -139,8 +139,8 @@ public class RenderedPartialFactory {
         ArrayList<RenderedPartial> rsparts = new ArrayList<>();
 
         // count partials
-        int tileNumberW = 0;
-        int tileNumberH = 0;
+        int partialNumberW = 0;
+        int partialNumberH = 0;
 
         // first position to go from
         // position is rounded in order to have partials that can be reused in future display
@@ -150,12 +150,21 @@ public class RenderedPartialFactory {
         PartialRenderingQueue renderingQueue = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toNotifyWhenPartialsCome);
         renderingQueue.setDebugMode(debugMode);
 
+        // count how many tiles are already loaded
+        int loaded = 0;
+
+        // be sure that we have enough partials around selection
+        double maxX = worldBounds.getMaxX() + partialSideWu;
+        double maxY = worldBounds.getMaxY() + partialSideWu;
+        x -= partialSideWu;
+        y -= partialSideWu;
+
         // iterate area to renderer from bottom left corner to upper right corner
-        while (y < worldBounds.getMaxY()) {
+        while (y < maxY) {
 
             // count horizontal partials only on the first line
-            if (tileNumberH == 0) {
-                tileNumberW++;
+            if (partialNumberH == 0) {
+                partialNumberW++;
             }
 
             // compute needed area for next partial
@@ -166,6 +175,7 @@ public class RenderedPartialFactory {
 
             if (RenderedPartial.isLoaded(part) || PartialRenderingQueue.isRenderInProgress(part)) {
                 rsparts.add(part);
+                loaded++;
                 loadedPartialsReused++;
             }
 
@@ -187,13 +197,15 @@ public class RenderedPartialFactory {
             // go to next
             x += partialSideWu;
 
-            // change line when finished
-            if (x > worldBounds.getMaxX()) {
+            // change line when finished,
+            // + partialSidePx to be sure that we stop after end of surface to render
+            if (x > maxX) {
+
                 y += partialSideWu;
-                tileNumberH++;
+                partialNumberH++;
 
                 // reset x except the last loop
-                if (y < worldBounds.getMaxY()) {
+                if (y < maxY) {
                     x = getStartPointFrom(worldBounds.getMinX(), partialSideWu);
                 }
             }
@@ -219,27 +231,29 @@ public class RenderedPartialFactory {
                 (int) Math.round(w * partialSidePx / partialSideWu),
                 (int) Math.round(h * partialSidePx / partialSideWu));
 
-        return new RenderedPartialQueryResult(rsparts, worldBounds, screenBounds, tileNumberW, tileNumberH);
+        return new RenderedPartialQueryResult(rsparts, worldBounds, screenBounds, partialNumberW, partialNumberH, loaded, renderingQueue);
     }
 
     /**
      * Get the closest start point of specified coordinate.
      * <p>
      * Coordinates are normalized in order to have reusable partials
+     * <p>
+     * When extreme values are used, starting values can be weird
      *
      * @param coord
      * @return
      */
     public double getStartPointFrom(double coord, double partialSideWu) {
 
+
         double mod = coord % partialSideWu;
+
         if (mod < 0) {
             mod += partialSideWu;
         }
 
-        double rslt = coord - mod;
-
-        return Math.round(rslt * 10000.0) / 10000.0;
+        return Math.round((coord - mod) * 10000.0) / 10000.0;
     }
 
     public double getPartialSideWu() {

@@ -20,11 +20,12 @@ import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Created by remipassmoilesel on 15/12/16.
+ * Render a map by cut it in several partials. When partials are rendered,
+ * they are stored in database in order to avoid resource consumption.
  */
-public class CacheRenderingEngine implements HasEventNotificationManager {
+public class CachedRenderingEngine implements HasEventNotificationManager {
 
-    private static final CustomLogger logger = LogManager.getLogger(CacheRenderingEngine.class);
+    private static final CustomLogger logger = LogManager.getLogger(CachedRenderingEngine.class);
 
     /**
      * Minimal size in world unit of rendered map on partial
@@ -101,7 +102,7 @@ public class CacheRenderingEngine implements HasEventNotificationManager {
     private final EventNotificationManager notifm;
 
 
-    public CacheRenderingEngine(Project p) {
+    public CachedRenderingEngine(Project p) {
         this.project = p;
         this.renderLock = new ReentrantLock();
         this.partialFactories = new HashMap<>();
@@ -330,14 +331,7 @@ public class CacheRenderingEngine implements HasEventNotificationManager {
      * Adapt rendering parameters to render all map
      */
     public void setParametersToRenderWholeMap() {
-
         worldEnvelope = project.getMaximumBounds();
-
-        System.out.println();
-        System.out.println(worldEnvelope);
-        System.out.println(renderedSizePx);
-        System.out.println(partialSidePx);
-
         partialSideWu = getOptimalPartialSideWu(worldEnvelope, renderedSizePx, partialSidePx);
     }
 

@@ -26,6 +26,8 @@ class PartialRenderingQueue {
 
     /**
      * List of partials which processing is already scheduled
+     * <p>
+     * This list is shared between all rendering queues of software
      */
     private static final ArrayList<RenderedPartial> partialsInProgress = new ArrayList<>(10);
 
@@ -77,7 +79,7 @@ class PartialRenderingQueue {
     private final double renderedWidthPx;
     private final double renderedHeightPx;
 
-    private ArrayList<Runnable> tasks;
+    private ArrayList<PartialRenderingTask> tasks;
 
     PartialRenderingQueue(MapContent content, RenderedPartialStore store, double renderedWidthPx, double renderedHeightPx, Runnable toNotifyWhenPartialsCome) {
         this.tasks = new ArrayList<>();
@@ -91,6 +93,7 @@ class PartialRenderingQueue {
 
         queueNumber++;
         queueId = queueNumber;
+
     }
 
     /**
@@ -102,95 +105,99 @@ class PartialRenderingQueue {
 
         partialsInProgress.add(part);
 
-        this.tasks.add(() -> {
+        this.tasks.add(new PartialRenderingTask() {
 
-            GuiUtils.throwIfOnEDT();
+            @Override
+            public void run() {
 
-            taskNumber++;
+                GuiUtils.throwIfOnEDT();
 
-            if (debugMode) {
-                logger.warning("Launching rendering task. Queue:  " + queueId + " Task: " + taskNumber);
-            }
+                taskNumber++;
 
-            try {
-                // try to find existing partial in database
-                boolean exist = false;
+                if (debugMode) {
+                    //logger.warning("Launching rendering task. Queue:  " + queueId + " Task: " + taskNumber);
+                }
+
                 try {
-                    exist = store.updatePartialFromDatabase(part);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-                if (exist == true) {
-                    loadedFromDatabase++;
-                }
-
-                // or create a new one
-                else {
-
-                    renderedPartials++;
-
-                    ReferencedEnvelope bounds = part.getEnvelope();
-
-                    // create an image, and renderer map
-                    int imgWidth = (int) renderedWidthPx;
-                    BufferedImage img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
-
-                    renderer.paint((Graphics2D) img.getGraphics(), new Rectangle(imgWidth, imgWidth), bounds);
-
-                    // keep image
-                    part.setImage(img, imgWidth, imgWidth);
-
+                    // try to find existing partial in database
+                    boolean exist = false;
                     try {
-                        store.addPartial(part);
+                        exist = store.updatePartialFromDatabase(part);
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
 
-                    //GuiUtils.showImage(img);
-
-                }
-
-                // display informations on tile if needed
-                if (debugMode) {
-
-                    BufferedImage img = part.getImage();
-                    ReferencedEnvelope bounds = part.getEnvelope();
-                    Graphics g2d = img.getGraphics();
-
-                    String[] lines = new String[]{
-                            String.valueOf(part.getId()),
-                            "Image id:" + System.identityHashCode(part.getImage()),
-                            "MinX: " + bounds.getMinX(),
-                            "MinY: " + bounds.getMinY(),
-                            "MaxX: " + bounds.getMaxX(),
-                            "MaxY: " + bounds.getMaxY(),
-                    };
-
-                    g2d.setColor(Color.WHITE);
-                    g2d.fillRect(0, 0, (int) (renderedWidthPx - 20), debugIncr * (lines.length + 1));
-
-                    g2d.setColor(Color.black);
-                    g2d.setFont(debugFont);
-
-                    int i = debugIncr;
-                    for (String l : lines) {
-                        g2d.drawString(l, 20, i);
-                        i += debugIncr;
+                    if (exist == true) {
+                        loadedFromDatabase++;
                     }
 
-                }
+                    // or create a new one
+                    else {
 
-            } finally {
-                partialsInProgress.remove(part);
+                        renderedPartials++;
 
-                // notify of new tile arrival
-                if (toNotifyWhenPartialsCome != null) {
-                    toNotifyWhenPartialsCome.run();
+                        ReferencedEnvelope bounds = part.getEnvelope();
+
+                        // create an image, and renderer map
+                        int imgWidth = (int) renderedWidthPx;
+                        BufferedImage img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
+
+                        renderer.paint((Graphics2D) img.getGraphics(), new Rectangle(imgWidth, imgWidth), bounds);
+
+                        // keep image
+                        part.setImage(img, imgWidth, imgWidth);
+
+                        try {
+                            store.addPartial(part);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+
+                        //GuiUtils.showImage(img);
+
+                    }
+
+                    // display informations on tile if needed
+                    if (debugMode) {
+
+                        BufferedImage img = part.getImage();
+                        ReferencedEnvelope bounds = part.getEnvelope();
+                        Graphics g2d = img.getGraphics();
+
+                        String[] lines = new String[]{
+                                String.valueOf(part.getId()),
+                                "Image id:" + System.identityHashCode(part.getImage()),
+                                "MinX: " + bounds.getMinX(),
+                                "MinY: " + bounds.getMinY(),
+                                "MaxX: " + bounds.getMaxX(),
+                                "MaxY: " + bounds.getMaxY(),
+                        };
+
+                        g2d.setColor(Color.WHITE);
+                        g2d.fillRect(0, 0, (int) (renderedWidthPx - 20), debugIncr * (lines.length + 1));
+
+                        g2d.setColor(Color.black);
+                        g2d.setFont(debugFont);
+
+                        int i = debugIncr;
+                        for (String l : lines) {
+                            g2d.drawString(l, 20, i);
+                            i += debugIncr;
+                        }
+
+                    }
+
+                } finally {
+                    partialsInProgress.remove(part);
+
+                    // notify of new tile arrival
+                    if (toNotifyWhenPartialsCome != null) {
+                        toNotifyWhenPartialsCome.run();
+                    }
                 }
             }
-
         });
+
     }
 
     /**
@@ -198,14 +205,30 @@ class PartialRenderingQueue {
      */
     public void start() {
         ThreadManager.runLater(() -> {
-            for (Runnable task : tasks) {
+            for (PartialRenderingTask task : tasks) {
                 try {
                     task.run();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+
+                task.markAsFinished();
             }
         });
+    }
+
+    /**
+     * Return true if all rendering tasks are finished
+     *
+     * @return
+     */
+    public boolean isFinished() {
+        for (PartialRenderingTask task : tasks) {
+            if (task.isFinished() == false) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public static long getLoadedFromDatabase() {
@@ -223,4 +246,6 @@ class PartialRenderingQueue {
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
     }
+
+
 }
