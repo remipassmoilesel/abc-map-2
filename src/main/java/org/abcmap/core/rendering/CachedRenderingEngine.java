@@ -331,6 +331,12 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                         () -> {
                             // each time a partial come, map will be repaint
                             notifm.fireEvent(new RenderingEvent(RenderingEvent.NEW_PARTIAL_LOADED));
+
+                            // notify all waiters that new partial come
+                            synchronized (CachedRenderingEngine.this) {
+                                CachedRenderingEngine.this.notifyAll();
+                            }
+
                         });
 
                 // store it to draw it later
@@ -429,12 +435,14 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      */
     public synchronized void waitForRendering() {
 
+        // iterate all sets of partials
         Iterator<String> keys = currentPartials.keySet().iterator();
 
         while (keys.hasNext()) {
             String k = keys.next();
             RenderedPartialQueryResult v = currentPartials.get(k);
 
+            // wait until all sets are ready
             while (v.isWorkDone() == false) {
                 try {
                     wait(20);
