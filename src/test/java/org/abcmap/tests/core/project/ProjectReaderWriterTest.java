@@ -72,7 +72,7 @@ public class ProjectReaderWriterTest {
 
         // add layouts
         for (int i = 0; i < 10; i++) {
-            LayoutSheet lay = new LayoutSheet(false, i, i + 1, i + 2, i + 3, i + 4, i + 5, i + 6);
+            LayoutSheet lay = new LayoutSheet(false, i, i + 1, i + 2, i + 3, i + 4, i + 5, i + 6, 1.5, newProject.getCrs());
             newProject.addLayout(lay);
         }
 

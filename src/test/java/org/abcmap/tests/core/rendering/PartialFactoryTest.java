@@ -1,4 +1,4 @@
-package org.abcmap.tests.core.partials;
+package org.abcmap.tests.core.rendering;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import junit.framework.TestCase;

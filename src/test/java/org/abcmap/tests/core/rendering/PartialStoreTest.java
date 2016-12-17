@@ -1,4 +1,4 @@
-package org.abcmap.tests.core.partials;
+package org.abcmap.tests.core.rendering;
 
 
 import junit.framework.TestCase;

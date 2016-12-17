@@ -1,4 +1,4 @@
-package org.abcmap.tests.core.partials;
+package org.abcmap.tests.core.rendering;
 
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
@@ -13,10 +13,14 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
+import static org.junit.Assert.assertTrue;
+
 /**
  * Created by remipassmoilesel on 17/12/16.
  */
 public class CachedRenderingEngineTest {
+
+    private boolean showInWindow = false;
 
     @BeforeClass
     public static void beforeTests() throws IOException, InterruptedException {
@@ -35,20 +39,22 @@ public class CachedRenderingEngineTest {
         Dimension imageDimension = new Dimension(3000, 3000);
         BufferedImage bimg = new BufferedImage(imageDimension.width, imageDimension.height, BufferedImage.TYPE_INT_ARGB);
 
-        // render project
+        // test waiting
         long before = System.currentTimeMillis();
         CachedRenderingEngine renderer = new CachedRenderingEngine(project);
         renderer.prepareMap(project.getMaximumBounds(), imageDimension, 1);
 
-//        renderer.waitForRendering();
+        renderer.waitForRendering();
 
         renderer.paint((Graphics2D) bimg.getGraphics());
         long renderingTime = System.currentTimeMillis() - before;
 
-        System.out.println(renderingTime);
+        assertTrue("Rendering wait test: " + renderingTime, renderingTime > 1);
 
-        GuiUtils.showImage(bimg);
+        if (showInWindow) {
+            GuiUtils.showImage(bimg);
+            Thread.sleep(50000);
+        }
 
-        Thread.sleep(50000);
     }
 }
