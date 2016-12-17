@@ -11,35 +11,40 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import static org.apache.commons.io.FileUtils.getTempDirectoryPath;
-
 /**
  * Manage temporary files and folders
+ * <p>
+ * // TODO: Merge with ProjectManager ?
  */
 public class TempFilesManager {
 
     private static final CustomLogger logger = LogManager.getLogger(TempFilesManager.class);
-    private final Path tempFolder;
+    private final Path tempFolderPath;
 
     public TempFilesManager() throws IOException {
 
         // check if temp folder exist
-        this.tempFolder = ConfigurationConstants.TEMP_FOLDER;
+        this.tempFolderPath = ConfigurationConstants.TEMP_FOLDER;
 
-        if (Files.exists(tempFolder) == false) {
-            Files.createDirectories(tempFolder);
+        if (Files.exists(tempFolderPath) == false) {
+            Files.createDirectories(tempFolderPath);
         }
 
     }
 
     /**
-     * Create a temproray file with specified prefix and suffix
+     * Create a temporary file with specified name and suffix
      *
      * @param prefix
      * @param suffix
      * @return
      */
     public Path createTemporaryFile(String prefix, String suffix) throws IOException {
+
+        ProjectManager projectm = MainManager.getProjectManager();
+        if (projectm.isInitialized() == false) {
+            throw new IllegalStateException("Project not initialized");
+        }
 
         // prefix is mandatory
         if (prefix == null) {
@@ -54,7 +59,7 @@ public class TempFilesManager {
 
         do {
             String name = prefix + System.nanoTime() + suffix;
-            file = Paths.get(getTempDirectoryPath(), name);
+            file = projectm.getProject().getTempDirectory().resolve(name);
         } while (Files.exists(file));
 
         Files.createFile(file);

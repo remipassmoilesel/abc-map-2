@@ -2,7 +2,7 @@ package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.layouts.ModifyLayouts;
+import org.abcmap.gui.ie.layouts.ManageLayouts;
 import org.abcmap.gui.windows.MainWindowMode;
 
 public class GroupLayout extends InteractionElementGroup {
@@ -12,6 +12,6 @@ public class GroupLayout extends InteractionElementGroup {
 
         windowMode = MainWindowMode.SHOW_LAYOUTS;
 
-        addInteractionElement(new ModifyLayouts());
+        addInteractionElement(new ManageLayouts());
     }
 }

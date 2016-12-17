@@ -14,7 +14,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import java.util.Objects;
 
 /**
- * Layout is a sheet which can be printed
+ * Represent a sheet where map an be drawn at various scale and position
+ * <p>
+ * This object is designed to be serialized in projects
  */
 @DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "LAYOUTS")
 public class LayoutSheet implements DataModel {
@@ -299,26 +301,29 @@ public class LayoutSheet implements DataModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        LayoutSheet layout = (LayoutSheet) o;
-        return index == layout.index &&
-                Double.compare(layout.minx, minx) == 0 &&
-                Double.compare(layout.miny, miny) == 0 &&
-                Double.compare(layout.maxx, maxx) == 0 &&
-                Double.compare(layout.maxy, maxy) == 0 &&
-                widthMm == layout.widthMm &&
-                heightMm == layout.heightMm &&
-                number == layout.number;
+        LayoutSheet that = (LayoutSheet) o;
+        return id == that.id &&
+                index == that.index &&
+                Double.compare(that.minx, minx) == 0 &&
+                Double.compare(that.miny, miny) == 0 &&
+                Double.compare(that.maxx, maxx) == 0 &&
+                Double.compare(that.maxy, maxy) == 0 &&
+                Double.compare(that.widthMm, widthMm) == 0 &&
+                Double.compare(that.heightMm, heightMm) == 0 &&
+                number == that.number &&
+                Double.compare(that.scale, scale) == 0 &&
+                Objects.equals(crsId, that.crsId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(index, minx, miny, maxx, maxy, widthMm, heightMm, number);
+        return Objects.hash(id, index, minx, miny, maxx, maxy, widthMm, heightMm, number, crsId, scale);
     }
 
     @Override
     public String toString() {
-        return "Layout{" +
-                "id='" + id + '\'' +
+        return "LayoutSheet{" +
+                "id=" + id +
                 ", index=" + index +
                 ", minx=" + minx +
                 ", miny=" + miny +
@@ -327,8 +332,8 @@ public class LayoutSheet implements DataModel {
                 ", widthMm=" + widthMm +
                 ", heightMm=" + heightMm +
                 ", number=" + number +
+                ", crsId='" + crsId + '\'' +
+                ", scale=" + scale +
                 '}';
     }
-
-
 }

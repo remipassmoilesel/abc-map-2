@@ -2,6 +2,7 @@ package org.abcmap.gui.ie.layouts;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layouts.LayoutManagerException;
 import org.abcmap.core.project.layouts.LayoutSheet;
 import org.abcmap.gui.components.buttons.HtmlButton;
 import org.abcmap.gui.ie.InteractionElement;
@@ -9,8 +10,9 @@ import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 
-public class ModifyLayouts extends InteractionElement {
+public class ManageLayouts extends InteractionElement {
 
     private static final String NEW_SHEET = "NEW_SHEET";
     private static final String MOVE_SHEET_UP = "MOVE_SHEET_UP";
@@ -18,8 +20,9 @@ public class ModifyLayouts extends InteractionElement {
     private static final String REMOVE_SHEET = "REMOVE_SHEET";
     private static final String CENTER_MAP_IN_SHEET = "CENTER_MAP_IN_SHEET";
     private static final String REMOVE_ALL = "REMOVE_ALL";
+    private static final String PRINT = "PRINT";
 
-    public ModifyLayouts() {
+    public ManageLayouts() {
         this.label = "Modifier les feuilles de mise en page";
         this.help = "Modifiez ci-dessous les feuilles de mise en pages: ajoutez, "
                 + "supprimez, changez l'ordre ...";
@@ -34,20 +37,16 @@ public class ModifyLayouts extends InteractionElement {
         JPanel panel = new JPanel(new MigLayout());
 
         HtmlButton buttonAdd = new HtmlButton("Ajouter une feuille");
-
         HtmlButton buttonRemove = new HtmlButton("Supprimer les feuilles sélectionnées");
-
         HtmlButton buttonMoveUp = new HtmlButton("Feuilles sélectionnées vers le haut");
-
         HtmlButton buttonMoveBottom = new HtmlButton("Feuilles sélectionnées vers le bas");
-
         HtmlButton buttonCenter = new HtmlButton("Centrer les feuilles sélectionnées");
-
         HtmlButton removeAll = new HtmlButton("Supprimer toutes les feuilles");
+        HtmlButton print = new HtmlButton("Imprimer");
 
         // construct panel and buttons
-        HtmlButton[] btns = new HtmlButton[]{buttonAdd, buttonRemove, buttonMoveUp, buttonMoveBottom, buttonCenter, removeAll};
-        String[] cmds = new String[]{NEW_SHEET, REMOVE_SHEET, MOVE_SHEET_UP, MOVE_SHEET_DOWN, CENTER_MAP_IN_SHEET, REMOVE_ALL};
+        HtmlButton[] btns = new HtmlButton[]{buttonAdd, buttonRemove, buttonMoveUp, buttonMoveBottom, buttonCenter, removeAll, print};
+        String[] cmds = new String[]{NEW_SHEET, REMOVE_SHEET, MOVE_SHEET_UP, MOVE_SHEET_DOWN, CENTER_MAP_IN_SHEET, REMOVE_ALL, PRINT};
         for (int i = 0; i < btns.length; i++) {
 
             HtmlButton btn = btns[i];
@@ -76,6 +75,7 @@ public class ModifyLayouts extends InteractionElement {
 
             String action = getLastActionCommand();
             if (action == null) {
+                logger.error(new Exception("Null command"));
                 return;
             }
 
@@ -86,15 +86,43 @@ public class ModifyLayouts extends InteractionElement {
 
                 LayoutSheet lay = new LayoutSheet(false, 200, 300, 600, 800, 210, 290, 10, 1.5d, project.getCrs());
                 project.addLayout(lay);
+
+                // notification
+                projectm.fireLayoutListChanged();
             }
 
             // remove all sheets
             else if (REMOVE_ALL.equals(action)) {
                 project.removeAllLayouts();
+
+                // notification
+                projectm.fireLayoutListChanged();
             }
 
-            // notification
-            projectm.fireLayoutListChanged();
+            // print sheets
+            else if (PRINT.equals(action)) {
+                dialm.showMessageInBox("Impression en cours de préparation ...");
+                try {
+                    laym.printLayouts();
+                }
+
+                // error while printing
+                catch (IOException e) {
+                    logger.error(e);
+                    dialm.showErrorInBox("Erreur lors de l'impression");
+                }
+
+                // already printing
+                catch (LayoutManagerException e) {
+                    logger.error(e);
+
+                    if (LayoutManagerException.isAlreadyPrinting(e)) {
+                        dialm.showErrorInBox("Une autre opération d'impression est en cours, veuillez patienter ...");
+                    }
+                }
+            }
+
+
 
            /* // supprimer les feuilles actives
             else if (REMOVE_SHEET.equals(action)) {
