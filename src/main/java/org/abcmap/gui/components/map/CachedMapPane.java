@@ -39,24 +39,9 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     private final CachedRenderingEngine renderingEngine;
 
     /**
-     * Minimum size of map rendered on a partial ("zoom" value)
-     */
-    private final double minimumPartialSideWu;
-
-    /**
-     * Maximum size of map rendered on a partial ("zoom" value)
-     */
-    private final double maximumPartialSideWu;
-
-    /**
      * World envelope (positions) of map rendered on panel
      */
     private ReferencedEnvelope worldEnvelope;
-
-    /**
-     * Size of partials side to render
-     */
-    private double partialSideWu;
 
     /**
      * Various mouse listeners which allow user to control map with mouse
@@ -67,6 +52,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * Optional navigation bar in bottom of map
      */
     private MapNavigationBar navigationBar;
+
+    /**
+     * Current scale of map
+     */
+    private double scale;
 
     private final EventNotificationManager notifm;
 
@@ -86,15 +76,12 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         this.project = p;
         this.renderingEngine = new CachedRenderingEngine(project);
 
-        this.partialSideWu = 500;
+        // unsignificant value the first time
+        scale = 1d;
 
         // first time render whole project
         this.worldEnvelope = project.getMaximumBounds();
         renderingEngine.setParametersToRenderWholeMap();
-
-        // limit minimum scale
-        this.minimumPartialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX()) / 10;
-        this.maximumPartialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX());
 
         // repaint when new partials are ready
         notifm = new EventNotificationManager(this);
@@ -103,13 +90,13 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         });
         renderingEngine.getNotificationManager().addObserver(this);
 
+        setDebugMode(true);
     }
 
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-
 
         if (debugMode) {
             //logger.warning("Repaint panel: " + this);
@@ -119,7 +106,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         if (navigationBar != null) {
             navigationBar.refreshBoundsFrom(getSize());
         }
-
 
         Graphics2D g2d = (Graphics2D) g;
 
@@ -163,7 +149,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         }
 
         try {
-            renderingEngine.prepareMap(worldEnvelope, panelDimensions, partialSideWu);
+            renderingEngine.prepareMap(worldEnvelope, panelDimensions, scale);
         } catch (RenderingException e) {
             logger.error(e);
         }
@@ -188,20 +174,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * @return
      */
     public void setScale(double scale) {
-        setPartialSideWu(renderingEngine.getPartialSidePx() * scale);
-    }
-
-    private void setPartialSideWu(double value) {
-
-        // check if value is not too small
-        if (partialSideWu < minimumPartialSideWu) {
-            partialSideWu = minimumPartialSideWu;
-        }
-
-        // check if value is not too big
-        else if (partialSideWu > maximumPartialSideWu) {
-            partialSideWu = maximumPartialSideWu;
-        }
+        this.scale = scale;
     }
 
     /**
@@ -214,7 +187,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         worldEnvelope = project.getMaximumBounds();
         renderingEngine.setParametersToRenderWholeMap();
-        setPartialSideWu(renderingEngine.getPartialSideWu());
+        scale = renderingEngine.getScale();
     }
 
     /**
@@ -343,6 +316,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // get width and height in world unit
         double partialSidePx = renderingEngine.getPartialSidePx();
+        double partialSideWu = renderingEngine.getPartialSideWu();
         double wdg = partialSideWu * panelDimensionsPx.width / partialSidePx;
         double hdg = partialSideWu * panelDimensionsPx.height / partialSidePx;
 

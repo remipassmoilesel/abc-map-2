@@ -77,6 +77,7 @@ public class CachedMapPaneMouseController extends MouseAdapter {
             zoomUnit = -zoomUnit;
         }
 
+
         pane.setScale(pane.getScale() + zoomUnit);
         pane.refreshMap();
 

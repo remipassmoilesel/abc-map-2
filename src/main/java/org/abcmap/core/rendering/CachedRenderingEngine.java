@@ -81,12 +81,12 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     /**
      * Minimum size of map rendered on a partial ("zoom" value)
      */
-    private final double minimumPartialSideWu;
+    private double minimumPartialSideWu;
 
     /**
      * Maximum size of map rendered on a partial ("zoom" value)
      */
-    private final double maximumPartialSideWu;
+    private double maximumPartialSideWu;
 
     /**
      * Lock to prevent too much thread rendering
@@ -126,8 +126,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         this.worldEnvelope = project.getMaximumBounds();
 
         // limit minimum scale
-        this.minimumPartialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX()) / 10;
-        this.maximumPartialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX());
+        computeMinAndMaxScaleBounds();
 
         // first time set fake pixel dimensions
         this.renderedSizePx = new Dimension(800, 800);
@@ -139,6 +138,15 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         this.notifm = new EventNotificationManager(this);
         project.getRenderedPartialsStore().getNotificationManager().addObserver(this);
 
+    }
+
+    /**
+     * Compute minimum and maximum limit of scale
+     */
+    public void computeMinAndMaxScaleBounds() {
+        ReferencedEnvelope world = project.getMaximumBounds();
+        this.minimumPartialSideWu = (world.getMaxX() - world.getMinX()) / 10;
+        this.maximumPartialSideWu = (world.getMaxX() - world.getMinX());
     }
 
     @Override
@@ -269,6 +277,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         }
 
         // set essential parameters after verifications
+        computeMinAndMaxScaleBounds();
         this.worldEnvelope = worldEnvelope;
         this.renderedSizePx = pixelDim;
         setPartialSideWu(partialSidePx * scale);
