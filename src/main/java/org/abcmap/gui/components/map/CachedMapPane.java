@@ -199,7 +199,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // add navigation bar
         if (val) {
-            navigationBar = new MapNavigationBar();
+            navigationBar = new MapNavigationBar(this);
             add(navigationBar);
             navigationBar.refreshBoundsFrom(getSize());
         }
