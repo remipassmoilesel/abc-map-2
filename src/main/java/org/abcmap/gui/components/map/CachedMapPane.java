@@ -1,5 +1,6 @@
 package org.abcmap.gui.components.map;
 
+import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
@@ -74,6 +75,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     private AffineTransform worldToScreenTransform;
 
     public CachedMapPane(Project p) {
+        super(new MigLayout("fill"));
 
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         addComponentListener(new RefreshMapComponentListener());
@@ -108,11 +110,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         if (debugMode) {
             //logger.warning("Repaint panel: " + this);
-        }
-
-        // refresh navigation bar
-        if (navigationBar != null) {
-            navigationBar.refreshBoundsFrom(getSize());
         }
 
         Graphics2D g2d = (Graphics2D) g;
@@ -227,8 +224,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // add navigation bar
         if (val) {
             navigationBar = new MapNavigationBar(this);
-            add(navigationBar);
-            navigationBar.refreshBoundsFrom(getSize());
+            add(navigationBar, "alignx right, aligny bottom");
         }
 
         // remove bar if present
@@ -353,44 +349,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         double y2 = worldEnvelope.getMinY() + hdg;
 
         return new ReferencedEnvelope(x1, x2, y1, y2, project.getCrs());
-    }
-
-
-    @Override
-    public void repaint(long tm, int x, int y, int width, int height) {
-        super.repaint(tm, x, y, width, height);
-
-        // refresh navigation bar
-        if (navigationBar != null) {
-            SwingUtilities.invokeLater(() -> {
-                navigationBar.refreshBoundsFrom(getSize());
-            });
-        }
-    }
-
-    @Override
-    public void revalidate() {
-        super.revalidate();
-
-        // refresh navigation bar
-        if (navigationBar != null) {
-            SwingUtilities.invokeLater(() -> {
-                navigationBar.refreshBoundsFrom(getSize());
-            });
-        }
-    }
-
-    @Override
-    public void setVisible(boolean aFlag) {
-        super.setVisible(aFlag);
-
-        // refresh navigation bar
-        // invoke it after panel is set visible (later)
-        if (navigationBar != null && aFlag) {
-            SwingUtilities.invokeLater(() -> {
-                navigationBar.refreshBoundsFrom(getSize());
-            });
-        }
     }
 
     @Override

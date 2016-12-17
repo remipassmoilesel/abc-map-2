@@ -73,35 +73,6 @@ public class MapNavigationBar extends JPanel {
     }
 
     /**
-     * Refresh position of navigation bar
-     *
-     * @param parentSize
-     */
-    public void refreshBoundsFrom(Dimension parentSize) {
-
-        // call out from EDT disturb positioning
-        GuiUtils.throwIfNotOnEDT();
-
-        // avoid uneeded calls
-        if (Utils.safeEquals(parentSize, lastParentSize)) {
-            return;
-        } else {
-            lastParentSize = new Dimension(parentSize);
-        }
-
-        Dimension navbarDims = getPreferredSize();
-
-        int x = parentSize.width - navbarDims.width;
-        int y = parentSize.height - navbarDims.height;
-        int w = navbarDims.width;
-        int h = navbarDims.height;
-
-        setBounds(x, y, w, h);
-
-        repaint();
-    }
-
-    /**
      * Perform zoom
      */
     private class ZoomActionListener implements ActionListener {
