@@ -113,6 +113,8 @@ public class ThreadManager {
      * Shutdown thread manager
      */
     public static void shutDown() {
+
+        // stop gently
         getExecutor().shutdown();
     }
 }

@@ -1,6 +1,7 @@
 package org.abcmap.gui.ie.program;
 
 import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.dialogs.QuestionResult;
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.ie.project.SaveProject;
@@ -82,6 +83,8 @@ public class QuitProgram extends InteractionElement {
             } catch (InterruptedException e) {
                 logger.error(e);
             }
+
+            ThreadManager.shutDown();
 
             // exit JVM, tchao !
             System.exit(0);
