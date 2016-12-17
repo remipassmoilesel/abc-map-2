@@ -89,13 +89,14 @@ public class RenderedPartial {
      */
     public void setImage(BufferedImage image, int width, int height) {
 
+        this.renderedWidth = width;
+        this.renderedHeight = height;
+
         if (image == null) {
-            image = waitingImage;
+            image = getWaitingImage();
         }
 
         this.imageSoftRef = new SoftReference<>(image);
-        this.renderedWidth = width;
-        this.renderedHeight = height;
     }
 
     /**
