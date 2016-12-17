@@ -5,6 +5,7 @@ import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.*;
+import org.abcmap.core.managers.LayoutManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.threads.ThreadManager;
@@ -138,6 +139,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
     protected CancelManager cancelm;
     protected ImportManager importm;
     protected DialogManager dialm;
+    protected LayoutManager laym;
 
     protected InteractionElement() {
 
@@ -152,6 +154,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
         cancelm = MainManager.getCancelManager();
         importm = MainManager.getImportManager();
         dialm = MainManager.getDialogManager();
+        laym = MainManager.getLayoutManager();
 
         this.label = "no label";
         this.help = null;

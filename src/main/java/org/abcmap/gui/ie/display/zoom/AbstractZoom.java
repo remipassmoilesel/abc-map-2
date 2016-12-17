@@ -3,6 +3,9 @@ package org.abcmap.gui.ie.display.zoom;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.ie.InteractionElement;
 
+/**
+ * Change zoom values for main map
+ */
 public abstract class AbstractZoom extends InteractionElement {
 
     private static final double SCALE_STEP = 0.2;
@@ -55,6 +58,11 @@ public abstract class AbstractZoom extends InteractionElement {
         // reset display
         else if (Direction.CENTER.equals(direction)) {
             mapm.resetDisplay();
+        }
+
+        // error
+        else {
+            throw new IllegalStateException("Unknown mode: " + direction);
         }
 
         mapm.refreshMapComponent();

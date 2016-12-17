@@ -29,6 +29,7 @@ public class MainManager {
     private static ClipboardManager clipboardManager;
     private static ImportManager importManager;
     private static DialogManager dialogManager;
+    private static LayoutManager layoutManager;
 
     /**
      * Initialize all managers
@@ -54,6 +55,7 @@ public class MainManager {
         clipboardManager = new ClipboardManager();
         importManager = new ImportManager();
         dialogManager = new DialogManager();
+        layoutManager = new LayoutManager();
 
         setInitialized(true);
     }
@@ -124,6 +126,10 @@ public class MainManager {
 
     public static DialogManager getDialogManager() {
         return dialogManager;
+    }
+
+    public static LayoutManager getLayoutManager() {
+        return layoutManager;
     }
 
     /**

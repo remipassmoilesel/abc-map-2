@@ -254,4 +254,12 @@ public class GeoUtils {
     }
 
 
+    public static String crsToString(CoordinateReferenceSystem crs) {
+        String authority = crs.getName().getAuthority() != null ? crs.getName().getAuthority() + ":" : "";
+        return authority + crs.getName().getCode();
+    }
+
+    public static CoordinateReferenceSystem stringToCrs(String crsId) throws FactoryException {
+        return CRS.decode(crsId);
+    }
 }

@@ -84,7 +84,7 @@ public class ModifyLayouts extends InteractionElement {
 
                 //projectm.setAllLayoutsActive(false);
 
-                LayoutSheet lay = new LayoutSheet(false, 200, 300, 600, 800, 210, 290, 10);
+                LayoutSheet lay = new LayoutSheet(false, 200, 300, 600, 800, 210, 290, 10, 1.5d, project.getCrs());
                 project.addLayout(lay);
             }
 

@@ -61,18 +61,17 @@ public class ManagedTask implements Runnable {
         // error happen, catch it
         catch (Throwable e) {
 
+            StringBuilder text = new StringBuilder();
+            text.append(ManagedTask.class.getSimpleName() + " #" + id + "/" + count + " - Previous calls: \n");
+            for (StackTraceElement stackTraceElement : callStack) {
+                text.append("\t" + stackTraceElement + "\n");
+            }
+            text.append("\n\n");
+
+            logger.error(e);
+            logger.error(text.toString());
+
             if (debugMode) {
-
-                StringBuilder text = new StringBuilder();
-                text.append(ManagedTask.class.getSimpleName() + " #" + id + "/" + count + " - Previous calls: \n");
-                for (StackTraceElement stackTraceElement : callStack) {
-                    text.append("\t" + stackTraceElement + "\n");
-                }
-                text.append("\n\n");
-
-                logger.error(e);
-                logger.error(text.toString());
-
                 System.err.println(e);
                 System.err.println(text);
             }

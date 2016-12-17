@@ -4,7 +4,11 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.util.Objects;
@@ -14,6 +18,8 @@ import java.util.Objects;
  */
 @DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "LAYOUTS")
 public class LayoutSheet implements DataModel {
+
+    private static final CustomLogger logger = LogManager.getLogger(LayoutSheet.class);
 
     private static final String ID_FIELD_NAME = "ID";
     private static final String IS_INDEX_FIELD_NAME = "IS_INDEX";
@@ -26,6 +32,9 @@ public class LayoutSheet implements DataModel {
     private static final String HEIGHT_MM_FIELD_NAME = "HEIGHT_MM";
 
     private static final String NUMBER_FIELD_NAME = "NUMBER";
+
+    private static final String CRS_FIELD_NAME = "CRS";
+    private static final String SCALE_FIELD_NAME = "SCALE";
 
     @DatabaseField(generatedId = true, columnName = ID_FIELD_NAME)
     private int id;
@@ -54,10 +63,17 @@ public class LayoutSheet implements DataModel {
     @DatabaseField(columnName = NUMBER_FIELD_NAME)
     private int number;
 
+    @DatabaseField(columnName = CRS_FIELD_NAME)
+    private String crsId;
+
+    @DatabaseField(columnName = SCALE_FIELD_NAME)
+    private double scale;
+
     public LayoutSheet() {
     }
 
-    public LayoutSheet(boolean index, double minx, double miny, double maxx, double maxy, double widthMm, double heightMm, int number) {
+    public LayoutSheet(boolean index, double minx, double miny, double maxx, double maxy, double widthMm, double heightMm, int number, double scale,
+                       CoordinateReferenceSystem crs) {
         this.index = index;
         this.minx = minx;
         this.miny = miny;
@@ -66,6 +82,8 @@ public class LayoutSheet implements DataModel {
         this.widthMm = widthMm;
         this.heightMm = heightMm;
         this.number = number;
+        this.scale = scale;
+        this.crsId = GeoUtils.crsToString(crs);
     }
 
     /**
@@ -231,6 +249,39 @@ public class LayoutSheet implements DataModel {
      */
     public void setNumber(int number) {
         this.number = number;
+    }
+
+    /**
+     * Return scale of sheet
+     *
+     * @return
+     */
+    public double getScale() {
+        return scale;
+    }
+
+    /**
+     * Set scale of sheet
+     *
+     * @param scale
+     */
+    public void setScale(double scale) {
+        this.scale = scale;
+    }
+
+    public ReferencedEnvelope getEnvelope() {
+
+        CoordinateReferenceSystem crs = null;
+
+        if (crsId != null) {
+            try {
+                crs = GeoUtils.stringToCrs(crsId);
+            } catch (FactoryException e) {
+                logger.error(e);
+            }
+        }
+
+        return new ReferencedEnvelope(minx, maxx, miny, maxy, crs);
     }
 
     public ReferencedEnvelope getEnvelope(CoordinateReferenceSystem crs) {

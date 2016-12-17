@@ -17,6 +17,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -421,5 +422,28 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
     public double getScale() {
         return getPartialSideWu() / getPartialSidePx();
+    }
+
+    /**
+     * Block current thread until all work of rendering is done
+     */
+    public synchronized void waitForRendering() {
+
+        Iterator<String> keys = currentPartials.keySet().iterator();
+
+        while (keys.hasNext()) {
+            String k = keys.next();
+            RenderedPartialQueryResult v = currentPartials.get(k);
+
+            while (v.isWorkDone() == false) {
+                try {
+                    wait(20);
+                } catch (InterruptedException e) {
+                    logger.error(e);
+                }
+            }
+
+        }
+
     }
 }

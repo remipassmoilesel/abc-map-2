@@ -68,4 +68,8 @@ public class RenderedPartialQueryResult {
     public ArrayList<RenderedPartial> getPartials() {
         return partials;
     }
+
+    public boolean isWorkDone() {
+        return renderingQueue.isFinished();
+    }
 }

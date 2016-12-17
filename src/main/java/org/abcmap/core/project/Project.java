@@ -2,12 +2,12 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.rendering.partials.RenderedPartialStore;
 import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.project.layers.LayerIndexEntry;
 import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.core.project.layouts.LayoutSheet;
+import org.abcmap.core.rendering.partials.RenderedPartialStore;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.tiles.TileStorage;
@@ -182,6 +182,7 @@ public class Project {
 
     /**
      * Return maximum bounds of all layers
+     * // TODO Exclude WMS layers ?
      *
      * @return
      */
