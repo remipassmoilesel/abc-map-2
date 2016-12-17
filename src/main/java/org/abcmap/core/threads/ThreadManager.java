@@ -90,12 +90,29 @@ public class ThreadManager {
         return task;
     }
 
+    /**
+     * Create thread pool if necessary and return it.
+     * Pool size will be determined by number of processors
+     * but never below 2
+     *
+     * @return
+     */
     private static ExecutorService getExecutor() {
 
         if (executor == null) {
-            executor = Executors.newFixedThreadPool(THREAD_POOL_LENGHT);
+            int nbProcs = Runtime.getRuntime().availableProcessors();
+            int nbThreads = nbProcs * 2;
+            executor = Executors.newFixedThreadPool(nbThreads);
+            //System.out.println("Initializing thread pool: " + nbProcs + " processors, threads: " + nbThreads);
         }
 
         return executor;
+    }
+
+    /**
+     * Shutdown thread manager
+     */
+    public static void shutDown() {
+        getExecutor().shutdown();
     }
 }
