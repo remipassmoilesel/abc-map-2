@@ -12,6 +12,8 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.crs.DefaultGeocentricCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.lite.StreamingRenderer;
@@ -20,21 +22,41 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.style.ContrastMethod;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Set;
 
 /**
  * Created by remipassmoilesel on 10/11/16.
  */
 public class GeoUtils {
 
+    public static final CustomLogger logger = LogManager.getLogger(GeoUtils.class);
+
+    public static final ArrayList<String> knownCrsNames = new ArrayList<>();
+    public static final ArrayList<CoordinateReferenceSystem> knownCrs = new ArrayList<>();
+
+    static {
+        // Upper case alphanum only
+        knownCrsNames.add("CARTESIAN");
+        knownCrs.add(DefaultGeocentricCRS.CARTESIAN);
+        knownCrsNames.add("WGS84");
+        knownCrs.add(DefaultGeographicCRS.WGS84);
+        knownCrsNames.add("CARTESIAN2D");
+        knownCrs.add(DefaultEngineeringCRS.CARTESIAN_2D);
+        knownCrsNames.add("GENERIC2D");
+        knownCrs.add(DefaultEngineeringCRS.GENERIC_2D);
+
+    }
+
     private static final FilterFactory ff = FeatureUtils.getFilterFactory();
     private static final StyleFactory sf = FeatureUtils.getStyleFactory();
-    public static final CustomLogger logger = LogManager.getLogger(GeoUtils.class);
+
 
     public static final CoordinateReferenceSystem WGS_84 = DefaultGeographicCRS.WGS84;
 
@@ -255,11 +277,38 @@ public class GeoUtils {
 
 
     public static String crsToString(CoordinateReferenceSystem crs) {
-        String authority = crs.getName().getAuthority() != null ? crs.getName().getAuthority() + ":" : "";
-        return authority + crs.getName().getCode();
+
+        if(crs == null){
+            throw new NullPointerException("CRS is null");
+        }
+
+        // CRS has an identifier, return it
+        Set<ReferenceIdentifier> identifiers = crs.getIdentifiers();
+        if (identifiers.size() > 0) {
+            return identifiers.iterator().next().toString();
+        }
+
+        // CRS is known, return a generic code
+        int index = knownCrs.indexOf(crs);
+        if (index > -1) {
+            return knownCrsNames.get(index);
+        }
+
+        // unknown situation, abort
+        throw new IllegalArgumentException("Unserializable CRS: " + crs);
     }
 
     public static CoordinateReferenceSystem stringToCrs(String crsId) throws FactoryException {
+
+        crsId = crsId.toUpperCase();
+
+        // check if CRS is known
+        int index = knownCrsNames.indexOf(crsId);
+        if (index > -1) {
+            return knownCrs.get(index);
+        }
+
+        // try to decode it
         return CRS.decode(crsId);
     }
 }
