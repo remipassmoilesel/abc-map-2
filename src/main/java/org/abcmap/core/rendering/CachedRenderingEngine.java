@@ -126,7 +126,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         this.worldEnvelope = project.getMaximumBounds();
 
         // limit minimum scale
-        computeMinAndMaxScaleBounds();
+        computeMinAndMaxPartialSideWu();
 
         // first time set fake pixel dimensions
         this.renderedSizePx = new Dimension(800, 800);
@@ -143,7 +143,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     /**
      * Compute minimum and maximum limit of scale
      */
-    public void computeMinAndMaxScaleBounds() {
+    private void computeMinAndMaxPartialSideWu() {
         ReferencedEnvelope world = project.getMaximumBounds();
         this.minimumPartialSideWu = (world.getMaxX() - world.getMinX()) / 10;
         this.maximumPartialSideWu = (world.getMaxX() - world.getMinX());
@@ -245,6 +245,10 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         System.out.println(partialSideWu);
         */
 
+        if (worldEnvelope == null || pixelDim == null) {
+            throw new NullPointerException("Invalid parameter: " + worldEnvelope + " / " + pixelDim);
+        }
+
         if (worldEnvelope.getMaxX() - worldEnvelope.getMinX() < 0) {
             throw new RenderingException("Invalid envelope: " + worldEnvelope);
         }
@@ -277,7 +281,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         }
 
         // set essential parameters after verifications
-        computeMinAndMaxScaleBounds();
+        computeMinAndMaxPartialSideWu();
         this.worldEnvelope = worldEnvelope;
         this.renderedSizePx = pixelDim;
         setPartialSideWu(partialSidePx * scale);
@@ -340,8 +344,13 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
     /**
      * Adapt rendering parameters to render all map
+     *
+     * @param renderedSizePx
      */
-    public void setParametersToRenderWholeMap() {
+    public void setParametersToRenderWholeMap(Dimension renderedSizePx) {
+
+        this.renderedSizePx = renderedSizePx;
+
         worldEnvelope = project.getMaximumBounds();
 
         double worldWidth = worldEnvelope.getMaxX() - worldEnvelope.getMinX();

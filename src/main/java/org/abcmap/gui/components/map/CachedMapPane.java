@@ -39,6 +39,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     private final CachedRenderingEngine renderingEngine;
 
     /**
+     *
+     */
+    private boolean firstTimeRender;
+
+    /**
      * World envelope (positions) of map rendered on panel
      */
     private ReferencedEnvelope worldEnvelope;
@@ -63,7 +68,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     /**
      * If set to true, more information are displayed
      */
-    private boolean debugMode = true;
+    private boolean debugMode;
 
     private ReferencedEnvelope lastWorldEnvelope;
     private AffineTransform worldToScreenTransform;
@@ -76,12 +81,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         this.project = p;
         this.renderingEngine = new CachedRenderingEngine(project);
 
-        // unsignificant value the first time
-        scale = 1d;
-
         // first time render whole project
-        this.worldEnvelope = project.getMaximumBounds();
-        renderingEngine.setParametersToRenderWholeMap();
+        firstTimeRender = true;
 
         // repaint when new partials are ready
         notifm = new EventNotificationManager(this);
@@ -90,13 +91,20 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         });
         renderingEngine.getNotificationManager().addObserver(this);
 
-        setDebugMode(true);
+        setDebugMode(false);
     }
-
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+
+        // don't paint before all is ready
+        if (firstTimeRender) {
+            if (debugMode) {
+                logger.warning(this.getClass().getSimpleName() + ".paintComponent(): Call rejected, before first rendering operation");
+            }
+            return;
+        }
 
         if (debugMode) {
             //logger.warning("Repaint panel: " + this);
@@ -143,9 +151,25 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         Dimension panelDimensions = getSize();
 
-        // panel is not displayed yet
+        // panel is not displayed yet, do not render
         if (panelDimensions.getWidth() < 1 || panelDimensions.getHeight() < 1) {
+            if (debugMode) {
+                logger.warning(this.getClass().getSimpleName() + ".refreshMap(): Call rejected, component too small " + panelDimensions);
+            }
             return;
+        }
+        if (this.isVisible() == false) {
+            if (debugMode) {
+                logger.warning(this.getClass().getSimpleName() + ".refreshMap(): Call rejected, component not visible");
+            }
+            return;
+        }
+
+        // first time we have to render map,
+        // render whole project
+        if (firstTimeRender) {
+            resetDisplay();
+            firstTimeRender = false;
         }
 
         try {
@@ -185,9 +209,12 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // TODO center map at a different scale ?
         // this could avoid "blank screen" when layers are large but empty
 
-        worldEnvelope = project.getMaximumBounds();
-        renderingEngine.setParametersToRenderWholeMap();
+        renderingEngine.setParametersToRenderWholeMap(getSize());
         scale = renderingEngine.getScale();
+        worldEnvelope = renderingEngine.getWorldEnvelope();
+
+        // first time width: 3000px ?
+        //System.out.println("Reset display: " + getSize() + " / " + scale + " / " + worldEnvelope + "");
     }
 
     /**
@@ -347,6 +374,19 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // refresh navigation bar
         if (navigationBar != null) {
+            SwingUtilities.invokeLater(() -> {
+                navigationBar.refreshBoundsFrom(getSize());
+            });
+        }
+    }
+
+    @Override
+    public void setVisible(boolean aFlag) {
+        super.setVisible(aFlag);
+
+        // refresh navigation bar
+        // invoke it after panel is set visible (later)
+        if (navigationBar != null && aFlag) {
             SwingUtilities.invokeLater(() -> {
                 navigationBar.refreshBoundsFrom(getSize());
             });

@@ -110,7 +110,7 @@ public class MapNavigationBar extends JPanel {
         public void actionPerformed(ActionEvent e) {
 
             String ac = e.getActionCommand();
-            
+
             // zoom in
             if (ZOOM_IN.equals(ac)) {
                 pane.setScale(pane.getScale() - scaleStep);

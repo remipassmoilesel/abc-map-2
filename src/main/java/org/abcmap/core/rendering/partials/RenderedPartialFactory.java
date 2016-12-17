@@ -123,7 +123,7 @@ public class RenderedPartialFactory {
 
         // check rendering values
         if (mapContent == null) {
-            throw new RenderingException("Noting to renderer, map content is null");
+            throw new RenderingException("Nothing to renderer, map content is null");
         }
 
         if (worldBounds == null) {
