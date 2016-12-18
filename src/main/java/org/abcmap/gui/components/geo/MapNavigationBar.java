@@ -21,22 +21,14 @@ import java.awt.event.ActionListener;
  */
 public class MapNavigationBar extends JPanel {
 
-    private static final double DEFAULT_SCALE_STEP = 0.2;
-
     private static final String ZOOM_IN = "ZOOM_IN";
     private static final String ZOOM_OUT = "ZOOM_OUT";
     private static final String CENTER = "CENTER";
-    private double scaleStep;
 
     /**
      * Panel to control
      */
     private CachedMapPane pane;
-
-    /**
-     * Last parent size, used to avoid unnecessary updates of position
-     */
-    private Dimension lastParentSize;
 
     public MapNavigationBar(CachedMapPane pane) {
         super(new MigLayout("insets 2, gap 2px"));
@@ -68,8 +60,6 @@ public class MapNavigationBar extends JPanel {
         zoomin.setCursor(GuiCursor.HAND_CURSOR);
         zoomout.setCursor(GuiCursor.HAND_CURSOR);
         center.setCursor(GuiCursor.HAND_CURSOR);
-
-        scaleStep = DEFAULT_SCALE_STEP;
     }
 
     /**
@@ -84,12 +74,12 @@ public class MapNavigationBar extends JPanel {
 
             // zoom in
             if (ZOOM_IN.equals(ac)) {
-                pane.setScale(pane.getScale() - scaleStep);
+                pane.zoomIn();
             }
 
             // zoom out
             else if (ZOOM_OUT.equals(ac)) {
-                pane.setScale(pane.getScale() + scaleStep);
+                pane.zoomOut();
             }
 
             // reset display

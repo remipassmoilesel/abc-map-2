@@ -8,7 +8,7 @@ public class DebugMenu extends InteractionElementGroup {
 
     public DebugMenu() {
 
-        label = "Debogage";
+        label = "Débogage";
 
         addInteractionElement(new ShowLastEvents());
         addInteractionElement(new CreateFakeProject());

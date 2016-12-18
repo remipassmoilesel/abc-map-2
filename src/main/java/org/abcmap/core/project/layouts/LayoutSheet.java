@@ -7,6 +7,7 @@ import org.abcmap.core.dao.DataModel;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -36,7 +37,6 @@ public class LayoutSheet implements DataModel {
     private static final String NUMBER_FIELD_NAME = "NUMBER";
 
     private static final String CRS_FIELD_NAME = "CRS";
-    private static final String SCALE_FIELD_NAME = "SCALE";
 
     @DatabaseField(generatedId = true, columnName = ID_FIELD_NAME)
     private int id;
@@ -68,9 +68,6 @@ public class LayoutSheet implements DataModel {
     @DatabaseField(columnName = CRS_FIELD_NAME)
     private String crsId;
 
-    @DatabaseField(columnName = SCALE_FIELD_NAME)
-    private double scale;
-
     public LayoutSheet() {
     }
 
@@ -84,7 +81,6 @@ public class LayoutSheet implements DataModel {
         this.widthMm = widthMm;
         this.heightMm = heightMm;
         this.number = number;
-        this.scale = scale;
         this.crsId = GeoUtils.crsToString(crs);
     }
 
@@ -205,6 +201,27 @@ public class LayoutSheet implements DataModel {
     }
 
     /**
+     * Get width converted in pixel at specified resolution
+     *
+     * @param dpi
+     * @return
+     */
+    public double getWidthPx(double dpi) {
+        return Utils.millimeterToPixel(getWidthMm(), dpi);
+    }
+
+
+    /**
+     * Get height converted in pixel at specified resolution
+     *
+     * @param dpi
+     * @return
+     */
+    public double getHeightPx(double dpi) {
+        return Utils.millimeterToPixel(getHeightMm(), dpi);
+    }
+
+    /**
      * Set width of representation in millimeters
      * <p>
      *
@@ -254,23 +271,10 @@ public class LayoutSheet implements DataModel {
     }
 
     /**
-     * Return scale of sheet
+     * Get envelope from current dimensions
      *
      * @return
      */
-    public double getScale() {
-        return scale;
-    }
-
-    /**
-     * Set scale of sheet
-     *
-     * @param scale
-     */
-    public void setScale(double scale) {
-        this.scale = scale;
-    }
-
     public ReferencedEnvelope getEnvelope() {
 
         CoordinateReferenceSystem crs = null;
@@ -283,10 +287,6 @@ public class LayoutSheet implements DataModel {
             }
         }
 
-        return new ReferencedEnvelope(minx, maxx, miny, maxy, crs);
-    }
-
-    public ReferencedEnvelope getEnvelope(CoordinateReferenceSystem crs) {
         return new ReferencedEnvelope(minx, maxx, miny, maxy, crs);
     }
 
@@ -311,13 +311,12 @@ public class LayoutSheet implements DataModel {
                 Double.compare(that.widthMm, widthMm) == 0 &&
                 Double.compare(that.heightMm, heightMm) == 0 &&
                 number == that.number &&
-                Double.compare(that.scale, scale) == 0 &&
                 Objects.equals(crsId, that.crsId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, index, minx, miny, maxx, maxy, widthMm, heightMm, number, crsId, scale);
+        return Objects.hash(id, index, minx, miny, maxx, maxy, widthMm, heightMm, number, crsId);
     }
 
     @Override
@@ -333,7 +332,6 @@ public class LayoutSheet implements DataModel {
                 ", heightMm=" + heightMm +
                 ", number=" + number +
                 ", crsId='" + crsId + '\'' +
-                ", scale=" + scale +
                 '}';
     }
 }

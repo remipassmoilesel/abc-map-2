@@ -16,14 +16,14 @@ import javax.swing.plaf.FontUIResource;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.JTextComponent;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.geom.Area;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.List;
-import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.List;
 
 public class GuiUtils {
 
@@ -887,8 +887,12 @@ public class GuiUtils {
             JFrame frame = new JFrame();
             frame.setTitle(img.toString());
 
+            // create label for image, with border
+            JLabel lbl = new JLabel(new ImageIcon(img));
+            lbl.setBorder(BorderFactory.createLineBorder(Color.blue));
+
             JPanel content = new JPanel();
-            content.add(new JLabel(new ImageIcon(img)));
+            content.add(lbl);
 
             frame.setContentPane(content);
 

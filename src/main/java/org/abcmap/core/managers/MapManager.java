@@ -18,10 +18,8 @@ public class MapManager implements HasEventNotificationManager {
     private final GuiManager guim;
 
     public MapManager() {
-
         guim = MainManager.getGuiManager();
         notifm = new EventNotificationManager(MapManager.this);
-
     }
 
     public JPanel getMapComponent() {
@@ -59,20 +57,24 @@ public class MapManager implements HasEventNotificationManager {
         return guim.getMainWindow().getMap();
     }
 
-    /**
-     * @param scaleStep
-     */
-    public void addToDisplayScale(double scaleStep) {
+    public void zoomInMainMap() {
 
         if (getMainMap() == null) {
             return;
         }
 
-        CachedMapPane pane = getMainMap();
-        pane.setScale(pane.getScale() + scaleStep);
-        pane.refreshMap();
+        getMainMap().zoomIn();
+        refreshMainMap();
+    }
 
-        refreshMapComponent();
+    public void zoomOutMainMap() {
+
+        if (getMainMap() == null) {
+            return;
+        }
+
+        getMainMap().zoomOut();
+        refreshMainMap();
     }
 
     public void resetDisplay() {
@@ -85,7 +87,7 @@ public class MapManager implements HasEventNotificationManager {
         map.repaint();
     }
 
-    public void refreshMapComponent() {
+    public void refreshMainMap() {
 
         CachedMapPane map = getMainMap();
         if (map == null) {

@@ -8,7 +8,6 @@ import org.abcmap.gui.ie.InteractionElement;
  */
 public abstract class AbstractZoom extends InteractionElement {
 
-    private static final double SCALE_STEP = 0.2;
 
     protected enum Direction {
         IN, OUT, CENTER
@@ -47,12 +46,12 @@ public abstract class AbstractZoom extends InteractionElement {
 
         // zoom in
         if (Direction.IN.equals(direction)) {
-            mapm.addToDisplayScale(-SCALE_STEP);
+            mapm.zoomInMainMap();
         }
 
         // zoom out
         else if (Direction.OUT.equals(direction)) {
-            mapm.addToDisplayScale(SCALE_STEP);
+            mapm.zoomOutMainMap();
         }
 
         // reset display
@@ -65,7 +64,7 @@ public abstract class AbstractZoom extends InteractionElement {
             throw new IllegalStateException("Unknown mode: " + direction);
         }
 
-        mapm.refreshMapComponent();
+        mapm.refreshMainMap();
 
     }
 

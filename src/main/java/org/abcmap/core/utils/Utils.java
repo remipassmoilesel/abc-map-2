@@ -931,12 +931,10 @@ public class Utils {
         return rslt.substring(0, length);
     }
 
-    public static int SCREEN_RES = Toolkit.getDefaultToolkit().getScreenResolution();
-
     /**
      * Convert pixels to millimeter at specified resolution
      * <p>
-     * Use SCREEN_RES for screen resolution
+     * Use getScreenResolution() for screen resolution
      *
      * @param pixel
      * @param dpiRes
@@ -960,4 +958,12 @@ public class Utils {
         return millimeter / 25.40d * dpiRes;
     }
 
+    /**
+     * Get current screen resolution
+     *
+     * @return
+     */
+    public static double getScreenResolution() {
+        return Toolkit.getDefaultToolkit().getScreenResolution();
+    }
 }

@@ -42,7 +42,7 @@ public class CachedRenderingEngineTest {
         // test waiting
         long before = System.currentTimeMillis();
         CachedRenderingEngine renderer = new CachedRenderingEngine(project);
-        renderer.prepareMap(project.getMaximumBounds(), imageDimension, 1);
+        renderer.prepareMap(project.getMaximumBounds(), imageDimension);
 
         renderer.waitForRendering();
 

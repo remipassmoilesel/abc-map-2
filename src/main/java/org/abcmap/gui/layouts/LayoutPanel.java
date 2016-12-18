@@ -43,33 +43,37 @@ public class LayoutPanel extends JPanel {
 
         // add control pane on right
         controlPaneWidthPx = 50;
-        JPanel controlPane = new JPanel(new MigLayout("fillx, width " + controlPaneWidthPx + "!"));
+        JPanel controlPane = new JPanel(new MigLayout("inset 0, gap 0, fillx, width " + controlPaneWidthPx + "!"));
         HtmlCheckbox chkActive = new HtmlCheckbox("");
         JButton btnReset = new JButton(GuiIcons.MAP_MOVECENTER);
         btnReset.addActionListener((ev) -> {
             mapPane.resetDisplay();
             mapPane.refreshMap();
-            updateLayoutFromMap();
+            updateLayoutFromPanel();
         });
         controlPane.add(chkActive, "alignx center, height 25px!, wrap 15");
-        controlPane.add(btnReset, "alignx center, height 25px!, width " + (GuiIcons.MAP_MOVECENTER.getImage().getWidth(null) + 5) + "px!, wrap 15");
+        controlPane.add(btnReset, "alignx center, height 25px!, width "
+                + (GuiIcons.MAP_MOVECENTER.getImage().getWidth(null) + 6) + "px!, wrap 15");
         add(controlPane, BorderLayout.EAST);
 
         // update layout when user use map
         MouseAdapter layoutUpdater = new MouseAdapter() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                updateLayoutFromMap();
+                updateLayoutFromPanel();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                updateLayoutFromMap();
+                updateLayoutFromPanel();
             }
         };
         mapPane.addMouseListener(layoutUpdater);
         mapPane.addMouseWheelListener(layoutUpdater);
+
+        updatePanelFromLayout();
     }
+
 
     private void refresh() {
         computeMaxDimensions();
@@ -150,9 +154,23 @@ public class LayoutPanel extends JPanel {
         refresh();
     }
 
-    private void updateLayoutFromMap() {
-        layout.setEnvelope(mapPane.getActualWorldEnvelope());
-        layout.setScale(mapPane.getScale());
+    /**
+     * Update layout parameters by using parameters from panel
+     */
+    private void updateLayoutFromPanel() {
+
+        // update world envelope
+        layout.setEnvelope(mapPane.getWorldEnvelope());
+    }
+
+    /**
+     * Update panel parameters by using layout parameters
+     */
+    private void updatePanelFromLayout() {
+
+        // update world envelope
+        mapPane.setWorldEnvelope(layout.getEnvelope());
+
     }
 
 }

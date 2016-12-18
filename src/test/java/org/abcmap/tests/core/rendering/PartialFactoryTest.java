@@ -108,8 +108,6 @@ public class PartialFactoryTest {
             Runnable runWindow = () -> {
 
                 CachedMapPane pane = new CachedMapPane(project);
-
-                pane.setScale(2); // TODO to check
                 pane.setDebugMode(true);
                 pane.setMouseManagementEnabled(true);
 

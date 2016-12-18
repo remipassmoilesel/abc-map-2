@@ -13,12 +13,10 @@ import java.awt.event.MouseWheelEvent;
 public class CachedMapPaneMouseController extends MouseAdapter {
 
     private final CachedMapPane pane;
-    private double zoomUnitIncrement;
     private Point lastPosition;
 
     public CachedMapPaneMouseController(CachedMapPane pane) {
         this.pane = pane;
-        this.zoomUnitIncrement = 0.3;
     }
 
     @Override
@@ -71,23 +69,14 @@ public class CachedMapPaneMouseController extends MouseAdapter {
     public void mouseWheelMoved(MouseWheelEvent e) {
         super.mouseWheelMoved(e);
 
-        double zoomUnit = zoomUnitIncrement;
-
         if (e.getWheelRotation() < 0) {
-            zoomUnit = -zoomUnit;
+            pane.zoomIn();
+        } else {
+            pane.zoomOut();
         }
 
-
-        pane.setScale(pane.getScale() + zoomUnit);
         pane.refreshMap();
 
     }
 
-    public void setZoomUnitIncrement(double zoomUnitIncrement) {
-        this.zoomUnitIncrement = zoomUnitIncrement;
-    }
-
-    public double getZoomUnitIncrement() {
-        return zoomUnitIncrement;
-    }
 }

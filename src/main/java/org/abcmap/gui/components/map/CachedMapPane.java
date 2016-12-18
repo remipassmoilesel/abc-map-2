@@ -40,7 +40,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     private final CachedRenderingEngine renderingEngine;
 
     /**
-     *
+     * If true, it is the first time panel is rendering
      */
     private boolean firstTimeRender;
 
@@ -60,19 +60,18 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     private MapNavigationBar navigationBar;
 
     /**
-     * Current scale of map
-     */
-    private double scale;
-
-    private final EventNotificationManager notifm;
-
-    /**
      * If set to true, more information are displayed
      */
     private boolean debugMode;
 
+    /**
+     * Step in world unit, which will be used to enlarge or shrink world envelope
+     */
+    private double zoomStep;
+
     private ReferencedEnvelope lastWorldEnvelope;
     private AffineTransform worldToScreenTransform;
+    private final EventNotificationManager notifm;
 
     public CachedMapPane(Project p) {
         super(new MigLayout("fill"));
@@ -93,7 +92,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         });
         renderingEngine.getNotificationManager().addObserver(this);
 
-        setDebugMode(false);
+        setDebugMode(true);
     }
 
     @Override
@@ -106,10 +105,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
                 logger.warning(this.getClass().getSimpleName() + ".paintComponent(): Call rejected, before first rendering operation");
             }
             return;
-        }
-
-        if (debugMode) {
-            //logger.warning("Repaint panel: " + this);
         }
 
         Graphics2D g2d = (Graphics2D) g;
@@ -170,10 +165,13 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         }
 
         try {
-            renderingEngine.prepareMap(worldEnvelope, panelDimensions, scale);
+            renderingEngine.prepareMap(worldEnvelope, panelDimensions);
         } catch (RenderingException e) {
             logger.error(e);
         }
+
+        // update zoom step value from rendering engine (project bounds)
+        computeZoomStep();
 
         // repaint component
         repaint();
@@ -181,21 +179,48 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     }
 
     /**
-     * Get current scale in panel
+     * Pixel scale can be used to translate summary pixels to world unit
      *
      * @return
      */
     public double getScale() {
-        return renderingEngine.getPartialSideWu() / renderingEngine.getPartialSidePx();
+        return renderingEngine.getScale();
     }
 
     /**
-     * Set current scale in panel
+     * Compute size of zoom step, in world unit
      *
      * @return
      */
-    public void setScale(double scale) {
-        this.scale = scale;
+    private void computeZoomStep() {
+        zoomStep = (renderingEngine.getMaximumPartialSideWu() - renderingEngine.getMinimumPartialSideWu()) / 20;
+    }
+
+    /**
+     * Zoom in one increment
+     */
+    public void zoomIn() {
+
+        double minx = worldEnvelope.getMinX() + zoomStep;
+        double miny = worldEnvelope.getMinY() + zoomStep;
+        double maxx = worldEnvelope.getMaxX() - zoomStep;
+        double maxy = worldEnvelope.getMaxY() - zoomStep;
+
+        worldEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, worldEnvelope.getCoordinateReferenceSystem());
+    }
+
+    /**
+     * Zoom out one increment
+     */
+    public void zoomOut() {
+
+        double minx = worldEnvelope.getMinX() - zoomStep;
+        double miny = worldEnvelope.getMinY() - zoomStep;
+        double maxx = worldEnvelope.getMaxX() + zoomStep;
+        double maxy = worldEnvelope.getMaxY() + zoomStep;
+
+        worldEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, worldEnvelope.getCoordinateReferenceSystem());
+
     }
 
     /**
@@ -207,7 +232,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // this could avoid "blank screen" when layers are large but empty
 
         renderingEngine.setParametersToRenderWholeMap(getSize());
-        scale = renderingEngine.getScale();
         worldEnvelope = renderingEngine.getWorldEnvelope();
 
         // first time width: 3000px ?
@@ -320,35 +344,12 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     }
 
     /**
-     * Get specified world envelope shown. It can be larger or greater than actual map shown
+     * Get specified world envelope to show
      *
      * @return
      */
     public ReferencedEnvelope getWorldEnvelope() {
         return new ReferencedEnvelope(worldEnvelope);
-    }
-
-    /**
-     * Get shown world envelope, corresponding to component size
-     *
-     * @return
-     */
-    public ReferencedEnvelope getActualWorldEnvelope() {
-
-        Dimension panelDimensionsPx = getSize();
-
-        // get width and height in world unit
-        double partialSidePx = renderingEngine.getPartialSidePx();
-        double partialSideWu = renderingEngine.getPartialSideWu();
-        double wdg = partialSideWu * panelDimensionsPx.width / partialSidePx;
-        double hdg = partialSideWu * panelDimensionsPx.height / partialSidePx;
-
-        double x1 = worldEnvelope.getMinX();
-        double x2 = worldEnvelope.getMinX() + wdg;
-        double y1 = worldEnvelope.getMinY();
-        double y2 = worldEnvelope.getMinY() + hdg;
-
-        return new ReferencedEnvelope(x1, x2, y1, y2, project.getCrs());
     }
 
     @Override
