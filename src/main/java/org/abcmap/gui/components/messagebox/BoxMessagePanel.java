@@ -1,5 +1,6 @@
 package org.abcmap.gui.components.messagebox;
 
+import org.abcmap.gui.HtmlLabel;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
@@ -8,79 +9,67 @@ import java.awt.*;
 /**
  * Message box which an appear on screen to inform user and disappear after a little time
  */
-public class BoxMessagePanel extends JPanel {
+public class BoxMessagePanel extends HtmlLabel {
 
-    private JLabel label;
-    private Font font;
-    private Color bgColor;
-    private Color fgColor;
-    private float transparency = 0.8f;
+    private float transparency = 0.9f;
 
     public BoxMessagePanel() {
         super();
 
         this.setLayout(new BorderLayout());
 
-        // main label
-        label = new JLabel();
-        label.setOpaque(false);
-        label.setHorizontalAlignment(SwingConstants.CENTER);
-        label.setVerticalAlignment(SwingConstants.CENTER);
-
-        font = new Font(Font.DIALOG, Font.BOLD, 18);
-        setMessageFont(font);
+        setOpaque(true);
+        setBorder(null);
+        setHorizontalAlignment(SwingConstants.CENTER);
+        setVerticalAlignment(SwingConstants.CENTER);
+        setFont(new Font(Font.DIALOG, Font.BOLD, 16));
 
         // default colors
-        bgColor = Color.black;
-        fgColor = Color.white;
-
-        setOpaque(true);
-        setBackground(bgColor);
-        label.setForeground(fgColor);
+        setForeground(Color.white);
+        setBackground(Color.black);
 
         setPreferredSize(new Dimension(600, 60));
-
-        add(label, BorderLayout.CENTER);
 
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        if (transparency != 1f) {
-            ((Graphics2D) g).setComposite(GuiUtils.createTransparencyComposite(transparency));
-        }
+        ((Graphics2D) g).setComposite(GuiUtils.createTransparencyComposite(transparency));
         super.paintComponent(g);
     }
 
-    public void setMessage(String text) {
-        label.setText(text);
-    }
-
-    public void refresh() {
-
-        label.revalidate();
-        label.repaint();
-
-        revalidate();
-        repaint();
-
-    }
-
-    public void setMessageFont(Font font) {
-        this.font = font;
-        if (label != null) {
-            label.setFont(font);
-        }
-    }
-
-    @Override
-    public void setBackground(Color bg) {
-        bgColor = bg;
-        super.setBackground(bg);
-    }
-
+    /**
+     * Set transparency
+     *
+     * @param transparency
+     */
     public void setTransparency(float transparency) {
         this.transparency = transparency;
     }
 
+    /**
+     * Get current transparency
+     *
+     * @return
+     */
+    public float getTransparency() {
+        return transparency;
+    }
+
+    /**
+     * Add value to current transparency
+     *
+     * @param increment
+     */
+    public void addTransparencyValue(float increment) {
+
+        transparency += increment;
+
+        // check interval
+        if (transparency > 1) {
+            transparency = 1;
+        } else if (transparency < 0) {
+            transparency = 0;
+        }
+    }
 }

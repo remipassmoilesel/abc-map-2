@@ -4,6 +4,7 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.color.ColorPicker;
+import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,26 +13,39 @@ import java.awt.event.MouseEvent;
 
 /**
  * Display a message on screen to inform user. Message disappear after a little time.
- *
+ * <p>
  * // TODO: handle multiple Threads: what happen if multiple simultaneous call ?
- *
  */
 public class MessageBoxManager {
 
     private static final CustomLogger logger = LogManager.getLogger(ColorPicker.class);
 
-    private JFrame frame;
-    private BoxMessagePanel messagePanel;
-    private JPopupMenu popup;
-    private Integer defaultTime;
+    private final int transpInterval = 50;
+    private final float transpIncrement = 0.1f;
 
-    public MessageBoxManager() {
-        this(null);
-    }
+    /**
+     * Parent frame of message box
+     */
+    private JFrame parentFrame;
+
+    /**
+     * Where is displayed message
+     */
+    private BoxMessagePanel messagePanel;
+
+    /**
+     * Popup hold message panel
+     */
+    private JPopupMenu popup;
+
+    /**
+     * If no time is specified, this one is used
+     */
+    private Integer defaultTime;
 
     public MessageBoxManager(JFrame parent) {
 
-        this.frame = parent;
+        this.parentFrame = parent;
 
         this.messagePanel = new BoxMessagePanel();
 
@@ -47,10 +61,11 @@ public class MessageBoxManager {
 
     }
 
-    public void setFrame(JFrame frame) {
-        this.frame = frame;
-    }
-
+    /**
+     * Show a message in box
+     *
+     * @param message
+     */
     public void showMessage(String message) {
         showMessage(defaultTime, message);
     }
@@ -73,63 +88,78 @@ public class MessageBoxManager {
         SwingUtilities.invokeLater(() -> {
 
             // do not show if main window is not visible
-            if (frame == null) {
+            if (parentFrame == null) {
                 return;
             }
 
             if (popup == null) {
                 popup = new JPopupMenu();
-                popup.add(messagePanel);
+                popup.setOpaque(false);
+
+                JPanel support = new JPanel(new BorderLayout());
+                support.add(messagePanel, BorderLayout.CENTER);
+
+                popup.setBorder(null);
+                popup.add(support);
                 popup.pack();
             }
 
             // set message
-            messagePanel.setMessage("<html><center>" + message + "</center></html>");
-            messagePanel.refresh();
+            messagePanel.setText("<center>" + message + "</center>");
+            messagePanel.revalidate();
+            messagePanel.repaint();
 
             // compute dimensions
-            Dimension df = frame.getSize();
+            Dimension df = parentFrame.getSize();
             Dimension dm = messagePanel.getPreferredSize();
 
             int x = (df.width - dm.width) / 2;
-
             int y = (int) (df.height - (df.height * 0.20f) - dm.height);
 
             try {
-                popup.show(frame.getContentPane(), x, y);
+                messagePanel.setTransparency(0);
+                popup.show(parentFrame.getContentPane(), x, y);
+
+                // fade in label
+                ThreadManager.runLater(() -> {
+
+                    GuiUtils.throwIfOnEDT();
+
+                    synchronized (this) {
+                        while (messagePanel.getTransparency() < 1) {
+                            try {
+                                wait(transpInterval);
+                            } catch (InterruptedException e) {
+                                logger.error(e);
+                            }
+                            messagePanel.addTransparencyValue(transpIncrement);
+                            messagePanel.revalidate();
+                            messagePanel.repaint();
+                        }
+                    }
+                });
+
+                // hide label
+                ThreadManager.runLater(() -> {
+                    popup.setVisible(false);
+                }, true, timeMilliSec + 1);
+
             } catch (Exception e) {
                 logger.error(e);
             }
 
-            // launch a closing timer
-            ThreadManager.runLater(new ClosingTask(popup), true, defaultTime);
-
         });
     }
 
+    /**
+     * Set background color of panel to indicate if it is an error or just information
+     *
+     * @param background
+     */
     public void setBackgroundColor(Color background) {
         messagePanel.setBackground(background);
-        messagePanel.refresh();
-    }
-
-    /**
-     * Close message box pop up
-     */
-    private class ClosingTask implements Runnable {
-
-        private JPopupMenu origin;
-
-        public ClosingTask(JPopupMenu origin) {
-            this.origin = origin;
-        }
-
-        public void run() {
-            if (popup == origin) {
-                // TODO: play with transparency
-                popup.setVisible(false);
-            }
-
-        }
+        messagePanel.revalidate();
+        messagePanel.repaint();
     }
 
 }
