@@ -18,7 +18,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.ArrayList;
 
 /**
  * Here are managed all operations concerning projects
@@ -168,7 +167,6 @@ public class ProjectManager implements HasEventNotificationManager {
         GuiUtils.throwIfOnEDT();
 
         ProjectWriter writer = new ProjectWriter();
-        Path tempDir = tempMan.createTempDirectory(currentProject.getTempDirectory());
         try {
             writer.export(currentProject, p);
         } catch (IOException e) {
@@ -184,37 +182,20 @@ public class ProjectManager implements HasEventNotificationManager {
 
         GuiUtils.throwIfOnEDT();
 
-        String root = "/tiles/osm_";
-
         createNewProject();
-
         Project project = getProject();
 
         // create a tile layer
         TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 0);
 
-        // TODO: get more realistic coordinates
-        ArrayList<Coordinate> positions = new ArrayList();
-        positions.add(new Coordinate(0, 0));
-        positions.add(new Coordinate(-520.4633750915527, -18.264129638671875));
-        positions.add(new Coordinate(-1078.8829231262207, 257.2473449707031));
-        positions.add(new Coordinate(-1078.8697395324707, 32.2457275390625));
-
-        int totalToInsert = 4;
-        for (int i = 0; i < totalToInsert; i++) {
-
-            String imgPath = root + (i + 1) + ".png";
-
-            InputStream res = ProjectManager.class.getResourceAsStream(imgPath);
-            if (res == null) {
-                throw new IOException("Image is null: " + imgPath);
-            }
-
-            BufferedImage img = ImageIO.read(res);
-
-            layer.addTile(img, positions.get(i));
+        String imgPath = "/tiles/osm_large.png";
+        InputStream res = ProjectManager.class.getResourceAsStream(imgPath);
+        if (res == null) {
+            throw new IOException("Image is null: " + imgPath);
         }
 
+        BufferedImage img = ImageIO.read(res);
+        layer.addTile(img, new Coordinate(45.60443, 4.082794));
         layer.refreshCoverage();
 
         // second notification sent
