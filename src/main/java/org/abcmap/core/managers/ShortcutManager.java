@@ -74,7 +74,7 @@ public class ShortcutManager {
 	public final KeyStroke GEOREF_TOOL = KeyStroke.getKeyStroke("alt G");
 	public final KeyStroke TILE_TOOL = KeyStroke.getKeyStroke("alt T");
 	public final KeyStroke ELLIPSE_TOOL = KeyStroke.getKeyStroke("alt E");
-	public final KeyStroke POLYLINE_TOOL = KeyStroke.getKeyStroke("alt P");
+	public final KeyStroke LINE_TOOL = KeyStroke.getKeyStroke("alt P");
 	public final KeyStroke POLYGON_TOOL = KeyStroke.getKeyStroke("alt shift P");
 	public final KeyStroke LABEL_TOOL = KeyStroke.getKeyStroke("alt L");
 	public final KeyStroke SYMBOL_TOOL = KeyStroke.getKeyStroke("alt shift S");

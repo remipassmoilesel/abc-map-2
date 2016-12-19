@@ -122,7 +122,7 @@ public class GuiIcons {
     public static final ImageIcon TOOL_ELLIPSE = getIcon(TOOLS_DIR + "tool_ellipse.png");
     public static final ImageIcon TOOL_RECTANGLE = getIcon(TOOLS_DIR + "tool_rectangle.png");
     public static final ImageIcon TOOL_POLYGON = getIcon(TOOLS_DIR + "tool_polygone.png");
-    public static final ImageIcon TOOL_POLYLINE = getIcon(TOOLS_DIR + "tool_polyline.png");
+    public static final ImageIcon TOOL_LINE = getIcon(TOOLS_DIR + "tool_polyline.png");
     public static final ImageIcon TOOL_IMAGE = getIcon(TOOLS_DIR + "tool_image.png");
     public static final ImageIcon TOOL_SYMBOL = getIcon(TOOLS_DIR + "tool_symbol.png");
     public static final ImageIcon TOOL_TILE = getIcon(TOOLS_DIR + "tool_tile.png");

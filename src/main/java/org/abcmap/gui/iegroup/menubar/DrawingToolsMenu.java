@@ -2,8 +2,8 @@ package org.abcmap.gui.iegroup.menubar;
 
 import org.abcmap.gui.ie.InteractionElement;
 import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.tools.ToolContainer;
-import org.abcmap.gui.tools.ToolLibrary;
+import org.abcmap.gui.tools.containers.ToolContainer;
+import org.abcmap.gui.tools.containers.ToolLibrary;
 
 import java.awt.event.ActionEvent;
 
@@ -13,7 +13,7 @@ public class DrawingToolsMenu extends InteractionElementGroup {
 
         label = "Outils de dessin";
 
-        ToolContainer[] tcs = ToolLibrary.getAvailablesTools();
+        ToolContainer[] tcs = ToolLibrary.getAvailableTools();
 
         for (ToolContainer tc : tcs) {
             ToolInteractionElement ie = new ToolInteractionElement(tc);

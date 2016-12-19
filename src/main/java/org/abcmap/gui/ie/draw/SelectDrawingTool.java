@@ -1,5 +1,6 @@
 package org.abcmap.gui.ie.draw;
 
+import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.ToolSelectionPanel;
 import org.abcmap.gui.ie.InteractionElement;
 
@@ -31,17 +32,16 @@ public class SelectDrawingTool extends InteractionElement {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-			/*
-            // l'outil du manager
-			String managerToolId = drawm.getCurrentToolContainer().getId();
+            // id of current tool
+            String managerToolId = drawm.getCurrentToolContainer().getId();
 
-			// l'outil appelant
-			String toolId = e.getActionCommand();
+            // lnew tool
+            String toolId = e.getActionCommand();
 
-			if (Utils.safeEquals(managerToolId, toolId) == false) {
-				drawm.setCurrentTool(toolId);
-			}
-			*/
+            if (Utils.safeEquals(managerToolId, toolId) == false) {
+                drawm.setCurrentTool(toolId);
+            }
+
         }
 
     }

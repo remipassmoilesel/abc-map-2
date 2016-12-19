@@ -1,4 +1,4 @@
-package org.abcmap.gui.tools;
+package org.abcmap.gui.tools.containers;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
@@ -7,14 +7,26 @@ import org.abcmap.core.managers.ShortcutManager;
 import org.abcmap.core.project.ProjectWriter;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.help.InteractionSequence;
+import org.abcmap.gui.tools.MapTool;
 import org.abcmap.gui.tools.options.ToolOptionPanel;
 
 import javax.swing.*;
 
+
+/**
+ * Tool container wrap metadata of tools
+ * <p>
+ * Each container should be able to create tool instances, option panel instances,
+ * <p>
+ * and to keep metadata like name, icon, keyboard, shortcut...
+ */
 public class ToolContainer {
 
     private static final CustomLogger logger = LogManager.getLogger(ProjectWriter.class);
 
+    /**
+     * Current instance of tool
+     */
     protected MapTool currentInstance;
 
     /**
@@ -63,6 +75,11 @@ public class ToolContainer {
         this.shortcuts = MainManager.getShortcutManager();
     }
 
+    /**
+     * Get current tool option panel instance
+     *
+     * @return
+     */
     public ToolOptionPanel getOptionPanel() {
         if (optionPanel == null) {
             return createToolOptionPanel();
@@ -71,6 +88,11 @@ public class ToolContainer {
         }
     }
 
+    /**
+     * Create a tool option panel
+     *
+     * @return
+     */
     protected ToolOptionPanel createToolOptionPanel() {
 
         if (optionPanelClass != null) {
@@ -85,18 +107,6 @@ public class ToolContainer {
         return optionPanel;
     }
 
-    public String getReadableName() {
-        return readableName;
-    }
-
-    public ImageIcon getIcon() {
-        return icon;
-    }
-
-    public String getId() {
-        return id;
-    }
-
     @Override
     public boolean equals(Object obj) {
 
@@ -109,6 +119,11 @@ public class ToolContainer {
 
     }
 
+    /**
+     * Create a new instance of tool
+     *
+     * @return
+     */
     public MapTool getNewInstance() {
 
         if (toolClass == null) {
@@ -127,15 +142,58 @@ public class ToolContainer {
 
     }
 
+    /**
+     * Return current instance of map tool. Each time a new tool is enabled, a new instance is created.
+     *
+     * @return
+     */
     public MapTool getCurrentInstance() {
         return currentInstance;
     }
 
+    /**
+     * Get keyboard accelerator of tool
+     *
+     * @return
+     */
     public KeyStroke getAccelerator() {
         return accelerator;
     }
 
+    /**
+     * Get interactions possible with tool
+     *
+     * @return
+     */
     public InteractionSequence[] getInteractions() {
         return interactionsSequences;
     }
+
+    /**
+     * Get name displayable on interface
+     *
+     * @return
+     */
+    public String getReadableName() {
+        return readableName;
+    }
+
+    /**
+     * Get icon associated with tool
+     *
+     * @return
+     */
+    public ImageIcon getIcon() {
+        return icon;
+    }
+
+    /**
+     * Get ID of tool
+     *
+     * @return
+     */
+    public String getId() {
+        return id;
+    }
+
 }
