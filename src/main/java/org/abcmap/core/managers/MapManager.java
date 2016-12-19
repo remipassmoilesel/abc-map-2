@@ -6,8 +6,8 @@ import org.abcmap.gui.components.map.CachedMapPane;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Point2D;
 
 /**
  * Created by remipassmoilesel on 08/12/16.
@@ -16,34 +16,12 @@ public class MapManager implements HasEventNotificationManager {
 
     private final EventNotificationManager notifm;
     private final GuiManager guim;
+    public MainMapBinding mainmap;
 
     public MapManager() {
         guim = MainManager.getGuiManager();
         notifm = new EventNotificationManager(MapManager.this);
-    }
-
-    public JPanel getMapComponent() {
-        return new JPanel();
-    }
-
-    public boolean isGeoreferencementEnabled() {
-        return false;
-    }
-
-    public int getDisplayScale() {
-        return 0;
-    }
-
-    public Point getScaledPoint(Point point) {
-        return point;
-    }
-
-    public CoordinateReferenceSystem getCRS(String code) {
-        return DefaultGeographicCRS.WGS84;
-    }
-
-    public static String getEpsgCode(CoordinateReferenceSystem system) {
-        return "";
+        mainmap = new MainMapBinding();
     }
 
     /**
@@ -57,45 +35,74 @@ public class MapManager implements HasEventNotificationManager {
         return guim.getMainWindow().getMap();
     }
 
-    public void zoomInMainMap() {
+    /**
+     * Sub name space grouping method working on main map only
+     * <p>
+     * All methods here should work without throwing exceptions
+     */
+    public class MainMapBinding {
 
-        if (getMainMap() == null) {
-            return;
+        public Point2D screenToWorld(Point point) {
+
+            if (getMainMap() == null || getMainMap().getScreenToWorldTransform() == null) {
+                return null;
+            }
+
+            return getMainMap().getWorldToScreenTransform().transform(point, null);
         }
 
-        getMainMap().zoomIn();
-        refreshMainMap();
+        public void zoomIn() {
+
+            if (getMainMap() == null) {
+                return;
+            }
+
+            getMainMap().zoomIn();
+            refresh();
+        }
+
+        public void zoomOut() {
+
+            if (getMainMap() == null) {
+                return;
+            }
+
+            getMainMap().zoomOut();
+            refresh();
+        }
+
+        public void resetDisplay() {
+            if (getMainMap() == null) {
+                return;
+            }
+
+            CachedMapPane map = getMainMap();
+            map.resetDisplay();
+            map.repaint();
+        }
+
+        public void refresh() {
+
+            CachedMapPane map = getMainMap();
+            if (map == null) {
+                return;
+            }
+
+            map.refreshMap();
+            map.repaint();
+        }
     }
 
-    public void zoomOutMainMap() {
-
-        if (getMainMap() == null) {
-            return;
-        }
-
-        getMainMap().zoomOut();
-        refreshMainMap();
+    public boolean isGeoreferencementEnabled() {
+        return false;
     }
 
-    public void resetDisplay() {
-        if (getMainMap() == null) {
-            return;
-        }
-
-        CachedMapPane map = getMainMap();
-        map.resetDisplay();
-        map.repaint();
+    public CoordinateReferenceSystem getCRS(String code) {
+        return DefaultGeographicCRS.WGS84;
     }
 
-    public void refreshMainMap() {
-
-        CachedMapPane map = getMainMap();
-        if (map == null) {
-            return;
-        }
-
-        map.refreshMap();
-        map.repaint();
+    public static String getEpsgCode(CoordinateReferenceSystem system) {
+        return "";
     }
 
     @Override
