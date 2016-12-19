@@ -7,10 +7,8 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.rendering.CachedRenderingEngine;
-import org.abcmap.core.rendering.RenderingException;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.renderer.lite.RendererUtilities;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,14 +62,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     private boolean debugMode;
 
-    /**
-     * Step in world unit, which will be used to enlarge or shrink world envelope
-     */
-    private double zoomStep;
-
-    private ReferencedEnvelope lastWorldEnvelope;
-    private AffineTransform worldToScreenTransform;
     private final EventNotificationManager notifm;
+
 
     public CachedMapPane(Project p) {
         super(new MigLayout("fill"));
@@ -107,31 +99,32 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             return;
         }
 
+        // paint map
         Graphics2D g2d = (Graphics2D) g;
-
         renderingEngine.paint(g2d);
 
+        // if debug mode enabled, paint world envelope asked
         if (debugMode) {
 
-            if (lastWorldEnvelope == null || lastWorldEnvelope.equals(worldEnvelope) == false) {
-                worldToScreenTransform = RendererUtilities.worldToScreenTransform(worldEnvelope, new Rectangle(getSize()));
-                lastWorldEnvelope = new ReferencedEnvelope(worldEnvelope);
+            AffineTransform worldToScreenTransform = getWorldToScreenTransform();
+            if (worldToScreenTransform != null) {
+
+                Point2D blc = new Point2D.Double(worldEnvelope.getMinX(), worldEnvelope.getMinY());
+                Point2D urc = new Point2D.Double(worldEnvelope.getMaxX(), worldEnvelope.getMaxY());
+                blc = worldToScreenTransform.transform(blc, null);
+                urc = worldToScreenTransform.transform(urc, null);
+
+                int x = (int) blc.getX();
+                int y = (int) urc.getY();
+                int w = (int) Math.abs(urc.getX() - blc.getX());
+                int h = (int) Math.abs(urc.getY() - blc.getY());
+
+                g2d.setColor(Color.blue);
+                int st = 2;
+                g2d.setStroke(new BasicStroke(st));
+                g2d.drawRect(x + st, y + st, w - st * 2, h - st * 2);
+
             }
-
-            Point2D blc = new Point2D.Double(worldEnvelope.getMinX(), worldEnvelope.getMinY());
-            Point2D urc = new Point2D.Double(worldEnvelope.getMaxX(), worldEnvelope.getMaxY());
-            blc = worldToScreenTransform.transform(blc, null);
-            urc = worldToScreenTransform.transform(urc, null);
-
-            int x = (int) blc.getX();
-            int y = (int) urc.getY();
-            int w = (int) Math.abs(urc.getX() - blc.getX());
-            int h = (int) Math.abs(urc.getY() - blc.getY());
-
-            g2d.setColor(Color.blue);
-            int st = 2;
-            g2d.setStroke(new BasicStroke(st));
-            g2d.drawRect(x + st, y + st, w - st * 2, h - st * 2);
         }
     }
 
@@ -164,14 +157,12 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             firstTimeRender = false;
         }
 
+        // prepare map to render
         try {
             renderingEngine.prepareMap(worldEnvelope, panelDimensions);
-        } catch (RenderingException e) {
+        } catch (Exception e) {
             logger.error(e);
         }
-
-        // update zoom step value from rendering engine (project bounds)
-        computeZoomStep();
 
         // repaint component
         repaint();
@@ -188,39 +179,70 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     }
 
     /**
-     * Compute size of zoom step, in world unit
-     *
-     * @return
+     * @param direction
      */
-    private void computeZoomStep() {
-        zoomStep = (renderingEngine.getMaximumPartialSideWu() - renderingEngine.getMinimumPartialSideWu()) / 20;
+    private void zoomEnvelope(int direction) {
+
+        double projectWidth = worldEnvelope.getMaxX() - worldEnvelope.getMinX();
+        double projectHeight = worldEnvelope.getMaxY() - worldEnvelope.getMinY();
+        double zoomStepW = (renderingEngine.getMaximumPartialSideWu() - renderingEngine.getMinimumPartialSideWu()) / 30;
+        double zoomStepH = projectHeight * zoomStepW / projectWidth;
+
+        double minx;
+        double maxx;
+        double miny;
+        double maxy;
+
+        ReferencedEnvelope newEnv;
+
+        // zoom in
+        if (direction > 0) {
+            minx = worldEnvelope.getMinX() + zoomStepW;
+            maxx = worldEnvelope.getMaxX() - zoomStepW;
+
+            miny = worldEnvelope.getMinY() + zoomStepH;
+            maxy = worldEnvelope.getMaxY() - zoomStepH;
+
+            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, worldEnvelope.getCoordinateReferenceSystem());
+
+        }
+
+        // zoom out
+        else if (direction < 0) {
+
+            minx = worldEnvelope.getMinX() - zoomStepW;
+            maxx = worldEnvelope.getMaxX() + zoomStepW;
+
+            miny = worldEnvelope.getMinY() - zoomStepH;
+            maxy = worldEnvelope.getMaxY() + zoomStepH;
+
+            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, worldEnvelope.getCoordinateReferenceSystem());
+
+        }
+
+        // invalid
+        else {
+            throw new IllegalArgumentException("Invalid zoom direction: " + direction);
+        }
+
+        if (renderingEngine.isEnvelopeInScaleLimit(newEnv)) {
+            worldEnvelope = newEnv;
+        }
+
     }
 
     /**
      * Zoom in one increment
      */
     public void zoomIn() {
-
-        double minx = worldEnvelope.getMinX() + zoomStep;
-        double miny = worldEnvelope.getMinY() + zoomStep;
-        double maxx = worldEnvelope.getMaxX() - zoomStep;
-        double maxy = worldEnvelope.getMaxY() - zoomStep;
-
-        worldEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, worldEnvelope.getCoordinateReferenceSystem());
+        zoomEnvelope(1);
     }
 
     /**
      * Zoom out one increment
      */
     public void zoomOut() {
-
-        double minx = worldEnvelope.getMinX() - zoomStep;
-        double miny = worldEnvelope.getMinY() - zoomStep;
-        double maxx = worldEnvelope.getMaxX() + zoomStep;
-        double maxy = worldEnvelope.getMaxY() + zoomStep;
-
-        worldEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, worldEnvelope.getCoordinateReferenceSystem());
-
+        zoomEnvelope(-1);
     }
 
     /**
@@ -231,8 +253,18 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // TODO center map at a different scale ?
         // this could avoid "blank screen" when layers are large but empty
 
-        renderingEngine.setParametersToRenderWholeMap(getSize());
-        worldEnvelope = renderingEngine.getWorldEnvelope();
+        // get world x and width
+        ReferencedEnvelope projectBounds = project.getMaximumBounds();
+
+        double worldWidthWu = projectBounds.getMaxX() - projectBounds.getMinX();
+        double heightWu = getHeight() * worldWidthWu / getWidth();
+
+        double minx = projectBounds.getMinX();
+        double maxx = projectBounds.getMaxX();
+        double miny = projectBounds.getMaxY() - heightWu;
+        double maxy = projectBounds.getMaxY();
+
+        worldEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, project.getCrs());
 
         // first time width: 3000px ?
         //System.out.println("Reset display: " + getSize() + " / " + scale + " / " + worldEnvelope + "");
@@ -263,6 +295,24 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
         renderingEngine.setDebugMode(debugMode);
+    }
+
+    /**
+     * Return a utility to transform coordinates
+     *
+     * @return
+     */
+    public AffineTransform getWorldToScreenTransform() {
+        return renderingEngine.getWorldToScreenTransform();
+    }
+
+    /**
+     * Return a utility to transform coordinates
+     *
+     * @return
+     */
+    public AffineTransform getScreenToWorldTransform() {
+        return renderingEngine.getScreenToWorldTransform();
     }
 
     /**
@@ -325,6 +375,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         }
     }
 
+    /**
+     * Get project associated with rendering engine
+     *
+     * @return
+     */
     public Project getProject() {
         return project;
     }
