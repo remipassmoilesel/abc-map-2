@@ -9,25 +9,23 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.util.ArrayList;
 
 /**
- * Wrap result of a partial query. Contains the list of partials and associated affine transform.
+ * Wrap result of a partial query. Contains the list of partials and associated affine transforms.
+ *
+ * Affine transforms are different for each partials
  */
 public class RenderedPartialQueryResult {
 
     private final int partialsLoaded;
     private final PartialRenderingQueue renderingQueue;
-    private int partialNumberWidth;
-    private int partialNumberHeight;
     private ArrayList<RenderedPartial> partials;
 
     private AffineTransform screenToWorldTransform;
     private AffineTransform worldToScreenTransform;
 
     public RenderedPartialQueryResult(ArrayList<RenderedPartial> partials, ReferencedEnvelope worldBounds, Rectangle screenBounds,
-                                      int partialNumberWidth, int partialNumberHeight, int partialsLoaded, PartialRenderingQueue renderingQueue) {
+                                      int partialsLoaded, PartialRenderingQueue renderingQueue) {
 
         this.partialsLoaded = partialsLoaded;
-        this.partialNumberWidth = partialNumberWidth;
-        this.partialNumberHeight = partialNumberHeight;
         this.partials = partials;
         this.renderingQueue = renderingQueue;
 
@@ -46,15 +44,6 @@ public class RenderedPartialQueryResult {
 
     public AffineTransform getWorldToScreenTransform() {
         return worldToScreenTransform;
-    }
-
-
-    public int getPartialNumberHeight() {
-        return partialNumberHeight;
-    }
-
-    public int getPartialNumberWidth() {
-        return partialNumberWidth;
     }
 
     public int getPartialsLoaded() {

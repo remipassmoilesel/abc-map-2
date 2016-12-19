@@ -138,10 +138,6 @@ public class RenderedPartialFactory {
 
         ArrayList<RenderedPartial> rsparts = new ArrayList<>();
 
-        // count partials
-        int partialNumberW = 0;
-        int partialNumberH = 0;
-
         // first position to go from
         // position is rounded in order to have partials that can be reused in future display
         double x = getStartPointFrom(worldBounds.getMinX(), partialSideWu);
@@ -161,11 +157,6 @@ public class RenderedPartialFactory {
 
         // iterate area to renderer from bottom left corner to upper right corner
         while (y < maxY) {
-
-            // count horizontal partials only on the first line
-            if (partialNumberH == 0) {
-                partialNumberW++;
-            }
 
             // compute needed area for next partial
             ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, mapContent.getCoordinateReferenceSystem());
@@ -202,7 +193,6 @@ public class RenderedPartialFactory {
             if (x > maxX) {
 
                 y += partialSideWu;
-                partialNumberH++;
 
                 // reset x except the last loop
                 if (y < maxY) {
@@ -231,7 +221,7 @@ public class RenderedPartialFactory {
                 (int) Math.round(w * partialSidePx / partialSideWu),
                 (int) Math.round(h * partialSidePx / partialSideWu));
 
-        return new RenderedPartialQueryResult(rsparts, worldBounds, screenBounds, partialNumberW, partialNumberH, loaded, renderingQueue);
+        return new RenderedPartialQueryResult(rsparts, worldBounds, screenBounds, loaded, renderingQueue);
     }
 
     /**
