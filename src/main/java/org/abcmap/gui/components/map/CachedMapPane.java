@@ -172,6 +172,27 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         }
 
         // ensure that envelope is valid and proportional to component
+        checkWorldEnvelope();
+
+        // prepare map to render
+        try {
+            renderingEngine.prepareMap(currentWorlEnvelope, panelDimensions);
+        } catch (Exception e) {
+            logger.error(e);
+        }
+
+        // repaint component
+        repaint();
+
+    }
+
+    /**
+     * Ensure that envelope is valid and proportional to component
+     */
+    private void checkWorldEnvelope() {
+
+        Dimension panelDimensions = getSize();
+
         double coeffPx = panelDimensions.getWidth() / panelDimensions.getHeight();
         double coeffWu = currentWorlEnvelope.getWidth() / currentWorlEnvelope.getHeight();
 
@@ -187,16 +208,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
             currentWorlEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorlEnvelope.getCoordinateReferenceSystem());
         }
-
-        // prepare map to render
-        try {
-            renderingEngine.prepareMap(currentWorlEnvelope, panelDimensions);
-        } catch (Exception e) {
-            logger.error(e);
-        }
-
-        // repaint component
-        repaint();
 
     }
 
@@ -259,6 +270,9 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
                 && newEnv.getWidth() < projectWorldWidth * maxZoomFactor) {
             currentWorlEnvelope = newEnv;
         }
+
+        // check if envelope is proportionnal
+        checkWorldEnvelope();
 
     }
 
