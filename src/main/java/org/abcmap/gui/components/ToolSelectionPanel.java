@@ -1,6 +1,8 @@
 package org.abcmap.gui.components;
 
 import net.miginfocom.swing.MigLayout;
+import org.abcmap.gui.tools.containers.ToolContainer;
+import org.abcmap.gui.tools.containers.ToolLibrary;
 
 import javax.swing.*;
 import java.awt.event.ActionListener;
@@ -17,18 +19,15 @@ public class ToolSelectionPanel extends JPanel {
     public ToolSelectionPanel() {
         super();
 
-
         setLayout(new MigLayout("gap 5, insets 5"));
 
-        /**
-        ToolContainer[] tools = ToolLibrary.getAvailablesTools();
+        ToolContainer[] tools = ToolLibrary.getAvailableTools();
 
         ButtonGroup bg = new ButtonGroup();
         buttons = new ArrayList<>();
 
         // initialized at 1 for columns
         int i = 1;
-
         for (ToolContainer tc : tools) {
 
             ImageIcon icon = tc.getIcon();
@@ -46,13 +45,13 @@ public class ToolSelectionPanel extends JPanel {
 
             i++;
         }
-         */
+
     }
 
     public void addActionListener(ActionListener listener) {
-//        for (JToggleButton btn : buttons) {
-//            btn.addActionListener(listener);
-//        }
+        for (JToggleButton btn : buttons) {
+            btn.addActionListener(listener);
+        }
     }
 
 }
