@@ -8,6 +8,7 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.rendering.CachedRenderingEngine;
 import org.abcmap.gui.components.geo.MapNavigationBar;
+import org.abcmap.gui.tools.MapTool;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import javax.swing.*;
@@ -170,6 +171,23 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             firstTimeRender = false;
         }
 
+        // ensure that envelope is valid and proportional to component
+        double coeffPx = panelDimensions.getWidth() / panelDimensions.getHeight();
+        double coeffWu = currentWorlEnvelope.getWidth() / currentWorlEnvelope.getHeight();
+
+        if (Math.abs(coeffPx - coeffWu) > 0.001) {
+
+            double widthWu = currentWorlEnvelope.getWidth();
+            double heightWu = widthWu / coeffPx;
+
+            double minx = currentWorlEnvelope.getMinX();
+            double miny = currentWorlEnvelope.getMinY();
+            double maxx = currentWorlEnvelope.getMaxX();
+            double maxy = miny + heightWu;
+
+            currentWorlEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorlEnvelope.getCoordinateReferenceSystem());
+        }
+
         // prepare map to render
         try {
             renderingEngine.prepareMap(currentWorlEnvelope, panelDimensions);
@@ -326,6 +344,28 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     public AffineTransform getScreenToWorldTransform() {
         return renderingEngine.getScreenToWorldTransform();
+    }
+
+    /**
+     * Remove a tool from listener list
+     *
+     * @param tool
+     */
+    public void removeToolFromListeners(MapTool tool) {
+        removeMouseListener(tool);
+        removeMouseMotionListener(tool);
+        removeMouseWheelListener(tool);
+    }
+
+    /**
+     * Remove a tool from listener list
+     *
+     * @param tool
+     */
+    public void addToolToListeners(MapTool tool) {
+        addMouseListener(tool);
+        addMouseMotionListener(tool);
+        addMouseWheelListener(tool);
     }
 
     /**
