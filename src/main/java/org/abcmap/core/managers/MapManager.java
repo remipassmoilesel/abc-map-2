@@ -48,7 +48,7 @@ public class MapManager implements HasEventNotificationManager {
                 return null;
             }
 
-            return getMainMap().getWorldToScreenTransform().transform(point, null);
+            return getMainMap().getScreenToWorldTransform().transform(point, null);
         }
 
         public void zoomIn() {

@@ -78,16 +78,18 @@ public class LayoutManager {
             for (LayoutSheet sheet : layouts) {
 
                 // create an image and render layout on
-                int w = (int) Utils.millimeterToPixel(sheet.getWidthMm(), 72);
-                int h = (int) Utils.millimeterToPixel(sheet.getWidthMm(), 72);
+                double screenRes = Utils.getScreenResolution();
+                int w = (int) Math.round(sheet.getWidthPx(screenRes));
+                int h = (int) Math.round(sheet.getHeightPx(screenRes));
 
                 Dimension dim = new Dimension(w, h);
                 BufferedImage img = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 
                 // render map in
                 ReferencedEnvelope env = sheet.getEnvelope();
+
                 try {
-                    renderingEngine.prepareMap(env, dim, sheet.getScale());
+                    renderingEngine.prepareMap(env, dim);
                 } catch (RenderingException e) {
                     logger.error(e);
                 }
@@ -98,10 +100,10 @@ public class LayoutManager {
                 Path tmp = tmpm.createTemporaryFile("layout_", ".png");
                 ImageIO.write(img, "png", Files.newOutputStream(tmp));
 
-                System.out.println(tmp);
+                //GuiUtils.showImage(img);
 
                 // create paper which can be print
-                papers.add(new LayoutPaper(sheet, tmp));
+                papers.add(new LayoutPaper(sheet, tmp, img));
 
             }
 
@@ -127,40 +129,51 @@ public class LayoutManager {
             // /!\ always affect book after first operations
             prnJob.setPageable(book);
 
-            if (prnJob.printDialog()) {
+            try {
 
-                // find best resolution available
-                int res = 0;
 
-                // iterate available resolutions
-                PrinterResolution[] supportedResolutions = (PrinterResolution[]) prnJob
-                        .getPrintService()
-                        .getSupportedAttributeValues(javax.print.attribute.standard.PrinterResolution.class, null, null);
+                if (prnJob.printDialog()) {
 
-                for (PrinterResolution sr : supportedResolutions) {
-                    int[] resolution = sr.getResolution(PrinterResolution.DPI);
+                    // find best resolution available
+                    // 200dpi by default
+                    int res = 200;
 
-                    // use first number
-                    if (resolution[0] >= ConfigurationConstants.DEFAULT_PRINT_RESOLUTION) {
-                        res = resolution[0];
-                        break;
+                    // iterate available resolutions
+                    PrinterResolution[] supportedResolutions = (PrinterResolution[]) prnJob
+                            .getPrintService().getSupportedAttributeValues(PrinterResolution.class, null, null);
+
+                    // sometimes no supported resolutions are found
+                    if (supportedResolutions != null) {
+
+                        for (PrinterResolution sr : supportedResolutions) {
+                            int[] resolution = sr.getResolution(PrinterResolution.DPI);
+
+                            // use first number
+                            if (resolution[0] >= ConfigurationConstants.DEFAULT_PRINT_RESOLUTION) {
+                                res = resolution[0];
+                                break;
+                            }
+                        }
+                    }
+
+                    // set resolution
+                    PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
+                    attr.add(new PrinterResolution(res, res, ResolutionSyntax.DPI));
+
+                    // print
+                    try {
+                        prnJob.print(attr);
+                    } catch (PrinterException e) {
+                        dialm.showErrorInBox("Erreur lors de l'impression");
+                        logger.error(e);
                     }
                 }
 
-                // set resolution
-                PrintRequestAttributeSet attr = new HashPrintRequestAttributeSet();
-                attr.add(new PrinterResolution(res, res, ResolutionSyntax.DPI));
-
-                // print
-                try {
-                    prnJob.print(attr);
-                } catch (PrinterException e) {
-                    dialm.showErrorInBox("Erreur lors de l'impression");
-                    logger.error(e);
-                }
+            } catch (Exception e) {
+                logger.error(e);
+                dialm.showErrorInBox("Erreur lors de l'impression");
             }
 
-            // TODO: delete temp images
 
         }
 

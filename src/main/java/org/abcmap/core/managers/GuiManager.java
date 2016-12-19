@@ -148,7 +148,15 @@ public class GuiManager implements HasEventNotificationManager {
         GuiUtils.throwIfNotOnEDT();
 
         for (Runnable runnable : initialisationOperations) {
-            runnable.run();
+
+            try {
+                runnable.run();
+            }
+            //
+            catch (Exception e) {
+                logger.error(e);
+            }
+
         }
 
     }
