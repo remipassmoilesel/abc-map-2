@@ -71,7 +71,6 @@ public class Initialization {
 
         SwingUtilities.invokeAndWait(() -> {
             guim.constructGui();
-            guim.runIntializationOperations();
         });
 
         ProjectManager pman = MainManager.getProjectManager();
@@ -106,6 +105,11 @@ public class Initialization {
         else {
             pman.createNewProject();
         }
+
+        // run gui initialization operation when all others operations started
+        SwingUtilities.invokeAndWait(() -> {
+            guim.runIntializationOperations();
+        });
 
 
     }
