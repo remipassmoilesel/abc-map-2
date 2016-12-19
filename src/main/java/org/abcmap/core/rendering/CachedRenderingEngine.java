@@ -51,11 +51,6 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     private final HashMap<String, RenderedPartialFactory> partialFactories;
 
     /**
-     * If set to true, scale will be limited
-     */
-    private boolean scaleLimited;
-
-    /**
      * Current set of partials that have to be painted
      */
     private HashMap<String, RenderedPartialQueryResult> currentPartials;
@@ -84,16 +79,6 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      * Current value of rendered map in partials. In world unit.
      */
     private double partialSideWu;
-
-    /**
-     * Minimum size of map rendered on a partial ("zoom" value)
-     */
-    private double minimumPartialSideWu;
-
-    /**
-     * Maximum size of map rendered on a partial ("zoom" value)
-     */
-    private double maximumPartialSideWu;
 
     /**
      * Lock to prevent too much thread rendering
@@ -131,32 +116,17 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         // default partial size in pixel
         this.partialSidePx = DEFAULT_PARTIAL_SIDE_PX;
 
-        // limit scale
-        this.scaleLimited = true;
-
         // default world envelope
         this.worldEnvelope = project.getMaximumBounds();
 
         // // first display, use default values
         this.renderedSizePx = new Dimension(1000, 1000);
-        computeMinAndMaxPartialSideWu();
-        setPartialSideWu(maximumPartialSideWu);
+        this.partialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX()) / 2;
 
         // listen partial store changes
         this.notifm = new EventNotificationManager(this);
         project.getRenderedPartialsStore().getNotificationManager().addObserver(this);
 
-    }
-
-    /**
-     * Compute minimum and maximum limit of scale
-     * <p>
-     * Prevent display errors
-     */
-    private void computeMinAndMaxPartialSideWu() {
-        ReferencedEnvelope world = project.getMaximumBounds();
-        this.minimumPartialSideWu = (world.getMaxX() - world.getMinX()) / 10;
-        this.maximumPartialSideWu = (world.getMaxX() - world.getMinX());
     }
 
     @Override
@@ -182,12 +152,16 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 continue;
             }
 
-            // get affine transform to set position of partials
+            // set graphics properties used for debug mode
             if (debugMode) {
                 g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
             }
 
             AffineTransform worldToScreenTransform = getWorldToScreenTransform();
+
+            // compare affine transforms
+            //System.out.println(worldToScreenTransform.equals(partials.getWorldToScreenTransform()));
+            //System.out.println(getScreenToWorldTransform().equals(partials.getScreenToWorldTransform()));
 
             // iterate current partials
             for (RenderedPartial part : partials.getPartials()) {
@@ -230,6 +204,16 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         }
     }
 
+    /**
+     * Prepare map to paint
+     * <p>
+     * /!\ World envelope reference is bottom left corner
+     * /!\ Screen reference is upper left corner
+     *
+     * @param worldEnvelope
+     * @param pixelDim
+     * @throws RenderingException
+     */
     public void prepareMap(ReferencedEnvelope worldEnvelope, Dimension pixelDim) throws RenderingException {
 
         /*
@@ -244,7 +228,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
         // on thread at a time renderer map for now
         if (renderLock.tryLock() == false) {
-            logger.error("Abort rendering operations, rendering is already in progress");
+            logger.debug("Abort rendering operations, rendering is already in progress");
             return;
         }
 
@@ -277,14 +261,13 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             }
 
             // set essential parameters after verifications
-            computeMinAndMaxPartialSideWu();
             this.worldEnvelope = worldEnvelope;
             this.renderedSizePx = pixelDim;
-            computePartialSideWu();
+            this.partialSideWu = computePartialSideWu(worldEnvelope);
 
             logger.debug("Rendering component: " + this);
 
-            RenderedPartialQueryResult first = null;
+            RenderedPartialQueryResult firstResults = null;
 
             // iterate layers, sorted by z-index
             for (AbstractLayer lay : project.getLayersList()) {
@@ -336,14 +319,14 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 // store it to draw it later
                 currentPartials.put(layId, newPartials);
 
-                if(first == null){
-                    first = newPartials;
+                if (firstResults == null) {
+                    firstResults = newPartials;
                 }
             }
 
             // update transforms
-            worldToScreenTransform = first.getWorldToScreenTransform();
-            screenToWorldTransform = first.getScreenToWorldTransform();
+            worldToScreenTransform = firstResults.getWorldToScreenTransform();
+            screenToWorldTransform = firstResults.getScreenToWorldTransform();
 
 
         } finally {
@@ -370,30 +353,22 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     }
 
     /**
-     * Compute optimal partial side size in world units, relative to world bounds and pixel dimensions
+     * Compute size of map rendered on partials
+     *
+     * @param env
+     * @return
      */
-    private void computePartialSideWu() {
+    private double computePartialSideWu(ReferencedEnvelope env) {
         double coeff = renderedSizePx.getWidth() / partialSidePx;
-        double worldWidth = worldEnvelope.getMaxX() - worldEnvelope.getMinX();
-        setPartialSideWu(worldWidth / coeff);
+        double worldWidth = env.getMaxX() - env.getMinX();
+        return worldWidth / coeff;
     }
 
     /**
-     * Adapt rendering parameters to render all map
+     * Get current world envelope
      *
-     * @param renderedSizePx
+     * @return
      */
-    public void setParametersToRenderWholeMap(Dimension renderedSizePx) {
-
-        this.renderedSizePx = renderedSizePx;
-        worldEnvelope = project.getMaximumBounds();
-
-        double worldWidth = worldEnvelope.getMaxX() - worldEnvelope.getMinX();
-        double renderedSurfaceWidth = renderedSizePx.getWidth();
-
-        setPartialSideWu(worldWidth * partialSidePx / renderedSurfaceWidth);
-    }
-
     public ReferencedEnvelope getWorldEnvelope() {
         return worldEnvelope;
     }
@@ -458,32 +433,6 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     }
 
     /**
-     * Set size of partial side and check if value is correct
-     *
-     * @param value
-     */
-    private void setPartialSideWu(double value) {
-
-        partialSideWu = value;
-
-        if (scaleLimited) {
-
-            // check if value is not too small
-            if (partialSideWu < minimumPartialSideWu) {
-                partialSideWu = minimumPartialSideWu;
-            }
-
-            // check if value is not too big
-            else if (partialSideWu > maximumPartialSideWu) {
-                partialSideWu = maximumPartialSideWu;
-            }
-
-        }
-
-    }
-
-
-    /**
      * Block current thread until all work of rendering is done
      */
     public synchronized void waitForRendering() {
@@ -508,20 +457,4 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
     }
 
-    /**
-     * If set to true, scale will be limited
-     *
-     * @param scaleLimited
-     */
-    public void setScaleLimited(boolean scaleLimited) {
-        this.scaleLimited = scaleLimited;
-    }
-
-    public double getMinimumPartialSideWu() {
-        return minimumPartialSideWu;
-    }
-
-    public double getMaximumPartialSideWu() {
-        return maximumPartialSideWu;
-    }
 }
