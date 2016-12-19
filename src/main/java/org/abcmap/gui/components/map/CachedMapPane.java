@@ -37,6 +37,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     private final CachedRenderingEngine renderingEngine;
 
+
     /**
      * If true, it is the first time panel is rendering
      */
@@ -45,7 +46,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     /**
      * World envelope (positions) of map rendered on panel
      */
-    private ReferencedEnvelope worldEnvelope;
+    private ReferencedEnvelope currentWorlEnvelope;
 
     /**
      * Various mouse listeners which allow user to control map with mouse
@@ -62,14 +63,26 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     private boolean debugMode;
 
-    private final EventNotificationManager notifm;
+    /**
+     * Minimal zoom factor relative to project width
+     */
+    private double minZoomFactor;
 
+    /**
+     * Maximal zoom factor relative to project width
+     */
+    private double maxZoomFactor;
+
+    private final EventNotificationManager notifm;
 
     public CachedMapPane(Project p) {
         super(new MigLayout("fill"));
 
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         addComponentListener(new RefreshMapComponentListener());
+
+        minZoomFactor = 0.1;
+        maxZoomFactor = 1.5;
 
         this.project = p;
         this.renderingEngine = new CachedRenderingEngine(project);
@@ -109,8 +122,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             AffineTransform worldToScreenTransform = getWorldToScreenTransform();
             if (worldToScreenTransform != null) {
 
-                Point2D blc = new Point2D.Double(worldEnvelope.getMinX(), worldEnvelope.getMinY());
-                Point2D urc = new Point2D.Double(worldEnvelope.getMaxX(), worldEnvelope.getMaxY());
+                Point2D blc = new Point2D.Double(currentWorlEnvelope.getMinX(), currentWorlEnvelope.getMinY());
+                Point2D urc = new Point2D.Double(currentWorlEnvelope.getMaxX(), currentWorlEnvelope.getMaxY());
                 blc = worldToScreenTransform.transform(blc, null);
                 urc = worldToScreenTransform.transform(urc, null);
 
@@ -159,7 +172,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // prepare map to render
         try {
-            renderingEngine.prepareMap(worldEnvelope, panelDimensions);
+            renderingEngine.prepareMap(currentWorlEnvelope, panelDimensions);
         } catch (Exception e) {
             logger.error(e);
         }
@@ -183,10 +196,10 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     private void zoomEnvelope(int direction) {
 
-        double projectWidth = worldEnvelope.getMaxX() - worldEnvelope.getMinX();
-        double projectHeight = worldEnvelope.getMaxY() - worldEnvelope.getMinY();
-        double zoomStepW = (renderingEngine.getMaximumPartialSideWu() - renderingEngine.getMinimumPartialSideWu()) / 30;
-        double zoomStepH = projectHeight * zoomStepW / projectWidth;
+        double projectWorldWidth = project.getMaximumBounds().getWidth();
+
+        double zoomStepW = projectWorldWidth / 30;
+        double zoomStepH = currentWorlEnvelope.getHeight() * zoomStepW / currentWorlEnvelope.getWidth();
 
         double minx;
         double maxx;
@@ -197,26 +210,25 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // zoom in
         if (direction > 0) {
-            minx = worldEnvelope.getMinX() + zoomStepW;
-            maxx = worldEnvelope.getMaxX() - zoomStepW;
+            minx = currentWorlEnvelope.getMinX() + zoomStepW;
+            maxx = currentWorlEnvelope.getMaxX() - zoomStepW;
 
-            miny = worldEnvelope.getMinY() + zoomStepH;
-            maxy = worldEnvelope.getMaxY() - zoomStepH;
+            miny = currentWorlEnvelope.getMinY() + zoomStepH;
+            maxy = currentWorlEnvelope.getMaxY() - zoomStepH;
 
-            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, worldEnvelope.getCoordinateReferenceSystem());
-
+            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorlEnvelope.getCoordinateReferenceSystem());
         }
 
         // zoom out
         else if (direction < 0) {
 
-            minx = worldEnvelope.getMinX() - zoomStepW;
-            maxx = worldEnvelope.getMaxX() + zoomStepW;
+            minx = currentWorlEnvelope.getMinX() - zoomStepW;
+            maxx = currentWorlEnvelope.getMaxX() + zoomStepW;
 
-            miny = worldEnvelope.getMinY() - zoomStepH;
-            maxy = worldEnvelope.getMaxY() + zoomStepH;
+            miny = currentWorlEnvelope.getMinY() - zoomStepH;
+            maxy = currentWorlEnvelope.getMaxY() + zoomStepH;
 
-            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, worldEnvelope.getCoordinateReferenceSystem());
+            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorlEnvelope.getCoordinateReferenceSystem());
 
         }
 
@@ -225,8 +237,9 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             throw new IllegalArgumentException("Invalid zoom direction: " + direction);
         }
 
-        if (renderingEngine.isEnvelopeInScaleLimit(newEnv)) {
-            worldEnvelope = newEnv;
+        if (newEnv.getWidth() > projectWorldWidth * minZoomFactor
+                && newEnv.getWidth() < projectWorldWidth * maxZoomFactor) {
+            currentWorlEnvelope = newEnv;
         }
 
     }
@@ -264,7 +277,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         double miny = projectBounds.getMaxY() - heightWu;
         double maxy = projectBounds.getMaxY();
 
-        worldEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, project.getCrs());
+        currentWorlEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, project.getCrs());
 
         // first time width: 3000px ?
         //System.out.println("Reset display: " + getSize() + " / " + scale + " / " + worldEnvelope + "");
@@ -395,7 +408,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             throw new IllegalStateException("Coordinate Reference Systems are different: " + worldEnvelope.getCoordinateReferenceSystem() + " / " + project.getCrs());
         }
 
-        this.worldEnvelope = worldEnvelope;
+        this.currentWorlEnvelope = worldEnvelope;
     }
 
     /**
@@ -404,7 +417,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * @return
      */
     public ReferencedEnvelope getWorldEnvelope() {
-        return new ReferencedEnvelope(worldEnvelope);
+        return new ReferencedEnvelope(currentWorlEnvelope);
     }
 
     @Override
