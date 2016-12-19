@@ -169,6 +169,8 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             return;
         }
 
+        System.out.println();
+
         for (AbstractLayer lay : project.getLayersList()) {
 
             RenderedPartialQueryResult partials = currentPartials.get(lay.getId());
@@ -182,7 +184,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             AffineTransform worldToScreen = partials.getWorldToScreenTransform();
 
             if (debugMode) {
-                g2d.setColor(Color.darkGray);
+                g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
             }
 
             // iterate current partials
@@ -202,7 +204,15 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 g2d.drawImage(part.getImage(), x, y, w, h, null);
 
                 if (debugMode) {
+
+                    g2d.setColor(Color.darkGray);
                     g2d.drawRect(x, y, w, h);
+
+                    // show index on partial
+                    g2d.setColor(Color.BLACK);
+                    String index = "#" + partials.getPartials().indexOf(part);
+                    g2d.drawString(index, x + w / 2, y + h / 2);
+
                 }
 
             }
