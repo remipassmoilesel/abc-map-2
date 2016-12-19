@@ -1,10 +1,10 @@
 package org.abcmap.gui.iegroup.menubar;
 
-import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.profiles.CreateNewProfile;
-import org.abcmap.gui.ie.profiles.OpenProfile;
-import org.abcmap.gui.ie.profiles.SaveAsProfile;
-import org.abcmap.gui.ie.profiles.SaveProfile;
+import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.profiles.CreateNewProfile;
+import org.abcmap.ielements.profiles.OpenProfile;
+import org.abcmap.ielements.profiles.SaveAsProfile;
+import org.abcmap.ielements.profiles.SaveProfile;
 
 public class ProfileMenu extends InteractionElementGroup {
 

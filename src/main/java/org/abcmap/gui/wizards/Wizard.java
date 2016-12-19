@@ -2,7 +2,7 @@ package org.abcmap.gui.wizards;
 
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.gui.ie.InteractionElementGroup;
+import org.abcmap.ielements.InteractionElementGroup;
 import org.abcmap.gui.iegroup.docks.GroupWizard;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.HasDisplayableSpace;

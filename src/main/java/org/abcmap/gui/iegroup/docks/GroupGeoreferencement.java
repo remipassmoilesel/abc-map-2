@@ -1,10 +1,10 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.geo.ActivateGeoreferencement;
-import org.abcmap.gui.ie.geo.SelectGeoReferences;
-import org.abcmap.gui.ie.geo.SelectMapCRS;
+import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.geo.ActivateGeoreferencement;
+import org.abcmap.ielements.geo.SelectGeoReferences;
+import org.abcmap.ielements.geo.SelectMapCRS;
 
 public class GroupGeoreferencement extends InteractionElementGroup {
 

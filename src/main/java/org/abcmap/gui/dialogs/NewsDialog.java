@@ -2,7 +2,7 @@ package org.abcmap.gui.dialogs;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.configuration.ConfigurationConstants;
-import org.abcmap.gui.ie.ressources.GoToWebSite;
+import org.abcmap.ielements.ressources.GoToWebSite;
 
 import javax.swing.*;
 import java.awt.*;

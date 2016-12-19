@@ -17,7 +17,7 @@ public class ConfigurationConstants {
     /**
      * Root for interaction element introspection search
      */
-    public static final String IE_PACKAGE_ROOT = "org.abcmap.gui.ie";
+    public static final String IE_PACKAGE_ROOT = "org.abcmap.ielements";
 
     /**
      * Root for plugins
@@ -41,24 +41,19 @@ public class ConfigurationConstants {
     public static final String VOTE_PAGE_URL = WEBSITE_URL + "vote/";
     public static final String NEWS_PAGE_URL = WEBSITE_URL + "news/";
     public static final String HELP_PAGE_URL = WEBSITE_URL + "help/";
-    public static final String BUG_REPORT_URL = WEBSITE_URL
-            + "contact/?action=report";
-    public static final String ASK_FORM_URL = WEBSITE_URL
-            + "contact/?action=ask";
+    public static final String BUG_REPORT_URL = WEBSITE_URL + "contact/?action=report";
+    public static final String ASK_FORM_URL = WEBSITE_URL + "contact/?action=ask";
 
     /*
      * Print settings
      */
-    public static final Float SCREEN_RESOLUTION = (float) Toolkit
-            .getDefaultToolkit().getScreenResolution();
     public static final Float JAVA_RESOLUTION = 72f;
     public static final Integer DEFAULT_PRINT_RESOLUTION = 300;
 
     /*
      * Main paths of software
      */
-    public static String SYSTEM_HOME_PATH = FileSystemView.getFileSystemView()
-            .getDefaultDirectory().getAbsolutePath();
+    public static String SYSTEM_HOME_PATH = FileSystemView.getFileSystemView().getDefaultDirectory().getAbsolutePath();
     public static final Path SYMBOLS_DIR_PATH = Paths.get("./symbols");
     public static final Path PROFILE_ROOT_PATH = Paths.get("./profiles");
     public static final Path LOG_DIRECTORY = Paths.get("./log");

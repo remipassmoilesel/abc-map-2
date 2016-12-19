@@ -1,8 +1,8 @@
 package org.abcmap.gui.iegroup.menubar;
 
 import org.abcmap.core.managers.MainManager;
-import org.abcmap.gui.ie.InteractionElement;
-import org.abcmap.gui.ie.InteractionElementGroup;
+import org.abcmap.ielements.InteractionElement;
+import org.abcmap.ielements.InteractionElementGroup;
 
 import javax.swing.*;
 import java.util.ArrayList;

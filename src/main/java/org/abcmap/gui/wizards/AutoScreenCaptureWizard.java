@@ -1,14 +1,14 @@
 package org.abcmap.gui.wizards;
 
-import org.abcmap.gui.ie.draw.SelectLayer;
-import org.abcmap.gui.ie.importation.SelectCropAreaForScreen;
-import org.abcmap.gui.ie.importation.SelectPictureAnalyseMode;
-import org.abcmap.gui.ie.importation.robot.LaunchRobotImport;
-import org.abcmap.gui.ie.importation.robot.SelectCaptureArea;
-import org.abcmap.gui.ie.importation.robot.SelectRobotImportOptions;
-import org.abcmap.gui.ie.project.NewProject;
-import org.abcmap.gui.ie.project.OpenProject;
-import org.abcmap.gui.ie.ressources.GoToOpenStreetMap;
+import org.abcmap.ielements.draw.SelectLayer;
+import org.abcmap.ielements.importation.SelectCropAreaForScreen;
+import org.abcmap.ielements.importation.SelectPictureAnalyseMode;
+import org.abcmap.ielements.importation.robot.LaunchRobotImport;
+import org.abcmap.ielements.importation.robot.SelectCaptureArea;
+import org.abcmap.ielements.importation.robot.SelectRobotImportOptions;
+import org.abcmap.ielements.project.NewProject;
+import org.abcmap.ielements.project.OpenProject;
+import org.abcmap.ielements.ressources.GoToOpenStreetMap;
 import org.abcmap.gui.iegroup.docks.GroupImportation;
 
 import java.util.ArrayList;

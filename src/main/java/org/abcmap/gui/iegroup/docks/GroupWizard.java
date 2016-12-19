@@ -4,8 +4,8 @@ import net.miginfocom.swing.MigLayout;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.GuiStyle;
 import org.abcmap.gui.components.dock.Dock;
-import org.abcmap.gui.ie.InteractionElement;
-import org.abcmap.gui.ie.InteractionElementGroup;
+import org.abcmap.ielements.InteractionElement;
+import org.abcmap.ielements.InteractionElementGroup;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.wizards.*;
 

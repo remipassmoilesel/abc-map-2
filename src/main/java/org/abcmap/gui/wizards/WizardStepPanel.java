@@ -8,7 +8,7 @@ import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.GuiStyle;
 import org.abcmap.gui.HtmlLabel;
 import org.abcmap.gui.components.buttons.HtmlButton;
-import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
 import java.awt.*;

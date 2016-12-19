@@ -5,7 +5,7 @@ import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.GuiStyle;
 import org.abcmap.gui.components.CustomComponent;
-import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.ielements.InteractionElement;
 import org.abcmap.gui.components.dock.blockitems.HideableBlockItem;
 import org.abcmap.gui.utils.GuiUtils;
 

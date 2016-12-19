@@ -1,6 +1,6 @@
 package org.abcmap.gui.wizards;
 
-import org.abcmap.gui.ie.ressources.GoToHelpPage;
+import org.abcmap.ielements.ressources.GoToHelpPage;
 import org.abcmap.gui.iegroup.docks.GroupWizard;
 
 import java.util.ArrayList;

@@ -2,7 +2,7 @@ package org.abcmap.gui.components.dock.blockitems;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.gui.GuiStyle;
-import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.ielements.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;

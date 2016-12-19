@@ -1,9 +1,9 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.project.*;
-import org.abcmap.gui.ie.recents.OpenRecentProject;
+import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.project.*;
+import org.abcmap.ielements.recents.OpenRecentProject;
 
 public class GroupProject extends InteractionElementGroup {
 

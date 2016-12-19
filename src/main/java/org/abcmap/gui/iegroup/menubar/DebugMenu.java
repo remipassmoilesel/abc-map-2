@@ -1,8 +1,8 @@
 package org.abcmap.gui.iegroup.menubar;
 
-import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.debug.CreateFakeProject;
-import org.abcmap.gui.ie.debug.ShowLastEvents;
+import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.debug.CreateFakeProject;
+import org.abcmap.ielements.debug.ShowLastEvents;
 
 public class DebugMenu extends InteractionElementGroup {
 

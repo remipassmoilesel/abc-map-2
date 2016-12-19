@@ -2,7 +2,7 @@ package org.abcmap.gui.components.dock.blockitems;
 
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.GuiCursor;
-import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

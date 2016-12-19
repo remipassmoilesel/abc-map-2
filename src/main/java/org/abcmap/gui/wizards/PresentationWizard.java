@@ -1,7 +1,7 @@
 package org.abcmap.gui.wizards;
 
-import org.abcmap.gui.ie.program.ShowAboutDialog;
-import org.abcmap.gui.ie.program.ShowSupportProjectDialog;
+import org.abcmap.ielements.program.ShowAboutDialog;
+import org.abcmap.ielements.program.ShowSupportProjectDialog;
 import org.abcmap.gui.iegroup.docks.GroupDrawingTools;
 import org.abcmap.gui.iegroup.docks.GroupGeoreferencement;
 import org.abcmap.gui.iegroup.docks.GroupImportation;

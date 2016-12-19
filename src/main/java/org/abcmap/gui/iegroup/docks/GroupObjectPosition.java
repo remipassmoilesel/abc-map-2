@@ -1,10 +1,10 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.align.AlignAndDistribute;
-import org.abcmap.gui.ie.position.MoveElementsByCoordinates;
-import org.abcmap.gui.ie.position.MoveElementsByZOrder;
+import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.align.AlignAndDistribute;
+import org.abcmap.ielements.position.MoveElementsByCoordinates;
+import org.abcmap.ielements.position.MoveElementsByZOrder;
 
 public class GroupObjectPosition extends InteractionElementGroup {
     public GroupObjectPosition() {

@@ -2,7 +2,7 @@ package org.abcmap.gui.menu;
 
 
 import org.abcmap.gui.components.buttons.HtmlMenuItem;
-import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.ielements.InteractionElement;
 
 public class ClickableMenuItem extends HtmlMenuItem {
 

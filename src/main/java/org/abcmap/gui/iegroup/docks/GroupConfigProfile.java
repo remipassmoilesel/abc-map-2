@@ -1,9 +1,9 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.profiles.*;
-import org.abcmap.gui.ie.recents.OpenRecentProfile;
+import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.profiles.*;
+import org.abcmap.ielements.recents.OpenRecentProfile;
 
 public class GroupConfigProfile extends InteractionElementGroup {
 

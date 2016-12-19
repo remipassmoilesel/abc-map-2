@@ -3,7 +3,7 @@ package org.abcmap.gui.menu;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.gui.components.buttons.HtmlMenuItem;
-import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
 import java.awt.*;

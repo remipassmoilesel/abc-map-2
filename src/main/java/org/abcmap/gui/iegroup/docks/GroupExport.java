@@ -1,8 +1,8 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.export.*;
+import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.export.*;
 
 public class GroupExport extends InteractionElementGroup {
 

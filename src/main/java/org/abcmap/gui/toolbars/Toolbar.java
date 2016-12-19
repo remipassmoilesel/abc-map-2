@@ -1,7 +1,7 @@
 package org.abcmap.gui.toolbars;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
 import java.awt.*;

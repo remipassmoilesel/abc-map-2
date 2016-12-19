@@ -4,7 +4,7 @@ import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.utils.CoeffComparator;
 import org.abcmap.core.utils.Utils;
-import org.abcmap.gui.ie.InteractionElement;
+import org.abcmap.ielements.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;

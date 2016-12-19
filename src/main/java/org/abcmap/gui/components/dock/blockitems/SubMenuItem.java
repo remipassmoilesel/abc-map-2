@@ -2,8 +2,8 @@ package org.abcmap.gui.components.dock.blockitems;
 
 import org.abcmap.gui.GuiCursor;
 import org.abcmap.gui.components.dock.Dock;
-import org.abcmap.gui.ie.InteractionElement;
-import org.abcmap.gui.ie.InteractionElementGroup;
+import org.abcmap.ielements.InteractionElement;
+import org.abcmap.ielements.InteractionElementGroup;
 import org.abcmap.gui.utils.GuiUtils;
 
 import java.awt.event.MouseAdapter;

@@ -7,8 +7,8 @@ import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.components.CustomComponent;
 import org.abcmap.gui.components.buttons.HtmlLabel;
 import org.abcmap.gui.components.dock.blockitems.DockMenuPanel;
-import org.abcmap.gui.ie.InteractionElement;
-import org.abcmap.gui.ie.InteractionElementGroup;
+import org.abcmap.ielements.InteractionElement;
+import org.abcmap.ielements.InteractionElementGroup;
 import org.abcmap.gui.windows.MainWindowMode;
 
 import javax.swing.*;

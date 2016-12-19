@@ -1,9 +1,9 @@
 package org.abcmap.gui.iegroup.menubar;
 
-import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.analyse.AnalyseSelectedTiles;
-import org.abcmap.gui.ie.analyse.ImportImageFromFile;
-import org.abcmap.gui.ie.analyse.ImportTileFromFile;
+import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.analyse.AnalyseSelectedTiles;
+import org.abcmap.ielements.analyse.ImportImageFromFile;
+import org.abcmap.ielements.analyse.ImportTileFromFile;
 
 public class ImportMenu extends InteractionElementGroup {
 

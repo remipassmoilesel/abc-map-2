@@ -1,8 +1,8 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.gui.ie.InteractionElementGroup;
-import org.abcmap.gui.ie.layouts.ManageLayouts;
+import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.layouts.ManageLayouts;
 import org.abcmap.gui.windows.MainWindowMode;
 
 public class GroupLayout extends InteractionElementGroup {

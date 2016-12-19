@@ -14,7 +14,7 @@ import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.StatusBar;
 import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.components.map.CachedMapPane;
-import org.abcmap.gui.ie.program.QuitProgram;
+import org.abcmap.ielements.program.QuitProgram;
 import org.abcmap.gui.layouts.LayoutListPanel;
 import org.abcmap.gui.utils.GuiUtils;
 
