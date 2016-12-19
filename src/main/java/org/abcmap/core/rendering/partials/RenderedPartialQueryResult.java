@@ -1,5 +1,7 @@
 package org.abcmap.core.rendering.partials;
 
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.renderer.lite.RendererUtilities;
 
@@ -9,14 +11,18 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.util.ArrayList;
 
 /**
- * Wrap result of a partial query. Contains the list of partials and associated affine transforms.
- *
- * Affine transforms are different for each partials
+ * Wrap result of a partial query. Contains the list of partials and associated information
+ * <p>
+ * A thing important to remember is that asked world bounds are not rendered bounds, rendered bounds are larger.
  */
 public class RenderedPartialQueryResult {
 
+    private static final CustomLogger logger = LogManager.getLogger(RenderedPartialQueryResult.class);
+
     private final int partialsLoaded;
     private final PartialRenderingQueue renderingQueue;
+    private final ReferencedEnvelope worldBounds;
+    private final Rectangle screenBounds;
     private ArrayList<RenderedPartial> partials;
 
     private AffineTransform screenToWorldTransform;
@@ -28,22 +34,27 @@ public class RenderedPartialQueryResult {
         this.partialsLoaded = partialsLoaded;
         this.partials = partials;
         this.renderingQueue = renderingQueue;
+        this.worldBounds = worldBounds;
+        this.screenBounds = screenBounds;
 
-        worldToScreenTransform = RendererUtilities.worldToScreenTransform(worldBounds, screenBounds);
-        try {
-            screenToWorldTransform = worldToScreenTransform.createInverse();
-        } catch (NoninvertibleTransformException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    public AffineTransform getScreenToWorldTransform() {
-        return screenToWorldTransform;
     }
 
     public AffineTransform getWorldToScreenTransform() {
+        if (worldToScreenTransform == null) {
+            worldToScreenTransform = RendererUtilities.worldToScreenTransform(worldBounds, screenBounds);
+        }
         return worldToScreenTransform;
+    }
+
+    public AffineTransform getScreenToWorldTransform() {
+        if (screenToWorldTransform == null) {
+            try {
+                screenToWorldTransform = getWorldToScreenTransform().createInverse();
+            } catch (NoninvertibleTransformException e) {
+                logger.error(e);
+            }
+        }
+        return screenToWorldTransform;
     }
 
     public int getPartialsLoaded() {

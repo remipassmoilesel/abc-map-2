@@ -116,6 +116,9 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      */
     private Dimension renderedSizePx;
 
+    private AffineTransform worldToScreenTransform;
+    private AffineTransform screenToWorldTransform;
+
     private final EventNotificationManager notifm;
 
     public CachedRenderingEngine(Project p) {
@@ -165,11 +168,9 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     public void paint(Graphics2D g2d) {
 
         if (renderLock.isLocked()) {
-            logger.debug("Render is in progress, abort painting");
+            logger.error("Render is in progress, abort painting");
             return;
         }
-
-        System.out.println();
 
         for (AbstractLayer lay : project.getLayersList()) {
 
@@ -177,15 +178,16 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
             // list of layer changed before refreshMap called
             if (partials == null) {
+                logger.error("Partials are null " + lay.getId());
                 continue;
             }
 
             // get affine transform to set position of partials
-            AffineTransform worldToScreen = partials.getWorldToScreenTransform();
-
             if (debugMode) {
                 g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
             }
+
+            AffineTransform worldToScreenTransform = getWorldToScreenTransform();
 
             // iterate current partials
             for (RenderedPartial part : partials.getPartials()) {
@@ -193,7 +195,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 // compute position of tile on map
                 ReferencedEnvelope ev = part.getEnvelope();
                 Point2D.Double worldPos = new Point2D.Double(ev.getMinX(), ev.getMaxY());
-                Point2D screenPos = worldToScreen.transform(worldPos, null);
+                Point2D screenPos = worldToScreenTransform.transform(worldPos, null);
 
                 int x = (int) Math.round(screenPos.getX());
                 int y = (int) Math.round(screenPos.getY());
@@ -211,7 +213,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                     // show index on partial
                     g2d.setColor(Color.BLACK);
                     String index = "#" + partials.getPartials().indexOf(part);
-                    g2d.drawString(index, x + w / 2, y + h / 2);
+                    g2d.drawString(index, x + w / 2, y + h / 2 + 30);
 
                 }
 
@@ -220,7 +222,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             // draw maximums bounds asked if necessary
             if (debugMode) {
                 Point2D.Double ulc = new Point2D.Double(worldEnvelope.getMinX(), worldEnvelope.getMaxY());
-                Point2D wp = worldToScreen.transform(ulc, null);
+                Point2D wp = worldToScreenTransform.transform(ulc, null);
                 g2d.setStroke(new BasicStroke(2));
                 g2d.setColor(Color.red);
                 g2d.drawRect((int) wp.getX(), (int) wp.getY(), 3, 3);
@@ -240,46 +242,49 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         System.out.println(partialSideWu);
         */
 
-        if (worldEnvelope == null || pixelDim == null) {
-            throw new NullPointerException("Invalid parameter: " + worldEnvelope + " / " + pixelDim);
-        }
-
-        if (worldEnvelope.getMaxX() - worldEnvelope.getMinX() < 0) {
-            throw new RenderingException("Invalid envelope: " + worldEnvelope);
-        }
-
-        if (worldEnvelope.getMaxY() - worldEnvelope.getMinY() < 0) {
-            throw new RenderingException("Invalid envelope: " + worldEnvelope);
-        }
-
-        if (pixelDim.width < 0 || pixelDim.height < 0) {
-            throw new RenderingException("Invalid dimensions: " + pixelDim);
-        }
-
-        if (worldEnvelope.getCoordinateReferenceSystem().equals(project.getCrs()) == false) {
-            throw new RenderingException("Coordinate Reference Systems are different: " + worldEnvelope.getCoordinateReferenceSystem() + " / " + project.getCrs());
-        }
-
-        // check if this method have not been called few milliseconds before
-        if (checkMinimumRenderInterval() == false) {
-            return;
-        }
-
         // on thread at a time renderer map for now
         if (renderLock.tryLock() == false) {
             logger.error("Abort rendering operations, rendering is already in progress");
             return;
         }
 
-        // set essential parameters after verifications
-        computeMinAndMaxPartialSideWu();
-        this.worldEnvelope = worldEnvelope;
-        this.renderedSizePx = pixelDim;
-        computePartialSideWu();
-
         try {
 
+            if (worldEnvelope == null || pixelDim == null) {
+                throw new NullPointerException("Invalid parameter: " + worldEnvelope + " / " + pixelDim);
+            }
+
+            if (worldEnvelope.getMaxX() - worldEnvelope.getMinX() < 0) {
+                throw new RenderingException("Invalid envelope: " + worldEnvelope);
+            }
+
+            if (worldEnvelope.getMaxY() - worldEnvelope.getMinY() < 0) {
+                throw new RenderingException("Invalid envelope: " + worldEnvelope);
+            }
+
+            if (pixelDim.width < 0 || pixelDim.height < 0) {
+                throw new RenderingException("Invalid dimensions: " + pixelDim);
+            }
+
+            if (worldEnvelope.getCoordinateReferenceSystem().equals(project.getCrs()) == false) {
+                throw new RenderingException("Coordinate Reference Systems are different: " + worldEnvelope.getCoordinateReferenceSystem() + " / " + project.getCrs());
+            }
+
+            // check if this method have not been called few milliseconds before
+            if (checkMinimumRenderInterval() == false) {
+                logger.debug("Ask rendering too early: " + lastRender);
+                return;
+            }
+
+            // set essential parameters after verifications
+            computeMinAndMaxPartialSideWu();
+            this.worldEnvelope = worldEnvelope;
+            this.renderedSizePx = pixelDim;
+            computePartialSideWu();
+
             logger.debug("Rendering component: " + this);
+
+            RenderedPartialQueryResult first = null;
 
             // iterate layers, sorted by z-index
             for (AbstractLayer lay : project.getLayersList()) {
@@ -287,8 +292,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 String layId = lay.getId();
 
                 // retrieve map content associated with layer
-
-                // if map does no exist, create one
+                // if content does no exist, create one
                 MapContent map = layerMapContents.get(layId);
                 if (map == null) {
                     map = lay.buildMapContent();
@@ -331,12 +335,38 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
                 // store it to draw it later
                 currentPartials.put(layId, newPartials);
+
+                if(first == null){
+                    first = newPartials;
+                }
             }
+
+            // update transforms
+            worldToScreenTransform = first.getWorldToScreenTransform();
+            screenToWorldTransform = first.getScreenToWorldTransform();
 
 
         } finally {
             renderLock.unlock();
         }
+    }
+
+    /**
+     * Get last world to screen transform generated
+     *
+     * @return
+     */
+    public AffineTransform getWorldToScreenTransform() {
+        return worldToScreenTransform;
+    }
+
+    /**
+     * Get last screen to world transform generated
+     *
+     * @return
+     */
+    public AffineTransform getScreenToWorldTransform() {
+        return screenToWorldTransform;
     }
 
     /**
