@@ -293,23 +293,22 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 // if map is not up to date, create a new one and invalidate cache
                 if (GeoUtils.isMapContains(map, lay.getInternalLayer()) == false) {
 
-                    System.out.println("Cache invalidated ! " + layId);
+                    System.out.println("Layer changed ! " + layId);
 
                     map = lay.buildMapContent();
                     layerMapContents.put(layId, map);
                     factory.setMapContent(map);
 
-                    project.getRenderedPartialsStore().deletePartialsForLayer(layId);
-
+                    project.deleteCacheForLayer(layId);
                 }
 
                 // search which partials are necessary to display
                 RenderedPartialQueryResult newPartials = factory.intersect(worldEnvelope, partialSideWu,
                         () -> {
-                            // each time a partial come, map will be repaint
+                            // notify observers that new partials come
                             notifm.fireEvent(new RenderingEvent(RenderingEvent.NEW_PARTIAL_LOADED));
 
-                            // notify all waiters that new partial come
+                            // notify thread waiters that new partial come
                             synchronized (CachedRenderingEngine.this) {
                                 CachedRenderingEngine.this.notifyAll();
                             }

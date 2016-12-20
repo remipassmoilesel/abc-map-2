@@ -2,22 +2,34 @@ package org.abcmap.gui.components.layers;
 
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 
 /**
- * Render list of all layers in a JList
+ * Render list of layers in a JList
  *
  * @author remipassmoilesel
  */
 public class LayerListRenderer extends JLabel implements ListCellRenderer<AbstractLayer> {
 
+
     private ProjectManager projectm;
 
-    private Color activeLayerColor;
+    /**
+     * Color used to draw active layer background when list is disabled
+     */
+    private Color defaultActiveLayerColorWhenListDisabled;
+
+    /**
+     * Color used to draw active layer background when list is enabled
+     */
+    private Color defaultActiveLayerColor;
 
     public LayerListRenderer() {
 
@@ -25,7 +37,8 @@ public class LayerListRenderer extends JLabel implements ListCellRenderer<Abstra
 
         this.projectm = MainManager.getProjectManager();
 
-        this.activeLayerColor = new Color(43, 3, 188);
+        this.defaultActiveLayerColor = new Color(43, 3, 188);
+        this.defaultActiveLayerColorWhenListDisabled = new Color(155, 168, 188);
 
         setOpaque(true);
         setHorizontalAlignment(LEFT);
@@ -38,12 +51,8 @@ public class LayerListRenderer extends JLabel implements ListCellRenderer<Abstra
 
         GuiUtils.throwIfNotOnEDT();
 
-       /* MapLayer activeLayer = null;
-        try {
-            activeLayer = projectm.getActiveLayer();
-        } catch (NullPointerException | MapLayerException e) {
-            activeLayer = null;
-        }
+        Project project = projectm.getProject();
+        AbstractLayer activeLayer = project.getActiveLayer();
 
         // project not initialized
         if (layer == null || activeLayer == null) {
@@ -57,9 +66,10 @@ public class LayerListRenderer extends JLabel implements ListCellRenderer<Abstra
         // project initialized
         else {
             Color cBorder;
+            Color activeColor = list.isEnabled() ? defaultActiveLayerColor : defaultActiveLayerColorWhenListDisabled;
 
             if (activeLayer.equals(layer)) {
-                setBackground(activeLayerColor);
+                setBackground(activeColor);
                 setForeground(Color.white);
                 cBorder = Color.LIGHT_GRAY;
             } else {
@@ -100,8 +110,6 @@ public class LayerListRenderer extends JLabel implements ListCellRenderer<Abstra
                 this.setSize(getPreferredSize());
             }
         }
-        return this;*/
-
         return this;
     }
 }

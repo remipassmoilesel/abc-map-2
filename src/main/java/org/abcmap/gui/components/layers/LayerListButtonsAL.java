@@ -1,19 +1,24 @@
 package org.abcmap.gui.components.layers;
 
-import org.abcmap.core.managers.CancelManager;
-import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.*;
+import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.gui.dialogs.RenameLayerDialog;
 import org.abcmap.gui.utils.GuiUtils;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Listent user actions on layers
  */
 public class LayerListButtonsAL implements ActionListener {
+
+    private static final CustomLogger logger = LogManager.getLogger(LayerListButtonsAL.class);
 
     public static final String NEW = "NEW";
     public static final String REMOVE = "REMOVE";
@@ -42,184 +47,139 @@ public class LayerListButtonsAL implements ActionListener {
 
         GuiUtils.throwIfNotOnEDT();
 
-        if (projectm.isInitialized() == false){
+        if (projectm.isInitialized() == false) {
             return;
         }
-/*
 
-        MapLayer lay;
-        try {
-            lay = projectm.getActiveLayer();
-        } catch (MapLayerException e1) {
-            Log.debug(e1);
-            return;
-        }
+        Project project = projectm.getProject();
+        AbstractLayer lay = project.getActiveLayer();
 
         if (CHANGE_VISIBILITY.equals(mode)) {
             changeLayerVisibility(lay);
         }
-
+        //
         else if (NEW.equals(mode)) {
-            createNewLayer();
+            createNewFeatureLayer();
         }
-
+        //
         else if (MOVE_UP.equals(mode)) {
-            moveLayer(lay, +1);
-        }
-
-        else if (MOVE_DOWN.equals(mode)) {
             moveLayer(lay, -1);
         }
-
+        //
+        else if (MOVE_DOWN.equals(mode)) {
+            moveLayer(lay, +1);
+        }
+        //
         else if (REMOVE.equals(mode)) {
             removeLayer(lay);
         }
-
+        //
         else if (DUPLICATE.equals(mode)) {
             duplicateLayer(lay);
         }
-
+        //
         else if (RENAME.equals(mode)) {
             renameLayer(lay);
         }
-*/
 
+        // TODO: fire event ?
     }
 
     private void changeLayerVisibility(AbstractLayer lay) {
+        //TODO: save operation in cancelm
 
-/*        lay.getMementoManager().saveStateToRestore();
         lay.setVisible(!lay.isVisible());
-        lay.getMementoManager().saveStateToRedo();
 
-        cancelm.addMapLayerOperation(lay);
-
-        projectm.fireLayerListChanged();*/
-
+        // fire event
+        projectm.fireLayerChanged(lay);
     }
 
     private void moveLayer(AbstractLayer lay, int step) {
 
-       /* 
-       ArrayList<MapLayer> layers = projectm.getLayers();
-        int index = layers.indexOf(lay) + step;
+        //TODO: save operation in cancelm
 
-        if (index >= 0 && index < layers.size()) {
+        Project project = projectm.getProject();
+        ArrayList<AbstractLayer> layers = project.getLayersList();
+        int newIndex = layers.indexOf(lay) + step;
 
-            projectm.getMementoManager().saveStateToRestore();
-
-            projectm.getProject().setNotificationsEnabled(false);
-
-            try {
-                projectm.removeLayer(lay);
-                projectm.addLayer(lay, index);
-            } catch (MapLayerException e) {
-                Log.debug(e);
-            }
-
-            projectm.getProject().setNotificationsEnabled(true);
-
-            projectm.fireLayerListChanged();
-
-            projectm.getMementoManager().saveStateToRedo();
-
-            cancelm.addProjectListsOperation();
+        // move layer only if new index is in bounds
+        if (newIndex >= 0 && newIndex < layers.size()) {
+            project.moveLayerToIndex(lay, newIndex);
         }
-*/
+
+        // fire event
+        projectm.fireLayerListChanged();
     }
 
     private void removeLayer(AbstractLayer lay) {
-/*
 
-        // enregistrer l'opération
-        MapLayerCancelOp op = cancelm.addMapLayerOperation(lay);
-        op.layerHaveBeenDeleted(true);
+        //TODO: save operation in cancelm
 
-        // supprimer le calque puis choisir le prochain
-        projectm.removeLayer(lay);
+        // remove active layer
+        Project project = projectm.getProject();
+        project.removeLayer(lay);
 
-        // trouver un nouvel index de calque actif
-        int index = projectm.getLayers().size() - 1;
-        if (index < 0)
-            index = 0;
+        // change active layer
+        int index = project.getLayersList().size() - 1;
+        project.setActiveLayer(index);
 
-        // changer le calque actif
-        try {
-            projectm.setActiveLayer(index);
-        } catch (MapLayerException e) {
-            Log.debug(e);
-        }
-*/
-
+        // fire event
+        projectm.fireLayerListChanged();
     }
 
-    private void createNewLayer() {
+    private void createNewFeatureLayer() {
 
-     /*
-        MapLayer lay = projectm.addNewLayer();
+        //TODO: save operation in cancelm
 
+        Project project = projectm.getProject();
+        AbstractLayer lay;
         try {
-            projectm.setActiveLayer(lay);
-        } catch (MapLayerException e) {
-            Log.debug(e);
+
+            // create a new layer
+            lay = project.addNewFeatureLayer("Nouvelle couche", true, project.getHigherZindex() + 1);
+
+            // set new layer active
+            project.setActiveLayer(lay);
+
+        } catch (IOException e) {
+            logger.error(e);
         }
 
-        MapLayerCancelOp op = cancelm.addMapLayerOperation(lay);
-        op.layerHaveBeenAdded(true);*/
+        // fire event
+        projectm.fireLayerListChanged();
 
-    }
-
-    private void duplicateLayer(final AbstractLayer lay) {
-
-       /*
-        ThreadManager.runLater(new Runnable() {
-            @Override
-            public void run() {
-
-                 MapLayer newLay = lay.duplicate();
-
-                newLay.setName(lay.getName() + " (copie)");
-
-                projectm.addLayer(newLay);
-
-                try {
-                    projectm.setActiveLayer(newLay);
-                } catch (MapLayerException e) {
-                    Log.debug(e);
-                }
-
-                MapLayerCancelOp op = cancelm.addMapLayerOperation(newLay);
-                op.layerHaveBeenAdded(true);
-
-            }
-        });*/
     }
 
     private void renameLayer(AbstractLayer lay) {
 
-       /*
+        //TODO: save operation in cancelm
 
         String name = lay.getName();
 
-
+        // show dialog with original name
         RenameLayerDialog dial = new RenameLayerDialog(guim.getMainWindow(), name);
         dial.setVisible(true);
 
-
+        // change name if validated
         if (RenameLayerDialog.ACTION_VALIDATED.equals(dial.getAction())) {
-
-
-            lay.getMementoManager().saveStateToRestore();
-
-
             lay.setName(dial.getInput());
+        }
 
-
-            lay.getMementoManager().saveStateToRedo();
-            cancelm.addMapLayerOperation(lay);
-
-        }*/
-
+        // fire event
+        projectm.fireLayerListChanged();
     }
+
+
+    private void duplicateLayer(final AbstractLayer lay) {
+
+        // TODO: to complete
+        ThreadManager.runLater(new Runnable() {
+            @Override
+            public void run() {
+                throw new IllegalStateException("Unimplemented method !");
+            }
+        });
+    }
+
 
 }

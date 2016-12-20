@@ -7,7 +7,7 @@ import org.abcmap.ielements.draw.SelectLayer;
 
 public class GroupLayersAndDimensions extends InteractionElementGroup {
     public GroupLayersAndDimensions() {
-        label = "Calques et dimensions";
+        label = "Calques";
         blockIcon = GuiIcons.GROUP_LAYERS;
 
         addInteractionElement(new SelectLayer());

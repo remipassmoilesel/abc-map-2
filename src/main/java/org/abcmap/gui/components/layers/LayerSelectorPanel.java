@@ -1,33 +1,24 @@
 package org.abcmap.gui.components.layers;
 
-import java.awt.Color;
-import java.awt.Component;
+import net.miginfocom.swing.MigLayout;
+import org.abcmap.core.events.manager.EventNotificationManager;
+import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.gui.GuiIcons;
+import org.abcmap.gui.utils.GuiUtils;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.ListSelectionModel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.events.manager.Event;
-import org.abcmap.core.events.manager.EventListener;
-import org.abcmap.core.events.manager.HasEventNotificationManager;
-import org.abcmap.core.events.manager.EventNotificationManager;
-import org.abcmap.core.project.layers.AbstractLayer;
-import org.abcmap.gui.GuiIcons;
-import org.abcmap.gui.utils.GuiUtils;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Manage layers in project
@@ -61,7 +52,10 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
         // listen project
         this.notifm = new EventNotificationManager(this);
-        notifm.setDefaultListener(new LayerSelectorUpdater());
+        notifm.setDefaultListener((ev) -> {
+            // TODO filter events
+            SwingUtilities.invokeLater(formUpdater);
+        });
         projectm.getNotificationManager().addObserver(this);
 
         // selectable list of layers
@@ -75,7 +69,7 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
         jlist.setCellRenderer(new LayerListRenderer());
         jlist.addListSelectionListener(new SelectionListener());
 
-        // list is in scrollpane
+        // list is in a scrollpane
         JScrollPane sp = new JScrollPane(jlist);
         sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -83,8 +77,7 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
         // opacity setter
         GuiUtils.addLabel("Opacité du calque: ", this, "wrap");
-        opacitySlider = new JSlider(JSlider.HORIZONTAL, SLIDER_MIN_VALUE,
-                SLIDER_MAX_VALUE, 0);
+        opacitySlider = new JSlider(JSlider.HORIZONTAL, SLIDER_MIN_VALUE, SLIDER_MAX_VALUE, 0);
         opacitySlider.addChangeListener(new SliderListener());
         add(opacitySlider, "grow, span, wrap 8px");
 
@@ -93,26 +86,21 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
         up.addActionListener(new LayerListButtonsAL(LayerListButtonsAL.MOVE_UP));
 
         JButton down = new JButton(GuiIcons.LAYER_DOWN);
-        down.addActionListener(new LayerListButtonsAL(
-                LayerListButtonsAL.MOVE_DOWN));
+        down.addActionListener(new LayerListButtonsAL(LayerListButtonsAL.MOVE_DOWN));
 
         JButton rename = new JButton(GuiIcons.LAYER_RENAME);
-        rename.addActionListener(new LayerListButtonsAL(
-                LayerListButtonsAL.RENAME));
+        rename.addActionListener(new LayerListButtonsAL(LayerListButtonsAL.RENAME));
 
         JButton remove = new JButton(GuiIcons.LAYER_REMOVE);
-        remove.addActionListener(new LayerListButtonsAL(
-                LayerListButtonsAL.REMOVE));
+        remove.addActionListener(new LayerListButtonsAL(LayerListButtonsAL.REMOVE));
 
         JButton newlayer = new JButton(GuiIcons.LAYER_ADD);
-        newlayer.addActionListener(new LayerListButtonsAL(
-                LayerListButtonsAL.NEW));
+        newlayer.addActionListener(new LayerListButtonsAL(LayerListButtonsAL.NEW));
 
         JButton visibility = new JButton(GuiIcons.LAYER_VISIBILITY_BUTTON);
-        visibility.addActionListener(new LayerListButtonsAL(
-                LayerListButtonsAL.CHANGE_VISIBILITY));
+        visibility.addActionListener(new LayerListButtonsAL(LayerListButtonsAL.CHANGE_VISIBILITY));
 
-        // buttons are in seprate panel
+        // buttons are in separate panel
         JPanel subPanel = new JPanel(new MigLayout("insets 0"));
         String dim = "width 30!, height 30!";
         subPanel.add(newlayer, dim);
@@ -124,13 +112,16 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
         add(subPanel);
 
+        // first update
+        formUpdater.run();
+
         // refresh component
         revalidate();
         repaint();
     }
 
     /**
-     * Listen mouse selection of layers
+     * Change active layer from selection list
      */
     private class SelectionListener implements ListSelectionListener {
 
@@ -139,46 +130,32 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
             GuiUtils.throwIfNotOnEDT();
 
-   /*         if (projectm.isInitialized() == false){
+            if (projectm.isInitialized() == false) {
                 return;
             }
 
-            AbstractLayer activeLayer;
-            try {
-                activeLayer = projectm.getActiveLayer();
-            } catch (AbstractLayerException e1) {
+            Project project = projectm.getProject();
+            AbstractLayer activeLayer = project.getActiveLayer();
 
-                // le projet n'est pas initialisé:
-                // repeindre la liste vide puis retour
-                if (showExceptions)
-                    Log.debug(e1);
-                jlist.repaint();
-                return;
-            }
-
+            // get selected layer. If null, stop operation
             AbstractLayer lay = jlist.getSelectedValue();
-
-            if (lay == null){
+            if (lay == null) {
                 return;
             }
 
-            // selectionner le calque, uniquement si il n'est pas deja actif
+            // select layer
             if (activeLayer.equals(lay) == false) {
-                try {
-                    projectm.setActiveLayer(lay);
-                } catch (AbstractLayerException e1) {
-                    if (showExceptions)
-                        Log.debug(e1);
-                }
-            }*/
+                project.setActiveLayer(lay);
+            }
 
-            refresh();
+            // fire event
+            projectm.fireLayerListChanged();
 
         }
     }
 
     /**
-     * Listent opacity change of layers
+     * Update layers from opacity sliders
      *
      * @author remipassmoilesel
      */
@@ -188,33 +165,31 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
             GuiUtils.throwIfNotOnEDT();
 
+            // do othing if project is invalid
             if (projectm.isInitialized() == false) {
                 return;
             }
 
+            // get selected value, rounded
+            Project project = projectm.getProject();
             JSlider slider = (JSlider) arg0.getSource();
             float value = Float.valueOf(slider.getValue()) / 100;
 
-
-            /*AbstractLayer lay;
-            try {
-                lay = projectm.getActiveLayer();
-            } catch (AbstractLayerException e) {
-                if (showExceptions)
-                    Log.debug(e);
-                return;
-            }
-
-            // appliquer la valeur d'opacité uniquement si différente
+            // hange layer only if needed
+            AbstractLayer lay = project.getActiveLayer();
             if (lay.getOpacity() != value) {
-                lay.setOpacity(value);
-            }*/
+                ThreadManager.runLater(() -> {
+                    lay.setOpacity(value);
 
+                    // fire event
+                    projectm.fireLayerChanged(lay);
+                });
+            }
         }
     }
 
     /**
-     * Update form values
+     * Update form values from project
      */
     private class FormUpdater implements Runnable {
 
@@ -239,27 +214,34 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
                 return;
             }
 
-           /* // project is initialized, show current values
+            // project is initialized, show current values
             else {
 
-                AbstractLayer activeLayer;
-                try {
-                    activeLayer = projectm.getActiveLayer();
-                } catch (AbstractLayerException e) {
-                    if (showExceptions)
-                        Log.debug(e);
-                    return;
+                Project project = projectm.getProject();
+                AbstractLayer activeLayer = project.getActiveLayer();
+
+                if (opacitySlider.isEnabled() == false) {
+                    opacitySlider.setEnabled(true);
                 }
 
-                float opacity = activeLayer.getOpacity();
-                int newValue = Math.round(opacity * 100);
+                // update opacity of active layer
+                double opacity = activeLayer.getOpacity();
+                int newValue = (int) Math.round(opacity * 100);
                 if (newValue != opacitySlider.getValue()) {
                     GuiUtils.changeWithoutFire(opacitySlider, newValue);
                     opacitySlider.revalidate();
                     opacitySlider.repaint();
                 }
 
-                ArrayList<AbstractLayer> layers = projectm.getLayers();
+                // update layer list
+                ArrayList<AbstractLayer> layers = project.getLayersList();
+                Collections.reverse(layers);
+
+                if (jlist.isEnabled() == false) {
+                    jlist.setEnabled(true);
+                }
+
+                // empty model, but do not change it
                 listModel.clear();
                 for (int i = layers.size(); i > 0; i--) {
                     listModel.addElement(layers.get(i - 1));
@@ -267,17 +249,15 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
                 jlist.revalidate();
                 jlist.repaint();
-            }*/
+            }
 
         }
 
     }
 
-    private class LayerSelectorUpdater implements EventListener {
-        @Override
-        public void notificationReceived(Event arg) {
-            SwingUtilities.invokeLater(formUpdater);
-        }
+    public void refresh() {
+        this.repaint();
+        this.revalidate();
     }
 
     @Override
@@ -285,9 +265,5 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
         return notifm;
     }
 
-    public void refresh() {
-        this.repaint();
-        this.revalidate();
-    }
 
 }

@@ -15,7 +15,7 @@ import java.nio.file.Paths;
 public class ConfigurationConstants {
 
     /**
-     * Root for interaction element introspection search
+     * Root package of interaction elemente, for introspection search
      */
     public static final String IE_PACKAGE_ROOT = "org.abcmap.ielements";
 
@@ -27,8 +27,6 @@ public class ConfigurationConstants {
     /**
      * Packages where are stored draw
      */
-    public final static String DRAW_PACKAGE = "abcmap.draw.draw";
-
     public static final String SOFTWARE_NAME = "Abc-Map";
     public static final String SOFTWARE_VERSION = "2.00";
 
@@ -68,8 +66,6 @@ public class ConfigurationConstants {
 
     public static final Charset DEFAULT_CHARSET = Charset.forName("utf-8");
     public static final int SCROLLBAR_UNIT_INCREMENT = 20;
-    public static final Dimension MINIMUM_MAP_DIMENSIONS = new Dimension(800,
-            600);
 
     /*
      * Configuration profiles settings
@@ -78,10 +74,6 @@ public class ConfigurationConstants {
     public static final String PROFILE_EXTENSION = "xml";
     public static final Path DEFAULT_PROFILE_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), "default." + PROFILE_EXTENSION);
     public static final Path CURRENT_PROFILE_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), ".current");
-
-    public static final String XML_PARAMETER_TAG = "parameter";
-    public static final String XML_ROOT_NAME = "parameters";
-    public static final String XML_PARAMETER_ATTRIBUTE_NAME = "name";
 
     public static final String PROJECT_EXTENSION = "abm";
 

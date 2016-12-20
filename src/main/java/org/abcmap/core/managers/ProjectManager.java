@@ -10,6 +10,7 @@ import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
 import org.abcmap.core.project.backup.ProjectBackupInterval;
+import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.gui.utils.GuiUtils;
 
@@ -79,11 +80,17 @@ public class ProjectManager implements HasEventNotificationManager {
 
     }
 
+    /**
+     * Start project backup interval, to save project a regular interval
+     */
     private void startBackupInterval() {
         backupTimer.stop();
         backupTimer.start();
     }
 
+    /**
+     * Stop project backup interval
+     */
     private void stopBackupInterval() {
         backupTimer.stop();
     }
@@ -202,6 +209,33 @@ public class ProjectManager implements HasEventNotificationManager {
         notifm.fireEvent(new ProjectEvent(ProjectEvent.NEW_PROJECT_LOADED));
     }
 
+    /**
+     * Fire an event meaning that layouts sheets changed
+     */
+    public void fireLayoutListChanged() {
+        notifm.fireEvent(new ProjectEvent(ProjectEvent.LAYOUTS_LIST_CHANGED, null));
+    }
+
+    /**
+     * Fire an event meaning that layers list changed
+     */
+    public void fireLayerListChanged() {
+        notifm.fireEvent(new ProjectEvent(ProjectEvent.LAYERS_LIST_CHANGED, null));
+    }
+
+    /**
+     *
+     * @param lay
+     */
+    public void fireLayerChanged(AbstractLayer lay) {
+        notifm.fireEvent(new ProjectEvent(ProjectEvent.LAYER_CHANGED, lay));
+    }
+
+    /**
+     * Return current project loaded. Can return null.
+     *
+     * @return
+     */
     public Project getProject() {
         return currentProject;
     }
@@ -211,10 +245,4 @@ public class ProjectManager implements HasEventNotificationManager {
         return notifm;
     }
 
-    /**
-     * Fire an event meaning that layouts sheets changed
-     */
-    public void fireLayoutListChanged() {
-        notifm.fireEvent(new ProjectEvent(ProjectEvent.LAYOUTS_LIST_CHANGED, null));
-    }
 }

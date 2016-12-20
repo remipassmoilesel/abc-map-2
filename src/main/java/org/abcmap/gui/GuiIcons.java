@@ -100,8 +100,8 @@ public class GuiIcons {
     public static final ImageIcon LAYER_DOWN = getIcon(LAYERS_DIR + "layer_down.png");
 //    public static final ImageIcon LAYER_TOP = getIcon(LAYERS_DIR + "layer_top.png");
 //    public static final ImageIcon LAYER_BOTTOM = getIcon(LAYERS_DIR + "layer_bottom.png");
-//    public static final ImageIcon LAYER_IS_VISIBLE = getIcon(LAYERS_DIR + "layer_is_visible.png");
-//    public static final ImageIcon LAYER_IS_INVISIBLE = getIcon(LAYERS_DIR + "layer_is_invisible.png");
+    public static final ImageIcon LAYER_IS_VISIBLE = getIcon(LAYERS_DIR + "layer_is_visible.png");
+    public static final ImageIcon LAYER_IS_INVISIBLE = getIcon(LAYERS_DIR + "layer_is_invisible.png");
     public static final ImageIcon LAYER_VISIBILITY_BUTTON = getIcon(LAYERS_DIR + "layer_visibility_button.png");
 
 	/*

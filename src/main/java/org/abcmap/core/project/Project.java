@@ -2,6 +2,8 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.project.layers.LayerIndexEntry;
@@ -99,6 +101,8 @@ public class Project {
      */
     private CoordinateReferenceSystem crs;
 
+    private final ProjectManager pman;
+
     /**
      * Create a new project associated with the database at specified location.
      * <p>
@@ -108,6 +112,8 @@ public class Project {
      * @throws IOException
      */
     public Project(Path databasePath) throws IOException {
+
+        this.pman = MainManager.getProjectManager();
 
         this.databasePath = databasePath;
 
