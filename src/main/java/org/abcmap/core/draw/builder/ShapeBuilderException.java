@@ -1,4 +1,4 @@
-package org.abcmap.core.draw;
+package org.abcmap.core.draw.builder;
 
 /**
  * Exception that can be thrown on drawing errors

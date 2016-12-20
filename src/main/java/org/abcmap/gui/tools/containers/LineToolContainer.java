@@ -9,6 +9,7 @@ import org.abcmap.gui.tools.LineTool;
 public class LineToolContainer extends ToolContainer {
 
     public LineToolContainer() {
+        this.id = ToolLibrary.LINE_TOOL;
         this.readableName = "Ligne";
         this.icon = GuiIcons.TOOL_LINE;
         this.accelerator = shortcuts.LINE_TOOL;

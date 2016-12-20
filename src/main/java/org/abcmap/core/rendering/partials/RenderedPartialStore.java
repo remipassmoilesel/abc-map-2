@@ -277,7 +277,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
     }
 
     private void fireNewPartialsAdded() {
-        notifm.fireEvent(new PartialStoreEvent(PartialStoreEvent.NEW_PARTIALS_ADDED, null));
+        notifm.fireEvent(new PartialStoreEvent(PartialStoreEvent.NEW_PARTIALS_AVAILABLE, null));
     }
 
     @Override

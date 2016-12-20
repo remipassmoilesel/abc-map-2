@@ -9,6 +9,7 @@ import org.abcmap.gui.tools.PolygonTool;
 public class PolygonToolContainer extends ToolContainer {
 
     public PolygonToolContainer() {
+        this.id = ToolLibrary.POLYGON_TOOL;
         this.readableName = "Polygone";
         this.icon = GuiIcons.TOOL_POLYGON;
         this.accelerator = shortcuts.POLYGON_TOOL;

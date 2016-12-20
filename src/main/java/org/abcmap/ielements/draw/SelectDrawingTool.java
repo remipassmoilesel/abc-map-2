@@ -2,6 +2,7 @@ package org.abcmap.ielements.draw;
 
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.ToolSelectionPanel;
+import org.abcmap.gui.tools.containers.ToolContainer;
 import org.abcmap.ielements.InteractionElement;
 
 import java.awt.*;
@@ -32,13 +33,19 @@ public class SelectDrawingTool extends InteractionElement {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            // id of current tool
-            String managerToolId = drawm.getCurrentToolContainer().getId();
+            // current tool
+            ToolContainer currentTool = drawm.getCurrentToolContainer();
 
-            // lnew tool
+            // new tool id
             String toolId = e.getActionCommand();
 
-            if (Utils.safeEquals(managerToolId, toolId) == false) {
+            // no tool set, set new tool
+            if (currentTool == null) {
+                drawm.setCurrentTool(toolId);
+            }
+
+            // check if tool is not already set
+            else if (Utils.safeEquals(currentTool.getId(), toolId) == false) {
                 drawm.setCurrentTool(toolId);
             }
 

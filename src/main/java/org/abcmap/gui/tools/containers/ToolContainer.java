@@ -193,6 +193,11 @@ public class ToolContainer {
      * @return
      */
     public String getId() {
+
+        if (id == null) {
+            throw new IllegalStateException("Id should be set in controller: " + id);
+        }
+
         return id;
     }
 

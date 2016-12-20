@@ -1,15 +1,16 @@
-package org.abcmap.core.draw;
+package org.abcmap.core.draw.builder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.opengis.feature.simple.SimpleFeature;
+
+import java.awt.geom.AffineTransform;
 
 public class PointBuilder extends AbstractShapeBuilder {
 
     public PointBuilder(FeatureLayer layer) {
         super(layer);
     }
-
 
     /**
      * Create a new point.
@@ -19,7 +20,7 @@ public class PointBuilder extends AbstractShapeBuilder {
      * @param coord
      */
     public SimpleFeature addPoint(Coordinate coord) {
-        currentFeature = getActiveLayer().addShape(geometryFactory.createPoint(coord));
+        currentFeature = buildFeature(geometryFactory.createPoint(coord));
         applyStyle();
         return currentFeature;
     }

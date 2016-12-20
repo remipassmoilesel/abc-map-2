@@ -14,9 +14,9 @@ import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.StatusBar;
 import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.components.map.CachedMapPane;
-import org.abcmap.ielements.program.QuitProgram;
 import org.abcmap.gui.layouts.LayoutListPanel;
 import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.ielements.program.QuitProgram;
 
 import javax.swing.*;
 import java.awt.*;
@@ -199,6 +199,7 @@ public class MainWindow extends AbstractCustomWindow implements HasEventNotifica
                 // component is not up to date, create a new one
                 if (mapPanel == null || mapPanel.getProject().equals(currentProject) == false) {
                     mapPanel = new CachedMapPane(currentProject);
+                    mapPanel.setAcceptPaintFromTool(true);
                     mapPanel.setMouseManagementEnabled(true);
                     mapPanel.setNavigationBarEnabled(true);
                 }

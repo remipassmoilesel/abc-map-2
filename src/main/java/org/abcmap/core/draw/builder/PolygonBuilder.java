@@ -1,16 +1,17 @@
-package org.abcmap.core.draw;
+package org.abcmap.core.draw.builder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.opengis.feature.simple.SimpleFeature;
 
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 /**
  * Tool to polygons
  */
-public class PolygonBuilder extends AbstractPolylineBuilder {
+public class PolygonBuilder extends AbstractLineBuilder {
 
     public PolygonBuilder(FeatureLayer layer) {
         super(layer);

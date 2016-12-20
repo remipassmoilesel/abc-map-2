@@ -1,6 +1,10 @@
 package org.abcmap.core.managers;
 
-import org.abcmap.core.draw.*;
+import org.abcmap.core.draw.DrawManagerException;
+import org.abcmap.core.draw.LayerElement;
+import org.abcmap.core.draw.builder.LineBuilder;
+import org.abcmap.core.draw.builder.PointBuilder;
+import org.abcmap.core.draw.builder.PolygonBuilder;
 import org.abcmap.core.events.DrawManagerEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
@@ -13,6 +17,7 @@ import org.abcmap.gui.tools.containers.ToolContainer;
 import org.abcmap.gui.tools.containers.ToolLibrary;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 /**
@@ -62,7 +67,8 @@ public class DrawManager implements HasEventNotificationManager {
      *
      * @return
      */
-    public LineBuilder getLineBuilder() throws DrawManagerException {
+    public LineBuilder getLineBuilder(AffineTransform transform) throws DrawManagerException {
+
         FeatureLayer layer = getActiveFeatureLayerOrThrow();
 
         LineBuilder builder = new LineBuilder(layer);
@@ -233,6 +239,23 @@ public class DrawManager implements HasEventNotificationManager {
         return currentToolContainer;
     }
 
+    /**
+     * Return current tool or null if no tool is set
+     *
+     * @return
+     */
+    public MapTool getCurrentTool() {
+
+        // no tool is set
+        if (getCurrentToolContainer() == null) {
+            return null;
+        }
+        // a tool is set, return instance
+        else {
+            return getCurrentToolContainer().getCurrentInstance();
+        }
+    }
+
     public ArrayList<String> getAvailableSymbolSets() {
         return new ArrayList<>();
     }
@@ -245,9 +268,6 @@ public class DrawManager implements HasEventNotificationManager {
         return new ArrayList<>();
     }
 
-    public Object getCurrentTool() {
-        return new Object();
-    }
 
     public LayerElement getFirstSelectedElement() {
         return getFirstSelectedElement((Class) null);

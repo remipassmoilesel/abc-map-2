@@ -5,6 +5,9 @@ package org.abcmap.gui.tools.containers;
  */
 public class ToolLibrary {
 
+    public static final String LINE_TOOL = "LINE_TOOL";
+    public static final String POLYGON_TOOL = "POLYGON_TOOL";
+
     private static ToolContainer[] containers;
 
     /**

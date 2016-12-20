@@ -5,6 +5,7 @@ import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
@@ -41,6 +42,10 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     private final CachedRenderingEngine renderingEngine;
 
+    /**
+     * If set to true, panel will ask to current tool to paint if needed
+     */
+    private boolean acceptPaintFromTool;
 
     /**
      * If true, it is the first time panel is rendering
@@ -78,9 +83,13 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     private double maxZoomFactor;
 
     private final EventNotificationManager notifm;
+    private final DrawManager drawm;
 
     public CachedMapPane(Project p) {
         super(new MigLayout("fill"));
+
+        drawm = MainManager.getDrawManager();
+        this.acceptPaintFromTool = false;
 
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         addComponentListener(new RefreshMapComponentListener());
@@ -135,26 +144,41 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // if debug mode enabled, paint world envelope asked
         if (debugMode) {
+            paintGrid(g2d);
+        }
 
-            AffineTransform worldToScreenTransform = getWorldToScreenTransform();
-            if (worldToScreenTransform != null) {
+        // let tool paint if needed
+        if (acceptPaintFromTool && drawm.getCurrentTool() != null) {
+            drawm.getCurrentTool().drawOnMainMap(g2d);
+        }
 
-                Point2D blc = new Point2D.Double(currentWorlEnvelope.getMinX(), currentWorlEnvelope.getMinY());
-                Point2D urc = new Point2D.Double(currentWorlEnvelope.getMaxX(), currentWorlEnvelope.getMaxY());
-                blc = worldToScreenTransform.transform(blc, null);
-                urc = worldToScreenTransform.transform(urc, null);
+    }
 
-                int x = (int) blc.getX();
-                int y = (int) urc.getY();
-                int w = (int) Math.abs(urc.getX() - blc.getX());
-                int h = (int) Math.abs(urc.getY() - blc.getY());
+    /**
+     * Paint grid for debug purposes
+     *
+     * @param g2d
+     */
+    private void paintGrid(Graphics2D g2d) {
 
-                g2d.setColor(Color.blue);
-                int st = 2;
-                g2d.setStroke(new BasicStroke(st));
-                g2d.drawRect(x + st, y + st, w - st * 2, h - st * 2);
+        AffineTransform worldToScreenTransform = getWorldToScreenTransform();
+        if (worldToScreenTransform != null) {
 
-            }
+            Point2D blc = new Point2D.Double(currentWorlEnvelope.getMinX(), currentWorlEnvelope.getMinY());
+            Point2D urc = new Point2D.Double(currentWorlEnvelope.getMaxX(), currentWorlEnvelope.getMaxY());
+            blc = worldToScreenTransform.transform(blc, null);
+            urc = worldToScreenTransform.transform(urc, null);
+
+            int x = (int) blc.getX();
+            int y = (int) urc.getY();
+            int w = (int) Math.abs(urc.getX() - blc.getX());
+            int h = (int) Math.abs(urc.getY() - blc.getY());
+
+            g2d.setColor(Color.blue);
+            int st = 2;
+            g2d.setStroke(new BasicStroke(st));
+            g2d.drawRect(x + st, y + st, w - st * 2, h - st * 2);
+
         }
     }
 
@@ -479,6 +503,20 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         }
 
         this.currentWorlEnvelope = worldEnvelope;
+    }
+
+    /**
+     * If set to true, panel will ask to current tool to paint if needed
+     */
+    public void setAcceptPaintFromTool(boolean acceptPaintFromTool) {
+        this.acceptPaintFromTool = acceptPaintFromTool;
+    }
+
+    /**
+     * If set to true, panel will ask to current tool to paint if needed
+     */
+    public boolean isAcceptPaintFromTool() {
+        return acceptPaintFromTool;
     }
 
     /**

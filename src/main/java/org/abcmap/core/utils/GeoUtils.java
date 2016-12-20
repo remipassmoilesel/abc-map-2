@@ -229,6 +229,26 @@ public class GeoUtils {
     }
 
     /**
+     * Transform a Point2D object in coordinate
+     *
+     * @param point
+     * @return
+     */
+    public static Coordinate point2DtoCoordinate(Point2D point) {
+        return new Coordinate(point.getX(), point.getY());
+    }
+
+    /**
+     * Transform a Point2D object in coordinate
+     *
+     * @param point
+     * @return
+     */
+    public static Coordinate point2DtoCoordinate(Point point) {
+        return point2DtoCoordinate((Point2D) point);
+    }
+
+    /**
      * Return true if specified map content contain specified layer
      *
      * @param map
@@ -245,7 +265,15 @@ public class GeoUtils {
         return false;
     }
 
-    public static boolean compareEnvelopes(ReferencedEnvelope env1, ReferencedEnvelope env2, double v) {
+    /**
+     * Return true if two envelopes are similar with delta precision
+     *
+     * @param env1
+     * @param env2
+     * @param delta
+     * @return
+     */
+    public static boolean compareEnvelopes(ReferencedEnvelope env1, ReferencedEnvelope env2, double delta) {
 
         if (env1 == env2) {
             return true;
@@ -267,7 +295,7 @@ public class GeoUtils {
 
         for (int i = 0; i < val1.length; i++) {
             double diff = Math.abs(val1[i] - val2[i]);
-            if (diff > v) {
+            if (diff > delta) {
                 return false;
             }
         }
@@ -275,10 +303,15 @@ public class GeoUtils {
         return true;
     }
 
-
+    /**
+     * Return a unique identifier for CRS that can be used to recreate a CRS with stringToCrs()
+     *
+     * @param crs
+     * @return
+     */
     public static String crsToString(CoordinateReferenceSystem crs) {
 
-        if(crs == null){
+        if (crs == null) {
             throw new NullPointerException("CRS is null");
         }
 
@@ -298,6 +331,13 @@ public class GeoUtils {
         throw new IllegalArgumentException("Unserializable CRS: " + crs);
     }
 
+    /**
+     * Create a CRS from a string created with crsToString()
+     *
+     * @param crsId
+     * @return
+     * @throws FactoryException
+     */
     public static CoordinateReferenceSystem stringToCrs(String crsId) throws FactoryException {
 
         crsId = crsId.toUpperCase();
@@ -311,4 +351,6 @@ public class GeoUtils {
         // try to decode it
         return CRS.decode(crsId);
     }
+
+
 }

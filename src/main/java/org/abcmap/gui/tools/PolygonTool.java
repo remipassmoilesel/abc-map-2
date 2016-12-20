@@ -1,7 +1,5 @@
 package org.abcmap.gui.tools;
 
-import org.abcmap.gui.tools.MapTool;
-
 import java.awt.event.MouseEvent;
 
 /**
@@ -13,6 +11,6 @@ public class PolygonTool extends MapTool{
     public void mouseReleased(MouseEvent e) {
         super.mouseReleased(e);
 
-        checkProjectOrShowMessage();
+        getProjectOrShowMessage();
     }
 }

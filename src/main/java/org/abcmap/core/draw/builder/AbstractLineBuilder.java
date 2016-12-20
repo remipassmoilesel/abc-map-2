@@ -1,4 +1,4 @@
-package org.abcmap.core.draw;
+package org.abcmap.core.draw.builder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -6,18 +6,22 @@ import com.vividsolutions.jts.geom.Point;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.opengis.feature.simple.SimpleFeature;
 
+import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 /**
  * Abstract tool designed to draw lines or polygon
  */
-public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
+public abstract class AbstractLineBuilder extends AbstractShapeBuilder {
 
-    public AbstractPolylineBuilder(FeatureLayer layer) {
+    /**
+     * List of points of shape
+     */
+    protected ArrayList<Coordinate> shapePoints;
+
+    public AbstractLineBuilder(FeatureLayer layer) {
         super(layer);
     }
-
-    protected ArrayList<Coordinate> shapePoints;
 
     /**
      * Get the geometry to add to the active layer
@@ -35,7 +39,7 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
 
         throwIfDrawing();
 
-        shapePoints = new ArrayList<Coordinate>();
+        shapePoints = new ArrayList<>();
 
         // store point to expand line later
         shapePoints.add(firstPoint);
@@ -44,7 +48,7 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
         Point pointShape = geometryFactory.createPoint(firstPoint);
 
         // store the current feature to change geometries later
-        currentFeature = getActiveLayer().addShape(pointShape);
+        currentFeature = buildFeature(pointShape);
 
         applyStyle();
 
@@ -66,8 +70,6 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
         // modify geometry
         currentFeature.setDefaultGeometry(getGeometry());
 
-        currentFeature = getActiveLayer().updateFeature(currentFeature);
-
         applyStyle();
 
         return currentFeature;
@@ -82,18 +84,18 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
 
         throwIfNotDrawing();
 
-        // store point
+        // store last point
         shapePoints.add(endPoint);
 
-        // modify geometry
+        // update geometry
         currentFeature.setDefaultGeometry(getGeometry());
-
         applyStyle();
 
-        currentFeature = getActiveLayer().updateFeature(currentFeature);
-
+        // save current feature and layer, and get back the feature with correct id
+        currentFeature = confirmDrawing();
         SimpleFeature returnVal = currentFeature;
 
+        // reset all
         resetTool();
 
         return returnVal;
@@ -114,8 +116,6 @@ public abstract class AbstractPolylineBuilder extends AbstractShapeBuilder {
     public void cancelDrawing() {
 
         throwIfNotDrawing();
-
-        getActiveLayer().removeFeatures(currentFeature);
 
         resetTool();
     }

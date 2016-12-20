@@ -3,9 +3,9 @@ package org.abcmap.tests.core.draw;
 
 import org.abcmap.TestUtils;
 import org.abcmap.core.draw.DrawManagerException;
-import org.abcmap.core.draw.LineBuilder;
-import org.abcmap.core.draw.PointBuilder;
-import org.abcmap.core.draw.PolygonBuilder;
+import org.abcmap.core.draw.builder.LineBuilder;
+import org.abcmap.core.draw.builder.PointBuilder;
+import org.abcmap.core.draw.builder.PolygonBuilder;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
@@ -56,7 +56,7 @@ public class DrawManagerTest {
         dm.setActiveBackground(Color.green);
 
         // draw random lines
-        LineBuilder lbuilder = dm.getLineBuilder();
+        LineBuilder lbuilder = dm.getLineBuilder(null);
         for (int i = 0; i < lineNumber; i++) {
             lbuilder.newLine(TestUtils.getRandomPoint());
 

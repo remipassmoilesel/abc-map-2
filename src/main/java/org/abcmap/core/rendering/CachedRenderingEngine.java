@@ -176,7 +176,6 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             // iterate current partials
             for (RenderedPartial part : partials.getPartials()) {
 
-
                 // compute position of tile on map
                 ReferencedEnvelope ev = part.getEnvelope();
                 Point2D.Double worldPos = new Point2D.Double(ev.getMinX(), ev.getMaxY());
@@ -187,7 +186,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 int w = part.getRenderedWidth();
                 int h = part.getRenderedHeight();
 
-                // draw partial
+                // draw partial with transparency
                 g2dT.drawImage(part.getImage(), x, y, w, h, null);
 
                 if (debugMode) {

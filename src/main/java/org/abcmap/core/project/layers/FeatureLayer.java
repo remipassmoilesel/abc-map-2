@@ -215,4 +215,7 @@ public class FeatureLayer extends AbstractLayer {
         }
     }
 
+    public DefaultFeatureBuilder getFeatureBuilder() {
+        return featureBuilder;
+    }
 }
