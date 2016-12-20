@@ -120,7 +120,7 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
     /**
      * Set opacity, between 0 and 1
      */
-    public double getOpacity() {
+    public float getOpacity() {
         return indexEntry.getOpacity();
     }
 
@@ -129,9 +129,11 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
      *
      * @param opacity
      */
-    public void setOpacity(double opacity) {
+    public void setOpacity(float opacity) {
         indexEntry.setOpacity(opacity);
-        deleteCache();
+
+        // do not delete cache here
+        //deleteCache();
     }
 
     /**

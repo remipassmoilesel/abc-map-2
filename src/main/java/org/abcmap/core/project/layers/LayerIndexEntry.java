@@ -37,7 +37,7 @@ public class LayerIndexEntry implements DataModel {
     private int zindex;
 
     @DatabaseField(columnName = OPACITY_FIELD_NAME)
-    private double opacity;
+    private float opacity;
 
     public LayerIndexEntry() {
     }
@@ -154,7 +154,7 @@ public class LayerIndexEntry implements DataModel {
      *
      * @param opacity
      */
-    public void setOpacity(double opacity) {
+    public void setOpacity(float opacity) {
 
         if (opacity < 0 || opacity > 1) {
             throw new IllegalArgumentException("Invalid opacity: " + opacity);
@@ -168,7 +168,7 @@ public class LayerIndexEntry implements DataModel {
      *
      * @return
      */
-    public double getOpacity() {
+    public float getOpacity() {
         return opacity;
     }
 

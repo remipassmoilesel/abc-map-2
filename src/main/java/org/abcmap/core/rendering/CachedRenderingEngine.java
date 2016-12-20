@@ -10,6 +10,7 @@ import org.abcmap.core.rendering.partials.RenderedPartial;
 import org.abcmap.core.rendering.partials.RenderedPartialFactory;
 import org.abcmap.core.rendering.partials.RenderedPartialQueryResult;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 
@@ -142,6 +143,15 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             return;
         }
 
+        // set graphics properties used for debug mode
+        if (debugMode) {
+            g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
+        }
+
+        // paint background
+        g2d.setColor(project.getBackgroundColor());
+        g2d.fillRect(0, 0, renderedSizePx.width, renderedSizePx.height);
+
         for (AbstractLayer lay : project.getLayersList()) {
 
             RenderedPartialQueryResult partials = currentPartials.get(lay.getId());
@@ -152,10 +162,9 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 continue;
             }
 
-            // set graphics properties used for debug mode
-            if (debugMode) {
-                g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
-            }
+            // set transparency (in other graphics !)
+            Graphics2D g2dT = (Graphics2D) g2d.create();
+            g2dT.setComposite(GuiUtils.createTransparencyComposite(lay.getOpacity()));
 
             AffineTransform worldToScreenTransform = getWorldToScreenTransform();
 
@@ -163,8 +172,10 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             //System.out.println(worldToScreenTransform.equals(partials.getWorldToScreenTransform()));
             //System.out.println(getScreenToWorldTransform().equals(partials.getScreenToWorldTransform()));
 
+
             // iterate current partials
             for (RenderedPartial part : partials.getPartials()) {
+
 
                 // compute position of tile on map
                 ReferencedEnvelope ev = part.getEnvelope();
@@ -177,7 +188,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 int h = part.getRenderedHeight();
 
                 // draw partial
-                g2d.drawImage(part.getImage(), x, y, w, h, null);
+                g2dT.drawImage(part.getImage(), x, y, w, h, null);
 
                 if (debugMode) {
 

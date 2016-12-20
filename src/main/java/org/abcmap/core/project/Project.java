@@ -307,8 +307,8 @@ public class Project {
      *
      * @return
      */
-    public String getBackgroundColor() {
-        return metadataContainer.getValue(PMConstants.BG_COLOR);
+    public Color getBackgroundColor() {
+        return Utils.stringToColor(metadataContainer.getValue(PMConstants.BG_COLOR));
     }
 
     @Override
