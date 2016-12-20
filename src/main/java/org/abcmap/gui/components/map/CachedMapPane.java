@@ -1,12 +1,15 @@
 package org.abcmap.gui.components.map;
 
 import net.miginfocom.swing.MigLayout;
+import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.rendering.CachedRenderingEngine;
+import org.abcmap.core.rendering.RenderingEvent;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -94,9 +97,22 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // repaint when new partials are ready
         notifm = new EventNotificationManager(this);
         notifm.setDefaultListener((ev) -> {
-            CachedMapPane.this.repaint();
+            // new partials are ready, only repaint
+            if (ev instanceof RenderingEvent) {
+                CachedMapPane.this.repaint();
+            }
+            // map changed, prepare new and repaint
+            else if (ev instanceof ProjectEvent) {
+                refreshMap();
+            }
+
         });
+
+        // listen rendering new partials
         renderingEngine.getNotificationManager().addObserver(this);
+
+        // listen map modifications
+        MainManager.getProjectManager().getNotificationManager().addObserver(this);
 
         setDebugMode(true);
     }
