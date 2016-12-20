@@ -5,6 +5,8 @@ import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
 
+import java.util.Objects;
+
 /**
  * Object representing layer metadata. Metadata is stored separately in database.
  */
@@ -17,6 +19,7 @@ public class LayerIndexEntry implements DataModel {
     private static final String NAME_FIELD_NAME = "NAME";
     private static final String VISIBLE_FIELD_NAME = "VISIBLE";
     private static final String ZINDEX_FIELD_NAME = "ZINDEX";
+    private static final String OPACITY_FIELD_NAME = "OPACITY";
 
     @DatabaseField(id = true, columnName = ID_FIELD_NAME)
     private String layerId;
@@ -33,6 +36,9 @@ public class LayerIndexEntry implements DataModel {
     @DatabaseField(columnName = ZINDEX_FIELD_NAME)
     private int zindex;
 
+    @DatabaseField(columnName = OPACITY_FIELD_NAME)
+    private double opacity;
+
     public LayerIndexEntry() {
     }
 
@@ -42,6 +48,7 @@ public class LayerIndexEntry implements DataModel {
         this.visible = visible;
         this.zindex = zindex;
         this.type = type;
+        this.opacity = 1;
 
         if (layerId == null) {
             generateNewId();
@@ -51,44 +58,118 @@ public class LayerIndexEntry implements DataModel {
 
     }
 
+    /**
+     * Return type of lyaer
+     *
+     * @return
+     */
     public LayerType getType() {
         return type;
     }
 
+    /**
+     * Set type of layer
+     *
+     * @param type
+     */
     public void setType(LayerType type) {
         this.type = type;
     }
 
+    /**
+     * Return layer unique id
+     *
+     * @return
+     */
     public String getLayerId() {
         return layerId;
     }
 
+    /**
+     * Set layer unique id
+     *
+     * @param layerId
+     */
     public void setLayerId(String layerId) {
         this.layerId = layerId;
     }
 
+    /**
+     * Get readable name of layer
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
+
+    /**
+     * Set readable name of layer
+     *
+     * @return
+     */
 
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Return true if layer is visible
+     *
+     * @return
+     */
     public boolean isVisible() {
         return visible;
     }
 
+    /**
+     * Set layer visible or not
+     *
+     * @param visible
+     */
     public void setVisible(boolean visible) {
         this.visible = visible;
     }
 
+    /**
+     * Get zindex of layer, 0 on bottom
+     *
+     * @return
+     */
     public int getZindex() {
         return zindex;
     }
 
+    /**
+     * Set zindex of layer, 0 is bottom
+     *
+     * @param zindex
+     */
     public void setZindex(int zindex) {
         this.zindex = zindex;
+    }
+
+    /**
+     * Set opacity of layer between 0 and 1
+     *
+     * @param opacity
+     */
+    public void setOpacity(double opacity) {
+
+        if (opacity < 0 || opacity > 1) {
+            throw new IllegalArgumentException("Invalid opacity: " + opacity);
+        }
+
+        this.opacity = opacity;
+    }
+
+    /**
+     * Get opacity of layer between 0 and 1
+     *
+     * @return
+     */
+    public double getOpacity() {
+        return opacity;
     }
 
     /**
@@ -124,24 +205,17 @@ public class LayerIndexEntry implements DataModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         LayerIndexEntry that = (LayerIndexEntry) o;
-
-        if (visible != that.visible) return false;
-        if (zindex != that.zindex) return false;
-        if (type != that.type) return false;
-        if (layerId != null ? !layerId.equals(that.layerId) : that.layerId != null) return false;
-        return name != null ? name.equals(that.name) : that.name == null;
-
+        return visible == that.visible &&
+                zindex == that.zindex &&
+                Double.compare(that.opacity, opacity) == 0 &&
+                Objects.equals(layerId, that.layerId) &&
+                type == that.type &&
+                Objects.equals(name, that.name);
     }
 
     @Override
     public int hashCode() {
-        int result = type != null ? type.hashCode() : 0;
-        result = 31 * result + (layerId != null ? layerId.hashCode() : 0);
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (visible ? 1 : 0);
-        result = 31 * result + zindex;
-        return result;
+        return Objects.hash(layerId, type, name, visible, zindex, opacity);
     }
 }

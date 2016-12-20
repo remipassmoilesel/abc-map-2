@@ -57,7 +57,7 @@ public class ProjectWriter {
         pwriter.writeMetadatas(project, project.getDatabasePath());
 
         // add the first layer
-        project.addNewFeatureLayer("First layer", true, 0);
+        project.addFirstLayer();
 
         // set the first layer active
         project.setActiveLayer(0);

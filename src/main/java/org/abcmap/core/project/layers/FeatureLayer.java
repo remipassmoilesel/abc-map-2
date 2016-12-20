@@ -57,7 +57,7 @@ public class FeatureLayer extends AbstractLayer {
         // if true, create a new database entry
         if (create) {
             // create a simple feature type
-            SimpleFeatureType type = DefaultFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), this.crs);
+            SimpleFeatureType type = DefaultFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), owner.getCrs());
             datastore.createSchema(type);
         }
 
@@ -65,7 +65,7 @@ public class FeatureLayer extends AbstractLayer {
         this.featureStore = (SimpleFeatureStore) featureSource;
 
         // create a feature builder associated with the layer
-        this.featureBuilder = FeatureUtils.getDefaultFeatureBuilder(entry.getLayerId(), crs);
+        this.featureBuilder = FeatureUtils.getDefaultFeatureBuilder(entry.getLayerId(), owner.getCrs());
         this.internalLayer = new org.geotools.map.FeatureLayer(featureSource, layerStyle);
     }
 

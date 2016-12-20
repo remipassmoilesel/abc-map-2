@@ -88,7 +88,7 @@ public class TileLayer extends AbstractLayer {
             tileStorage.createCoverageStorage(entry.getLayerId());
 
             // create an outline feature entry
-            SimpleFeatureType type = TileFeatureBuilder.getTileFeatureType(entry.getLayerId(), this.crs);
+            SimpleFeatureType type = TileFeatureBuilder.getTileFeatureType(entry.getLayerId(), owner.getCrs());
 
             datastore.createSchema(type);
 
@@ -97,7 +97,7 @@ public class TileLayer extends AbstractLayer {
         this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
 
         // create a feature builder to create outlines
-        this.featureBuilder = FeatureUtils.getTileFeatureBuilder(entry.getLayerId(), crs);
+        this.featureBuilder = FeatureUtils.getTileFeatureBuilder(entry.getLayerId(), owner.getCrs());
 
         // outline layer, with an empty style
         this.outlineStyle = sf.createStyle();
@@ -116,7 +116,7 @@ public class TileLayer extends AbstractLayer {
      * @throws IOException
      */
     public void refreshCoverage() throws IOException {
-        buildCoverageLayer(coverageName, crsCode);
+        buildCoverageLayer(coverageName, GeoUtils.crsToString(project.getCrs()));
     }
 
     /**

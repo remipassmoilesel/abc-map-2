@@ -14,6 +14,7 @@ import org.abcmap.core.tiles.TileStorage;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLProcessor;
 import org.abcmap.core.utils.SQLUtils;
+import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.swing.JMapFrame;
@@ -365,14 +366,21 @@ public class Project {
     /**
      * Set the active layer, the only layer alterable
      *
-     * @param activeLayer
+     * @param layer
      */
-    public void setActiveLayer(AbstractLayer activeLayer) {
-        this.activeLayer = activeLayer;
+    public void setActiveLayer(AbstractLayer layer) {
+
+        if (getLayersList().indexOf(layer) < 0) {
+            throw new IllegalArgumentException("Invalid layer: " + layer);
+        }
+
+        this.activeLayer = layer;
     }
 
     /**
      * Get the active layer, the only layer alterable
+     * <p>
+     * There is always an active layer, because if all layers are removed, a new feature layer will be added
      *
      * @return
      */
@@ -533,12 +541,131 @@ public class Project {
         return partialStore;
     }
 
+    /**
+     * Return layer corresponding to specified id or null
+     *
+     * @param layerId
+     */
+    public AbstractLayer getLayerById(String layerId) {
+
+        for (AbstractLayer lay : getLayersList()) {
+            if (Utils.safeEquals(lay.getId(), layerId)) {
+                return lay;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Remove a layer from project
+     * <p>
+     * Layer is found by its index in a list sorted by zindex (getLayersList())
+     * <p>
+     * If no layer remains, a feature layer is added as if the project is new
+     *
+     * @param index
+     */
+    public void removeLayer(int index) {
+
+        ArrayList<AbstractLayer> list = getLayersList();
+        if (index < 0 || index > list.size()) {
+            throw new IllegalArgumentException("Illegal index: " + index);
+        }
+
+        removeLayer(list.get(index));
+    }
+
+    /**
+     * Remove a layer from project
+     * <p>
+     * If no layer remains, a feature layer is added as if the project is new
+     *
+     * @param lay
+     */
+    public void removeLayer(AbstractLayer lay) {
+
+        mainLayersList.remove(lay);
+
+        if (mainLayersList.size() < 1) {
+            try {
+                addFirstLayer();
+            } catch (IOException e) {
+                logger.error(e);
+            }
+        }
+
+    }
+
+    /**
+     * Move specified layer to specified index in sorted list by zindex(getLayersList())
+     * <p>
+     * Return the new layers list
+     *
+     * @param layToMove
+     * @param newIndex
+     */
+    public ArrayList<AbstractLayer> moveLayerToIndex(AbstractLayer layToMove, int newIndex) {
+
+        ArrayList<AbstractLayer> list = getLayersList();
+
+        // check arguments
+        if (list.indexOf(layToMove) < 0) {
+            throw new IllegalArgumentException("Invalid layer: " + layToMove);
+        }
+
+        if (newIndex < 0 || newIndex > list.size()) {
+            throw new IllegalArgumentException("Invalid index: " + newIndex + " / min 0 / max " + list.size());
+        }
+
+        // remove layer
+        list.remove(layToMove);
+
+        // replace it on desired index
+        list.add(newIndex, layToMove);
+
+        // reset zindex
+        for (int i = 0; i < list.size(); i++) {
+            AbstractLayer lay = list.get(i);
+            lay.setZindex(i);
+        }
+
+        return getLayersList();
+    }
+
+    /**
+     * Invalidate cache for specified layer, on this thread
+     *
+     * @param layId
+     */
+    public void deleteCacheForLayer(String layId) {
+
+        if (getLayerById(layId) == null) {
+            throw new IllegalArgumentException("Unable to find layer: " + layId);
+        }
+
+        partialStore.deletePartialsForLayer(layId);
+    }
+
+    /**
+     * Add the first layer in project
+     */
+    public void addFirstLayer() throws IOException {
+        addNewFeatureLayer("First layer", true, 0);
+    }
+
+
+    /**
+     * Add a layout in project
+     *
+     * @param lay
+     */
     public void addLayout(LayoutSheet lay) {
         layouts.add(lay);
     }
 
     /**
-     * Return a copy of layout list
+     * Return a shallow copy of layout list
      *
      * @return
      */
@@ -553,15 +680,37 @@ public class Project {
         layouts.clear();
     }
 
+    /**
+     * Remove specified layer
+     *
+     * @param lay
+     */
     public void removeLayout(LayoutSheet lay) {
         layouts.remove(lay);
+    }
+
+    /**
+     * Replace project layouts list by specified list
+     *
+     * @param layouts
+     */
+    public void setLayouts(ArrayList<LayoutSheet> layouts) {
+        this.layouts = layouts;
+    }
+
+    /**
+     * Get higher zindex available in layer
+     *
+     * @return
+     */
+    public int getHigherZindex() {
+        ArrayList<AbstractLayer> list = getLayersList();
+        return list.get(list.size() - 1).getZindex();
     }
 
     public void setAllElementsSelected(boolean allElementsSelected) {
         //TODO
     }
 
-    public void setLayouts(ArrayList<LayoutSheet> layouts) {
-        this.layouts = layouts;
-    }
+
 }

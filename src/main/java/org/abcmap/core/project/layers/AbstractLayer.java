@@ -6,13 +6,13 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.opengis.filter.FilterFactory;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * This object is a wrapper of Geotools layer
@@ -25,12 +25,9 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
     protected final static GeometryFactory geom = GeoUtils.getGeometryFactory();
     protected final Project project;
 
-    protected final String crsCode;
-    protected CoordinateReferenceSystem crs;
     protected Layer internalLayer;
     protected LayerIndexEntry indexEntry;
     protected Style layerStyle;
-
 
     /**
      * Main constructor of a layer. Layers have to be created with Project.addNewFeatureLayer() instead of this constructor.
@@ -38,14 +35,21 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
      * @param entry
      */
     public AbstractLayer(Project owner, LayerIndexEntry entry) {
-
         this.project = owner;
         this.indexEntry = entry;
         this.layerStyle = sf.createStyle();
-        this.crsCode = "EPSG:404000";
-        this.crs = GeoUtils.GENERIC_2D;
+    }
 
-        this.layerStyle = sf.createStyle();
+    /**
+     * This method should be call every time a modification happen to layer
+     * <p>
+     * in order to display modifications
+     */
+    protected void deleteCache() {
+
+        GuiUtils.throwIfOnEDT();
+
+        project.deleteCacheForLayer(indexEntry.getLayerId());
     }
 
     /**
@@ -101,24 +105,6 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
     }
 
     /**
-     * Get coordinate reference system of the layer
-     *
-     * @return
-     */
-    public CoordinateReferenceSystem getCrs() {
-        return crs;
-    }
-
-    /**
-     * Set coordinate reference system of the layer
-     *
-     * @return
-     */
-    public void setCrs(CoordinateReferenceSystem crs) {
-        this.crs = crs;
-    }
-
-    /**
      * Create a map content with this layer as a single layer.
      * <p>
      * This kind of map content are used to render each layer at a time
@@ -131,24 +117,39 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
         return content;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        AbstractLayer layer = (AbstractLayer) o;
-
-        return indexEntry != null ? indexEntry.equals(layer.indexEntry) : layer.indexEntry == null;
-
+    /**
+     * Set opacity, between 0 and 1
+     */
+    public double getOpacity() {
+        return indexEntry.getOpacity();
     }
 
-    @Override
-    public int hashCode() {
-        return indexEntry != null ? indexEntry.hashCode() : 0;
+    /**
+     * Set opacity, between 0 and 1
+     *
+     * @param opacity
+     */
+    public void setOpacity(double opacity) {
+        indexEntry.setOpacity(opacity);
+        deleteCache();
     }
 
+    /**
+     * Return zindex of layer. 0 is bottom
+     *
+     * @return
+     */
     public int getZindex() {
         return indexEntry.getZindex();
+    }
+
+    /**
+     * Set zindex of layer. 0 is bottom
+     *
+     * @return
+     */
+    public void setZindex(int zindex) {
+        indexEntry.setZindex(zindex);
     }
 
     @Override
@@ -171,5 +172,56 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
 
     }
 
+    /**
+     * Return true if this layer should be painted
+     *
+     * @return
+     */
+    public boolean isVisible() {
+        return indexEntry.isVisible();
+    }
+
+    /**
+     * Set to true to paint layer
+     *
+     * @param visible
+     */
+    public void setVisible(boolean visible) {
+        indexEntry.setVisible(visible);
+    }
+
+    /**
+     * Get readable name of layer
+     *
+     * @return
+     */
+    public String getName() {
+        return indexEntry.getName();
+    }
+
+    /**
+     * Set readable name of layer
+     *
+     * @param name
+     */
+    public void setName(String name) {
+        indexEntry.setName(name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        AbstractLayer layer = (AbstractLayer) o;
+
+        return indexEntry != null ? indexEntry.equals(layer.indexEntry) : layer.indexEntry == null;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return indexEntry != null ? indexEntry.hashCode() : 0;
+    }
 
 }
