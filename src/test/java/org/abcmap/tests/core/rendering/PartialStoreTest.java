@@ -4,10 +4,10 @@ package org.abcmap.tests.core.rendering;
 import junit.framework.TestCase;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.project.Project;
 import org.abcmap.core.rendering.partials.RenderedPartial;
 import org.abcmap.core.rendering.partials.RenderedPartialStore;
 import org.abcmap.core.rendering.partials.SerializableRenderedPartial;
-import org.abcmap.core.project.Project;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.BeforeClass;
@@ -41,6 +41,8 @@ public class PartialStoreTest {
 
         ArrayList<RenderedPartial> partials = new ArrayList<>();
 
+        String layerId = "layer1";
+
         // add some partials
         int totalToInsert = 4;
         for (int i = 0; i < totalToInsert; i++) {
@@ -51,7 +53,7 @@ public class PartialStoreTest {
             TestCase.assertTrue("Image reading: " + imgPath, img != null);
 
             ReferencedEnvelope ev = new ReferencedEnvelope(i, i + 1, i + 2, i + 3, DefaultGeographicCRS.WGS84);
-            RenderedPartial part = new RenderedPartial(img, ev, img.getWidth(), img.getHeight(), "layer1");
+            RenderedPartial part = new RenderedPartial(img, ev, img.getWidth(), img.getHeight(), layerId);
 
             partials.add(part);
 
@@ -77,7 +79,28 @@ public class PartialStoreTest {
             return null;
         });
 
-        assertTrue("Database partials test: " + totalToInsert + " / " + rowCount[0], rowCount[0] == totalToInsert);
+        assertTrue("Partials insertion in storage test: " + totalToInsert + " / " + rowCount[0], rowCount[0] == totalToInsert);
+
+        // delete partials
+        store.deletePartialsForLayer(layerId);
+
+        final int[] rowCount2 = {0};
+        project.executeWithDatabaseConnection((conn) -> {
+
+            PreparedStatement stat = conn.prepareStatement("SELECT count(*) FROM " + SerializableRenderedPartial.TABLE_NAME +
+                    " WHERE " + SerializableRenderedPartial.PARTIAL_LAYERID_FIELD_NAME + "=?");
+            stat.setString(1, layerId);
+            ResultSet rslt = stat.executeQuery();
+            rslt.next();
+
+            rowCount2[0] = rslt.getInt(1);
+
+            stat.close();
+            rslt.close();
+            return null;
+        });
+
+        assertTrue("Partials deletion on storage: " + rowCount[0], rowCount2[0] == 0);
 
     }
 

@@ -4,16 +4,17 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.field.SqlType;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
+import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableUtils;
 import org.abcmap.core.events.PartialStoreEvent;
-import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
-import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import java.awt.image.BufferedImage;
@@ -201,26 +202,45 @@ public class RenderedPartialStore implements HasEventNotificationManager {
         return addedInDatabase;
     }
 
+    /**
+     * Return a shallow copy of partial list
+     *
+     * @return
+     */
     public ArrayList<RenderedPartial> getLoadedPartials() {
         return new ArrayList<>(loadedPartials);
     }
 
+    /**
+     * Delete partials associated with layer id in memory and in database
+     * <p>
+     * All is done on this thread
+     *
+     * @param layerId
+     */
     public void deletePartialsForLayer(String layerId) {
 
-        ThreadManager.runLater(() -> {
-            try {
-                Where<SerializableRenderedPartial, ?> statement = dao.deleteBuilder().where().raw(
-                        SerializableRenderedPartial.PARTIAL_X2_FIELD_NAME + "=? ",
-
-                        new SelectArg(SqlType.STRING, layerId)
-                );
-
-                statement.query();
-            } catch (SQLException e) {
-                e.printStackTrace();
+        // delete in memory partials
+        for (RenderedPartial part : new ArrayList<>(loadedPartials)) {
+            if (Utils.safeEquals(part.getLayerId(), layerId)) {
+                loadedPartials.remove(part);
             }
+        }
 
-        });
+        // delete in database
+        try {
+            DeleteBuilder<SerializableRenderedPartial, ?> db = dao.deleteBuilder();
+            db.where().raw(
+                    SerializableRenderedPartial.PARTIAL_LAYERID_FIELD_NAME + "=? ",
+
+                    new SelectArg(SqlType.STRING, layerId)
+            );
+            db.delete();
+
+        } catch (SQLException e) {
+            logger.error(e);
+        }
+
     }
 
     /**
@@ -239,6 +259,11 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
     }
 
+    /**
+     * Close this store and all internal connections
+     *
+     * @throws IOException
+     */
     public void close() throws IOException {
 
         if (connectionSource != null) {

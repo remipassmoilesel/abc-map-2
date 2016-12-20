@@ -153,10 +153,11 @@ public class RenderedPartialFactory {
         double maxX = worldBounds.getMaxX();
         double maxY = worldBounds.getMaxY();
 
-//        double maxX = worldBounds.getMaxX() + partialSideWu;
-//        double maxY = worldBounds.getMaxY() + partialSideWu;
-//        x -= partialSideWu;
-//        y -= partialSideWu;
+        // this can be interesting to load partials before user need it
+        //double maxX = worldBounds.getMaxX() + partialSideWu;
+        //double maxY = worldBounds.getMaxY() + partialSideWu;
+        //x -= partialSideWu;
+        //y -= partialSideWu;
 
         // iterate area to renderer from bottom left corner to upper right corner
         while (y < maxY) {
