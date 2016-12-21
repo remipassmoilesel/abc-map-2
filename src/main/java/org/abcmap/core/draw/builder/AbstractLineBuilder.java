@@ -4,6 +4,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.styles.StyleContainer;
+import org.abcmap.core.utils.FeatureUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.awt.geom.AffineTransform;
@@ -19,8 +21,8 @@ public abstract class AbstractLineBuilder extends AbstractShapeBuilder {
      */
     protected ArrayList<Coordinate> shapePoints;
 
-    public AbstractLineBuilder(FeatureLayer layer) {
-        super(layer);
+    public AbstractLineBuilder(FeatureLayer layer, StyleContainer style) {
+        super(layer, style);
     }
 
     /**
@@ -50,8 +52,6 @@ public abstract class AbstractLineBuilder extends AbstractShapeBuilder {
         // store the current feature to change geometries later
         currentFeature = buildFeature(pointShape);
 
-        applyStyle();
-
         return currentFeature;
     }
 
@@ -70,8 +70,6 @@ public abstract class AbstractLineBuilder extends AbstractShapeBuilder {
         // modify geometry
         currentFeature.setDefaultGeometry(getGeometry());
 
-        applyStyle();
-
         return currentFeature;
     }
 
@@ -89,6 +87,8 @@ public abstract class AbstractLineBuilder extends AbstractShapeBuilder {
 
         // update geometry
         currentFeature.setDefaultGeometry(getGeometry());
+
+        // apply style attribute (to the last shape)
         applyStyle();
 
         // save current feature and layer, and get back the feature with correct id

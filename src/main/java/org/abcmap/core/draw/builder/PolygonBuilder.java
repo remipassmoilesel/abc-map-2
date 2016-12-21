@@ -3,6 +3,7 @@ package org.abcmap.core.draw.builder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.styles.StyleContainer;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.awt.geom.AffineTransform;
@@ -13,8 +14,8 @@ import java.util.ArrayList;
  */
 public class PolygonBuilder extends AbstractLineBuilder {
 
-    public PolygonBuilder(FeatureLayer layer) {
-        super(layer);
+    public PolygonBuilder(FeatureLayer layer, StyleContainer style) {
+        super(layer, style);
     }
 
     @Override

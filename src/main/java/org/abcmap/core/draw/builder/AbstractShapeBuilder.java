@@ -4,6 +4,7 @@ import com.vividsolutions.jts.awt.ShapeWriter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.draw.feature.DefaultFeatureBuilder;
+import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.FeatureLayer;
@@ -26,8 +27,12 @@ import java.awt.geom.AffineTransform;
  */
 public abstract class AbstractShapeBuilder {
 
-    protected DefaultFeatureBuilder featureBuilder;
+    protected final DrawManager drawm;
 
+    /**
+     * Feature builder associated with layer
+     */
+    protected DefaultFeatureBuilder featureBuilder;
 
     /**
      * Utility used to build geometries
@@ -61,10 +66,11 @@ public abstract class AbstractShapeBuilder {
      *
      * @param layer
      */
-    public AbstractShapeBuilder(FeatureLayer layer) {
+    public AbstractShapeBuilder(FeatureLayer layer, StyleContainer style) {
 
+        this.drawm = MainManager.getDrawManager();
         this.project = MainManager.getProjectManager().getProject();
-        this.style = null;
+        this.style = style;
         this.activeLayer = layer;
         this.featureBuilder = layer.getFeatureBuilder();
 
@@ -110,9 +116,12 @@ public abstract class AbstractShapeBuilder {
      * Apply style to the current feature.
      */
     protected void applyStyle() {
-        if (style != null) {
-            project.getStyleLibrary().applyStyle(style, activeLayer, currentFeature);
+
+        if (style == null) {
+            throw new NullPointerException("Style is null");
         }
+
+        project.getStyleLibrary().applyStyle(style, activeLayer, currentFeature);
     }
 
     /**
@@ -122,15 +131,6 @@ public abstract class AbstractShapeBuilder {
      */
     public StyleContainer getStyle() {
         return style;
-    }
-
-    /**
-     * Set current style
-     *
-     * @param style
-     */
-    public void setStyle(StyleContainer style) {
-        this.style = style;
     }
 
     /**
@@ -184,5 +184,12 @@ public abstract class AbstractShapeBuilder {
 
     }
 
-
+    /**
+     * Get current drawn feature or null
+     *
+     * @return
+     */
+    public SimpleFeature getCurrentFeature() {
+        return currentFeature;
+    }
 }
