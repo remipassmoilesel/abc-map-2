@@ -235,4 +235,22 @@ public class SQLUtils {
         PreparedStatement stat = conn.prepareStatement("SHUTDOWN");
         stat.execute();
     }
+
+    /**
+     * /!\ Do not work with all versions of H2 database
+     *
+     * @param conn
+     * @throws SQLException
+     */
+    public static void printH2DatabaseVersion(Connection conn) throws SQLException {
+
+        PreparedStatement stat = conn.prepareStatement("SELECT H2VERSION() FROM DUAL");
+        ResultSet res = stat.executeQuery();
+
+        System.out.println();
+        System.out.println("H2 Database version: ");
+        while (res.next()) {
+            System.out.println(res.getObject(1));
+        }
+    }
 }

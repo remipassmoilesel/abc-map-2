@@ -982,4 +982,24 @@ public class Utils {
             System.out.println(url.getFile());
         }
     }
+
+    public static void printStackTrace() {
+        printStackTrace(5, 2);
+    }
+
+    public static void printStackTrace(int count) {
+        printStackTrace(count, 2);
+    }
+
+    public static void printStackTrace(int count, int offset) {
+
+        System.out.println("## Stack trace: ");
+
+        StackTraceElement[] stack = new Exception().getStackTrace();
+        for (int j = offset; j < count && j < stack.length; j++) {
+            System.out.println("\t" + stack[j]);
+        }
+
+        System.out.println();
+    }
 }
