@@ -7,6 +7,7 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.gui.GuiColors;
+import org.abcmap.gui.tools.containers.ToolLibrary;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -61,6 +62,8 @@ public class Initialization {
         try {
             MainManager.init();
         } catch (Exception e) {
+            e.printStackTrace();
+            logger.error(e);
             LaunchError.showErrorAndDie();
         }
 
@@ -105,6 +108,9 @@ public class Initialization {
         else {
             pman.createNewProject();
         }
+
+        // set default tool
+        MainManager.getDrawManager().setCurrentTool(ToolLibrary.LINE_TOOL);
 
         // run gui initialization operation when all others operations started
         SwingUtilities.invokeAndWait(() -> {
