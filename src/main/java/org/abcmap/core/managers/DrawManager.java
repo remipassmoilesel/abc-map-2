@@ -17,7 +17,6 @@ import org.abcmap.gui.tools.containers.ToolContainer;
 import org.abcmap.gui.tools.containers.ToolLibrary;
 
 import java.awt.*;
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 /**
@@ -30,7 +29,7 @@ public class DrawManager implements HasEventNotificationManager {
     /**
      * Present thick of lines, used if a new builder is returned
      */
-    private final int activeThick;
+    private int activeThick;
 
     /**
      * Active color used to draw, if a new builder is returned
@@ -67,12 +66,11 @@ public class DrawManager implements HasEventNotificationManager {
      *
      * @return
      */
-    public LineBuilder getLineBuilder(AffineTransform transform) throws DrawManagerException {
+    public LineBuilder getLineBuilder() {
 
         FeatureLayer layer = getActiveFeatureLayerOrThrow();
 
-        LineBuilder builder = new LineBuilder(layer);
-        builder.setStyle(getActiveStyle());
+        LineBuilder builder = new LineBuilder(layer, getActiveStyle());
         return builder;
 
     }
@@ -82,11 +80,10 @@ public class DrawManager implements HasEventNotificationManager {
      *
      * @return
      */
-    public PolygonBuilder getPolygonBuilder() throws DrawManagerException {
+    public PolygonBuilder getPolygonBuilder() {
         FeatureLayer layer = getActiveFeatureLayerOrThrow();
 
-        PolygonBuilder builder = new PolygonBuilder(layer);
-        builder.setStyle(getActiveStyle());
+        PolygonBuilder builder = new PolygonBuilder(layer, getActiveStyle());
         return builder;
     }
 
@@ -95,21 +92,46 @@ public class DrawManager implements HasEventNotificationManager {
      *
      * @return
      */
-    public PointBuilder getPointBuilder() throws DrawManagerException {
+    public PointBuilder getPointBuilder() {
         FeatureLayer layer = getActiveFeatureLayerOrThrow();
 
-        PointBuilder builder = new PointBuilder(layer);
-        builder.setStyle(getActiveStyle());
+        PointBuilder builder = new PointBuilder(layer, getActiveStyle());
         return builder;
     }
 
     /**
-     * Return active style on map
+     * Create and return a style that can be used on project
+     * <p>
+     * Can return null if project is not initialized
+     * <p>
+     * Styles cannot be modified directly after instantiation, because they have to be registered in project to be used.
+     * <p>
+     * In order to modify a style, create a new one with this method
      *
      * @return
      */
     public StyleContainer getActiveStyle() {
-        return projectm.getProject().getStyle(activeForeground, activeBackground, activeThick);
+        return getStyle(activeForeground, activeBackground, activeThick);
+    }
+
+    /**
+     * Create and return a style that can be used on project
+     * <p>
+     * Can return null if project is not initialized
+     * <p>
+     * Styles cannot be modified directly after instantiation, because they have to be registered in project to be used.
+     * <p>
+     * In order to modify a style, create a new one with this method
+     *
+     * @return
+     */
+    public StyleContainer getStyle(Color fg, Color bg, int thick) {
+
+        if (projectm.isInitialized() == false) {
+            throw new IllegalStateException("Project not initialized");
+        }
+
+        return projectm.getProject().getStyle(fg, bg, thick);
     }
 
     /**
@@ -154,11 +176,11 @@ public class DrawManager implements HasEventNotificationManager {
      * @return
      * @throws DrawManagerException
      */
-    private FeatureLayer getActiveFeatureLayerOrThrow() throws DrawManagerException {
+    private FeatureLayer getActiveFeatureLayerOrThrow() throws IllegalStateException {
 
         AbstractLayer layer = projectm.getProject().getActiveLayer();
         if (layer instanceof FeatureLayer == false) {
-            throw new DrawManagerException("Active layer is not a feature layer");
+            throw new IllegalStateException("Active layer is not a feature layer");
         }
 
         return (FeatureLayer) layer;
