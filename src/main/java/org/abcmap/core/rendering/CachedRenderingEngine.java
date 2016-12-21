@@ -1,5 +1,6 @@
 package org.abcmap.core.rendering;
 
+import org.abcmap.core.events.CacheRenderingEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
@@ -126,6 +127,10 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
         // listen partial store changes
         this.notifm = new EventNotificationManager(this);
+        notifm.setDefaultListener((ev) -> {
+            // TODO: check if event concern current area
+            notifm.fireEvent(ev);
+        });
         project.getRenderedPartialsStore().getNotificationManager().addObserver(this);
 
     }
@@ -167,11 +172,6 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             g2dT.setComposite(GuiUtils.createTransparencyComposite(lay.getOpacity()));
 
             AffineTransform worldToScreenTransform = getWorldToScreenTransform();
-
-            // compare affine transforms
-            //System.out.println(worldToScreenTransform.equals(partials.getWorldToScreenTransform()));
-            //System.out.println(getScreenToWorldTransform().equals(partials.getScreenToWorldTransform()));
-
 
             // iterate current partials
             for (RenderedPartial part : partials.getPartials()) {
@@ -225,16 +225,6 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      * @throws RenderingException
      */
     public void prepareMap(ReferencedEnvelope worldEnvelope, Dimension pixelDim) throws RenderingException {
-
-        /*
-        System.out.println();
-        System.out.println("worldEnvelope");
-        System.out.println(worldEnvelope);
-        System.out.println("pixelDim");
-        System.out.println(pixelDim);
-        System.out.println("partialSideWu");
-        System.out.println(partialSideWu);
-        */
 
         // on thread at a time renderer map for now
         if (renderLock.tryLock() == false) {
@@ -316,7 +306,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 RenderedPartialQueryResult newPartials = factory.intersect(worldEnvelope, partialSideWu,
                         () -> {
                             // notify observers that new partials come
-                            notifm.fireEvent(new RenderingEvent(RenderingEvent.NEW_PARTIAL_LOADED));
+                            fireNewPartialsLoaded();
 
                             // notify thread waiters that new partial come
                             synchronized (CachedRenderingEngine.this) {
@@ -341,6 +331,10 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         } finally {
             renderLock.unlock();
         }
+    }
+
+    private void fireNewPartialsLoaded() {
+        notifm.fireEvent(new CacheRenderingEvent(CacheRenderingEvent.NEW_PARTIALS_AVAILABLE));
     }
 
     /**

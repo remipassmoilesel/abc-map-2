@@ -33,18 +33,61 @@ public class Event {
 
     }
 
-    public Object getName() {
+    /**
+     * Utility to create test event methods
+     *
+     * @param eventClass
+     * @param name
+     * @param event
+     * @return
+     */
+    protected static boolean testEvent(Class<? extends Event> eventClass, String name, Event event) {
+
+        // test class
+        if (eventClass.isInstance(event) == false) {
+            return false;
+        }
+
+        // test event name
+        if (event.getName().equals(name)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Get name of event
+     *
+     * @return
+     */
+    public String getName() {
         return name;
     }
 
+    /**
+     * Get value of event. Can be null.
+     *
+     * @return
+     */
     public Object getValue() {
         return value;
     }
 
+    /**
+     * Get time of creation
+     *
+     * @return
+     */
     public String getCreationTime() {
         return creationTime;
     }
 
+    /**
+     * Get unique instance number
+     *
+     * @return
+     */
     public Integer getInstanceNumber() {
         return instanceNumber;
     }

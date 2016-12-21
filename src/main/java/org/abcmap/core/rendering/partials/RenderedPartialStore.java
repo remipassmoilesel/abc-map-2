@@ -8,7 +8,7 @@ import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableUtils;
-import org.abcmap.core.events.PartialStoreEvent;
+import org.abcmap.core.events.CacheRenderingEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
@@ -258,7 +258,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
             logger.error(e);
         }
 
-        fireNewPartialsAdded();
+        firePartialsDeleted();
 
     }
 
@@ -296,11 +296,11 @@ public class RenderedPartialStore implements HasEventNotificationManager {
     }
 
     private void fireNewPartialsAdded() {
-        notifm.fireEvent(new PartialStoreEvent(PartialStoreEvent.NEW_PARTIALS_AVAILABLE, null));
+        notifm.fireEvent(new CacheRenderingEvent(CacheRenderingEvent.NEW_PARTIALS_AVAILABLE, null));
     }
 
     private void firePartialsDeleted() {
-        notifm.fireEvent(new PartialStoreEvent(PartialStoreEvent.PARTIALS_DELETED, null));
+        notifm.fireEvent(new CacheRenderingEvent(CacheRenderingEvent.PARTIALS_DELETED, null));
     }
 
     @Override
