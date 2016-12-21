@@ -190,10 +190,10 @@ public class ProjectManager implements HasEventNotificationManager {
         GuiUtils.throwIfOnEDT();
 
         createNewProject();
-        Project project = getProject();
+        Project fakeProject = getProject();
 
         // create a tile layer
-        TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 0);
+        TileLayer tileLayer = (TileLayer) fakeProject.addNewTileLayer("Tile layer 1", true, 0);
 
         String imgPath = "/tiles/osm_large.png";
         InputStream res = ProjectManager.class.getResourceAsStream(imgPath);
@@ -202,8 +202,11 @@ public class ProjectManager implements HasEventNotificationManager {
         }
 
         BufferedImage img = ImageIO.read(res);
-        layer.addTile(img, new Coordinate(45.60443, 4.082794));
-        layer.refreshCoverage();
+        tileLayer.addTile(img, new Coordinate(45.60443, 4.082794));
+        tileLayer.refreshCoverage();
+
+        // move layer tile under other layers
+        fakeProject.moveLayerToIndex(tileLayer, 0);
 
         // second notification sent
         notifm.fireEvent(new ProjectEvent(ProjectEvent.NEW_PROJECT_LOADED));
@@ -224,7 +227,6 @@ public class ProjectManager implements HasEventNotificationManager {
     }
 
     /**
-     *
      * @param lay
      */
     public void fireLayerChanged(AbstractLayer lay) {
