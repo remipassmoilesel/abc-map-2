@@ -6,4 +6,5 @@ log/*
 tmp/*
 tests-playground/*
 data/*
+lib/h2gis
 

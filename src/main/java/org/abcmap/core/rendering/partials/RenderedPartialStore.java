@@ -220,21 +220,38 @@ public class RenderedPartialStore implements HasEventNotificationManager {
      */
     public void deletePartialsForLayer(String layerId) {
 
+        // TODO: activate deletion by bounds, with H2GIS for database when maven issue will be resolved
+        ReferencedEnvelope boundsToDelete = null;
+
         // delete in memory partials
         for (RenderedPartial part : new ArrayList<>(loadedPartials)) {
             if (Utils.safeEquals(part.getLayerId(), layerId)) {
-                loadedPartials.remove(part);
+
+                // remove from all layer
+                if (boundsToDelete == null) {
+                    loadedPartials.remove(part);
+                }
+
+                // remove from area only
+                else {
+                    ReferencedEnvelope partEnv = part.getEnvelope();
+                    ReferencedEnvelope inters = partEnv.intersection(boundsToDelete);
+                    if (inters != null && inters.isEmpty() == false) {
+                        System.out.println(inters);
+                        loadedPartials.remove(part);
+                    }
+                }
+
             }
         }
 
         // delete in database
         try {
             DeleteBuilder<SerializableRenderedPartial, ?> db = dao.deleteBuilder();
-            db.where().raw(
-                    SerializableRenderedPartial.PARTIAL_LAYERID_FIELD_NAME + "=? ",
 
-                    new SelectArg(SqlType.STRING, layerId)
-            );
+            db.where().raw(SerializableRenderedPartial.PARTIAL_LAYERID_FIELD_NAME + "=? ",
+                    new SelectArg(SqlType.STRING, layerId));
+
             db.delete();
 
         } catch (SQLException e) {

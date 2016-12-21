@@ -21,6 +21,8 @@ import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.lang.instrument.Instrumentation;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -965,5 +967,19 @@ public class Utils {
      */
     public static double getScreenResolution() {
         return Toolkit.getDefaultToolkit().getScreenResolution();
+    }
+
+    /**
+     * Print current class path to console
+     */
+    public static void printClasspath() {
+        ClassLoader cl = ClassLoader.getSystemClassLoader();
+
+        URL[] urls = ((URLClassLoader) cl).getURLs();
+
+        System.out.println("Classpath: ");
+        for (URL url : urls) {
+            System.out.println(url.getFile());
+        }
     }
 }
