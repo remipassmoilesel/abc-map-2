@@ -258,6 +258,8 @@ public class RenderedPartialStore implements HasEventNotificationManager {
             logger.error(e);
         }
 
+        fireNewPartialsAdded();
+
     }
 
     /**
@@ -295,6 +297,10 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
     private void fireNewPartialsAdded() {
         notifm.fireEvent(new PartialStoreEvent(PartialStoreEvent.NEW_PARTIALS_AVAILABLE, null));
+    }
+
+    private void firePartialsDeleted() {
+        notifm.fireEvent(new PartialStoreEvent(PartialStoreEvent.PARTIALS_DELETED, null));
     }
 
     @Override

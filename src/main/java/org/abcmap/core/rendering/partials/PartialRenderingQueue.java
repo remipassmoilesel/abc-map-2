@@ -142,7 +142,12 @@ class PartialRenderingQueue {
                         int imgWidth = (int) renderedWidthPx;
                         BufferedImage img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
 
-                        renderer.paint((Graphics2D) img.getGraphics(), new Rectangle(imgWidth, imgWidth), bounds);
+                        // improve drawing quality
+                        Graphics2D g2d = (Graphics2D) img.getGraphics();
+                        GuiUtils.applyQualityRenderingHints(g2d);
+
+                        // draw image
+                        renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), bounds);
 
                         // keep image
                         part.setImage(img, imgWidth, imgWidth);
