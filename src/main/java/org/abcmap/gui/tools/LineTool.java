@@ -29,7 +29,7 @@ public class LineTool extends MapTool {
 
             // first point of line
             if (builder == null) {
-                builder = new LineBuilder(layer);
+                builder = drawm.getLineBuilder();
                 builder.newLine(screenToWorldCoordinate(e.getPoint()));
             }
 
@@ -46,6 +46,8 @@ public class LineTool extends MapTool {
             if (builder != null) {
                 builder.terminateLine(screenToWorldCoordinate(e.getPoint()));
                 builder = null;
+
+                deleteActiveLayerCache();
             }
 
         }

@@ -65,6 +65,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
         return projectm.getProject();
     }
 
+
     /**
      * Return current active layer or null. If project is not initialized, show a message.
      *
@@ -172,6 +173,24 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
 
         getMainMapPane().repaint();
     }
+
+    /**
+     * Delete active layer cache if possible. Should be called before redraw map.
+     */
+    protected void deleteActiveLayerCache() {
+
+        // TODO
+        //GuiUtils.throwIfOnEDT();
+
+        Project project = projectm.getProject();
+        if (project == null) {
+            return;
+        }
+
+        project.deleteCacheForLayer(project.getActiveLayer().getId());
+
+    }
+
 
     /**
      * Get point, transform it and return a coordinate object
