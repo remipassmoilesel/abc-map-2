@@ -235,7 +235,6 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
                 // update layer list
                 ArrayList<AbstractLayer> layers = project.getLayersList();
-                Collections.reverse(layers);
 
                 if (jlist.isEnabled() == false) {
                     jlist.setEnabled(true);

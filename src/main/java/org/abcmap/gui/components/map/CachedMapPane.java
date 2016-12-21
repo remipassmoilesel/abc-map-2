@@ -1,6 +1,7 @@
 package org.abcmap.gui.components.map;
 
 import net.miginfocom.swing.MigLayout;
+import org.abcmap.core.events.CacheRenderingEvent;
 import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
@@ -10,9 +11,9 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.rendering.CachedRenderingEngine;
-import org.abcmap.core.rendering.RenderingEvent;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
+import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import javax.swing.*;
@@ -106,12 +107,14 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // repaint when new partials are ready
         notifm = new EventNotificationManager(this);
         notifm.setDefaultListener((ev) -> {
+
             // new partials are ready, only repaint
-            if (ev instanceof RenderingEvent) {
+            if (CacheRenderingEvent.isNewPartialsEvent(ev)) {
                 CachedMapPane.this.repaint();
             }
+
             // map changed, prepare new and repaint
-            else if (ev instanceof ProjectEvent) {
+            else if (CacheRenderingEvent.isPartialsDeletedEvent(ev) || ev instanceof ProjectEvent) {
                 refreshMap();
             }
 
@@ -138,8 +141,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             return;
         }
 
-        // paint map
+        // improve quality of painting
         Graphics2D g2d = (Graphics2D) g;
+        GuiUtils.applyQualityRenderingHints(g2d);
+
+        // paint map
         renderingEngine.paint(g2d);
 
         // if debug mode enabled, paint world envelope asked
