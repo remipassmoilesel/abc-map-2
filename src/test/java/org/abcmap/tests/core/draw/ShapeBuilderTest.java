@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -42,7 +43,7 @@ public class ShapeBuilderTest {
         FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
 
         // test point building
-        PointBuilder pointB = new PointBuilder(activeLayer, null);
+        PointBuilder pointB = new PointBuilder(activeLayer, project.getStyle(Color.black, Color.white, 5));
 
         for (int i = 100; i < 120; i++) {
             SimpleFeature pt = pointB.addPoint(new Coordinate(i, i));
