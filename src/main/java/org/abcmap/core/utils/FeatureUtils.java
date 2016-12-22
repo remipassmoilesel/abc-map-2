@@ -1,7 +1,7 @@
 package org.abcmap.core.utils;
 
-import org.abcmap.core.draw.feature.DefaultFeatureBuilder;
-import org.abcmap.core.draw.feature.TileFeatureBuilder;
+import org.abcmap.core.draw.DefaultFeatureBuilder;
+import org.abcmap.core.tiles.TileFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
 import org.geotools.data.FeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
@@ -14,6 +14,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.Name;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -87,8 +88,8 @@ public class FeatureUtils {
      *
      * @return
      */
-    public static FilterFactory getFilterFactory() {
-        return CommonFactoryFinder.getFilterFactory();
+    public static FilterFactory2 getFilterFactory() {
+        return CommonFactoryFinder.getFilterFactory2();
     }
 
     /**

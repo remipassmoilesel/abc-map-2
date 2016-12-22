@@ -9,6 +9,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.referencing.CRS;
@@ -18,14 +19,16 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.*;
+import org.geotools.swing.JMapFrame;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.filter.FilterFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.style.ContrastMethod;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -54,9 +57,8 @@ public class GeoUtils {
 
     }
 
-    private static final FilterFactory ff = FeatureUtils.getFilterFactory();
+    private static final FilterFactory2 ff = FeatureUtils.getFilterFactory();
     private static final StyleFactory sf = FeatureUtils.getStyleFactory();
-
 
     public static final CoordinateReferenceSystem WGS_84 = DefaultGeographicCRS.WGS84;
 
@@ -351,6 +353,35 @@ public class GeoUtils {
         // try to decode it
         return CRS.decode(crsId);
     }
+
+    /**
+     * Show a geotools layer in window
+     *
+     * @param title
+     * @param layer
+     */
+    public static void showInDebugWindow(String title, FeatureLayer layer) {
+
+        SwingUtilities.invokeLater(() -> {
+
+            // create a map content
+            MapContent mapContent = new MapContent();
+            mapContent.addLayer(layer);
+
+            // create a map frame and show it
+            JMapFrame frame = new JMapFrame(mapContent);
+            frame.setTitle(title);
+            frame.setSize(800, 600);
+            frame.enableStatusBar(true);
+            frame.enableTool(JMapFrame.Tool.ZOOM, JMapFrame.Tool.PAN, JMapFrame.Tool.RESET);
+            frame.enableToolBar(true);
+            frame.enableLayerTable(true);
+            frame.setVisible(true);
+
+        });
+
+    }
+
 
 
 }
