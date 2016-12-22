@@ -11,6 +11,7 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.rendering.CachedRenderingEngine;
+import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
 import org.abcmap.gui.utils.GuiUtils;
@@ -203,6 +204,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             }
             return;
         }
+
         if (this.isVisible() == false) {
             if (debugMode) {
                 logger.warning(this.getClass().getSimpleName() + ".refreshMap(): Call rejected, component not visible");
