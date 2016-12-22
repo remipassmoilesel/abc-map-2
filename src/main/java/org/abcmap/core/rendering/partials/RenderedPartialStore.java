@@ -8,20 +8,36 @@ import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableUtils;
+import com.vividsolutions.jts.geom.Polygon;
 import org.abcmap.core.events.CacheRenderingEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
+import org.geotools.data.FeatureStore;
+import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.jdbc.JDBCDataStore;
+import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.identity.Identifier;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -33,6 +49,8 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(RenderedPartialStore.class);
 
+    private static final FilterFactory2 ff = FeatureUtils.getFilterFactory();
+
     /**
      * Precision used when search existing partials by area in database
      */
@@ -41,7 +59,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
     /**
      * Maximum number of partials which can be stored in RAM
      * <p>
-     * This is a theorical value, only a few partials will be really loaded (with image) and
+     * This is a theoretical value, only a few partials will be really loaded (with image) and
      * just the most recent partials are used
      */
     private static final int MAX_LOADED_LIST_SIZE = 1000;
@@ -53,18 +71,45 @@ public class RenderedPartialStore implements HasEventNotificationManager {
      */
     private ArrayList<RenderedPartial> loadedPartials;
 
+    /**
+     * We need to store outlines of features, in order to eventually delete them by area.
+     * <p>
+     * Each time a partial is created, an outline feature is reated too and stored in this store.
+     */
+    private final FeatureStore outlineFeatureStore;
+
+    /**
+     * Datastore associated with feature store
+     */
+    private final JDBCDataStore datastore;
+
+    /**
+     * Outline feature builder
+     */
+    private final PartialFeatureBuilder outlineFeatureBuilder;
+
+    /**
+     * Database object used to serialize partials, with images
+     */
+    private final Dao<SerializableRenderedPartial, Long> dao;
+
+    /**
+     * Connection used by dao
+     */
+    private final JdbcPooledConnectionSource connectionSource;
+
+    /**
+     * Coordinate reference system of store, should be the same as the project
+     */
+    private CoordinateReferenceSystem crs;
 
     private final EventNotificationManager notifm;
-
-
-    private final Dao<SerializableRenderedPartial, ?> dao;
-    private final JdbcPooledConnectionSource connectionSource;
     private static long addedInDatabase = 0;
 
-    public RenderedPartialStore(Path databasePath) throws SQLException {
+    public RenderedPartialStore(Path databasePath, CoordinateReferenceSystem system) throws SQLException {
 
         this.loadedPartials = new ArrayList<>();
-
+        this.crs = system;
         this.connectionSource = new JdbcPooledConnectionSource("jdbc:h2:./" + databasePath, "", "");
         connectionSource.setMaxConnectionAgeMillis(5 * 60 * 1000);
         connectionSource.setTestBeforeGet(true);
@@ -75,6 +120,24 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
         // create dao object
         this.dao = DaoManager.createDao(connectionSource, SerializableRenderedPartial.class);
+
+        // open a data store to store outlines of partials
+        try {
+
+            // create a feature builder to store outlines
+            outlineFeatureBuilder = new PartialFeatureBuilder(crs);
+            SimpleFeatureType type = outlineFeatureBuilder.getType();
+
+            // open data store and create a feature scheme
+            datastore = SQLUtils.getDatastoreFromH2(databasePath);
+            datastore.createSchema(type);
+
+            // open a feature store
+            outlineFeatureStore = (FeatureStore) datastore.getFeatureSource(type.getTypeName());
+
+        } catch (IOException e) {
+            throw new SQLException("Cannot create datastore from: " + databasePath);
+        }
 
         this.notifm = new EventNotificationManager(this);
     }
@@ -189,8 +252,23 @@ public class RenderedPartialStore implements HasEventNotificationManager {
             throw new NullPointerException("Image is null");
         }
 
-        dao.create(new SerializableRenderedPartial(part));
+        // serialize partial in database
+        SerializableRenderedPartial serializable = new SerializableRenderedPartial(part);
+        dao.create(serializable);
 
+        // create outline of partial, clockwise round from lower right corner
+        ReferencedEnvelope env = part.getEnvelope();
+
+        // serialize outline
+        try {
+            Polygon outline = JTS.toGeometry(part.getEnvelope());
+            SimpleFeature feature = outlineFeatureBuilder.build(outline, part.getId(), part.getLayerId());
+            outlineFeatureStore.addFeatures(FeatureUtils.asList(feature));
+        } catch (IOException e) {
+            throw new SQLException("Unable to insert this partial outline: " + part + " / " + env);
+        }
+
+        // add partial in loaded list
         addInLoadedList(part);
 
         addedInDatabase++;
@@ -219,12 +297,31 @@ public class RenderedPartialStore implements HasEventNotificationManager {
      * @param layerId
      */
     public void deletePartialsForLayer(String layerId) {
+        deletePartialsForLayer(layerId, null);
+    }
 
-        // TODO: activate deletion by bounds, with H2GIS for database when maven issue will be resolved
-        ReferencedEnvelope boundsToDelete = null;
+    /**
+     * Delete partials associated with layer id in memory and in database, but only if they intersect the specified referenced envelope.
+     * <p>
+     * Envelope can be null
+     *
+     * @param layerId
+     * @param boundsToDelete
+     */
+    public void deletePartialsForLayer(String layerId, ReferencedEnvelope boundsToDelete) {
+
+        if (layerId == null) {
+            throw new NullPointerException("Layer id cannot be null");
+        }
+
+        if (boundsToDelete != null && boundsToDelete.getCoordinateReferenceSystem().equals(crs) == false) {
+            throw new IllegalArgumentException("Invalid crs: " + crs + " / " + boundsToDelete.getCoordinateReferenceSystem());
+        }
 
         // delete in memory partials
         for (RenderedPartial part : new ArrayList<>(loadedPartials)) {
+
+            // check layer id of partial
             if (Utils.safeEquals(part.getLayerId(), layerId)) {
 
                 // remove from all layer
@@ -234,10 +331,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
                 // remove from area only
                 else {
-                    ReferencedEnvelope partEnv = part.getEnvelope();
-                    ReferencedEnvelope inters = partEnv.intersection(boundsToDelete);
-                    if (inters != null && inters.isEmpty() == false) {
-                        System.out.println(inters);
+                    if (part.getEnvelope().intersects((com.vividsolutions.jts.geom.Envelope) boundsToDelete) == true) {
                         loadedPartials.remove(part);
                     }
                 }
@@ -247,19 +341,71 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
         // delete in database
         try {
-            DeleteBuilder<SerializableRenderedPartial, ?> db = dao.deleteBuilder();
 
-            db.where().raw(SerializableRenderedPartial.PARTIAL_LAYERID_FIELD_NAME + "=? ",
-                    new SelectArg(SqlType.STRING, layerId));
+            // delete from whole layer
+            if (boundsToDelete == null) {
 
-            db.delete();
+                // delete partials
+                DeleteBuilder<SerializableRenderedPartial, ?> db = dao.deleteBuilder();
+                db.where().raw(SerializableRenderedPartial.PARTIAL_LAYERID_FIELD_NAME + "=? ", new SelectArg(SqlType.STRING, layerId));
+                db.delete();
 
-        } catch (SQLException e) {
+                // delete outlines
+                Filter filter = PartialFeatureBuilder.getLayerIdFilter(layerId);
+                outlineFeatureStore.removeFeatures(filter);
+            }
+
+            // or just some
+            else {
+
+                // get all id to delete, filter them by intersection
+                Collection<Long> partialIds = new ArrayList<>();
+                HashSet<Identifier> outlineIds = new HashSet<>();
+
+                Filter filter = PartialFeatureBuilder.getAreaFilter(boundsToDelete);
+                filter = ff.and(filter, PartialFeatureBuilder.getLayerIdFilter(layerId));
+
+                FeatureIterator features = outlineFeatureStore.getFeatures(filter).features();
+                while (features.hasNext()) {
+                    Feature feat = features.next();
+                    partialIds.add(PartialFeatureBuilder.getId(feat));
+                    outlineIds.add(feat.getIdentifier());
+                }
+
+                // remove outlines
+                outlineFeatureStore.removeFeatures(ff.id(outlineIds));
+
+                // remove partials
+                dao.deleteIds(partialIds);
+
+            }
+
+        } catch (Exception e) {
             logger.error(e);
         }
 
         firePartialsDeleted();
 
+    }
+
+    /**
+     * Get store where outlines of partials are saved
+     * <p>
+     * Use it for debug purposes only
+     *
+     * @return
+     */
+    public FeatureStore getOutlineFeatureStore() {
+        return outlineFeatureStore;
+    }
+
+    /**
+     * Get builder able to construct features representing outline of partials
+     *
+     * @return
+     */
+    public PartialFeatureBuilder getOutlineFeatureBuilder() {
+        return outlineFeatureBuilder;
     }
 
     /**
@@ -291,6 +437,10 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
         if (dao != null) {
             dao.closeLastIterator();
+        }
+
+        if (datastore != null) {
+            datastore.dispose();
         }
 
     }
