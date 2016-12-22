@@ -8,6 +8,7 @@ import com.j256.ormlite.stmt.DeleteBuilder;
 import com.j256.ormlite.stmt.SelectArg;
 import com.j256.ormlite.stmt.Where;
 import com.j256.ormlite.table.TableUtils;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import org.abcmap.core.events.CacheRenderingEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
@@ -54,7 +55,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
     /**
      * Precision used when search existing partials by area in database
      */
-    private static final Double PRECISION = 0.001d;
+    private static final Double PRECISION = 0.0001d;
 
     /**
      * Maximum number of partials which can be stored in RAM
@@ -86,7 +87,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
     /**
      * Outline feature builder
      */
-    private final PartialFeatureBuilder outlineFeatureBuilder;
+    private final PartialOutlineFeatureBuilder outlineFeatureBuilder;
 
     /**
      * Database object used to serialize partials, with images
@@ -125,7 +126,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
         try {
 
             // create a feature builder to store outlines
-            outlineFeatureBuilder = new PartialFeatureBuilder(crs);
+            outlineFeatureBuilder = new PartialOutlineFeatureBuilder(crs);
             SimpleFeatureType type = outlineFeatureBuilder.getType();
 
             // open data store and create a feature scheme
@@ -191,7 +192,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
                 new SelectArg(SqlType.DOUBLE, area.getMaxX()),
                 new SelectArg(SqlType.DOUBLE, area.getMinY()),
                 new SelectArg(SqlType.DOUBLE, area.getMaxY()),
-                new SelectArg(SqlType.STRING, SerializableRenderedPartial.crsToId(area.getCoordinateReferenceSystem())),
+                new SelectArg(SqlType.STRING, GeoUtils.crsToString(area.getCoordinateReferenceSystem())),
                 new SelectArg(SqlType.STRING, part.getLayerId())
         );
         List<SerializableRenderedPartial> results = statement.query();
@@ -209,10 +210,14 @@ public class RenderedPartialStore implements HasEventNotificationManager {
         }
 
         // one result found, prepare it and return it
-        BufferedImage img = results.get(0).getImage();
+        SerializableRenderedPartial serializ = results.get(0);
+
+        BufferedImage img = serializ.getImage();
         int w = img.getWidth();
         int h = img.getHeight();
         part.setImage(img, w, h);
+
+        part.setDatabaseId(serializ.getId());
 
         // update in memory partial
         addInLoadedList(part);
@@ -259,10 +264,10 @@ public class RenderedPartialStore implements HasEventNotificationManager {
         // create outline of partial, clockwise round from lower right corner
         ReferencedEnvelope env = part.getEnvelope();
 
-        // serialize outline
+        // Serialize outline. Be sure to assicate the good ID ! (from db)
         try {
             Polygon outline = JTS.toGeometry(part.getEnvelope());
-            SimpleFeature feature = outlineFeatureBuilder.build(outline, part.getId(), part.getLayerId());
+            SimpleFeature feature = outlineFeatureBuilder.build(outline, serializable.getId(), part.getLayerId());
             outlineFeatureStore.addFeatures(FeatureUtils.asList(feature));
         } catch (IOException e) {
             throw new SQLException("Unable to insert this partial outline: " + part + " / " + env);
@@ -303,7 +308,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
     /**
      * Delete partials associated with layer id in memory and in database, but only if they intersect the specified referenced envelope.
      * <p>
-     * Envelope can be null
+     * Envelope can be null, in this case whole layer will be removed
      *
      * @param layerId
      * @param boundsToDelete
@@ -351,7 +356,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
                 db.delete();
 
                 // delete outlines
-                Filter filter = PartialFeatureBuilder.getLayerIdFilter(layerId);
+                Filter filter = PartialOutlineFeatureBuilder.getLayerIdFilter(layerId);
                 outlineFeatureStore.removeFeatures(filter);
             }
 
@@ -362,21 +367,25 @@ public class RenderedPartialStore implements HasEventNotificationManager {
                 Collection<Long> partialIds = new ArrayList<>();
                 HashSet<Identifier> outlineIds = new HashSet<>();
 
-                Filter filter = PartialFeatureBuilder.getAreaFilter(boundsToDelete);
-                filter = ff.and(filter, PartialFeatureBuilder.getLayerIdFilter(layerId));
+                Filter filter = PartialOutlineFeatureBuilder.getAreaFilter(boundsToDelete);
+                filter = ff.and(filter, PartialOutlineFeatureBuilder.getLayerIdFilter(layerId));
+
+                ArrayList<ReferencedEnvelope> envs = new ArrayList<>();
 
                 FeatureIterator features = outlineFeatureStore.getFeatures(filter).features();
                 while (features.hasNext()) {
                     Feature feat = features.next();
-                    partialIds.add(PartialFeatureBuilder.getId(feat));
+                    partialIds.add(PartialOutlineFeatureBuilder.getId(feat));
                     outlineIds.add(feat.getIdentifier());
+                    envs.add(JTS.toEnvelope((Geometry) feat.getDefaultGeometryProperty().getValue()));
                 }
+                features.close();
+
+                // remove partials first
+                dao.deleteIds(partialIds);
 
                 // remove outlines
                 outlineFeatureStore.removeFeatures(ff.id(outlineIds));
-
-                // remove partials
-                dao.deleteIds(partialIds);
 
             }
 
@@ -404,7 +413,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
      *
      * @return
      */
-    public PartialFeatureBuilder getOutlineFeatureBuilder() {
+    public PartialOutlineFeatureBuilder getOutlineFeatureBuilder() {
         return outlineFeatureBuilder;
     }
 

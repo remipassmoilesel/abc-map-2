@@ -1,11 +1,13 @@
 package org.abcmap.tests.core.rendering;
 
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 import junit.framework.TestCase;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.rendering.partials.PartialFeatureBuilder;
+import org.abcmap.core.rendering.partials.PartialOutlineFeatureBuilder;
 import org.abcmap.core.rendering.partials.RenderedPartial;
 import org.abcmap.core.rendering.partials.RenderedPartialStore;
 import org.abcmap.core.rendering.partials.SerializableRenderedPartial;
@@ -13,6 +15,7 @@ import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.data.FeatureStore;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
@@ -21,8 +24,10 @@ import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.*;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opengis.feature.Feature;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -32,12 +37,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertTrue;
 
 public class PartialStoreTest {
 
-    private boolean showWindows = true;
+    private boolean showWindows = false;
 
     protected final static StyleFactory sf = FeatureUtils.getStyleFactory();
     protected final static FilterFactory2 ff = FeatureUtils.getFilterFactory();
@@ -118,7 +124,7 @@ public class PartialStoreTest {
             rslt.close();
 
             // check outlines
-            stat = conn.prepareStatement("SELECT count(*) FROM " + PartialFeatureBuilder.FEATURE_NAME);
+            stat = conn.prepareStatement("SELECT count(*) FROM " + PartialOutlineFeatureBuilder.FEATURE_NAME);
             rslt = stat.executeQuery();
             rslt.next();
 
@@ -132,6 +138,60 @@ public class PartialStoreTest {
 
         assertTrue("Partials insertion test: " + expectedTotal + " / " + rowCount[0], rowCount[0] == expectedTotal);
         assertTrue("Partial outlines insertion test: " + expectedTotal + " / " + rowCount[1], rowCount[1] == expectedTotal);
+
+        // test envelopes
+        rowCount[0] = 0;
+        HashMap<Integer, Geometry[]> unequalGeometries = new HashMap<>();
+        project.executeWithDatabaseConnection((conn) -> {
+
+            PreparedStatement stat = conn.prepareStatement("SELECT * FROM " + PartialOutlineFeatureBuilder.FEATURE_NAME + ", " + SerializableRenderedPartial.TABLE_NAME
+                    + " WHERE " + PartialOutlineFeatureBuilder.PARTIAL_ID_ATTRIBUTE_NAME + " = " + SerializableRenderedPartial.PARTIAL_ID_FIELD_NAME);
+
+            ResultSet rslt = stat.executeQuery();
+
+            HashMap<Long, ReferencedEnvelope> envelopeToCheck = new HashMap<>();
+            while (rslt.next()) {
+
+                int columnX1 = rslt.findColumn("X1");
+                int columnX2 = rslt.findColumn("X2");
+                int columnY1 = rslt.findColumn("Y1");
+                int columnY2 = rslt.findColumn("Y2");
+                int columnCRS = rslt.findColumn("CRS");
+                int columnPARTIAL_ID = rslt.findColumn(PartialOutlineFeatureBuilder.PARTIAL_ID_ATTRIBUTE_NAME);
+
+                double x1 = rslt.getDouble(columnX1);
+                double x2 = rslt.getDouble(columnX2);
+                double y1 = rslt.getDouble(columnY1);
+                double y2 = rslt.getDouble(columnY2);
+                CoordinateReferenceSystem crs = GeoUtils.stringToCrs(rslt.getString(columnCRS));
+                long partialId = rslt.getLong(columnPARTIAL_ID);
+
+                envelopeToCheck.put(partialId, new ReferencedEnvelope(x1, x2, y1, y2, crs));
+            }
+
+            rowCount[0] = envelopeToCheck.size();
+
+            FeatureIterator featureIter = store.getOutlineFeatureStore().getFeatures().features();
+            while (featureIter.hasNext()) {
+
+                Feature feat = featureIter.next();
+                Long partialId = (Long) feat.getProperty(PartialOutlineFeatureBuilder.PARTIAL_ID_ATTRIBUTE_NAME).getValue();
+
+                Polygon geom1 = (Polygon) feat.getDefaultGeometryProperty().getValue();
+                Polygon geom2 = JTS.toGeometry(envelopeToCheck.get(partialId));
+
+                if (geom1.equals(geom2) == false) {
+                    unequalGeometries.put(unequalGeometries.size(), new Geometry[]{geom1, geom2});
+                }
+            }
+
+            featureIter.close();
+
+            return null;
+        });
+
+        assertTrue("Partials / outlines Join test: " + rowCount[0], rowCount[0] == expectedTotal);
+        assertTrue("Envelope equality test: " + unequalGeometries, unequalGeometries.size() == 0);
 
         // This envelope will be used to delete partials LATER.
         // It is created here in order to add it to debug windows if needed
@@ -165,8 +225,8 @@ public class PartialStoreTest {
             rowCount[0] = rslt.getInt(1);
 
             // check outlines
-            stat = conn.prepareStatement("SELECT count(*) FROM " + PartialFeatureBuilder.FEATURE_NAME
-                    + " WHERE " + PartialFeatureBuilder.LAYER_ID_ATTRIBUTE_NAME + "=?");
+            stat = conn.prepareStatement("SELECT count(*) FROM " + PartialOutlineFeatureBuilder.FEATURE_NAME
+                    + " WHERE " + PartialOutlineFeatureBuilder.LAYER_ID_ATTRIBUTE_NAME + "=?");
             stat.setString(1, layerIds[0]);
             rslt = stat.executeQuery();
             rslt.next();
@@ -212,8 +272,8 @@ public class PartialStoreTest {
             rowCount[0] = rslt.getInt(1);
 
             // check how many outlines rest after deletion
-            stat = conn.prepareStatement("SELECT count(*) FROM " + PartialFeatureBuilder.FEATURE_NAME
-                    + " WHERE " + PartialFeatureBuilder.LAYER_ID_ATTRIBUTE_NAME + "=?");
+            stat = conn.prepareStatement("SELECT count(*) FROM " + PartialOutlineFeatureBuilder.FEATURE_NAME
+                    + " WHERE " + PartialOutlineFeatureBuilder.LAYER_ID_ATTRIBUTE_NAME + "=?");
             stat.setString(1, layerIds[1]);
             rslt = stat.executeQuery();
             rslt.next();
