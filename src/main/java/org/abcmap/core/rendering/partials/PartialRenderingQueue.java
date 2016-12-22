@@ -121,6 +121,7 @@ class PartialRenderingQueue {
                 try {
                     // try to find existing partial in database
                     boolean loadedFromDatabase = false;
+                    long renderTime = -1;
                     try {
                         loadedFromDatabase = store.updatePartialFromDatabase(part);
                     } catch (SQLException e) {
@@ -147,7 +148,9 @@ class PartialRenderingQueue {
                         GuiUtils.applyQualityRenderingHints(g2d);
 
                         // draw image
+                        long before = System.currentTimeMillis();
                         renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), bounds);
+                        renderTime = System.currentTimeMillis() - before;
 
                         // keep image
                         part.setImage(img, imgWidth, imgWidth);
@@ -183,6 +186,7 @@ class PartialRenderingQueue {
                                 "MaxX: " + bounds.getMaxX(),
                                 "MaxY: " + bounds.getMaxY(),
                                 "Loaded from DB: " + loadedFromDatabase,
+                                "RenderTime: " + renderTime + " ms",
                         };
 
                         g2d.setColor(Color.WHITE);
