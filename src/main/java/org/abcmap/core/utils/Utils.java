@@ -984,7 +984,7 @@ public class Utils {
     }
 
     public static void printStackTrace() {
-        printStackTrace(5, 2);
+        printStackTrace(3, 2);
     }
 
     public static void printStackTrace(int count) {

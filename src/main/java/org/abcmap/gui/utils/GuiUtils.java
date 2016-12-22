@@ -28,6 +28,7 @@ import java.util.List;
 public class GuiUtils {
 
     private static final CustomLogger logger = LogManager.getLogger(GuiUtils.class);
+    private static Object qualityRenderingHints;
 
     /**
      * Configure default look and feel
@@ -216,18 +217,21 @@ public class GuiUtils {
      * @param g2d
      */
     public static void applyQualityRenderingHints(Graphics2D g2d) {
+        g2d.setRenderingHints(getQualityRenderingHints());
+    }
 
+    /**
+     * Get java rendering hints corresponding to high quality rendering
+     *
+     * @return
+     */
+    public static HashMap<RenderingHints.Key, Object> getQualityRenderingHints() {
         HashMap<RenderingHints.Key, Object> hints = new HashMap<RenderingHints.Key, Object>();
-        hints.put(RenderingHints.KEY_INTERPOLATION,
-                RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-        hints.put(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-        hints.put(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-        hints.put(RenderingHints.KEY_TEXT_ANTIALIASING,
-                RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        g2d.setRenderingHints(hints);
-
+        hints.put(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        hints.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        hints.put(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        hints.put(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        return hints;
     }
 
     /**
@@ -917,5 +921,6 @@ public class GuiUtils {
         });
 
     }
+
 
 }
