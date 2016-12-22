@@ -144,11 +144,6 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
     public void paint(Graphics2D g2d) {
 
-        if (renderLock.isLocked()) {
-            logger.error("Render is in progress, abort painting");
-            return;
-        }
-
         // set graphics properties used for debug mode
         if (debugMode) {
             g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 16));
@@ -160,10 +155,10 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
         for (AbstractLayer lay : project.getLayersList()) {
 
-            RenderedPartialQueryResult partials = currentPartials.get(lay.getId());
+            RenderedPartialQueryResult partialCtr = currentPartials.get(lay.getId());
 
             // list of layer changed before refreshMap called
-            if (partials == null) {
+            if (partialCtr == null) {
                 logger.error("Partials are null " + lay.getId());
                 continue;
             }
@@ -175,7 +170,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             AffineTransform worldToScreenTransform = getWorldToScreenTransform();
 
             // iterate current partials
-            for (RenderedPartial part : partials.getPartials()) {
+            for (RenderedPartial part : partialCtr.getPartials()) {
 
                 // compute position of tile on map
                 ReferencedEnvelope ev = part.getEnvelope();
@@ -197,7 +192,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
                     // show index on partial
                     g2d.setColor(Color.BLACK);
-                    String index = "#" + partials.getPartials().indexOf(part);
+                    String index = "#" + partialCtr.getPartials().indexOf(part);
                     g2d.drawString(index, x + w / 2, y + h / 2 + 30);
 
                 }
