@@ -31,7 +31,7 @@ public class StyleContainer implements DataModel {
     private static final String THICK_FIELD_NAME = "THICK";
 
     @DatabaseField(id = true, columnName = ID_FIELD_NAME)
-    private String id;
+    private Long id;
 
     @DatabaseField(columnName = FOREGROUND_FIELD_NAME)
     private String foreground;
@@ -108,12 +108,12 @@ public class StyleContainer implements DataModel {
      *
      * @return
      */
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public String generateId() {
-        this.id = "style_" + System.nanoTime();
+    public Long generateId() {
+        this.id = System.nanoTime();
         return this.id;
     }
 

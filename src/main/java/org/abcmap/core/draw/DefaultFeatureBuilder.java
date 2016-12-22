@@ -59,14 +59,12 @@ public class DefaultFeatureBuilder {
         tbuilder.setName(name);
         tbuilder.setCRS(crs);
         tbuilder.add(GEOMETRY_ATTRIBUTE_NAME, Geometry.class);
-        tbuilder.add(STYLE_ID_ATTRIBUTE_NAME, String.class);
+        tbuilder.add(STYLE_ID_ATTRIBUTE_NAME, Long.class);
 
         return tbuilder.buildFeatureType();
     }
 
     public static Geometry getGeometry(SimpleFeature feat) {
-
         return (Geometry) feat.getAttribute(GEOMETRY_ATTRIBUTE_NAME);
-
     }
 }
