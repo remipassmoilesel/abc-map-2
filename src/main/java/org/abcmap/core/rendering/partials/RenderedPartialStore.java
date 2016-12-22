@@ -323,21 +323,25 @@ public class RenderedPartialStore implements HasEventNotificationManager {
             throw new IllegalArgumentException("Invalid crs: " + crs + " / " + boundsToDelete.getCoordinateReferenceSystem());
         }
 
-        // delete in memory partials
+        // Force update of in memory partials
+        // Here we do not remove partials from list to avoid flickering.
+        // Existing part stay in memory until new one replace it, to prevent paint 'null' images
         for (RenderedPartial part : new ArrayList<>(loadedPartials)) {
 
             // check layer id of partial
             if (Utils.safeEquals(part.getLayerId(), layerId)) {
 
-                // remove from all layer
+                // all layer
                 if (boundsToDelete == null) {
-                    loadedPartials.remove(part);
+                    part.setOutdated(true);
+                    //loadedPartials.remove(part);
                 }
 
-                // remove from area only
+                // on specified area
                 else {
                     if (part.getEnvelope().intersects((com.vividsolutions.jts.geom.Envelope) boundsToDelete) == true) {
-                        loadedPartials.remove(part);
+                        part.setOutdated(true);
+                        //loadedPartials.remove(part);
                     }
                 }
 

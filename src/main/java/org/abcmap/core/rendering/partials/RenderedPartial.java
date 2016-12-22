@@ -17,6 +17,10 @@ public class RenderedPartial {
 
     private static long partialCount = 0;
     private static BufferedImage waitingImage;
+
+    /**
+     * Database if of serialized partial
+     */
     private long databaseId;
 
     /**
@@ -50,6 +54,15 @@ public class RenderedPartial {
     private long debugId;
 
     /**
+     * If set to true, this partial should be updated
+     * <p>
+     * Partials should not be removed when outdated, to prevent flickering of panel.
+     * <p>
+     * Existing partial stay in memory until new one replace it, and can be paint, to prevent paint 'null' images
+     */
+    private boolean outdated;
+
+    /**
      * If image is set to null, a waiting generated image will be used
      *
      * @param image
@@ -64,6 +77,7 @@ public class RenderedPartial {
         this.envelope = envelope;
         this.layerId = layerId;
         this.databaseId = -1;
+        this.outdated = false;
         setImage(image, renderedWidth, renderedHeight);
     }
 
@@ -201,15 +215,49 @@ public class RenderedPartial {
             return false;
         }
 
+        if (part.isOutdated() == true) {
+            return false;
+        }
+
         return true;
     }
 
+    /**
+     * Set database unique id of serialized partial corresponding this
+     *
+     * @param databaseId
+     */
     public void setDatabaseId(long databaseId) {
         this.databaseId = databaseId;
     }
 
+    /**
+     * Get database unique id of serialized partial corresponding this
+     */
     public long getDatabaseId() {
         return databaseId;
+    }
+
+    /**
+     * If set to true, this partial should be updated
+     * <p>
+     * Partials should not be removed when outdated, to prevent flickering of panel.
+     * <p>
+     * Existing partial stay in memory until new one replace it, and can be paint, to prevent paint 'null' images
+     *
+     * @param outdated
+     */
+    public void setOutdated(boolean outdated) {
+        this.outdated = outdated;
+    }
+
+    /**
+     * If set to true, this partial should not be considered as up to date, and image should be replaced soon
+     *
+     * @return
+     */
+    public boolean isOutdated() {
+        return outdated;
     }
 
     /**
@@ -251,4 +299,5 @@ public class RenderedPartial {
 
         return waitingImage;
     }
+
 }

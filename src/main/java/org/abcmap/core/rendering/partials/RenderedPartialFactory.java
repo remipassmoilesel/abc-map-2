@@ -128,7 +128,7 @@ public class RenderedPartialFactory {
 
         if (mapContent.getCoordinateReferenceSystem() == null) {
             // TODO throw error here ?
-           logger.warning("Map content reference system is null: " + mapContent);
+           //logger.warning("Map content reference system is null: " + mapContent);
         }
 
         if (worldBounds == null) {
@@ -183,15 +183,16 @@ public class RenderedPartialFactory {
             // partial does not exist or image is not loaded, create it
             else {
 
-                // create a new partial if needed
+                // create a new partial only if needed
                 if (part == null) {
                     part = new RenderedPartial(null, area, (int) partialSidePx, (int) partialSidePx, layerId);
                     store.addInLoadedList(part);
-                    rsparts.add(part);
                 }
 
                 // create a task to retrieve or renderer image from map
                 renderingQueue.addTask(part);
+
+                rsparts.add(part);
 
             }
 

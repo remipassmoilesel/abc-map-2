@@ -162,12 +162,17 @@ class PartialRenderingQueue {
 
                     }
 
+                    // mark as up to date
+                    part.setOutdated(false);
+
                     // display informations on tile if needed
                     if (debugMode) {
 
                         BufferedImage img = part.getImage();
                         ReferencedEnvelope bounds = part.getEnvelope();
-                        Graphics g2d = img.getGraphics();
+                        Graphics2D g2d = (Graphics2D) img.getGraphics();
+
+                        GuiUtils.applyQualityRenderingHints(g2d);
 
                         String[] lines = new String[]{
                                 "Partial id: " + part.getDebugId(),
