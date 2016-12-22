@@ -64,4 +64,9 @@ public class DefaultFeatureBuilder {
         return tbuilder.buildFeatureType();
     }
 
+    public static Geometry getGeometry(SimpleFeature feat) {
+
+        return (Geometry) feat.getAttribute(GEOMETRY_ATTRIBUTE_NAME);
+
+    }
 }

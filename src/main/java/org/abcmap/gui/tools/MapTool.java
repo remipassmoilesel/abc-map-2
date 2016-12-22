@@ -9,6 +9,7 @@ import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.gui.components.map.CachedMapPane;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import javax.swing.*;
 import java.awt.*;
@@ -178,6 +179,12 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * Delete active layer cache if possible. Should be called before redraw map.
      */
     protected void deleteActiveLayerCache() {
+        deleteActiveLayerCache(null);
+    }
+    /**
+     * Delete active layer cache if possible. Should be called before redraw map.
+     */
+    protected void deleteActiveLayerCache(ReferencedEnvelope env) {
 
         // TODO
         //GuiUtils.throwIfOnEDT();
@@ -187,7 +194,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
             return;
         }
 
-        project.deleteCacheForLayer(project.getActiveLayer().getId());
+        project.deleteCacheForLayer(project.getActiveLayer().getId(), env);
 
     }
 

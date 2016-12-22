@@ -1,10 +1,17 @@
 package org.abcmap.gui.tools;
 
+import org.abcmap.core.draw.DefaultFeatureBuilder;
 import org.abcmap.core.draw.builder.LineBuilder;
 import org.abcmap.core.project.layers.FeatureLayer;
+import org.apache.xpath.SourceTree;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
  * Draw line on map with current style
@@ -44,10 +51,12 @@ public class LineTool extends MapTool {
         else if (e.getClickCount() > 1) {
 
             if (builder != null) {
-                builder.terminateLine(screenToWorldCoordinate(e.getPoint()));
+                SimpleFeature feat = builder.terminateLine(screenToWorldCoordinate(e.getPoint()));
                 builder = null;
 
-                deleteActiveLayerCache();
+                ReferencedEnvelope bounds = JTS.bounds(DefaultFeatureBuilder.getGeometry(feat), projectm.getProject().getCrs());
+
+                deleteActiveLayerCache(bounds);
             }
 
         }

@@ -641,16 +641,18 @@ public class Project {
 
     /**
      * Invalidate cache for specified layer, on this thread
+     * <p>
+     * Evelope can be null, in this case whole layer will be deleted
      *
      * @param layId
      */
-    public void deleteCacheForLayer(String layId) {
+    public void deleteCacheForLayer(String layId, ReferencedEnvelope env) {
 
         if (getLayerById(layId) == null) {
             throw new IllegalArgumentException("Unable to find layer: " + layId);
         }
 
-        partialStore.deletePartialsForLayer(layId);
+        partialStore.deletePartialsForLayer(layId, env);
     }
 
     /**

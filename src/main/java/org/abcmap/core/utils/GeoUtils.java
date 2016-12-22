@@ -64,7 +64,7 @@ public class GeoUtils {
 
     /**
      * Generic 2D coordinate reference system. Prefer use of this instead of
-     * DefaultEngineeringSystem.GENERIC2D because it can be a lot slower.
+     * DefaultEngineeringSystem.GENERIC2D because its format is easier to serialize.
      */
     public static CoordinateReferenceSystem GENERIC_2D;
 
@@ -307,6 +307,8 @@ public class GeoUtils {
 
     /**
      * Return a unique identifier for CRS that can be used to recreate a CRS with stringToCrs()
+     * <p>
+     * If specified CRS is null, using DefaultEngineeringCRS.GENERIC_2D;
      *
      * @param crs
      * @return
@@ -314,7 +316,7 @@ public class GeoUtils {
     public static String crsToString(CoordinateReferenceSystem crs) {
 
         if (crs == null) {
-            throw new NullPointerException("CRS is null");
+            crs = DefaultEngineeringCRS.GENERIC_2D;
         }
 
         // CRS has an identifier, return it
@@ -381,7 +383,6 @@ public class GeoUtils {
         });
 
     }
-
 
 
 }

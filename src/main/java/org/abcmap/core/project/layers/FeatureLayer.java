@@ -58,6 +58,7 @@ public class FeatureLayer extends AbstractLayer {
         if (create) {
             // create a simple feature type
             SimpleFeatureType type = DefaultFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), owner.getCrs());
+
             datastore.createSchema(type);
         }
 

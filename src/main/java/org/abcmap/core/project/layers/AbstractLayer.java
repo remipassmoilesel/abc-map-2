@@ -45,11 +45,11 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
      * <p>
      * in order to display modifications
      */
-    protected void deleteCache() {
+    protected void deleteCache(ReferencedEnvelope env) {
 
         GuiUtils.throwIfOnEDT();
 
-        project.deleteCacheForLayer(indexEntry.getLayerId());
+        project.deleteCacheForLayer(indexEntry.getLayerId(), env);
     }
 
     /**
