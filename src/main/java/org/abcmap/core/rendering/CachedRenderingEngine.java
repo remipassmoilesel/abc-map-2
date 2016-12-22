@@ -11,6 +11,7 @@ import org.abcmap.core.rendering.partials.RenderedPartial;
 import org.abcmap.core.rendering.partials.RenderedPartialFactory;
 import org.abcmap.core.rendering.partials.RenderedPartialQueryResult;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
@@ -299,7 +300,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                     layerMapContents.put(layId, map);
                     factory.setMapContent(map);
 
-                    project.deleteCacheForLayer(layId);
+                    project.deleteCacheForLayer(layId, null);
                 }
 
                 // search which partials are necessary to display

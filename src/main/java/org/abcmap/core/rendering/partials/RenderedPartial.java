@@ -15,8 +15,9 @@ import java.util.Objects;
  */
 public class RenderedPartial {
 
-    private static long id = 0;
+    private static long partialCount = 0;
     private static BufferedImage waitingImage;
+    private long databaseId;
 
     /**
      * Soft reference to the rendered image
@@ -46,10 +47,11 @@ public class RenderedPartial {
     /**
      * Debug id
      */
-    private long partId;
+    private long debugId;
 
     /**
      * If image is set to null, a waiting generated image will be used
+     *
      * @param image
      * @param envelope
      * @param renderedWidth
@@ -57,10 +59,11 @@ public class RenderedPartial {
      * @param layerId
      */
     public RenderedPartial(BufferedImage image, ReferencedEnvelope envelope, int renderedWidth, int renderedHeight, String layerId) {
-        id++;
-        this.partId = id;
+        partialCount++;
+        this.debugId = partialCount;
         this.envelope = envelope;
         this.layerId = layerId;
+        this.databaseId = -1;
         setImage(image, renderedWidth, renderedHeight);
     }
 
@@ -159,8 +162,13 @@ public class RenderedPartial {
         return Objects.hash(envelope, layerId);
     }
 
-    public long getId() {
-        return partId;
+    /**
+     * Get debug unique ID of partial. This id is not a database ID, and should not be used for other task than debugging
+     *
+     * @return
+     */
+    public long getDebugId() {
+        return debugId;
     }
 
     @Override
@@ -194,6 +202,14 @@ public class RenderedPartial {
         }
 
         return true;
+    }
+
+    public void setDatabaseId(long databaseId) {
+        this.databaseId = databaseId;
+    }
+
+    public long getDatabaseId() {
+        return databaseId;
     }
 
     /**

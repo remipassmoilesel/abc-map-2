@@ -126,6 +126,11 @@ public class RenderedPartialFactory {
             throw new RenderingException("Nothing to renderer, map content is null");
         }
 
+        if (mapContent.getCoordinateReferenceSystem() == null) {
+            // TODO throw error here ?
+           logger.warning("Map content reference system is null: " + mapContent);
+        }
+
         if (worldBounds == null) {
             throw new RenderingException("World bounds are null");
         }
@@ -170,6 +175,7 @@ public class RenderedPartialFactory {
 
             if (RenderedPartial.isLoaded(part) || PartialRenderingQueue.isRenderInProgress(part)) {
                 rsparts.add(part);
+
                 loaded++;
                 loadedPartialsReused++;
             }

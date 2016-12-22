@@ -5,11 +5,8 @@ import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
 import org.abcmap.core.utils.BufferedImagePersister;
+import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.CRS;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.image.BufferedImage;
 import java.util.Objects;
@@ -85,7 +82,7 @@ public class SerializableRenderedPartial implements DataModel {
     }
 
     public SerializableRenderedPartial(BufferedImage img, ReferencedEnvelope ev, String layerId) {
-        this(img, ev.getMinX(), ev.getMaxX(), ev.getMinY(), ev.getMaxY(), crsToId(ev.getCoordinateReferenceSystem()), layerId);
+        this(img, ev.getMinX(), ev.getMaxX(), ev.getMinY(), ev.getMaxY(), GeoUtils.crsToString(ev.getCoordinateReferenceSystem()), layerId);
     }
 
     public SerializableRenderedPartial(BufferedImage img, double x1, double x2, double y1, double y2, String crsId, String layerId) {
@@ -98,27 +95,29 @@ public class SerializableRenderedPartial implements DataModel {
         this.layerId = layerId;
     }
 
+    /**
+     * Set image to serialize
+     *
+     * @param img
+     */
     public void setImage(BufferedImage img) {
         this.image = img;
     }
 
+    /**
+     * Get serialized image
+     *
+     * @return
+     */
     public BufferedImage getImage() {
         return image;
     }
 
-    public static String crsToId(CoordinateReferenceSystem crs) {
-        if (crs == null) {
-            crs = DefaultEngineeringCRS.GENERIC_2D;
-        }
-        String authority = crs.getName().getAuthority() != null ? crs.getName().getAuthority() + ":" : "";
-        return authority + crs.getName().getCode();
-    }
-
-    public static CoordinateReferenceSystem idToCrs(String crsId) throws FactoryException {
-        return CRS.decode(crsId);
-    }
-
-
+    /**
+     * Return CRS id as a String
+     *
+     * @return
+     */
     public String getCrsId() {
         return crsId;
     }

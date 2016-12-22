@@ -16,7 +16,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 /**
  * Special feature representing a partial
  */
-public class PartialFeatureBuilder {
+public class PartialOutlineFeatureBuilder {
 
     private static final FilterFactory2 ff = FeatureUtils.getFilterFactory();
 
@@ -42,7 +42,7 @@ public class PartialFeatureBuilder {
 
     private final SimpleFeatureBuilder builder;
 
-    public PartialFeatureBuilder(CoordinateReferenceSystem system) {
+    public PartialOutlineFeatureBuilder(CoordinateReferenceSystem system) {
         builder = new SimpleFeatureBuilder(getPartialFeatureType(system));
     }
 
@@ -82,7 +82,7 @@ public class PartialFeatureBuilder {
      * @return
      */
     public static Long getId(Feature feat) {
-        return (Long) feat.getProperty(PartialFeatureBuilder.PARTIAL_ID_ATTRIBUTE_NAME).getValue();
+        return (Long) feat.getProperty(PartialOutlineFeatureBuilder.PARTIAL_ID_ATTRIBUTE_NAME).getValue();
     }
 
     /**
@@ -102,7 +102,7 @@ public class PartialFeatureBuilder {
      * @return
      */
     public static Filter getAreaFilter(ReferencedEnvelope env) {
-        return ff.bbox(ff.property(PartialFeatureBuilder.GEOMETRY_ATTRIBUTE_NAME), env);
+        return ff.bbox(ff.property(PartialOutlineFeatureBuilder.GEOMETRY_ATTRIBUTE_NAME), env);
     }
 
 

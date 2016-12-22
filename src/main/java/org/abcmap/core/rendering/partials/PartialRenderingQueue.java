@@ -120,15 +120,15 @@ class PartialRenderingQueue {
 
                 try {
                     // try to find existing partial in database
-                    boolean exist = false;
+                    boolean loadedFromDatabase = false;
                     try {
-                        exist = store.updatePartialFromDatabase(part);
+                        loadedFromDatabase = store.updatePartialFromDatabase(part);
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        logger.error(e);
                     }
 
-                    if (exist == true) {
-                        loadedFromDatabase++;
+                    if (loadedFromDatabase == true) {
+                        PartialRenderingQueue.loadedFromDatabase++;
                     }
 
                     // or create a new one
@@ -155,7 +155,7 @@ class PartialRenderingQueue {
                         try {
                             store.addPartial(part);
                         } catch (SQLException e) {
-                            e.printStackTrace();
+                            logger.error(e);
                         }
 
                         //GuiUtils.showImage(img);
@@ -170,12 +170,14 @@ class PartialRenderingQueue {
                         Graphics g2d = img.getGraphics();
 
                         String[] lines = new String[]{
-                                String.valueOf(part.getId()),
+                                "Partial id: " + part.getDebugId(),
+                                "DB id: " + part.getDatabaseId(),
                                 "Image id:" + System.identityHashCode(part.getImage()),
                                 "MinX: " + bounds.getMinX(),
                                 "MinY: " + bounds.getMinY(),
                                 "MaxX: " + bounds.getMaxX(),
                                 "MaxY: " + bounds.getMaxY(),
+                                "Loaded from DB: " + loadedFromDatabase,
                         };
 
                         g2d.setColor(Color.WHITE);
@@ -189,6 +191,9 @@ class PartialRenderingQueue {
                             g2d.drawString(l, 20, i);
                             i += debugIncr;
                         }
+
+                        g2d.setColor(Color.GRAY);
+                        g2d.drawRect(0, 0, (int) (renderedWidthPx - 20), debugIncr * (lines.length + 1));
 
                     }
 
