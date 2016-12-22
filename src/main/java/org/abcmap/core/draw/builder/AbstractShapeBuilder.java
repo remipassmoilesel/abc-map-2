@@ -3,7 +3,7 @@ package org.abcmap.core.draw.builder;
 import com.vividsolutions.jts.awt.ShapeWriter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import org.abcmap.core.draw.feature.DefaultFeatureBuilder;
+import org.abcmap.core.draw.DefaultFeatureBuilder;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;

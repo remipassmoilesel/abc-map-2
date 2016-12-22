@@ -101,7 +101,6 @@ public class TileComposerTest {
             // add tile
             layer.addTile(toStitch);
 
-            System.out.println(position);
         }
 
         // test is rounded here to avoid bad precision errors

@@ -174,19 +174,23 @@ public class LayerIndexEntry implements DataModel {
 
     /**
      * Generate a new id for this layer entry, associated with its type
+     * <p>
+     * This name will used as a table name
      */
     public void generateNewId() {
 
         String prefix = null;
         if (getType() != null) {
-            prefix = generateId(getType().toString().toLowerCase());
+            prefix = generateId(getType().toString().toUpperCase());
         }
 
         this.setLayerId(prefix);
     }
 
     /**
-     * Generate a unique layer id with an optionnal prefix
+     * Generate a unique layer id with an optional prefix
+     * <p>
+     * This name will used as a table name
      *
      * @param prefix
      * @return
@@ -198,7 +202,7 @@ public class LayerIndexEntry implements DataModel {
         } else {
             prefix += "_";
         }
-        return "ABM_LAYER_" + prefix.toUpperCase() + System.nanoTime();
+        return ConfigurationConstants.SQL_TABLE_PREFIX + "LAYER_" + prefix.toUpperCase() + System.nanoTime();
     }
 
     @Override

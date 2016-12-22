@@ -2,9 +2,9 @@ package org.abcmap.core.project.layers;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
-import org.abcmap.core.draw.feature.TileFeatureBuilder;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.tiles.TileContainer;
+import org.abcmap.core.tiles.TileFeatureBuilder;
 import org.abcmap.core.tiles.TileStorage;
 import org.abcmap.core.tiles.TileStorageQueries;
 import org.abcmap.core.utils.FeatureUtils;
@@ -101,7 +101,7 @@ public class TileLayer extends AbstractLayer {
 
         // outline layer, with an empty style
         this.outlineStyle = sf.createStyle();
-        outlineStyle.featureTypeStyles().add(getOutlineFeatureType());
+        outlineStyle.featureTypeStyles().add(getOutlineFeatureTypeStyle());
 
         this.outlineLayer = new org.geotools.map.FeatureLayer(featureStore, outlineStyle);
 
@@ -370,7 +370,12 @@ public class TileLayer extends AbstractLayer {
         return coverageName;
     }
 
-    private static FeatureTypeStyle getOutlineFeatureType() {
+    /**
+     * Return default feature type style for outline layer
+     *
+     * @return
+     */
+    private static FeatureTypeStyle getOutlineFeatureTypeStyle() {
 
         Color foreground = Color.green;
         Color background = Color.yellow;

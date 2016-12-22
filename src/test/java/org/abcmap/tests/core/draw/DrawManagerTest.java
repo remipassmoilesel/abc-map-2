@@ -56,7 +56,7 @@ public class DrawManagerTest {
         dm.setActiveBackground(Color.green);
 
         // draw random lines
-        LineBuilder lbuilder = dm.getLineBuilder(null);
+        LineBuilder lbuilder = dm.getLineBuilder();
         for (int i = 0; i < lineNumber; i++) {
             lbuilder.newLine(TestUtils.getRandomPoint());
 

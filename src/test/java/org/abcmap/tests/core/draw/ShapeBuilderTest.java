@@ -42,7 +42,7 @@ public class ShapeBuilderTest {
         FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
 
         // test point building
-        PointBuilder pointB = new PointBuilder(activeLayer);
+        PointBuilder pointB = new PointBuilder(activeLayer, null);
 
         for (int i = 100; i < 120; i++) {
             SimpleFeature pt = pointB.addPoint(new Coordinate(i, i));
@@ -61,7 +61,7 @@ public class ShapeBuilderTest {
         }
 
         // test line building
-        LineBuilder lineB = new LineBuilder(activeLayer);
+        LineBuilder lineB = new LineBuilder(activeLayer, null);
         for (int i = 150; i < 170; i++) {
 
             ArrayList<Coordinate> points = new ArrayList<>();
@@ -90,7 +90,7 @@ public class ShapeBuilderTest {
         }
 
         // test polygon building
-        PolygonBuilder polyB = new PolygonBuilder(activeLayer);
+        PolygonBuilder polyB = new PolygonBuilder(activeLayer, null);
         for (int i = 170; i < 200; i++) {
 
             ArrayList<Coordinate> points = new ArrayList<>();

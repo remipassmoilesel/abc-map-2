@@ -130,7 +130,7 @@ public class Project {
         tileStorage.initialize();
 
         try {
-            partialStore = new RenderedPartialStore(databasePath);
+            partialStore = new RenderedPartialStore(databasePath, crs);
         } catch (SQLException e) {
             throw new IOException("Unable to initialize database: " + e.getMessage(), e);
         }
