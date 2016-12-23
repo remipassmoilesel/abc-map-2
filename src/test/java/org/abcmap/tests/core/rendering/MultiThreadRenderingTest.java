@@ -15,6 +15,7 @@ import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.MapContent;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.*;
 import org.geotools.styling.Stroke;
@@ -40,7 +41,7 @@ public class MultiThreadRenderingTest {
     private final static StyleFactory sf = FeatureUtils.getStyleFactory();
     private final static FilterFactory ff = FeatureUtils.getFilterFactory();
     private static final Long FAKE_STYLE_ID = 1l;
-    private static CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
+    private static CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 
     public static void main(String[] args) throws IOException {
 

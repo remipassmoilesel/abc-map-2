@@ -101,8 +101,6 @@ public class Project {
      */
     private CoordinateReferenceSystem crs;
 
-    private final ProjectManager pman;
-
     /**
      * Create a new project associated with the database at specified location.
      * <p>
@@ -112,8 +110,6 @@ public class Project {
      * @throws IOException
      */
     public Project(Path databasePath) throws IOException {
-
-        this.pman = MainManager.getProjectManager();
 
         this.databasePath = databasePath;
 

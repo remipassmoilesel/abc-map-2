@@ -50,7 +50,7 @@ public class GeoUtils {
         // Upper case alphanum only
         knownCrsNames.add("CARTESIAN");
         knownCrs.add(DefaultGeocentricCRS.CARTESIAN);
-        knownCrsNames.add("WGS84");
+        knownCrsNames.add("EPSG:4326");
         knownCrs.add(DefaultGeographicCRS.WGS84);
         knownCrsNames.add("CARTESIAN2D");
         knownCrs.add(DefaultEngineeringCRS.CARTESIAN_2D);
@@ -318,13 +318,8 @@ public class GeoUtils {
     public static String crsToString(CoordinateReferenceSystem crs) {
 
         if (crs == null) {
+            logger.warning("Crs is null: " + crs);
             crs = DefaultEngineeringCRS.GENERIC_2D;
-        }
-
-        // CRS has an identifier, return it
-        Set<ReferenceIdentifier> identifiers = crs.getIdentifiers();
-        if (identifiers.size() > 0) {
-            return identifiers.iterator().next().toString();
         }
 
         // CRS is known, return a generic code
@@ -333,8 +328,14 @@ public class GeoUtils {
             return knownCrsNames.get(index);
         }
 
+        // CRS has an identifier, return it
+        Set<ReferenceIdentifier> identifiers = crs.getIdentifiers();
+        if (identifiers.size() > 0) {
+            return identifiers.iterator().next().toString();
+        }
+
         // unknown situation, abort
-        throw new IllegalArgumentException("Unserializable CRS: " + crs);
+        throw new IllegalArgumentException("Unable to serialize CRS: " + crs);
     }
 
     /**
