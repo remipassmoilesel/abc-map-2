@@ -155,11 +155,11 @@
             <url>http://download.osgeo.org/webdav/geotools/</url>
         </repository>
 
-
     </repositories>
 
     <build>
         <plugins>
+
             <plugin>
                 <inherited>true</inherited>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -167,6 +167,29 @@
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <executable>java</executable>
+                    <arguments>
+                        <argument>-classpath</argument>
+                        <classpath/>
+                        <argument>org.abcmap.Launcher</argument>
+                        <argument>--dev-mode</argument>
+                        <argument>--create-fake-project</argument>
+                    </arguments>
                 </configuration>
             </plugin>
         </plugins>

@@ -8,6 +8,20 @@ The new version of Abc-Map, work in progress :p
 
 https://github.com/remipassmoilesel/Abc-map
 
+## Launch demo
+
+	$ git clone https://github.com/remipassmoilesel/abcmap2
+	$ cd abcmap2
+	$ git submodule init
+	$ git submodule update
+	$ cd lib/imagej-surf/
+	$ mvn install
+	$ cd ../geotools/
+	$ mvn install
+	$ cd ../..
+	$ maven compile
+	$ maven exec:exec
+
 ## Screenshots
 
 ![Capture d'écran](screenshots/2016-03-28_12-45-50.png)
