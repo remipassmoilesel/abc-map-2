@@ -16,7 +16,7 @@ https://github.com/remipassmoilesel/Abc-map
 	$ git submodule update
 	$ cd lib/imagej-surf/
 	$ mvn install
-	$ cd ../geotools/
+	$ cd ../geotools/modules/plugin/imagemosaic-jdbc
 	$ mvn install
 	$ cd ../..
 	$ maven compile
