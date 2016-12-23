@@ -187,6 +187,7 @@ class PartialRenderingQueue {
                                 "MaxY: " + bounds.getMaxY(),
                                 "Loaded from DB: " + loadedFromDatabase,
                                 "RenderTime: " + renderTime + " ms",
+                                "Layer id: " + part.getLayerId(),
                         };
 
                         g2d.setColor(Color.WHITE);
