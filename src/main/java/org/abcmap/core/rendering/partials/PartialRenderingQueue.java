@@ -172,7 +172,7 @@ class PartialRenderingQueue {
                                     mapContent.addLayer(new org.geotools.map.FeatureLayer(coll, layer.getStyle()));
 
                                 } catch (IOException e) {
-                                    e.printStackTrace();
+                                   logger.error(e);
                                 }
 
                             }
