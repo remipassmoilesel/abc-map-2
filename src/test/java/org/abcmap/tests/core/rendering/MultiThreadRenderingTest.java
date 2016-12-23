@@ -18,8 +18,6 @@ import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.*;
 import org.geotools.styling.Stroke;
-import org.junit.Ignore;
-import org.junit.Test;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -44,9 +42,7 @@ public class MultiThreadRenderingTest {
     private static final Long FAKE_STYLE_ID = 1l;
     private static CoordinateReferenceSystem crs = DefaultEngineeringCRS.GENERIC_2D;
 
-    @Test
-    @Ignore
-    public void test(){
+    public static void main(String[] args) throws IOException {
 
         // create random features
         int featureNumber = 50;
@@ -58,11 +54,11 @@ public class MultiThreadRenderingTest {
 //        MapContent mapContent = prepareMapWithoutDatabase(featureNumber, bounds);
 //        testWithSynchronizedRenderer(mapContent);
 //
-        MapContent mapContent = prepareMapWithoutDatabase(featureNumber, bounds);
-        testWithThreadPool(mapContent);
-
-//        MapContent mapContent = prepareMapWithDatabase(featureNumber, bounds);
+//        MapContent mapContent = prepareMapWithoutDatabase(featureNumber, bounds);
 //        testWithThreadPool(mapContent);
+
+        MapContent mapContent = prepareMapWithDatabase(featureNumber, bounds);
+        testWithThreadPool(mapContent);
 
 
     }
@@ -72,7 +68,7 @@ public class MultiThreadRenderingTest {
         PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
         DefaultFeatureBuilder builder = new DefaultFeatureBuilder("default", crs);
 
-        Path databasePath = Paths.get("tmp/rendererTest");
+        Path databasePath = Paths.get("tmp/rendererTest_" + System.currentTimeMillis());
         JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(databasePath);
         datastore.createSchema(builder.getCurrentFeatureType());
         FeatureStore featureStore = (FeatureStore) datastore.getFeatureSource(builder.getCurrentFeatureType().getTypeName());

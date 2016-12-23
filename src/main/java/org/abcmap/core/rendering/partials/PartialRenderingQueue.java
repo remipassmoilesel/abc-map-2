@@ -151,8 +151,8 @@ class PartialRenderingQueue {
                         Graphics2D g2d = (Graphics2D) img.getGraphics();
                         GuiUtils.applyQualityRenderingHints(g2d);
 
-                        // uncomment this to render from a feature collection
-                        if(true) {
+                        // set to true to render from a feature collection and monitor H2 loading time
+                        if(false) {
                             MapContent mapContent = PartialRenderingQueue.this.mapContent;
                             if (mapContent.layers().get(0) instanceof org.geotools.map.FeatureLayer) {
                                 try {
@@ -164,9 +164,9 @@ class PartialRenderingQueue {
                                         coll.add((SimpleFeature) it.next());
                                     }
                                     it.close();
-                                    long h2Retrieving = System.currentTimeMillis() - before;
+                                    long h2loading = System.currentTimeMillis() - before;
 
-                                    System.out.println("h2Retrieving: " + h2Retrieving + "ms");
+                                    System.out.println("h2loading: " + h2loading + "ms");
 
                                     mapContent = new MapContent();
                                     mapContent.addLayer(new org.geotools.map.FeatureLayer(coll, layer.getStyle()));
@@ -181,7 +181,9 @@ class PartialRenderingQueue {
 
                         // draw image
                         long before = System.currentTimeMillis();
+                        System.out.println("Start renderer: " + renderer + " " + part.getLayerId() + System.currentTimeMillis());
                         renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), bounds);
+                        System.out.println("Stop renderer: " + renderer + " " + part.getLayerId() + System.currentTimeMillis());
                         renderTime = System.currentTimeMillis() - before;
 
                         // keep image

@@ -15,12 +15,6 @@ public class ThreadManager {
     private static final CustomLogger logger = LogManager.getLogger(ThreadManager.class);
 
     /**
-     * Thread max length
-     */
-    private static final int THREAD_POOL_LENGHT = 4;
-
-
-    /**
      * Thread pool
      */
     private static ExecutorService executor;
@@ -101,7 +95,7 @@ public class ThreadManager {
 
         if (executor == null) {
             int nbProcs = Runtime.getRuntime().availableProcessors();
-            int nbThreads = nbProcs * 2;
+            int nbThreads = nbProcs;
             executor = Executors.newFixedThreadPool(nbThreads);
             //System.out.println("Initializing thread pool: " + nbProcs + " processors, threads: " + nbThreads);
         }
