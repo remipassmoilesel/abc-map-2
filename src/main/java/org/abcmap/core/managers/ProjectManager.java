@@ -2,6 +2,7 @@ package org.abcmap.core.managers;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.draw.builder.LineBuilder;
 import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
@@ -13,12 +14,15 @@ import org.abcmap.core.project.backup.ProjectBackupInterval;
 import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.gui.utils.GuiUtils;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.PrimitiveIterator;
+import java.util.Random;
 
 /**
  * Here are managed all operations concerning projects
@@ -207,6 +211,23 @@ public class ProjectManager implements HasEventNotificationManager {
 
         // move layer tile under other layers
         fakeProject.moveLayerToIndex(tileLayer, 0);
+
+        fakeProject.setActiveLayer(1);
+
+        System.out.println(fakeProject.getActiveLayer());
+
+        // populate with random features
+        int featureNumber = 10;
+        ReferencedEnvelope bounds = tileLayer.getBounds();
+        PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
+        LineBuilder builder = new LineBuilder((org.abcmap.core.project.layers.FeatureLayer) fakeProject.getActiveLayer(), MainManager.getDrawManager().getActiveStyle());
+        for (int i = 0; i < featureNumber; i++) {
+            builder.newLine(new Coordinate(rand.next(), rand.next()));
+            for (int j = 0; j < 5; j++) {
+                builder.addPoint(new Coordinate(rand.next(), rand.next()));
+            }
+            builder.terminateLine(new Coordinate(rand.next(), rand.next()));
+        }
 
         // second notification sent
         notifm.fireEvent(new ProjectEvent(ProjectEvent.NEW_PROJECT_LOADED));
