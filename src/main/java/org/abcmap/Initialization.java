@@ -22,7 +22,7 @@ public class Initialization {
 
     protected static final CustomLogger logger = LogManager.getLogger(Initialization.class);
 
-    private static final String PANDA_MODE_ARG = "--panda-mode";
+    private static final String DEV_MODE_ARG = "--dev-mode";
     private static final String CREATE_FAKE_ARG = "--create-fake-project";
 
     public static void doInit(String[] args) throws IOException, InvocationTargetException, InterruptedException {
@@ -36,7 +36,7 @@ public class Initialization {
             for (String str : args) {
 
                 // debug mode
-                if (PANDA_MODE_ARG.equalsIgnoreCase(str)) {
+                if (DEV_MODE_ARG.equalsIgnoreCase(str)) {
                     devMode = true;
                     System.out.println("Panda mode activated");
                 }
