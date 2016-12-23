@@ -6,12 +6,16 @@ import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.listeners.ListenerHandler;
 import org.abcmap.gui.utils.GuiUtils;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.lite.StreamingRenderer;
+import org.opengis.feature.simple.SimpleFeature;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -146,6 +150,34 @@ class PartialRenderingQueue {
                         // improve drawing quality
                         Graphics2D g2d = (Graphics2D) img.getGraphics();
                         GuiUtils.applyQualityRenderingHints(g2d);
+
+                        // uncomment this to render from a feature collection
+                        if(true) {
+                            MapContent mapContent = PartialRenderingQueue.this.mapContent;
+                            if (mapContent.layers().get(0) instanceof org.geotools.map.FeatureLayer) {
+                                try {
+                                    long before = System.currentTimeMillis();
+                                    org.geotools.map.FeatureLayer layer = (org.geotools.map.FeatureLayer) mapContent.layers().get(0);
+                                    FeatureIterator<?> it = layer.getFeatureSource().getFeatures().features();
+                                    DefaultFeatureCollection coll = new DefaultFeatureCollection();
+                                    while (it.hasNext()) {
+                                        coll.add((SimpleFeature) it.next());
+                                    }
+                                    it.close();
+                                    long h2Retrieving = System.currentTimeMillis() - before;
+
+                                    System.out.println("h2Retrieving: " + h2Retrieving + "ms");
+
+                                    mapContent = new MapContent();
+                                    mapContent.addLayer(new org.geotools.map.FeatureLayer(coll, layer.getStyle()));
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }
+
 
                         // draw image
                         long before = System.currentTimeMillis();
