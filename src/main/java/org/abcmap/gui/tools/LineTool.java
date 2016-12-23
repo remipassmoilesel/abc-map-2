@@ -1,30 +1,50 @@
 package org.abcmap.gui.tools;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.draw.DefaultFeatureBuilder;
 import org.abcmap.core.draw.builder.LineBuilder;
 import org.abcmap.core.project.layers.FeatureLayer;
-import org.apache.xpath.SourceTree;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 /**
  * Draw line on map with current style
  */
 public class LineTool extends MapTool {
 
+    private final BasicStroke indicationStroke;
     private LineBuilder builder;
+    private Point mousePosition;
+
+    public LineTool() {
+        super();
+        this.indicationStroke = new BasicStroke(3.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, new float[]{10.0f}, 0.0f);
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        super.mouseMoved(e);
+        mousePosition = e.getPoint();
+        repaintMainMap();
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        super.mouseExited(e);
+        mousePosition = null;
+        repaintMainMap();
+    }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         super.mouseClicked(e);
-
-        // TODO: block zoom when drawing ?
 
         FeatureLayer layer = getActiveFeatureLayerIfLeftClickOrShowMessage(e);
         if (layer == null) {
@@ -71,7 +91,20 @@ public class LineTool extends MapTool {
 
         // draw current shape if necessary
         if (builder != null) {
-            builder.drawCurrentShape(g2d, getMainMapWorldToScreen());
+            AffineTransform wts = getMainMapWorldToScreen();
+            builder.drawCurrentShape(g2d, wts);
+
+            // draw indication on drawing if needed
+            ArrayList<Coordinate> points = builder.getPoints();
+            if (points.size() > 0 && mousePosition != null) {
+                Coordinate fromCoord = points.get(points.size() - 1);
+                Point2D fromPoint = wts.transform(new Point2D.Double(fromCoord.x, fromCoord.y), null);
+
+                g2d.setColor(Color.yellow);
+                g2d.setStroke(indicationStroke);
+                g2d.drawLine((int) fromPoint.getX(), (int) fromPoint.getY(), mousePosition.x, mousePosition.y);
+            }
+
         }
     }
 

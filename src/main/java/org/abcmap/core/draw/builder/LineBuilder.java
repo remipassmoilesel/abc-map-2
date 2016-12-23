@@ -23,5 +23,4 @@ public class LineBuilder extends AbstractLineBuilder {
     protected Geometry getGeometry() {
         return geometryFactory.createLineString(shapePoints.toArray(new Coordinate[shapePoints.size()]));
     }
-
 }

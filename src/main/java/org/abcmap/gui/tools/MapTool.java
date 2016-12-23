@@ -181,6 +181,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
     protected void deleteActiveLayerCache() {
         deleteActiveLayerCache(null);
     }
+
     /**
      * Delete active layer cache if possible. Should be called before redraw map.
      */

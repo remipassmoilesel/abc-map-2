@@ -5,10 +5,8 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
-import org.abcmap.core.utils.FeatureUtils;
 import org.opengis.feature.simple.SimpleFeature;
 
-import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 
 /**
@@ -118,6 +116,10 @@ public abstract class AbstractLineBuilder extends AbstractShapeBuilder {
         throwIfNotDrawing();
 
         resetTool();
+    }
+
+    public ArrayList<Coordinate> getPoints() {
+        return new ArrayList<>(shapePoints);
     }
 
 }
