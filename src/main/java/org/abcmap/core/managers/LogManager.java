@@ -6,6 +6,8 @@ import org.abcmap.core.log.CustomLogger;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.logging.*;
 
 /**
@@ -20,6 +22,7 @@ public class LogManager {
 
     private static LogManager instance;
     private static final Level DEFAULT_LOG_LEVEL = Level.INFO;
+    private static Path LOG_ROOT = ConfigurationConstants.LOG_DIRECTORY;
 
     /**
      * Return a logger instance
@@ -45,6 +48,10 @@ public class LogManager {
      */
     private static LogManager initializeLoggers() throws IOException {
 
+        if (Files.isDirectory(LOG_ROOT) == false) {
+            Files.createDirectories(LOG_ROOT);
+        }
+
         // get the root logger
         java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
         Handler[] handlers = rootLogger.getHandlers();
@@ -60,7 +67,7 @@ public class LogManager {
         rootLogger.setLevel(DEFAULT_LOG_LEVEL);
 
         // add file logging
-        FileHandler fileTxt = new FileHandler(ConfigurationConstants.LOG_DIRECTORY + File.separator + "log_%g.txt", 2097152, 5, true);
+        FileHandler fileTxt = new FileHandler(LOG_ROOT + File.separator + "log_%g.txt", 2097152, 5, true);
         SimpleFormatter formatterTxt = new SimpleFormatter();
         fileTxt.setFormatter(formatterTxt);
         rootLogger.addHandler(fileTxt);
