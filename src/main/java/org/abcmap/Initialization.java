@@ -38,7 +38,7 @@ public class Initialization {
                 // debug mode
                 if (DEV_MODE_ARG.equalsIgnoreCase(str)) {
                     devMode = true;
-                    System.out.println("Panda mode activated");
+                    System.out.println("Dev mode enabled");
                 }
 
                 // create fake project
