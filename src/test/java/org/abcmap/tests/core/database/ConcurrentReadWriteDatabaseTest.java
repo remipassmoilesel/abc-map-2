@@ -1,14 +1,10 @@
-package org.abcmap.tests.database;
+package org.abcmap.tests.core.database;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.SQLUtils;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
