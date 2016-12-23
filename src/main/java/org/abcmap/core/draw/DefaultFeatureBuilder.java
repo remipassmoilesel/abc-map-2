@@ -18,9 +18,11 @@ public class DefaultFeatureBuilder {
     public static final String STYLE_ID_ATTRIBUTE_NAME = "style_id";
 
     private final SimpleFeatureBuilder builder;
+    private final SimpleFeatureType currentFeatureType;
 
     public DefaultFeatureBuilder(String featureName, CoordinateReferenceSystem crs) {
-        builder = new SimpleFeatureBuilder(getDefaultFeatureType(featureName, crs));
+        currentFeatureType = getDefaultFeatureType(featureName, crs);
+        builder = new SimpleFeatureBuilder(currentFeatureType);
     }
 
     /**
@@ -30,7 +32,7 @@ public class DefaultFeatureBuilder {
      * @return
      */
     public synchronized SimpleFeature build(Geometry geom) {
-        return build(geom, "");
+        return build(geom, -1l);
     }
 
     /**
@@ -39,7 +41,7 @@ public class DefaultFeatureBuilder {
      * @param geom
      * @return
      */
-    public synchronized SimpleFeature build(Geometry geom, String styleId) {
+    public synchronized SimpleFeature build(Geometry geom, Long styleId) {
         builder.add(geom);
         builder.add(styleId);
         return builder.buildFeature(null);
@@ -66,5 +68,9 @@ public class DefaultFeatureBuilder {
 
     public static Geometry getGeometry(SimpleFeature feat) {
         return (Geometry) feat.getAttribute(GEOMETRY_ATTRIBUTE_NAME);
+    }
+
+    public SimpleFeatureType getCurrentFeatureType() {
+        return currentFeatureType;
     }
 }

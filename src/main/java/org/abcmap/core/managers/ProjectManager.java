@@ -214,8 +214,6 @@ public class ProjectManager implements HasEventNotificationManager {
 
         fakeProject.setActiveLayer(1);
 
-        System.out.println(fakeProject.getActiveLayer());
-
         // populate with random features
         int featureNumber = 10;
         ReferencedEnvelope bounds = tileLayer.getBounds();
