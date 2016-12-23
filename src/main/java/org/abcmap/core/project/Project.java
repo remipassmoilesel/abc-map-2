@@ -362,11 +362,13 @@ public class Project {
 
     /**
      * Set the active layer, the only layer alterable
+     * <p>
+     * Index correspond to index in sorted list of layers
      *
      * @param index
      */
     public void setActiveLayer(int index) {
-        this.activeLayer = mainLayersList.get(index);
+        this.activeLayer = getLayersList().get(index);
     }
 
     /**
