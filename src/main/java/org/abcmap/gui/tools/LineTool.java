@@ -91,8 +91,12 @@ public class LineTool extends MapTool {
 
         // draw current shape if necessary
         if (builder != null) {
+
+            // only use a copy of graphics
+            Graphics2D g2dc = (Graphics2D) g2d.create();
+
             AffineTransform wts = getMainMapWorldToScreen();
-            builder.drawCurrentShape(g2d, wts);
+            builder.drawCurrentShape(g2dc, wts);
 
             // draw indication on drawing if needed
             ArrayList<Coordinate> points = builder.getPoints();
@@ -100,9 +104,9 @@ public class LineTool extends MapTool {
                 Coordinate fromCoord = points.get(points.size() - 1);
                 Point2D fromPoint = wts.transform(new Point2D.Double(fromCoord.x, fromCoord.y), null);
 
-                g2d.setColor(Color.yellow);
-                g2d.setStroke(indicationStroke);
-                g2d.drawLine((int) fromPoint.getX(), (int) fromPoint.getY(), mousePosition.x, mousePosition.y);
+                g2dc.setColor(Color.yellow);
+                g2dc.setStroke(indicationStroke);
+                g2dc.drawLine((int) fromPoint.getX(), (int) fromPoint.getY(), mousePosition.x, mousePosition.y);
             }
 
         }
