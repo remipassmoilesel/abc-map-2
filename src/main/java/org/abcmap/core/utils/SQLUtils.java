@@ -4,6 +4,7 @@ import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.sql.SqlUtil;
+import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,8 @@ import java.util.Map;
  * Created by remipassmoilesel on 08/11/16.
  */
 public class SQLUtils {
+
+    private static HashMap<String, JdbcConnectionPool> currentH2Pool;
 
     /**
      * Get informations about tables
@@ -131,7 +134,7 @@ public class SQLUtils {
      * @return
      * @throws IOException
      */
-    public static JDBCDataStore getDatastoreFromH2(Path database) throws IOException {
+    public static JDBCDataStore getGeotoolsDatastoreFromH2(Path database) throws IOException {
 
         Map<String, String> params = new HashMap();
         params.put("dbtype", "h2");
@@ -227,12 +230,21 @@ public class SQLUtils {
         return tables;
     }
 
-    public static Connection createH2Connection(Path databasePath) throws SQLException {
-        return DriverManager.getConnection(getJDBCUrlForH2(databasePath));
+    public static Connection getH2Connection(Path databasePath) throws SQLException {
+        if (currentH2Pool == null) {
+            currentH2Pool = new HashMap<String, JdbcConnectionPool>();
+        }
+
+        String key = databasePath.toAbsolutePath().toString();
+        if (currentH2Pool.get(key) == null) {
+            currentH2Pool.put(key, JdbcConnectionPool.create(getJdbcUrlForH2(databasePath), "", ""));
+        }
+
+        return currentH2Pool.get(key).getConnection();
     }
 
     public static void shutdownH2Database(Path databasePath) throws SQLException {
-        Connection conn = DriverManager.getConnection(getJDBCUrlForH2(databasePath));
+        Connection conn = DriverManager.getConnection(getJdbcUrlForH2(databasePath));
         PreparedStatement stat = conn.prepareStatement("SHUTDOWN");
         stat.execute();
     }
@@ -255,12 +267,16 @@ public class SQLUtils {
         }
     }
 
-    public static JdbcPooledConnectionSource getH2ConnectionPool(Path database) throws SQLException {
+    public static JdbcPooledConnectionSource getH2OrmliteConnectionPool(Path database) throws SQLException {
 
-        String databaseUrl = getJDBCUrlForH2(database);
+        String databaseUrl = getJdbcUrlForH2(database);
 
         JdbcPooledConnectionSource connectionSource = new JdbcPooledConnectionSource(databaseUrl);
         connectionSource.setMaxConnectionAgeMillis(Long.MAX_VALUE);
+        // TODO: this is a test value to observe eventual changes on rendering issue
+        // Attribute a value > 1 cause multiple connection check, which do not affect finally
+        // rendering process time.
+        connectionSource.setCheckConnectionsEveryMillis(-1);
         connectionSource.setTestBeforeGet(false);
 
         connectionSource.initialize();
@@ -268,8 +284,8 @@ public class SQLUtils {
         return connectionSource;
     }
 
-    public static String getJDBCUrlForH2(Path databasePath) {
-        System.err.println(databasePath);
+    public static String getJdbcUrlForH2(Path databasePath) {
+        //System.err.println(databasePath);
         return "jdbc:h2:file:" + databasePath.toAbsolutePath().toString();
     }
 }
