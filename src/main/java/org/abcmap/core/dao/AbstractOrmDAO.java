@@ -7,6 +7,7 @@ import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import com.j256.ormlite.table.TableUtils;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.utils.SQLUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -24,14 +25,10 @@ public abstract class AbstractOrmDAO {
 
     public AbstractOrmDAO(Path dbPath, Class<? extends DataModel> entity) throws IOException {
 
-        String databaseUrl = "jdbc:h2:" + dbPath.toString();
         try {
 
             // initialize sqlite connection
-            this.connectionSource = new JdbcPooledConnectionSource(databaseUrl);
-            connectionSource.setMaxConnectionAgeMillis(5 * 60 * 1000);
-            connectionSource.setTestBeforeGet(true);
-            connectionSource.initialize();
+            this.connectionSource = SQLUtils.getH2ConnectionPool(dbPath);
 
             this.dataModel = entity;
 

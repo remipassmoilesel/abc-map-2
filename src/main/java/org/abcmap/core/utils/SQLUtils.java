@@ -1,5 +1,6 @@
 package org.abcmap.core.utils;
 
+import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.sql.SqlUtil;
@@ -227,11 +228,11 @@ public class SQLUtils {
     }
 
     public static Connection createH2Connection(Path databasePath) throws SQLException {
-        return DriverManager.getConnection("jdbc:h2:file:" + databasePath.toAbsolutePath().toString());
+        return DriverManager.getConnection(getJDBCUrlForH2(databasePath));
     }
 
     public static void shutdownH2Database(Path databasePath) throws SQLException {
-        Connection conn = DriverManager.getConnection("jdbc:h2:file:" + databasePath.toAbsolutePath());
+        Connection conn = DriverManager.getConnection(getJDBCUrlForH2(databasePath));
         PreparedStatement stat = conn.prepareStatement("SHUTDOWN");
         stat.execute();
     }
@@ -252,5 +253,23 @@ public class SQLUtils {
         while (res.next()) {
             System.out.println(res.getObject(1));
         }
+    }
+
+    public static JdbcPooledConnectionSource getH2ConnectionPool(Path database) throws SQLException {
+
+        String databaseUrl = getJDBCUrlForH2(database);
+
+        JdbcPooledConnectionSource connectionSource = new JdbcPooledConnectionSource(databaseUrl);
+        connectionSource.setMaxConnectionAgeMillis(Long.MAX_VALUE);
+        connectionSource.setTestBeforeGet(false);
+
+        connectionSource.initialize();
+
+        return connectionSource;
+    }
+
+    public static String getJDBCUrlForH2(Path databasePath) {
+        System.err.println(databasePath);
+        return "jdbc:h2:file:" + databasePath.toAbsolutePath().toString();
     }
 }

@@ -111,10 +111,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
         this.loadedPartials = new ArrayList<>();
         this.crs = system;
-        this.connectionSource = new JdbcPooledConnectionSource("jdbc:h2:./" + databasePath, "", "");
-        connectionSource.setMaxConnectionAgeMillis(5 * 60 * 1000);
-        connectionSource.setTestBeforeGet(true);
-        connectionSource.initialize();
+        this.connectionSource = SQLUtils.getH2ConnectionPool(databasePath);
 
         // create tables
         TableUtils.createTableIfNotExists(connectionSource, SerializableRenderedPartial.class);
