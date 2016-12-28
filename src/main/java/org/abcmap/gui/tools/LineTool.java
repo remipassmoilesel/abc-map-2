@@ -90,7 +90,7 @@ public class LineTool extends MapTool {
         super.drawOnMainMap(g2d);
 
         // draw current shape if necessary
-        if (builder != null) {
+        if (builder != null && builder.isDrawing()) {
 
             // only use a copy of graphics
             Graphics2D g2dc = (Graphics2D) g2d.create();
