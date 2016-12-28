@@ -52,7 +52,7 @@ public class FeatureLayer extends AbstractLayer {
     public FeatureLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
         super(owner, entry);
 
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(project.getDatabasePath());
+        JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(project.getDatabasePath());
 
         // if true, create a new database entry
         if (create) {

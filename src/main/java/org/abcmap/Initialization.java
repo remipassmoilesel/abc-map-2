@@ -29,7 +29,7 @@ public class Initialization {
 
         // parse arguments
         boolean devMode = false;
-        boolean createFake = false;
+        String createFake = "";
         Path projectToOpen = null;
 
         if (args != null && args.length > 0) {
@@ -42,9 +42,9 @@ public class Initialization {
                 }
 
                 // create fake project
-                else if (CREATE_FAKE_ARG.equalsIgnoreCase(str)) {
-                    createFake = true;
-                    System.out.println("Fake project will be created");
+                else if (str.indexOf(CREATE_FAKE_ARG) != -1) {
+                    createFake = str;
+                    System.out.println("Fake project will be created: " + str);
                 }
 
                 // open project
@@ -101,8 +101,8 @@ public class Initialization {
 
         }
         // create a fake project
-        else if (createFake) {
-            pman.createFakeProject();
+        else if (createFake.isEmpty() == false) {
+            pman.createFakeProject(createFake);
         }
         // or create a new project at launch
         else {
@@ -116,7 +116,6 @@ public class Initialization {
         SwingUtilities.invokeAndWait(() -> {
             guim.runIntializationOperations();
         });
-
 
     }
 }

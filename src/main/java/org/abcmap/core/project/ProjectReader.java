@@ -53,7 +53,7 @@ public class ProjectReader {
         // create a database and load dump
         Path newDatabase = tempfolder.resolve(ProjectWriter.PROJECT_TEMP_NAME);
         try {
-            Connection conn = SQLUtils.createH2Connection(newDatabase);
+            Connection conn = SQLUtils.getH2Connection(newDatabase);
             PreparedStatement loadStat = conn.prepareStatement("RUNSCRIPT FROM ?;");
             loadStat.setString(1, dump.toAbsolutePath().toString());
             loadStat.execute();

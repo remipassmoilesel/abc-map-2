@@ -33,7 +33,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -334,8 +333,9 @@ public class GeoUtils {
             return identifiers.iterator().next().toString();
         }
 
-        // unknown situation, abort
-        throw new IllegalArgumentException("Unable to serialize CRS: " + crs);
+        // unknown situation, warning
+        logger.error("Unable to serialize CRS: " + crs.getIdentifiers());
+        return crs.toWKT();
     }
 
     /**

@@ -32,7 +32,7 @@ public class CachedRenderingEngineTest {
 
         // create a fake project
         ProjectManager pman = MainManager.getProjectManager();
-        pman.createFakeProject();
+        pman.createFakeProject(null);
         Project project = pman.getProject();
 
         // create an image where project will be rendered

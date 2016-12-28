@@ -237,7 +237,7 @@ public class TileStorage {
      * @throws IOException
      */
     public Connection getDatabaseConnection() throws SQLException {
-        return SQLUtils.createH2Connection(databasePath);
+        return SQLUtils.getH2Connection(databasePath);
     }
 
     /**

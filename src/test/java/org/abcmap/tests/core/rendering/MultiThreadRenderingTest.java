@@ -14,7 +14,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.MapContent;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.*;
@@ -70,7 +69,7 @@ public class MultiThreadRenderingTest {
         DefaultFeatureBuilder builder = new DefaultFeatureBuilder("default", crs);
 
         Path databasePath = Paths.get("tmp/rendererTest_" + System.currentTimeMillis());
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(databasePath);
+        JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(databasePath);
         datastore.createSchema(builder.getCurrentFeatureType());
         FeatureStore featureStore = (FeatureStore) datastore.getFeatureSource(builder.getCurrentFeatureType().getTypeName());
 

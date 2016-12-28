@@ -47,7 +47,7 @@ public class DatastoreTest {
         Files.deleteIfExists(db);
         Files.createFile(db);
 
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(db);
+        JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(db);
         String featureId = "feature1";
 
         SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();

@@ -29,7 +29,7 @@ public class ProjectTest {
         MapManager mapm = MainManager.getMapManager();
 
         // create a fake project
-        projectm.createFakeProject();
+        projectm.createFakeProject(null);
         Project project = projectm.getProject();
 
         // Remove all layers. Project should always have at least one layer

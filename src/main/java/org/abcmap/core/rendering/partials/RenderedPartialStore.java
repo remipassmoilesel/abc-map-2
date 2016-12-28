@@ -111,7 +111,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
         this.loadedPartials = new ArrayList<>();
         this.crs = system;
-        this.connectionSource = SQLUtils.getH2ConnectionPool(databasePath);
+        this.connectionSource = SQLUtils.getH2OrmliteConnectionPool(databasePath);
 
         // create tables
         TableUtils.createTableIfNotExists(connectionSource, SerializableRenderedPartial.class);
@@ -127,7 +127,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
             SimpleFeatureType type = outlineFeatureBuilder.getType();
 
             // open data store and create a feature scheme
-            datastore = SQLUtils.getDatastoreFromH2(databasePath);
+            datastore = SQLUtils.getGeotoolsDatastoreFromH2(databasePath);
             datastore.createSchema(type);
 
             // open a feature store

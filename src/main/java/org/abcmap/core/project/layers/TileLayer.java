@@ -74,7 +74,7 @@ public class TileLayer extends AbstractLayer {
 
         super(owner, entry);
 
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(project.getDatabasePath());
+        JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(project.getDatabasePath());
 
         this.tileStorage = project.getTileStorage();
 
@@ -248,7 +248,7 @@ public class TileLayer extends AbstractLayer {
         config.setDstype("DBCP");
         config.setUsername("");
         config.setPassword("");
-        config.setJdbcUrl(SQLUtils.getJDBCUrlForH2(databasePath));
+        config.setJdbcUrl(SQLUtils.getJdbcUrlForH2(databasePath));
         config.setDriverClassName("org.h2.Driver");
         config.setMaxActive(5);
         config.setMaxIdle(0);

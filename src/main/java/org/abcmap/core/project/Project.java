@@ -2,12 +2,7 @@ package org.abcmap.core.project;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
-import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.layers.AbstractLayer;
-import org.abcmap.core.project.layers.FeatureLayer;
-import org.abcmap.core.project.layers.LayerIndexEntry;
-import org.abcmap.core.project.layers.TileLayer;
+import org.abcmap.core.project.layers.*;
 import org.abcmap.core.project.layouts.LayoutSheet;
 import org.abcmap.core.rendering.partials.RenderedPartialStore;
 import org.abcmap.core.styles.StyleContainer;
@@ -487,7 +482,7 @@ public class Project {
      * @throws IOException
      */
     public Connection getDatabaseConnection() throws SQLException {
-        return SQLUtils.createH2Connection(databasePath);
+        return SQLUtils.getH2Connection(databasePath);
     }
 
     /**
@@ -719,4 +714,16 @@ public class Project {
     }
 
 
+    public AbstractLayer addNewShapeFileLayer(Path p) throws IOException {
+
+        // create a layer wrapper and store it
+        AbstractLayer layer = null;
+        try {
+            layer = new ShapeFileLayer(null, p.toString(), true, getHigherZindex(), this, p);
+        } catch (Exception e) {
+            throw new IOException("Error while adding shapefile layer: ", e);
+        }
+
+        return addLayer(layer);
+    }
 }

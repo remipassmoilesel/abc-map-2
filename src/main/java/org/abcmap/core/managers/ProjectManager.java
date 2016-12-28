@@ -21,6 +21,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.PrimitiveIterator;
 import java.util.Random;
 
@@ -30,6 +31,8 @@ import java.util.Random;
 public class ProjectManager implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(ProjectManager.class);
+    private static final String FAKE_PROJECT_1 = "--create-fake-project";
+    private static final String FAKE_PROJECT_2 = "--create-fake-project2";
     private final ProjectBackupInterval backupTimer;
     private final EventNotificationManager notifm;
     private Project currentProject;
@@ -189,42 +192,55 @@ public class ProjectManager implements HasEventNotificationManager {
     /**
      * Create a fake project for debug purposes
      */
-    public void createFakeProject() throws IOException {
+    public void createFakeProject(String id) throws IOException {
 
         GuiUtils.throwIfOnEDT();
 
         createNewProject();
         Project fakeProject = getProject();
 
-        // create a tile layer
-        TileLayer tileLayer = (TileLayer) fakeProject.addNewTileLayer("Tile layer 1", true, 0);
+        if (id == null || id.equals(FAKE_PROJECT_1)) {
 
-        String imgPath = "/tiles/osm_large.png";
-        InputStream res = ProjectManager.class.getResourceAsStream(imgPath);
-        if (res == null) {
-            throw new IOException("Image is null: " + imgPath);
+            // create a tile layer
+            TileLayer tileLayer = (TileLayer) fakeProject.addNewTileLayer("Tile layer 1", true, 0);
+
+            String imgPath = "/tiles/osm_large.png";
+            InputStream res = ProjectManager.class.getResourceAsStream(imgPath);
+            if (res == null) {
+                throw new IOException("Image is null: " + imgPath);
+            }
+
+            BufferedImage img = ImageIO.read(res);
+            tileLayer.addTile(img, new Coordinate(45.60443, 4.082794));
+            tileLayer.refreshCoverage();
+
+            // move layer tile under other layers
+            fakeProject.moveLayerToIndex(tileLayer, 0);
+
+            fakeProject.setActiveLayer(1);
+
+            // populate with random features
+            int featureNumber = 10;
+            ReferencedEnvelope bounds = tileLayer.getBounds();
+            PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
+            LineBuilder builder = new LineBuilder((org.abcmap.core.project.layers.FeatureLayer) fakeProject.getActiveLayer(), MainManager.getDrawManager().getActiveStyle());
+            for (int i = 0; i < featureNumber; i++) {
+                builder.newLine(new Coordinate(rand.next(), rand.next()));
+                for (int j = 0; j < 5; j++) {
+                    builder.addPoint(new Coordinate(rand.next(), rand.next()));
+                }
+                builder.terminateLine(new Coordinate(rand.next(), rand.next()));
+            }
         }
 
-        BufferedImage img = ImageIO.read(res);
-        tileLayer.addTile(img, new Coordinate(45.60443, 4.082794));
-        tileLayer.refreshCoverage();
+        // create a project with a single shape file
+        else if (id.equals(FAKE_PROJECT_2)) {
+            fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes/communes-20160119.shp"));
+        }
 
-        // move layer tile under other layers
-        fakeProject.moveLayerToIndex(tileLayer, 0);
-
-        fakeProject.setActiveLayer(1);
-
-        // populate with random features
-        int featureNumber = 10;
-        ReferencedEnvelope bounds = tileLayer.getBounds();
-        PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
-        LineBuilder builder = new LineBuilder((org.abcmap.core.project.layers.FeatureLayer) fakeProject.getActiveLayer(), MainManager.getDrawManager().getActiveStyle());
-        for (int i = 0; i < featureNumber; i++) {
-            builder.newLine(new Coordinate(rand.next(), rand.next()));
-            for (int j = 0; j < 5; j++) {
-                builder.addPoint(new Coordinate(rand.next(), rand.next()));
-            }
-            builder.terminateLine(new Coordinate(rand.next(), rand.next()));
+        // invalid argument
+        else {
+            throw new IllegalArgumentException("Invalid project id: " + id);
         }
 
         // second notification sent

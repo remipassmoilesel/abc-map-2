@@ -77,7 +77,7 @@ public class ShapeIdTest {
         SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(type);
 
         // get feature store from database
-        JDBCDataStore datastore = SQLUtils.getDatastoreFromH2(db);
+        JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(db);
         datastore.createSchema(type);
 
         FeatureStore featurestore = (FeatureStore) datastore.getFeatureSource(featureId);

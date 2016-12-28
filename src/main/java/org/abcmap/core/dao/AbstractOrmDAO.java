@@ -28,7 +28,7 @@ public abstract class AbstractOrmDAO {
         try {
 
             // initialize sqlite connection
-            this.connectionSource = SQLUtils.getH2ConnectionPool(dbPath);
+            this.connectionSource = SQLUtils.getH2OrmliteConnectionPool(dbPath);
 
             this.dataModel = entity;
 

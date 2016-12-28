@@ -28,7 +28,7 @@ public class CreateFakeProject extends InteractionElement {
 
         try {
             try {
-                projectm.createFakeProject();
+                projectm.createFakeProject(null);
             } catch (IOException e) {
                 dialm.showErrorInBox("Erreur lors de la création du faux projet");
             }
