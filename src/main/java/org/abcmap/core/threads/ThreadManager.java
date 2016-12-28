@@ -6,11 +6,14 @@ import org.abcmap.core.managers.LogManager;
 import javax.swing.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 /**
  * Utility to run tasks in others threads.
  */
 public class ThreadManager {
+
+    private static long executorTaskCount = 0;
 
     private static final CustomLogger logger = LogManager.getLogger(ThreadManager.class);
 
@@ -96,7 +99,17 @@ public class ThreadManager {
         if (executor == null) {
             int nbProcs = Runtime.getRuntime().availableProcessors();
             int nbThreads = nbProcs;
-            executor = Executors.newFixedThreadPool(nbThreads);
+            executor = Executors.newFixedThreadPool(nbThreads, new ThreadFactory() {
+
+                @Override
+                public Thread newThread(Runnable r) {
+                    executorTaskCount++;
+                    Thread t = new Thread(r);
+                    t.setName("Abm_task_" + executorTaskCount);
+                    return t;
+                }
+            });
+
             //System.out.println("Initializing thread pool: " + nbProcs + " processors, threads: " + nbThreads);
         }
 
