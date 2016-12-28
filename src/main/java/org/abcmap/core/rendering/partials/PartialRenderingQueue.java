@@ -151,39 +151,9 @@ class PartialRenderingQueue {
                         Graphics2D g2d = (Graphics2D) img.getGraphics();
                         GuiUtils.applyQualityRenderingHints(g2d);
 
-                        // set to true to render from a feature collection and monitor H2 loading time
-                        if(false) {
-                            MapContent mapContent = PartialRenderingQueue.this.mapContent;
-                            if (mapContent.layers().get(0) instanceof org.geotools.map.FeatureLayer) {
-                                try {
-                                    long before = System.currentTimeMillis();
-                                    org.geotools.map.FeatureLayer layer = (org.geotools.map.FeatureLayer) mapContent.layers().get(0);
-                                    FeatureIterator<?> it = layer.getFeatureSource().getFeatures().features();
-                                    DefaultFeatureCollection coll = new DefaultFeatureCollection();
-                                    while (it.hasNext()) {
-                                        coll.add((SimpleFeature) it.next());
-                                    }
-                                    it.close();
-                                    long h2loading = System.currentTimeMillis() - before;
-
-                                    System.out.println("h2loading: " + h2loading + "ms");
-
-                                    mapContent = new MapContent();
-                                    mapContent.addLayer(new org.geotools.map.FeatureLayer(coll, layer.getStyle()));
-
-                                } catch (IOException e) {
-                                   logger.error(e);
-                                }
-
-                            }
-                        }
-
-
                         // draw image
                         long before = System.currentTimeMillis();
-                        System.out.println("Start renderer: " + renderer + " " + part.getLayerId() + System.currentTimeMillis());
                         renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), bounds);
-                        System.out.println("Stop renderer: " + renderer + " " + part.getLayerId() + System.currentTimeMillis());
                         renderTime = System.currentTimeMillis() - before;
 
                         // keep image
