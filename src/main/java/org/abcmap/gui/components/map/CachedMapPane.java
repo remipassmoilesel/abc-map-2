@@ -11,7 +11,6 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.rendering.CachedRenderingEngine;
-import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
 import org.abcmap.gui.utils.GuiUtils;
@@ -77,7 +76,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     /**
      * Minimal zoom factor relative to project width
      */
-    private double minZoomFactor;
+    //private double minZoomFactor;
 
     /**
      * Maximal zoom factor relative to project width
@@ -96,8 +95,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         addComponentListener(new RefreshMapComponentListener());
 
-        minZoomFactor = 0.1;
-        maxZoomFactor = 1.5;
+        maxZoomFactor = 3;
 
         this.project = p;
         this.renderingEngine = new CachedRenderingEngine(project);
@@ -275,7 +273,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         double projectWorldWidth = project.getMaximumBounds().getWidth();
 
-        double zoomStepW = projectWorldWidth / 30;
+        double zoomStepW = currentWorlEnvelope.getWidth() / 10;
         double zoomStepH = currentWorlEnvelope.getHeight() * zoomStepW / currentWorlEnvelope.getWidth();
 
         double minx;
@@ -309,13 +307,12 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         }
 
-        // invalid
+        // invalid argument
         else {
             throw new IllegalArgumentException("Invalid zoom direction: " + direction);
         }
 
-        if (newEnv.getWidth() > projectWorldWidth * minZoomFactor
-                && newEnv.getWidth() < projectWorldWidth * maxZoomFactor) {
+        if (newEnv.getWidth() < projectWorldWidth * maxZoomFactor) {
             currentWorlEnvelope = newEnv;
         }
 

@@ -89,7 +89,7 @@ public class RenderedPartialFactory {
             throw new RenderingException("Invalid dimensions to render: " + pixelDimension);
         }
 
-        if (partialSideWu < CachedRenderingEngine.MIN_PARTIAL_SIDE_WU || Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
+        if (Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
             throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
         }
 
@@ -135,7 +135,7 @@ public class RenderedPartialFactory {
             throw new RenderingException("World bounds are null");
         }
 
-        if (partialSideWu < CachedRenderingEngine.MIN_PARTIAL_SIDE_WU || Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
+        if (Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
             throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
         }
 

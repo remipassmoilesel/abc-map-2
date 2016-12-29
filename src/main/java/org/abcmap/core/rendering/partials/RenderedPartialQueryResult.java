@@ -51,7 +51,7 @@ public class RenderedPartialQueryResult {
             try {
                 screenToWorldTransform = getWorldToScreenTransform().createInverse();
             } catch (NoninvertibleTransformException e) {
-                logger.error(e);
+                logger.error("Unable to invert transform: " + e);
             }
         }
         return screenToWorldTransform;

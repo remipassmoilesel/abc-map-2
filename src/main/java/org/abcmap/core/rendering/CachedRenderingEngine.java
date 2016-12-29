@@ -32,13 +32,6 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     private static final CustomLogger logger = LogManager.getLogger(CachedRenderingEngine.class);
 
     /**
-     * Minimal size in world unit of rendered map on partial
-     * <p>
-     * This value should prevent partial side to be negative
-     */
-    public static final double MIN_PARTIAL_SIDE_WU = 0.1d;
-
-    /**
      * Default size in pixel of each partial
      */
     public static final double DEFAULT_PARTIAL_SIDE_PX = 500d;
@@ -289,7 +282,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 // if map is not up to date, create a new one and invalidate cache
                 if (GeoUtils.isMapContains(map, lay.getInternalLayer()) == false) {
 
-                    System.out.println("Layer changed ! " + layId);
+                    logger.warning("Layer changed ! " + layId);
 
                     map = lay.buildMapContent();
                     layerMapContents.put(layId, map);

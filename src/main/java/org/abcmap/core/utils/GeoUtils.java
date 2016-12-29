@@ -334,6 +334,7 @@ public class GeoUtils {
         }
 
         // unknown situation, warning
+        // TODO find a solution, do not store WKT for all entries
         logger.error("Unable to serialize CRS: " + crs.getIdentifiers());
         return crs.toWKT();
     }
