@@ -189,6 +189,7 @@ class PartialRenderingQueue {
                                 "MinY: " + bounds.getMinY(),
                                 "MaxX: " + bounds.getMaxX(),
                                 "MaxY: " + bounds.getMaxY(),
+                                "Width: " + bounds.getWidth(),
                                 "Loaded from DB: " + loadedFromDatabase,
                                 "RenderTime: " + renderTime + " ms",
                                 "Layer id: " + part.getLayerId(),
