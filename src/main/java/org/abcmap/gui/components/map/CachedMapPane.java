@@ -273,9 +273,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         double projectWorldWidth = project.getMaximumBounds().getWidth();
 
-        double zoomStepW = currentWorlEnvelope.getWidth() / 10;
-        double zoomStepH = currentWorlEnvelope.getHeight() * zoomStepW / currentWorlEnvelope.getWidth();
-
         double minx;
         double maxx;
         double miny;
@@ -285,6 +282,10 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // zoom in
         if (direction > 0) {
+
+            double zoomStepW = currentWorlEnvelope.getWidth() / 10;
+            double zoomStepH = currentWorlEnvelope.getHeight() * zoomStepW / currentWorlEnvelope.getWidth();
+
             minx = currentWorlEnvelope.getMinX() + zoomStepW;
             maxx = currentWorlEnvelope.getMaxX() - zoomStepW;
 
@@ -296,6 +297,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // zoom out
         else if (direction < 0) {
+
+            // when zooming out, we need to have a 'zoom out step' greater than a 'zoom in step',
+            // in order to restore previous envelope before zoom in, and reuse views in cache
+            double zoomStepW = currentWorlEnvelope.getWidth() / 8;
+            double zoomStepH = currentWorlEnvelope.getHeight() * zoomStepW / currentWorlEnvelope.getWidth();
 
             minx = currentWorlEnvelope.getMinX() - zoomStepW;
             maxx = currentWorlEnvelope.getMaxX() + zoomStepW;
