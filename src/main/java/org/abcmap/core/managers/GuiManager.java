@@ -360,28 +360,27 @@ public class GuiManager implements HasEventNotificationManager {
     /**
      * Search for an interaction group and try to show it in dock.
      * <p>
-     * If nothing is found, throw an exeption
+     * If nothing is found, throw an exception
      *
      * @param clss
      */
     public void showGroupInDock(Class clss) {
-        showGroupInDock(clss.toString());
+        showGroupInDock(clss.getSimpleName());
     }
 
     /**
      * Search for an interaction group and try to show it in dock.
      * <p>
-     * If nothing is found, throw an exeption
+     * If nothing is found, throw an exception
      *
-     * @param className
+     * @param className: the simple name of class
      */
     public void showGroupInDock(String className) {
 
         Dock[] docks = new Dock[]{getMainWindow().getEastDock(), getMainWindow().getWestDock()};
 
-        for (int i = 0; i < docks.length; i++) {
+        for(Dock d : docks){
 
-            Dock d = docks[i];
             boolean r = d.showFirstMenuPanelCorrespondingThis(className);
 
             if (r) {

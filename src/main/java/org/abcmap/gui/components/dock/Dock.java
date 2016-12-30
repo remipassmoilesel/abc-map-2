@@ -239,7 +239,7 @@ public class Dock extends JPanel implements HasDisplayableSpace {
      * <p>
      * Main window mode will be changed
      *
-     * @param className
+     * @param className: the simple name of class
      * @return
      */
     public boolean showFirstMenuPanelCorrespondingThis(String className) {
@@ -249,14 +249,14 @@ public class Dock extends JPanel implements HasDisplayableSpace {
             // widget is a menu
             if (c instanceof DockMenuWidget) {
 
-                // comparer les noms de classes
+                // compare simple names of classes
                 DockMenuWidget mw = (DockMenuWidget) c;
                 if (className.equals(mw.getInteractionElementGroup().getClass().getSimpleName())) {
 
                     // change window mode if necessary
                     guim.getMainWindow().setWindowMode(mw.getInteractionElementGroup().getWindowMode());
 
-                    // afficher l'espace
+                    // show widget space
                     showWidgetspace(mw.getMenuPanel());
 
                     return true;
