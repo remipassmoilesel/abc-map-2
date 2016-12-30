@@ -2,6 +2,7 @@ package org.abcmap.gui.components.map;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -23,6 +24,12 @@ public class CachedMapPaneMouseController extends MouseAdapter {
     public void mouseDragged(MouseEvent e) {
         super.mouseDragged(e);
 
+        // check if left button enabled
+        if (SwingUtilities.isLeftMouseButton(e) == false) {
+            return;
+        }
+
+        // first move, keep position and return
         if (lastPosition == null) {
             lastPosition = e.getPoint();
             return;
@@ -62,6 +69,12 @@ public class CachedMapPaneMouseController extends MouseAdapter {
     @Override
     public void mouseReleased(MouseEvent e) {
         super.mouseReleased(e);
+
+        // check if left button enabled
+        if (SwingUtilities.isLeftMouseButton(e) == false) {
+            return;
+        }
+
         lastPosition = null;
     }
 
