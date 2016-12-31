@@ -157,6 +157,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * Refresh call repaint() after
      */
     protected void refreshMainMap() {
+
         if (getMainMapPane() == null) {
             return;
         }
@@ -168,6 +169,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * Repaint main map if possible
      */
     protected void repaintMainMap() {
+
         if (getMainMapPane() == null) {
             return;
         }
@@ -206,8 +208,21 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * @param p
      * @return
      */
-    protected Coordinate screenToWorldCoordinate(Point2D p) {
-        return screenToWorldCoordinate((Point) p);
+    protected Coordinate mainMapScreenToWorldCoordinate(Point2D p) {
+        AffineTransform trans = getMainMapPane().getScreenToWorldTransform();
+        Point2D worldPoint = trans.transform(p, null);
+        return GeoUtils.point2DtoCoordinate(worldPoint);
+    }
+
+    /**
+     * Get point, transform it and return a coordinate object
+     *
+     * @param x
+     * @param y
+     * @return
+     */
+    protected Coordinate mainMapScreenToWorldCoordinate(double x, double y) {
+        return mainMapScreenToWorldCoordinate(new Point2D.Double(x, y));
     }
 
     /**
@@ -216,10 +231,8 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * @param p
      * @return
      */
-    protected Coordinate screenToWorldCoordinate(Point p) {
-        AffineTransform trans = getMainMapPane().getScreenToWorldTransform();
-        Point2D worldPoint = trans.transform(p, null);
-        return GeoUtils.point2DtoCoordinate(worldPoint);
+    protected Coordinate mainMapScreenToWorldCoordinate(Point p) {
+      return mainMapScreenToWorldCoordinate((Point2D) p);
     }
 
     /**
@@ -229,6 +242,15 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      */
     public AffineTransform getMainMapWorldToScreen() {
         return getMainMapPane().getWorldToScreenTransform();
+    }
+
+    /**
+     * Get current screen to world transform associated with main map
+     *
+     * @return
+     */
+    public AffineTransform getMainMapScreenToWorld() {
+        return getMainMapPane().getScreenToWorldTransform();
     }
 
     protected void unselectAllIfCtrlNotPressed(MouseEvent arg0) {

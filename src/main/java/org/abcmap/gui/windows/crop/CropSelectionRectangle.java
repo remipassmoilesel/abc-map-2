@@ -47,12 +47,14 @@ public class CropSelectionRectangle {
 
     private Color fgColor;
     private BasicStroke stroke;
+    private int interactionAreaMargin;
 
     public CropSelectionRectangle() {
         super();
 
         drawm = MainManager.getDrawManager();
 
+        this.interactionAreaMargin = 5;
         this.thickness = 5;
         this.fgColor = Color.green;
         this.stroke = new BasicStroke(thickness);
@@ -86,7 +88,7 @@ public class CropSelectionRectangle {
 
     public void refreshShape() {
 
-        int margin = drawm.getInteractionAreaMargin() + thickness;
+        int margin = interactionAreaMargin + thickness;
         int halfMargin = Math.round(margin / 2);
 
         // compute outside bounds of interaction area

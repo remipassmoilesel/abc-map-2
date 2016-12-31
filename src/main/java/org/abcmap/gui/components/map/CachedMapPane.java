@@ -322,7 +322,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             currentWorlEnvelope = newEnv;
         }
 
-        // check if envelope is proportionnal
+        // check if envelope is proportional
         checkWorldEnvelope();
 
     }
@@ -467,6 +467,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     public void setMouseManagementEnabled(boolean enabled) {
 
+        // enable management
         if (enabled == true) {
 
             if (this.mouseControl != null) {
@@ -479,7 +480,10 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             this.addMouseMotionListener(mouseControl);
             this.addMouseWheelListener(mouseControl);
 
-        } else {
+        }
+
+        // disable management
+        else {
 
             if (this.mouseControl == null) {
                 return;
@@ -514,6 +518,9 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         }
 
         this.currentWorlEnvelope = worldEnvelope;
+
+        // check if envelope is proportional
+        checkWorldEnvelope();
     }
 
     /**

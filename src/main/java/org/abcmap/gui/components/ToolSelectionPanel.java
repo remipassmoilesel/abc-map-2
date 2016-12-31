@@ -41,7 +41,7 @@ public class ToolSelectionPanel extends JPanel {
             buttons.add(bt);
 
             String csts = i % TOOLS_PER_LINE == 0 ? "wrap," : "";
-            this.add(bt, csts + "width 50px!");
+            this.add(bt, csts + "width 50px!, height 40px!");
 
             i++;
         }

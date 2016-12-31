@@ -7,6 +7,7 @@ public class ToolLibrary {
 
     public static final String LINE_TOOL = "LINE_TOOL";
     public static final String POLYGON_TOOL = "POLYGON_TOOL";
+    public static final String ZOOM_TOOL = "ZOOM_TOOL";
 
     private static ToolContainer[] containers;
 
@@ -21,6 +22,7 @@ public class ToolLibrary {
             containers = new ToolContainer[]{
                     new LineToolContainer(),
                     new PolygonToolContainer(),
+                    new ZoomToolContainer()
             };
         }
 

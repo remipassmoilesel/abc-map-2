@@ -57,12 +57,12 @@ public class LineTool extends MapTool {
             // first point of line
             if (builder == null) {
                 builder = drawm.getLineBuilder();
-                builder.newLine(screenToWorldCoordinate(e.getPoint()));
+                builder.newLine(mainMapScreenToWorldCoordinate(e.getPoint()));
             }
 
             // other points of line
             else {
-                builder.addPoint(screenToWorldCoordinate(e.getPoint()));
+                builder.addPoint(mainMapScreenToWorldCoordinate(e.getPoint()));
             }
 
         }
@@ -71,7 +71,7 @@ public class LineTool extends MapTool {
         else if (e.getClickCount() > 1) {
 
             if (builder != null) {
-                SimpleFeature feat = builder.terminateLine(screenToWorldCoordinate(e.getPoint()));
+                SimpleFeature feat = builder.terminateLine(mainMapScreenToWorldCoordinate(e.getPoint()));
                 builder = null;
 
                 ReferencedEnvelope bounds = JTS.bounds(DefaultFeatureBuilder.getGeometry(feat), projectm.getProject().getCrs());
