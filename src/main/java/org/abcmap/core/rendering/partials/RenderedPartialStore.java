@@ -45,6 +45,8 @@ import java.util.List;
  * Store partials in RAM and in database
  * <p>
  * Partials should contains only soft links to images, in order to free memory when needed
+ * <p>
+ * Partial store use Coordinate Reference System of project
  */
 public class RenderedPartialStore implements HasEventNotificationManager {
 
@@ -182,14 +184,12 @@ public class RenderedPartialStore implements HasEventNotificationManager {
                         + "AND ABS(" + SerializableRenderedPartial.PARTIAL_X2_FIELD_NAME + " - ?) < " + PRECISION + " "
                         + "AND ABS(" + SerializableRenderedPartial.PARTIAL_Y1_FIELD_NAME + " - ?) < " + PRECISION + " "
                         + "AND ABS(" + SerializableRenderedPartial.PARTIAL_Y2_FIELD_NAME + " - ?) < " + PRECISION + " "
-                        + "AND " + SerializableRenderedPartial.PARTIAL_CRS_FIELD_NAME + "=? "
                         + "AND " + SerializableRenderedPartial.PARTIAL_LAYERID_FIELD_NAME + "=? ",
 
                 new SelectArg(SqlType.DOUBLE, area.getMinX()),
                 new SelectArg(SqlType.DOUBLE, area.getMaxX()),
                 new SelectArg(SqlType.DOUBLE, area.getMinY()),
                 new SelectArg(SqlType.DOUBLE, area.getMaxY()),
-                new SelectArg(SqlType.STRING, GeoUtils.crsToString(area.getCoordinateReferenceSystem())),
                 new SelectArg(SqlType.STRING, part.getLayerId())
         );
         List<SerializableRenderedPartial> results = statement.query();
@@ -466,5 +466,9 @@ public class RenderedPartialStore implements HasEventNotificationManager {
     @Override
     public EventNotificationManager getNotificationManager() {
         return notifm;
+    }
+
+    public CoordinateReferenceSystem getCrs() {
+        return crs;
     }
 }

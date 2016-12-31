@@ -1,5 +1,6 @@
 package org.abcmap.core.rendering.partials;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.rendering.CachedRenderingEngine;
@@ -168,7 +169,7 @@ public class RenderedPartialFactory {
         while (y < maxY) {
 
             // compute needed area for next partial
-            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, mapContent.getCoordinateReferenceSystem());
+            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, store.getCrs());
 
             // check if partial already exist and is already loaded
             RenderedPartial part = store.searchInLoadedList(layerId, area);

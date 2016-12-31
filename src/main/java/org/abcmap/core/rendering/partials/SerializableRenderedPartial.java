@@ -24,7 +24,6 @@ public class SerializableRenderedPartial implements DataModel {
     public static final String PARTIAL_X2_FIELD_NAME = "X2";
     public static final String PARTIAL_Y1_FIELD_NAME = "Y1";
     public static final String PARTIAL_Y2_FIELD_NAME = "Y2";
-    public static final String PARTIAL_CRS_FIELD_NAME = "CRS";
     public static final String PARTIAL_LAYERID_FIELD_NAME = "LAYERID";
 
 
@@ -67,12 +66,6 @@ public class SerializableRenderedPartial implements DataModel {
     @DatabaseField(columnName = PARTIAL_LAYERID_FIELD_NAME)
     private String layerId;
 
-    /**
-     * Identifier of Coordinate Reference System
-     */
-    @DatabaseField(columnName = PARTIAL_CRS_FIELD_NAME)
-    private String crsId;
-
     public SerializableRenderedPartial() {
 
     }
@@ -82,16 +75,15 @@ public class SerializableRenderedPartial implements DataModel {
     }
 
     public SerializableRenderedPartial(BufferedImage img, ReferencedEnvelope ev, String layerId) {
-        this(img, ev.getMinX(), ev.getMaxX(), ev.getMinY(), ev.getMaxY(), GeoUtils.crsToString(ev.getCoordinateReferenceSystem()), layerId);
+        this(img, ev.getMinX(), ev.getMaxX(), ev.getMinY(), ev.getMaxY(), layerId);
     }
 
-    public SerializableRenderedPartial(BufferedImage img, double x1, double x2, double y1, double y2, String crsId, String layerId) {
+    public SerializableRenderedPartial(BufferedImage img, double x1, double x2, double y1, double y2, String layerId) {
         this.image = img;
         this.x1 = x1;
         this.x2 = x2;
         this.y1 = y1;
         this.y2 = y2;
-        this.crsId = crsId;
         this.layerId = layerId;
     }
 
@@ -113,15 +105,6 @@ public class SerializableRenderedPartial implements DataModel {
         return image;
     }
 
-    /**
-     * Return CRS id as a String
-     *
-     * @return
-     */
-    public String getCrsId() {
-        return crsId;
-    }
-
     public long getId() {
         return id;
     }
@@ -134,13 +117,12 @@ public class SerializableRenderedPartial implements DataModel {
         return Double.compare(that.x1, x1) == 0 &&
                 Double.compare(that.x2, x2) == 0 &&
                 Double.compare(that.y1, y1) == 0 &&
-                Double.compare(that.y2, y2) == 0 &&
-                Objects.equals(crsId, that.crsId);
+                Double.compare(that.y2, y2) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x1, x2, y1, y2, crsId);
+        return Objects.hash(x1, x2, y1, y2);
     }
 
     @Override
@@ -151,7 +133,6 @@ public class SerializableRenderedPartial implements DataModel {
                 ", x2=" + x2 +
                 ", y1=" + y1 +
                 ", y2=" + y2 +
-                ", crs=" + crsId +
                 '}';
     }
 }
