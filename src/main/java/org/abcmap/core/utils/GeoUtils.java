@@ -367,15 +367,25 @@ public class GeoUtils {
      * @param layer
      */
     public static void showInDebugWindow(String title, FeatureLayer layer) {
+        // create a map content
+        MapContent mapContent = new MapContent();
+        mapContent.addLayer(layer);
+
+        showInDebugWindow(title, mapContent);
+    }
+
+    /**
+     * Show a geotools layer in window
+     *
+     * @param title
+     * @param content
+     */
+    public static void showInDebugWindow(String title, MapContent content) {
 
         SwingUtilities.invokeLater(() -> {
 
-            // create a map content
-            MapContent mapContent = new MapContent();
-            mapContent.addLayer(layer);
-
             // create a map frame and show it
-            JMapFrame frame = new JMapFrame(mapContent);
+            JMapFrame frame = new JMapFrame(content);
             frame.setTitle(title);
             frame.setSize(800, 600);
             frame.enableStatusBar(true);

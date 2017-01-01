@@ -6,16 +6,16 @@ import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.listeners.ListenerHandler;
 import org.abcmap.gui.utils.GuiUtils;
-import org.geotools.feature.DefaultFeatureCollection;
-import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.renderer.lite.StreamingRenderer;
-import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -141,19 +141,34 @@ class PartialRenderingQueue {
 
                         renderedPartials++;
 
-                        ReferencedEnvelope worldBounds = part.getEnvelope();
+                        ReferencedEnvelope partialWorldBounds = part.getEnvelope();
 
                         // create an image, and renderer map
                         int imgWidth = (int) renderedWidthPx;
                         BufferedImage img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
 
-                        // improve drawing quality
+                        // get layer and CRS
+                        Layer layer = mapContent.layers().get(0);
+                        CoordinateReferenceSystem layerCrs = layer.getFeatureSource().getSchema().getCoordinateReferenceSystem();
+
+                        // check crs, if different transform envelope to destination CRS
+                        if (partialWorldBounds.getCoordinateReferenceSystem().equals(layerCrs) == false) {
+
+                            try {
+                                partialWorldBounds = partialWorldBounds.transform(layerCrs, true);
+                            } catch (TransformException | FactoryException e) {
+                                logger.error(e);
+                            }
+
+                        }
+
+                        // get graphics from image and improve drawing quality
                         Graphics2D g2d = (Graphics2D) img.getGraphics();
                         GuiUtils.applyQualityRenderingHints(g2d);
 
                         // draw image
                         long before = System.currentTimeMillis();
-                        renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), worldBounds);
+                        renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), partialWorldBounds);
                         renderTime = System.currentTimeMillis() - before;
 
                         // keep image

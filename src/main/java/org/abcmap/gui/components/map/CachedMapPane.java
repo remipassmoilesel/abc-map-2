@@ -10,11 +10,16 @@ import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.ShapeFileLayer;
 import org.abcmap.core.rendering.CachedRenderingEngine;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
 import org.abcmap.gui.utils.GuiUtils;
+import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.type.FeatureType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,6 +27,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 
 /**
  * Display a map by using a partial cache system

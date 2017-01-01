@@ -174,7 +174,7 @@ public class RenderedPartialFactory {
 
             // Compute needed area for next partial
             // CRS must be null, to prevent problems with different systems
-            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, null);
+            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, worldBounds.getCoordinateReferenceSystem());
 
             // check if partial already exist and is already loaded
             RenderedPartial part = store.searchInLoadedList(layerId, area);

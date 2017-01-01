@@ -1,6 +1,5 @@
 package org.abcmap.core.rendering.partials;
 
-import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import java.awt.*;
@@ -273,23 +272,14 @@ public class RenderedPartial {
             waitingImage = new BufferedImage(side, side, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D g2d = (Graphics2D) waitingImage.getGraphics();
-            Graphics2D g2dT = (Graphics2D) waitingImage.createGraphics();
+            Graphics2D g2dT = waitingImage.createGraphics();
 
             int w = waitingImage.getWidth();
             int h = waitingImage.getHeight();
 
-            // no transparency here, because the are possibly several layers
-            //g2d.setComposite(GuiUtils.createTransparencyComposite(0.3f));
-
-            g2dT.setComposite(GuiUtils.createTransparencyComposite(0.0f));
-            g2dT.setColor(Color.white);
+            // fill as transparent
+            g2dT.setColor(new Color(0, 0, 0, 0));
             g2dT.fillRect(0, 0, w, h);
-
-            // draw a rectangle
-            int thick = 3;
-            g2d.setColor(new Color(0xF0EEEE));
-            g2d.setStroke(new BasicStroke(thick));
-            g2d.drawRect(0 + thick, 0 + thick, w - thick, h - thick);
 
             // draw tree points in rectangle
             g2d.setColor(Color.blue);

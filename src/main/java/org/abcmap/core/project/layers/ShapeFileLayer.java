@@ -1,5 +1,6 @@
 package org.abcmap.core.project.layers;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.Utils;
@@ -35,7 +36,7 @@ public class ShapeFileLayer extends AbstractLayer {
         FileDataStore datastore = FileDataStoreFinder.getDataStore(shapeFile.toFile());
         this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource();
 
-        // add style
+        // add random style
         Rule rule = FeatureUtils.createRuleFor(Utils.randColor(), null, 0.5f);
         layerStyle.featureTypeStyles().add(sf.createFeatureTypeStyle(new Rule[]{rule}));
 

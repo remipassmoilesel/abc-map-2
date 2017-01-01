@@ -27,7 +27,7 @@ public class ZoomTool extends MapTool {
     public ZoomTool() {
         super();
         drawer = new SimpleRectangleDesigner();
-        minSizePx = 20;
+        minSizePx = 10;
     }
 
     /**
