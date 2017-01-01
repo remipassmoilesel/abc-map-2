@@ -125,7 +125,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // listen map modifications
         MainManager.getProjectManager().getNotificationManager().addObserver(this);
 
-        setDebugMode(true);
+        setDebugMode(false);
     }
 
     @Override

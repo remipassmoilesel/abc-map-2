@@ -236,6 +236,8 @@ public class ProjectManager implements HasEventNotificationManager {
         // create a project with a single shape file
         else if (id.equals(FAKE_PROJECT_2)) {
             fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes/communes-20160119.shp"));
+            fakeProject.addNewShapeFileLayer(Paths.get("data/cinema/les_salles_de_cinemas_en_ile-de-france.shp"));
+            fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes-ed50/france-communes-ed50.shp"));
         }
 
         // invalid argument

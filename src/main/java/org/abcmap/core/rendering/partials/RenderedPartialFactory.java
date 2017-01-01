@@ -252,8 +252,7 @@ public class RenderedPartialFactory {
      * @return
      */
     public double getStartPointFrom(double coord, double partialSideWu) {
-
-
+        
         double mod = coord % partialSideWu;
 
         if (mod < 0) {

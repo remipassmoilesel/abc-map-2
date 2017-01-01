@@ -8,7 +8,6 @@ import org.abcmap.core.draw.DefaultFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.Utils;
 import org.geotools.styling.*;
-import org.geotools.styling.Stroke;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 
@@ -22,7 +21,6 @@ import java.util.Objects;
 @DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "STYLES")
 public class StyleContainer implements DataModel {
 
-    private final static StyleFactory sf = FeatureUtils.getStyleFactory();
     private final static FilterFactory ff = FeatureUtils.getFilterFactory();
 
     private static final String ID_FIELD_NAME = "ID";
@@ -70,7 +68,7 @@ public class StyleContainer implements DataModel {
     public Rule getRule() {
 
         if (this.rule == null) {
-            rule = generateStyle(this);
+            rule = generateRule(this);
         }
 
         return rule;
@@ -150,41 +148,15 @@ public class StyleContainer implements DataModel {
      * @param container
      * @return
      */
-    public static Rule generateStyle(StyleContainer container) {
+    public static Rule generateRule(StyleContainer container) {
 
-        // create point symbolizer
-        Stroke stroke = sf.stroke(ff.literal(container.getForeground()), null, null, null, null, null, null);
-        Fill fill = sf.fill(null, ff.literal(container.getBackground()), ff.literal(1.0));
-
-        Mark mark = sf.getCircleMark();
-        mark.setFill(fill);
-        mark.setStroke(stroke);
-
-        Graphic graphic = sf.createDefaultGraphic();
-        graphic.graphicalSymbols().clear();
-        graphic.graphicalSymbols().add(mark);
-        graphic.setSize(ff.literal(container.getThick()));
-
-        // here we can specify name of geometry field. Set to null allow to not specify it
-        PointSymbolizer pointSym = sf.createPointSymbolizer(graphic, null);
-
-        // create line symbolizer
-        LineSymbolizer lineSym = sf.createLineSymbolizer(stroke, null);
-
-        // create polygon symbolizer
-        PolygonSymbolizer polygonSym = sf.createPolygonSymbolizer(stroke, fill, null);
-
-        // create rule
-        Rule r = sf.createRule();
-        r.symbolizers().add(pointSym);
-        r.symbolizers().add(lineSym);
-        r.symbolizers().add(polygonSym);
+        Rule rule = FeatureUtils.createRuleFor(container.getForeground(), container.getBackground(), container.getThick());
 
         // apply on specified id
         Filter filter = ff.equal(ff.property(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME), ff.literal(container.getId()), true);
-        r.setFilter(filter);
+        rule.setFilter(filter);
 
-        return r;
+        return rule;
 
     }
 

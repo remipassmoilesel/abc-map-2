@@ -1,14 +1,15 @@
 package org.abcmap.core.utils;
 
 import org.abcmap.core.draw.DefaultFeatureBuilder;
-import org.abcmap.core.tiles.TileFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
+import org.abcmap.core.tiles.TileFeatureBuilder;
 import org.geotools.data.FeatureStore;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.filter.identity.FeatureIdImpl;
-import org.geotools.styling.StyleFactory;
+import org.geotools.styling.*;
+import org.geotools.styling.Stroke;
 import org.opengis.feature.Property;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.type.Name;
@@ -18,13 +19,15 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.filter.identity.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import java.awt.*;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
 public class FeatureUtils {
 
-    private static final FilterFactory ff = getFilterFactory();
+    private final static StyleFactory sf = FeatureUtils.getStyleFactory();
+    private final static FilterFactory ff = FeatureUtils.getFilterFactory();
 
     /**
      * Get the default feature builder
@@ -176,4 +179,37 @@ public class FeatureUtils {
         store.getDataStore().dispose();
     }
 
+    public static Rule createRuleFor(Color foreground, Color background, double thick) {
+
+        // create point symbolizer
+        Stroke stroke = sf.stroke(ff.literal(foreground), null, null, null, null, null, null);
+        Fill fill = sf.fill(null, ff.literal(background), ff.literal(1.0));
+
+        Mark mark = sf.getCircleMark();
+        mark.setFill(fill);
+        mark.setStroke(stroke);
+
+        Graphic graphic = sf.createDefaultGraphic();
+        graphic.graphicalSymbols().clear();
+        graphic.graphicalSymbols().add(mark);
+        graphic.setSize(ff.literal(thick));
+
+        // here we can specify name of geometry field. Set to null allow to not specify it
+        PointSymbolizer pointSym = sf.createPointSymbolizer(graphic, null);
+
+        // create line symbolizer
+        LineSymbolizer lineSym = sf.createLineSymbolizer(stroke, null);
+
+        // create polygon symbolizer
+        PolygonSymbolizer polygonSym = sf.createPolygonSymbolizer(stroke, fill, null);
+
+        // create rule
+        Rule r = sf.createRule();
+        r.symbolizers().add(pointSym);
+        r.symbolizers().add(lineSym);
+        r.symbolizers().add(polygonSym);
+
+        return r;
+
+    }
 }

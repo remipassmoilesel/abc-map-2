@@ -351,9 +351,36 @@ public class Utils {
         return getExtension(file.getName());
     }
 
+    /**
+     * Return a random int
+     *
+     * @param min
+     * @param max
+     * @return
+     */
     public static int randInt(int min, int max) {
         int randomNum = rand.nextInt((max - min) + 1) + min;
         return randomNum;
+    }
+
+    /**
+     * Colors used in random color method
+     */
+    private static final Color[] colors = new Color[]{
+            Color.RED,
+            Color.BLUE,
+            Color.GREEN,
+            Color.CYAN,
+            Color.DARK_GRAY
+    };
+
+    /**
+     * Return a random color
+     *
+     * @return
+     */
+    public static Color randColor() {
+        return colors[randInt(0, colors.length - 1)];
     }
 
     /**
