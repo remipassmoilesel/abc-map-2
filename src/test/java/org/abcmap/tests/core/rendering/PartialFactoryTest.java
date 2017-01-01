@@ -75,7 +75,7 @@ public class PartialFactoryTest {
         if (SHOW_IN_WINDOW == false) {
 
             // build partials for a fake layer map content
-            RenderedPartialFactory factory = new RenderedPartialFactory(project.getRenderedPartialsStore(), project.buildGlobalMapContent(true), "layer1");
+            RenderedPartialFactory factory = new RenderedPartialFactory(project.getRenderedPartialStore(), project.buildGlobalMapContent(true), "layer1");
             final int[] renderedTiles = {0};
             RenderedPartialQueryResult queryResult = factory.intersect(worldPosition, dimensionsPx, partialSideWu, DefaultEngineeringCRS.GENERIC_2D, () -> {
                 renderedTiles[0]++;

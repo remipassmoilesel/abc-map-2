@@ -100,7 +100,7 @@ public class ZoomTool extends MapTool {
             // create a new envelope and set it on main map
             ReferencedEnvelope env = new ReferencedEnvelope(blc.x, urc.x, blc.y, urc.y, projectm.getProject().getCrs());
             getMainMapPane().setWorldEnvelope(env);
-            
+
             drawer.resetRectangle();
 
             // repaint map

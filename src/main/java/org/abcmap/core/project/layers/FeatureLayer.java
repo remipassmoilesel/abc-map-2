@@ -28,7 +28,6 @@ public class FeatureLayer extends AbstractLayer {
 
     protected SimpleFeatureStore featureStore;
     protected DefaultFeatureBuilder featureBuilder;
-    protected SimpleFeatureSource featureSource;
 
     /**
      * Create a feature layer object.
@@ -62,12 +61,11 @@ public class FeatureLayer extends AbstractLayer {
             datastore.createSchema(type);
         }
 
-        this.featureSource = datastore.getFeatureSource(entry.getLayerId());
-        this.featureStore = (SimpleFeatureStore) featureSource;
+        this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
 
         // create a feature builder associated with the layer
         this.featureBuilder = FeatureUtils.getDefaultFeatureBuilder(entry.getLayerId(), owner.getCrs());
-        this.internalLayer = new org.geotools.map.FeatureLayer(featureSource, layerStyle);
+        this.internalLayer = new org.geotools.map.FeatureLayer(featureStore, layerStyle);
     }
 
     /**
@@ -78,15 +76,15 @@ public class FeatureLayer extends AbstractLayer {
     @Override
     public ReferencedEnvelope getBounds() {
         try {
-            return featureSource.getFeatures().getBounds();
+            return featureStore.getFeatures().getBounds();
         } catch (IOException e) {
             logger.error(e);
             throw new LayerIOException(e);
         }
     }
 
-    public SimpleFeatureSource getFeatureSource() {
-        return featureSource;
+    public SimpleFeatureStore getFeatureSource() {
+        return featureStore;
     }
 
     /**
@@ -94,7 +92,6 @@ public class FeatureLayer extends AbstractLayer {
      * <p>
      * Return the feature added
      * <p>
-     * TODO: find a way to remove synchronize attribute ?
      *
      * @param geom
      */
@@ -193,7 +190,7 @@ public class FeatureLayer extends AbstractLayer {
         Filter filter = FeatureUtils.getIdFilter(id);
 
         try {
-            SimpleFeatureIterator features = featureSource.getFeatures(filter).features();
+            SimpleFeatureIterator features = featureStore.getFeatures(filter).features();
 
             if (features.hasNext() == false) {
                 return null;

@@ -106,17 +106,19 @@ public class Project {
      */
     public Project(Path databasePath) throws IOException {
 
-        this.databasePath = databasePath;
+        // default system
+        this.crs = GeoUtils.WGS_84;
 
+        this.databasePath = databasePath;
         this.tempDirectory = databasePath.getParent();
         this.metadataContainer = new ProjectMetadata();
         this.mainLayersList = new ArrayList<>();
         this.layouts = new ArrayList<>();
-        this.crs = GeoUtils.GENERIC_2D;
         this.finalPath = null;
 
         this.styleLibrary = new StyleLibrary();
 
+        // create a new tile storage
         this.tileStorage = new TileStorage(databasePath);
         tileStorage.initialize();
 
@@ -181,6 +183,7 @@ public class Project {
     /**
      * Return maximum bounds of all layers
      * // TODO Exclude WMS layers ?
+     * // TODO: Check CRS compatibility between layers ?
      *
      * @return
      */
@@ -195,6 +198,10 @@ public class Project {
         for (AbstractLayer lay : getLayersList()) {
             ReferencedEnvelope bounds = lay.getInternalLayer().getBounds();
             // TODO: do not use empty feature layers ?
+
+            if (bounds.getCoordinateReferenceSystem() != getCrs()) {
+                logger.warning("Bounds computing: CRS are different");
+            }
 
             if (firstLoop) {
 
@@ -290,6 +297,9 @@ public class Project {
      * @return
      */
     public CoordinateReferenceSystem getCrs() {
+        if (crs == null) {
+            logger.warning("CRS of project is null");
+        }
         return crs;
     }
 
@@ -536,7 +546,7 @@ public class Project {
      *
      * @return
      */
-    public RenderedPartialStore getRenderedPartialsStore() {
+    public RenderedPartialStore getRenderedPartialStore() {
         return partialStore;
     }
 

@@ -1,6 +1,5 @@
 package org.abcmap.core.rendering.partials;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.rendering.CachedRenderingEngine;
@@ -65,6 +64,11 @@ public class RenderedPartialFactory {
         this.partialSidePx = CachedRenderingEngine.DEFAULT_PARTIAL_SIDE_PX;
     }
 
+    /**
+     * If set to true, supplementary information will be displayed on partials
+     *
+     * @param debugMode
+     */
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
     }
@@ -128,8 +132,8 @@ public class RenderedPartialFactory {
         }
 
         if (mapContent.getCoordinateReferenceSystem() == null) {
-            // TODO throw error here ?
-           //logger.warning("Map content reference system is null: " + mapContent);
+            //throw new RenderingException("Map content reference system is null: " + mapContent);
+            logger.warning("Map content reference system is null: " + mapContent);
         }
 
         if (worldBounds == null) {
@@ -168,8 +172,9 @@ public class RenderedPartialFactory {
         // iterate area to renderer from bottom left corner to upper right corner
         while (y < maxY) {
 
-            // compute needed area for next partial
-            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, store.getCrs());
+            // Compute needed area for next partial
+            // CRS must be null, to prevent problems with different systems
+            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, null);
 
             // check if partial already exist and is already loaded
             RenderedPartial part = store.searchInLoadedList(layerId, area);

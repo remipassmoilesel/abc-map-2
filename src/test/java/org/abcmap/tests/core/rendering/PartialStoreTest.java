@@ -58,7 +58,7 @@ public class PartialStoreTest {
 
         // get partial store
         Project project = MainManager.getProjectManager().getProject();
-        RenderedPartialStore store = project.getRenderedPartialsStore();
+        RenderedPartialStore store = project.getRenderedPartialStore();
 
         // side of partial in world unit
         double partialSide = 30;

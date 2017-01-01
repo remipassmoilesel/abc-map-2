@@ -175,7 +175,7 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
             JSlider slider = (JSlider) arg0.getSource();
             float value = Float.valueOf(slider.getValue()) / 100;
 
-            // hange layer only if needed
+            // change layer only if needed
             AbstractLayer lay = project.getActiveLayer();
             if (lay.getOpacity() != value) {
                 ThreadManager.runLater(() -> {

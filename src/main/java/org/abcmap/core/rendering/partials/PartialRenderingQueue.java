@@ -141,7 +141,7 @@ class PartialRenderingQueue {
 
                         renderedPartials++;
 
-                        ReferencedEnvelope bounds = part.getEnvelope();
+                        ReferencedEnvelope worldBounds = part.getEnvelope();
 
                         // create an image, and renderer map
                         int imgWidth = (int) renderedWidthPx;
@@ -153,7 +153,7 @@ class PartialRenderingQueue {
 
                         // draw image
                         long before = System.currentTimeMillis();
-                        renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), bounds);
+                        renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), worldBounds);
                         renderTime = System.currentTimeMillis() - before;
 
                         // keep image
@@ -172,7 +172,7 @@ class PartialRenderingQueue {
                     // mark as up to date
                     part.setOutdated(false);
 
-                    // display informations on tile if needed
+                    // display debug information on partial if needed
                     if (debugMode) {
 
                         BufferedImage img = part.getImage();

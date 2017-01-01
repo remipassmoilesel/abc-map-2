@@ -124,14 +124,14 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             // TODO: check if event concern current area
             notifm.fireEvent(ev);
         });
-        project.getRenderedPartialsStore().getNotificationManager().addObserver(this);
+        project.getRenderedPartialStore().getNotificationManager().addObserver(this);
 
     }
 
     @Override
     protected void finalize() throws Throwable {
         // remove observer on finalizing
-        project.getRenderedPartialsStore().getNotificationManager().removeObserver(this);
+        project.getRenderedPartialStore().getNotificationManager().removeObserver(this);
     }
 
     public void paint(Graphics2D g2d) {
@@ -273,7 +273,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 // retrieve partial factory associated with layer
                 RenderedPartialFactory factory = partialFactories.get(layId);
                 if (factory == null) {
-                    factory = new RenderedPartialFactory(project.getRenderedPartialsStore(), map, layId);
+                    factory = new RenderedPartialFactory(project.getRenderedPartialStore(), map, layId);
                     factory.setDebugMode(debugMode);
                     partialFactories.put(layId, factory);
                 }

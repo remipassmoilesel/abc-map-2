@@ -63,11 +63,11 @@ public class LayerListButtonsAL implements ActionListener {
         }
         //
         else if (MOVE_UP.equals(mode)) {
-            moveLayer(lay, -1);
+            moveLayer(lay, +1);
         }
         //
         else if (MOVE_DOWN.equals(mode)) {
-            moveLayer(lay, +1);
+            moveLayer(lay, -1);
         }
         //
         else if (REMOVE.equals(mode)) {
