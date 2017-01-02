@@ -278,7 +278,7 @@ public class RenderedPartial {
             int h = waitingImage.getHeight();
 
             // fill as transparent
-            g2dT.setColor(new Color(0, 0, 0, 0));
+            g2dT.setColor(new Color(0.9f, 0.9f, 0.9f, 0.2f));
             g2dT.fillRect(0, 0, w, h);
 
             // draw tree points in rectangle
