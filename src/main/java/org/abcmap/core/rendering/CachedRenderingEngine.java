@@ -151,7 +151,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
             // list of layer changed before refreshMap called
             if (partialCtr == null) {
-                logger.error("Partials are null " + lay.getId());
+                logger.debug("Partials are null " + lay.getId());
                 continue;
             }
 

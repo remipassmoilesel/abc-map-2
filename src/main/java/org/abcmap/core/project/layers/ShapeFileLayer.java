@@ -25,14 +25,14 @@ public class ShapeFileLayer extends AbstractLayer {
     //private final SimpleFeatureStore featureStore;
 
     public ShapeFileLayer(String layerId, String title, boolean visible, int zindex, Project owner, Path shapeFile) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), owner, shapeFile);
+        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.SHAPE_FILE), owner, shapeFile);
     }
 
     public ShapeFileLayer(LayerIndexEntry entry, Project owner, Path shapeFile) throws IOException {
 
         super(owner, entry);
 
-        // retrieve a shape file and add it to a mapcontent
+        // retrieve a shape file and add it to a map content
         FileDataStore datastore = FileDataStoreFinder.getDataStore(shapeFile.toFile());
         this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource();
 

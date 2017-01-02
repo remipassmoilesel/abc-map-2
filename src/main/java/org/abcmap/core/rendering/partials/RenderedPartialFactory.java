@@ -7,6 +7,7 @@ import org.abcmap.core.rendering.RenderingException;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -131,11 +132,6 @@ public class RenderedPartialFactory {
             throw new RenderingException("Nothing to renderer, map content is null");
         }
 
-        if (mapContent.getCoordinateReferenceSystem() == null) {
-            //throw new RenderingException("Map content reference system is null: " + mapContent);
-            logger.warning("Map content reference system is null: " + mapContent);
-        }
-
         if (worldBounds == null) {
             throw new RenderingException("World bounds are null");
         }
@@ -176,30 +172,41 @@ public class RenderedPartialFactory {
             // CRS must be null, to prevent problems with different systems
             ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, worldBounds.getCoordinateReferenceSystem());
 
-            // check if partial already exist and is already loaded
-            RenderedPartial part = store.searchInLoadedList(layerId, area);
+            // check if bounds of partials are on layer
+            ReferencedEnvelope layerBounds = mapContent.layers().get(0).getBounds();
+            try {
 
-            if (RenderedPartial.isLoaded(part) || PartialRenderingQueue.isRenderInProgress(part)) {
-                rsparts.add(part);
+                if (layerBounds.intersects(area.toBounds(layerBounds.getCoordinateReferenceSystem()))) {
 
-                loaded++;
-                loadedPartialsReused++;
-            }
+                    // check if partial already exist and is already loaded
+                    RenderedPartial part = store.searchInLoadedList(layerId, area);
 
-            // partial does not exist or image is not loaded, create it
-            else {
+                    if (RenderedPartial.isLoaded(part) || PartialRenderingQueue.isRenderInProgress(part)) {
+                        rsparts.add(part);
 
-                // create a new partial only if needed
-                if (part == null) {
-                    part = new RenderedPartial(null, area, (int) partialSidePx, (int) partialSidePx, layerId);
-                    store.addInLoadedList(part);
+                        loaded++;
+                        loadedPartialsReused++;
+                    }
+
+                    // partial does not exist or image is not loaded, create it
+                    else {
+
+                        // create a new partial only if needed
+                        if (part == null) {
+                            part = new RenderedPartial(null, area, (int) partialSidePx, (int) partialSidePx, layerId);
+                            store.addInLoadedList(part);
+                        }
+
+                        // create a task to retrieve or renderer image from map
+                        renderingQueue.addTask(part);
+
+                        rsparts.add(part);
+
+                    }
+
                 }
-
-                // create a task to retrieve or renderer image from map
-                renderingQueue.addTask(part);
-
-                rsparts.add(part);
-
+            } catch (TransformException e) {
+                logger.error(e);
             }
 
             // go to next
@@ -252,7 +259,7 @@ public class RenderedPartialFactory {
      * @return
      */
     public double getStartPointFrom(double coord, double partialSideWu) {
-        
+
         double mod = coord % partialSideWu;
 
         if (mod < 0) {

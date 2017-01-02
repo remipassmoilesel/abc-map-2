@@ -1,9 +1,13 @@
 package org.abcmap.core.project.layers;
 
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
+
 /**
- * Created by remipassmoilesel on 10/11/16.
+ * Types of layer
  */
 public enum LayerType {
+
 
     /**
      * A features layer
@@ -18,7 +22,14 @@ public enum LayerType {
     /**
      * A distant raster layer
      */
-    WMS;
+    WMS,
+
+    /**
+     * Layer displaying a shape file
+     */
+    SHAPE_FILE;
+
+    private static final CustomLogger logger = LogManager.getLogger(LayerType.class);
 
     /**
      * Return the corresponding enum object or null.
@@ -30,6 +41,7 @@ public enum LayerType {
         try {
             return LayerType.valueOf(name);
         } catch (Exception e) {
+            logger.error(e);
             return null;
         }
     }

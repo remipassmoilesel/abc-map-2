@@ -1,6 +1,9 @@
 package org.abcmap.gui.components.map;
 
+import com.vividsolutions.jts.awt.ShapeWriter;
+import com.vividsolutions.jts.geom.Envelope;
 import net.miginfocom.swing.MigLayout;
+import org.abcmap.core.draw.builder.AffinePointTransformation;
 import org.abcmap.core.events.CacheRenderingEvent;
 import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
@@ -11,15 +14,13 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbstractLayer;
-import org.abcmap.core.project.layers.ShapeFileLayer;
 import org.abcmap.core.rendering.CachedRenderingEngine;
+import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
 import org.abcmap.gui.utils.GuiUtils;
-import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.type.FeatureType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,7 +28,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Display a map by using a partial cache system
@@ -91,6 +92,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
     private final EventNotificationManager notifm;
     private final DrawManager drawm;
+    private ArrayList<Object[]> boundsList;
 
     public CachedMapPane(Project p) {
         super(new MigLayout("fill"));
@@ -131,7 +133,9 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // listen map modifications
         MainManager.getProjectManager().getNotificationManager().addObserver(this);
 
-        setDebugMode(false);
+        boundsList = new ArrayList<>();
+
+        setDebugMode(true);
     }
 
     @Override
@@ -156,11 +160,50 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // if debug mode enabled, paint world envelope asked
         if (debugMode) {
             paintGrid(g2d);
+            paintBounds(g2d);
         }
 
         // let tool paint if needed
         if (acceptPaintFromTool && drawm.getCurrentTool() != null) {
             drawm.getCurrentTool().drawOnMainMap(g2d);
+        }
+
+    }
+
+    private void paintBounds(Graphics2D g2d) {
+
+        AffineTransform worldToScreenTransform = getWorldToScreenTransform();
+        ShapeWriter shapeWriter = new ShapeWriter(new AffinePointTransformation(worldToScreenTransform));
+
+        for (Object[] o : boundsList) {
+            g2d.setColor((Color) o[2]);
+            g2d.setStroke(new BasicStroke(2));
+            Shape shape = shapeWriter.toShape(JTS.toGeometry((Envelope) o[1]));
+            g2d.draw(shape);
+            g2d.drawString(o[0].toString(), (int) shape.getBounds().getMinX(), (int) shape.getBounds().getMinY());
+        }
+
+    }
+
+    public void prepareBounds() {
+
+        boundsList.clear();
+
+        // add project bounds
+        Object[] projectBounds = new Object[]{
+                "Project bounds",
+                project.getMaximumBounds(),
+                Color.BLACK
+        };
+
+        // add layers
+        for (AbstractLayer layer : project.getLayersList()) {
+            boundsList.add(new Object[]{
+                    "Layer: " + layer.getId(),
+                    layer.getBounds(),
+                    Utils.randColor()
+            });
+
         }
 
     }
@@ -231,6 +274,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             renderingEngine.prepareMap(currentWorlEnvelope, panelDimensions);
         } catch (Exception e) {
             logger.error(e);
+        }
+
+        // prepare bounds
+        if (debugMode) {
+            prepareBounds();
         }
 
         // repaint component
