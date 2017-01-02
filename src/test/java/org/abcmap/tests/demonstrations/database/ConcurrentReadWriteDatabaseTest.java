@@ -1,4 +1,4 @@
-package org.abcmap.tests.core.database;
+package org.abcmap.tests.demonstrations.database;
 
 import org.abcmap.TestUtils;
 import org.abcmap.core.utils.SQLUtils;

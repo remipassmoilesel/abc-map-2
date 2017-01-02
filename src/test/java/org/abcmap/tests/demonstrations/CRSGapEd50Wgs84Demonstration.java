@@ -1,4 +1,4 @@
-package org.abcmap.tests.core;
+package org.abcmap.tests.demonstrations;
 
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
@@ -21,8 +21,12 @@ import java.nio.file.Paths;
  * This example show weird behavior with Geotools. If a converted shape file from WGS84 to ED50 is displayed on the original file, a gap will be displayed between shape files.
  * <p>
  * To reproduce this: download a shape file, transform it with QGis 2.6, modify the code below and launch it
+ * <p>
+ * This issue appear on udig too.
+ * <p>
+ * Maybe this issue appear because of ED5 domain, too small ?
  */
-public class CRSGapEd50Wgs84Test {
+public class CRSGapEd50Wgs84Demonstration {
 
     private static final FilterFactory2 ff = FeatureUtils.getFilterFactory();
     private static final StyleFactory sf = FeatureUtils.getStyleFactory();

@@ -1,4 +1,4 @@
-package org.abcmap.tests.core.database;
+package org.abcmap.tests.demonstrations.database;
 
 import org.abcmap.TestUtils;
 import org.abcmap.core.utils.SQLUtils;
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
  *
  * Table names are case sensitive, column names are not
  */
-public class CaseSensitiveDatabase {
+public class CaseSensitiveDatabaseDemonstration {
 
     private static final String TEST_TABLE_NAME = "name_in_lower_case";
     private static final String COLUMN_A = "columnA";
