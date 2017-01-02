@@ -14,7 +14,9 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.rendering.CachedRenderingEngine;
+import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
@@ -81,20 +83,20 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * If set to true, more information are displayed
      */
     private boolean debugMode;
-
-    /**
-     * Minimal zoom factor relative to project width
-     */
-    //private double minZoomFactor;
+    private boolean drawLayerBounds;
 
     /**
      * Maximal zoom factor relative to project width
      */
     private double maxZoomFactor;
 
+    /**
+     * List of layer and project bounds with properties, to draw in debug mode
+     */
+    private ArrayList<Object[]> debugBoundsList;
+
     private final EventNotificationManager notifm;
     private final DrawManager drawm;
-    private ArrayList<Object[]> boundsList;
 
     public CachedMapPane(Project p) {
         super(new MigLayout("fill"));
@@ -135,9 +137,9 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // listen map modifications
         MainManager.getProjectManager().getNotificationManager().addObserver(this);
 
-        boundsList = new ArrayList<>();
+        debugBoundsList = new ArrayList<>();
 
-        setDebugMode(true);
+        setDebugMode(false);
     }
 
     @Override
@@ -170,6 +172,26 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             drawm.getCurrentTool().drawOnMainMap(g2d);
         }
 
+//        System.out.println();
+//        for (AbstractLayer lay : project.getLayersList()) {
+//
+//            System.out.println(lay + " " + lay.getInternalLayer().getFeatureSource().getSchema().getCoordinateReferenceSystem().toString().substring(0, 15));
+//
+//            if (lay instanceof FeatureLayer) {
+//                FeatureLayer flay = (FeatureLayer) lay;
+//                flay.executeVisit((feat) -> {
+//                    System.out.println(feat);
+//                    System.out.println(feat.getFeatureType().getCoordinateReferenceSystem().toString().substring(0, 15));
+//                    System.out.println(feat.getFeatureType().getCoordinateReferenceSystem().equals(GeoUtils.WGS_84));
+//                    System.out.println("feat.getFeatureType().getCoordinateReferenceSystem()");
+//                    System.out.println(feat.getFeatureType().getCoordinateReferenceSystem());
+//                    System.out.println("GeoUtils.WGS_84");
+//                    System.out.println(GeoUtils.WGS_84);
+//                    return true;
+//                });
+//            }
+//        }
+
     }
 
     /**
@@ -179,38 +201,40 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     private void paintBounds(Graphics2D g2d) {
 
-        AffineTransform worldToScreenTransform = getWorldToScreenTransform();
-        ShapeWriter shapeWriter = new ShapeWriter(new AffinePointTransformation(worldToScreenTransform));
+        if (drawLayerBounds == true) {
+            AffineTransform worldToScreenTransform = getWorldToScreenTransform();
+            ShapeWriter shapeWriter = new ShapeWriter(new AffinePointTransformation(worldToScreenTransform));
 
-        ArrayList<Integer> yPositions = new ArrayList<>();
+            ArrayList<Integer> yPositions = new ArrayList<>();
 
-        int fontSize = 11;
+            int fontSize = 11;
 
-        for (Object[] o : boundsList) {
-            g2d.setColor((Color) o[2]);
-            g2d.setStroke(new BasicStroke(2));
-            Shape shape = shapeWriter.toShape(JTS.toGeometry((Envelope) o[1]));
-            g2d.draw(shape);
+            for (Object[] o : debugBoundsList) {
+                g2d.setColor((Color) o[2]);
+                g2d.setStroke(new BasicStroke(2));
+                Shape shape = shapeWriter.toShape(JTS.toGeometry((Envelope) o[1]));
+                g2d.draw(shape);
 
-            int increment = (int) (fontSize * 2);
-            int yPos = (int) shape.getBounds().getMinY() - increment;
-            for (int i = 0; i < yPositions.size(); i++) {
-                Integer cPos = yPositions.get(i);
-                if (Math.abs(cPos - yPos) < increment / 2) {
-                    yPos -= increment;
+                int increment = (int) (fontSize * 2);
+                int yPos = (int) shape.getBounds().getMinY() - increment;
+                for (int i = 0; i < yPositions.size(); i++) {
+                    Integer cPos = yPositions.get(i);
+                    if (Math.abs(cPos - yPos) < increment / 2) {
+                        yPos -= increment;
+                    }
                 }
+                yPositions.add(yPos);
+
+                g2d.setColor(Color.white);
+                g2d.fillRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
+
+                g2d.setColor(Color.gray);
+                g2d.drawRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
+
+                g2d.setColor((Color) o[2]);
+                g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 11));
+                g2d.drawString(o[0].toString(), (int) shape.getBounds().getMinX(), yPos);
             }
-            yPositions.add(yPos);
-
-            g2d.setColor(Color.white);
-            g2d.fillRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
-
-            g2d.setColor(Color.gray);
-            g2d.drawRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
-
-            g2d.setColor((Color) o[2]);
-            g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 11));
-            g2d.drawString(o[0].toString(), (int) shape.getBounds().getMinX(), yPos);
         }
 
     }
@@ -220,28 +244,32 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     public void prepareBounds() {
 
-        boundsList.clear();
+        debugBoundsList.clear();
 
-        // add layers
-        for (AbstractLayer layer : project.getLayersList()) {
-            try {
-                boundsList.add(new Object[]{
-                        "Layer: " + layer.getId(),
-                        layer.getBounds().transform(project.getCrs(), true),
-                        Utils.randColor()
-                });
-            } catch (TransformException | FactoryException e) {
-                logger.error(e);
+        if (drawLayerBounds == true) {
+
+            // add layers
+            for (AbstractLayer layer : project.getLayersList()) {
+                try {
+                    debugBoundsList.add(new Object[]{
+                            "Layer: " + layer.getId(),
+                            layer.getBounds().transform(project.getCrs(), true),
+                            Utils.randColor()
+                    });
+                } catch (TransformException | FactoryException e) {
+                    logger.error(e);
+                }
+
             }
 
-        }
+            // add project bounds
+            debugBoundsList.add(new Object[]{
+                    "Project bounds",
+                    project.getMaximumBounds(),
+                    Color.BLACK
+            });
 
-        // add project bounds
-        boundsList.add(new Object[]{
-                "Project bounds",
-                project.getMaximumBounds(),
-                Color.BLACK
-        });
+        }
 
     }
 
@@ -483,6 +511,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
+        this.drawLayerBounds = debugMode;
         renderingEngine.setDebugMode(debugMode);
     }
 

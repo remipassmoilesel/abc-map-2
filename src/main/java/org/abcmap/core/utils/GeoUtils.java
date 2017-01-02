@@ -8,15 +8,16 @@ import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
+import org.geotools.factory.Hints;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.ReferencingFactoryFinder;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.geotools.referencing.crs.DefaultGeocentricCRS;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.*;
@@ -26,6 +27,7 @@ import org.opengis.filter.FilterFactory2;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.ReferenceIdentifier;
+import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.style.ContrastMethod;
 
@@ -39,18 +41,53 @@ import java.util.Set;
  * Created by remipassmoilesel on 10/11/16.
  */
 public class GeoUtils {
+    /**
+     * Generic 2D coordinate reference system. Prefer use of this instead of
+     * DefaultEngineeringSystem.GENERIC2D because its format is easier to serialize.
+     */
+    public static CoordinateReferenceSystem GENERIC_2D;
+    /**
+     * Do not use DefaultGeographicCRS.WGS_84: axis order disturb display
+     */
+    public static CoordinateReferenceSystem WGS_84;
 
-    public static final CustomLogger logger = LogManager.getLogger(GeoUtils.class);
-
+    /**
+     * List of known CRS names. These CRS can npt be easily serialized by authority / code.
+     */
     public static final ArrayList<String> knownCrsNames = new ArrayList<>();
+
+    /**
+     * List of known CRS. These CRS can npt be easily serialized by authority / code.
+     */
     public static final ArrayList<CoordinateReferenceSystem> knownCrs = new ArrayList<>();
 
+    /**
+     * Main CRS factory used in software. This factory should be used in every decode operation.
+     * <p>
+     * /!\ EPSG:40400 do not work with this factory
+     */
+    private static final CRSAuthorityFactory crsFactory;
+    public static final CustomLogger logger = LogManager.getLogger(GeoUtils.class);
+
     static {
+
+        // initialize main crs factory
+        Hints hints = new Hints(Hints.FORCE_LONGITUDE_FIRST_AXIS_ORDER, Boolean.TRUE);
+        crsFactory = ReferencingFactoryFinder.getCRSAuthorityFactory("EPSG", hints);
+
+
+        try {
+            GENERIC_2D = CRS.decode("EPSG:404000");
+            WGS_84 = decode("EPSG:4326");
+        } catch (FactoryException e) {
+            logger.error(e);
+        }
+
         // Upper case alphanum only
         knownCrsNames.add("CARTESIAN");
         knownCrs.add(DefaultGeocentricCRS.CARTESIAN);
         knownCrsNames.add("EPSG:4326");
-        knownCrs.add(DefaultGeographicCRS.WGS84);
+        knownCrs.add(WGS_84);
         knownCrsNames.add("CARTESIAN2D");
         knownCrs.add(DefaultEngineeringCRS.CARTESIAN_2D);
         knownCrsNames.add("GENERIC2D");
@@ -60,22 +97,6 @@ public class GeoUtils {
 
     private static final FilterFactory2 ff = FeatureUtils.getFilterFactory();
     private static final StyleFactory sf = FeatureUtils.getStyleFactory();
-
-    public static final CoordinateReferenceSystem WGS_84 = DefaultGeographicCRS.WGS84;
-
-    /**
-     * Generic 2D coordinate reference system. Prefer use of this instead of
-     * DefaultEngineeringSystem.GENERIC2D because its format is easier to serialize.
-     */
-    public static CoordinateReferenceSystem GENERIC_2D;
-
-    static {
-        try {
-            GENERIC_2D = CRS.decode("EPSG:404000");
-        } catch (FactoryException e) {
-            logger.error(e);
-        }
-    }
 
     /**
      * Return a JTS geometry factory
@@ -398,5 +419,16 @@ public class GeoUtils {
 
     }
 
-
+    /**
+     * Main CRS factory used in software. This factory should be used in every CRS decode operation.
+     * <p>
+     * /!\ EPSG:40400 do not work with this factory
+     *
+     * @param code
+     * @return
+     * @throws FactoryException
+     */
+    public static CoordinateReferenceSystem decode(String code) throws FactoryException {
+        return crsFactory.createCoordinateReferenceSystem(code);
+    }
 }

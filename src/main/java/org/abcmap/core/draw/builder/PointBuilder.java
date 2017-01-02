@@ -5,7 +5,7 @@ import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
 import org.opengis.feature.simple.SimpleFeature;
 
-public class PointBuilder extends AbstractShapeBuilder {
+public class PointBuilder extends AbstractFeatureBuilder {
 
     public PointBuilder(FeatureLayer layer, StyleContainer style) {
         super(layer, style);

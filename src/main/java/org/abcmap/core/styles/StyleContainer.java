@@ -4,7 +4,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
-import org.abcmap.core.draw.DefaultFeatureBuilder;
+import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.Utils;
 import org.geotools.styling.*;
@@ -153,7 +153,7 @@ public class StyleContainer implements DataModel {
         Rule rule = FeatureUtils.createRuleFor(container.getForeground(), container.getBackground(), container.getThick());
 
         // apply on specified id
-        Filter filter = ff.equal(ff.property(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME), ff.literal(container.getId()), true);
+        Filter filter = ff.equal(ff.property(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME), ff.literal(container.getId()), true);
         rule.setFilter(filter);
 
         return rule;

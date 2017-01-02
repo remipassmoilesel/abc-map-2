@@ -244,7 +244,7 @@ public class SQLUtils {
     }
 
     public static void shutdownH2Database(Path databasePath) throws SQLException {
-        Connection conn = DriverManager.getConnection(getJdbcUrlForH2(databasePath));
+        Connection conn = getH2Connection(databasePath);
         PreparedStatement stat = conn.prepareStatement("SHUTDOWN");
         stat.execute();
     }

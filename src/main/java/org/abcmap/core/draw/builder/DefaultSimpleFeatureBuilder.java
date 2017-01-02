@@ -1,4 +1,4 @@
-package org.abcmap.core.draw;
+package org.abcmap.core.draw.builder;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -12,7 +12,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * <p>
  * Features building is synchronized.
  */
-public class DefaultFeatureBuilder {
+public class DefaultSimpleFeatureBuilder {
 
     public static final String GEOMETRY_ATTRIBUTE_NAME = "geometry";
     public static final String STYLE_ID_ATTRIBUTE_NAME = "style_id";
@@ -20,7 +20,7 @@ public class DefaultFeatureBuilder {
     private final SimpleFeatureBuilder builder;
     private final SimpleFeatureType currentFeatureType;
 
-    public DefaultFeatureBuilder(String featureName, CoordinateReferenceSystem crs) {
+    public DefaultSimpleFeatureBuilder(String featureName, CoordinateReferenceSystem crs) {
         currentFeatureType = getDefaultFeatureType(featureName, crs);
         builder = new SimpleFeatureBuilder(currentFeatureType);
     }

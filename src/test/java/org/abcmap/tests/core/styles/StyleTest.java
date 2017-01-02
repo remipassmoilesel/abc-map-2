@@ -3,7 +3,7 @@ package org.abcmap.tests.core.styles;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.draw.builder.DefaultFeatureBuilder;
+import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.utils.FeatureUtils;
@@ -53,12 +53,12 @@ public class StyleTest {
 
         assertTrue("Style util exception test", styleApplied == false);
 
-        DefaultFeatureBuilder fbuilder = FeatureUtils.getDefaultFeatureBuilder("somename", DefaultGeographicCRS.WGS84);
+        DefaultSimpleFeatureBuilder fbuilder = FeatureUtils.getDefaultFeatureBuilder("somename", DefaultGeographicCRS.WGS84);
         SimpleFeature feat = fbuilder.build(null);
 
         FeatureUtils.applyStyleToFeatures(style, feat);
 
-        assertTrue("Style util test", feat.getAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals(style.getId()));
+        assertTrue("Style util test", feat.getAttribute(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals(style.getId()));
 
         Project project = MainManager.getProjectManager().getProject();
         StyleLibrary styleLib = project.getStyleLibrary();
@@ -72,7 +72,7 @@ public class StyleTest {
         // style application test
         FeatureTypeStyle ftsApplied = styleLib.applyStyle(style1, project.getActiveLayer(), feat);
 
-        assertTrue("Style application test", feat.getAttribute(DefaultFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals(style1.getId()));
+        assertTrue("Style application test", feat.getAttribute(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals(style1.getId()));
 
         for (FeatureTypeStyle fts : project.getActiveLayer().getLayerStyle().featureTypeStyles()) {
             assertTrue("Style application test 2", fts == ftsApplied);

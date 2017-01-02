@@ -311,10 +311,11 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 }
             }
 
-            if(firstResults == null){
+            if (firstResults == null) {
                 throw new RenderingException("Invalid bounds, no results founds");
             }
 
+            // TODO: which transformation use ? First layer, active layer ?
             // update transforms
             worldToScreenTransform = firstResults.getWorldToScreenTransform();
             screenToWorldTransform = firstResults.getScreenToWorldTransform();

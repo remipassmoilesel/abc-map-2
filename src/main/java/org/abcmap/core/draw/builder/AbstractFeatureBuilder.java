@@ -3,7 +3,6 @@ package org.abcmap.core.draw.builder;
 import com.vividsolutions.jts.awt.ShapeWriter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
-import org.abcmap.core.draw.DefaultFeatureBuilder;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
@@ -25,14 +24,14 @@ import java.awt.geom.AffineTransform;
  * <p>
  * Temporary shapes (before confirmation) can be displayed with graphics by using draw() method
  */
-public abstract class AbstractShapeBuilder {
+public abstract class AbstractFeatureBuilder {
 
     protected final DrawManager drawm;
 
     /**
      * Feature builder associated with layer
      */
-    protected DefaultFeatureBuilder featureBuilder;
+    protected DefaultSimpleFeatureBuilder featureBuilder;
 
     /**
      * Utility used to build geometries
@@ -47,7 +46,7 @@ public abstract class AbstractShapeBuilder {
     /**
      * Layer where shape is drawn
      */
-    protected final FeatureLayer activeLayer;
+    protected final FeatureLayer layer;
 
     /**
      * Style container for current shape. Can be null.
@@ -66,12 +65,12 @@ public abstract class AbstractShapeBuilder {
      *
      * @param layer
      */
-    public AbstractShapeBuilder(FeatureLayer layer, StyleContainer style) {
+    public AbstractFeatureBuilder(FeatureLayer layer, StyleContainer style) {
 
         this.drawm = MainManager.getDrawManager();
         this.project = MainManager.getProjectManager().getProject();
         this.style = style;
-        this.activeLayer = layer;
+        this.layer = layer;
         this.featureBuilder = layer.getFeatureBuilder();
 
     }
@@ -90,7 +89,7 @@ public abstract class AbstractShapeBuilder {
      * By default write the shape in layer
      */
     public SimpleFeature confirmDrawing() {
-        return activeLayer.addFeature(currentFeature);
+        return layer.addFeature(currentFeature);
     }
 
     /**
@@ -121,7 +120,7 @@ public abstract class AbstractShapeBuilder {
             throw new NullPointerException("Style is null");
         }
 
-        project.getStyleLibrary().applyStyle(style, activeLayer, currentFeature);
+        project.getStyleLibrary().applyStyle(style, layer, currentFeature);
     }
 
     /**
@@ -157,7 +156,7 @@ public abstract class AbstractShapeBuilder {
      * @return
      */
     protected FeatureLayer getCurrentLayer() {
-        return activeLayer;
+        return layer;
     }
 
     /**

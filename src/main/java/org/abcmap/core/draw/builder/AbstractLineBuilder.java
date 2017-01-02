@@ -12,7 +12,7 @@ import java.util.ArrayList;
 /**
  * Abstract tool designed to draw lines or polygon
  */
-public abstract class AbstractLineBuilder extends AbstractShapeBuilder {
+public abstract class AbstractLineBuilder extends AbstractFeatureBuilder {
 
     /**
      * List of points of shape

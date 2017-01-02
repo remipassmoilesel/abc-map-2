@@ -1,12 +1,11 @@
 package org.abcmap.core.project.layers;
 
 import com.vividsolutions.jts.geom.Geometry;
-import org.abcmap.core.draw.DefaultFeatureBuilder;
+import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.simple.SimpleFeatureIterator;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.jdbc.JDBCDataStore;
@@ -27,7 +26,7 @@ import java.util.Set;
 public class FeatureLayer extends AbstractLayer {
 
     protected SimpleFeatureStore featureStore;
-    protected DefaultFeatureBuilder featureBuilder;
+    protected DefaultSimpleFeatureBuilder featureBuilder;
 
     /**
      * Create a feature layer object.
@@ -56,8 +55,7 @@ public class FeatureLayer extends AbstractLayer {
         // if true, create a new database entry
         if (create) {
             // create a simple feature type
-            SimpleFeatureType type = DefaultFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), owner.getCrs());
-
+            SimpleFeatureType type = DefaultSimpleFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), owner.getCrs());
             datastore.createSchema(type);
         }
 
@@ -213,7 +211,7 @@ public class FeatureLayer extends AbstractLayer {
         }
     }
 
-    public DefaultFeatureBuilder getFeatureBuilder() {
+    public DefaultSimpleFeatureBuilder getFeatureBuilder() {
         return featureBuilder;
     }
 }
