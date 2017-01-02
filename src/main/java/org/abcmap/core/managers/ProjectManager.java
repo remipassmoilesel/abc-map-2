@@ -103,7 +103,7 @@ public class ProjectManager implements HasEventNotificationManager {
     }
 
     /**
-     * Close the current project and delete temprorary files
+     * Close the current project and delete temporary files
      */
     public void closeProject() throws IOException {
 

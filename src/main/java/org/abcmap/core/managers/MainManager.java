@@ -41,8 +41,6 @@ public class MainManager {
             return;
         }
 
-        configureLibraries();
-
         configurationManager = new ConfigurationManager();
         tempFilesManager = new TempFilesManager();
         projectManager = new ProjectManager();
@@ -58,14 +56,6 @@ public class MainManager {
         layoutManager = new LayoutManager();
 
         setInitialized(true);
-    }
-
-    private static void configureLibraries() {
-
-        // deacrease database log
-        System.setProperty(LocalLog.LOCAL_LOG_LEVEL_PROPERTY, "ERROR");
-        System.setProperty(LocalLog.LOCAL_LOG_PROPERTIES_FILE, "ormlite-log.txt");
-
     }
 
     public static boolean isDebugMode() {
