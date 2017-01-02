@@ -15,7 +15,9 @@ import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.swing.JMapFrame;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -196,11 +198,16 @@ public class Project {
         boolean firstLoop = true;
 
         for (AbstractLayer lay : getLayersList()) {
-            ReferencedEnvelope bounds = lay.getInternalLayer().getBounds();
-            // TODO: do not use empty feature layers ?
 
+            ReferencedEnvelope bounds = lay.getInternalLayer().getBounds();
+
+            // transform bounds if necessary
             if (bounds.getCoordinateReferenceSystem() != getCrs()) {
-                logger.warning("Bounds computing: CRS are different");
+                try {
+                    bounds = bounds.transform(getCrs(), true);
+                } catch (TransformException | FactoryException e) {
+                    logger.error(e);
+                }
             }
 
             if (firstLoop) {
