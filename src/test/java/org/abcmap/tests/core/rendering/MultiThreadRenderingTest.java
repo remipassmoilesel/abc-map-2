@@ -3,7 +3,7 @@ package org.abcmap.tests.core.rendering;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import org.abcmap.core.draw.DefaultFeatureBuilder;
+import org.abcmap.core.draw.builder.DefaultFeatureBuilder;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;

@@ -19,7 +19,7 @@ public class ThreadTest {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
-        TestUtils.mainManagerInit();
+        TestUtils.softwareInit();
     }
 
     @Test

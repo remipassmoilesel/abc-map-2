@@ -6,7 +6,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.draw.DefaultFeatureBuilder;
+import org.abcmap.core.draw.builder.DefaultFeatureBuilder;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;

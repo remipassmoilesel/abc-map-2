@@ -1,11 +1,14 @@
 package org.abcmap;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.MainManager;
 import org.abcmap.core.managers.ProjectManager;
 
 import java.awt.*;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.PrimitiveIterator;
@@ -15,6 +18,8 @@ import java.util.Random;
  * Misc constants used in configuration cases
  */
 public class TestUtils {
+
+    private static final CustomLogger logger = LogManager.getLogger(TestUtils.class);
 
     public static final Path PLAYGROUND_DIRECTORY = Paths.get("tests-playground");
     public static final Path RESOURCES_DIRECTORY = Paths.get("src/test/resources");
@@ -33,10 +38,20 @@ public class TestUtils {
      *
      * @throws IOException
      */
-    public static void mainManagerInit() throws IOException {
+    public static void softwareInit() throws IOException {
+
         if (MainManager.isInitialized() == false) {
-            MainManager.init();
+            try {
+                Initialization.doInit(new String[]{});
+            } catch (InvocationTargetException | InterruptedException e) {
+
+                // TODO: enable log from here
+                e.printStackTrace();
+
+                logger.error(e);
+            }
         }
+
     }
 
     /**
@@ -46,7 +61,7 @@ public class TestUtils {
      */
     public static void createNewProject() throws IOException {
 
-        mainManagerInit();
+        softwareInit();
 
         ProjectManager pman = MainManager.getProjectManager();
 
@@ -55,11 +70,15 @@ public class TestUtils {
             pman.closeProject();
         }
 
-        // wait a little before creating to avoid errors
+        // wait a little before create a new project to avoid errors
         try {
             Thread.sleep(500);
         } catch (InterruptedException e) {
+
+            // TODO: enable log from here
             e.printStackTrace();
+
+            logger.error(e);
         }
 
         // create new project

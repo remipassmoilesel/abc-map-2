@@ -22,7 +22,7 @@ public class ProjectManagerTest {
 
     @BeforeClass
     public static void beforeTests() throws IOException {
-        TestUtils.mainManagerInit();
+        TestUtils.softwareInit();
     }
 
     @Test
