@@ -21,6 +21,8 @@ import org.abcmap.gui.tools.MapTool;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.TransformException;
 
 import javax.swing.*;
 import java.awt.*;
@@ -170,41 +172,76 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
     }
 
+    /**
+     * Paint layers and project bounds
+     *
+     * @param g2d
+     */
     private void paintBounds(Graphics2D g2d) {
 
         AffineTransform worldToScreenTransform = getWorldToScreenTransform();
         ShapeWriter shapeWriter = new ShapeWriter(new AffinePointTransformation(worldToScreenTransform));
+
+        ArrayList<Integer> yPositions = new ArrayList<>();
+
+        int fontSize = 11;
 
         for (Object[] o : boundsList) {
             g2d.setColor((Color) o[2]);
             g2d.setStroke(new BasicStroke(2));
             Shape shape = shapeWriter.toShape(JTS.toGeometry((Envelope) o[1]));
             g2d.draw(shape);
-            g2d.drawString(o[0].toString(), (int) shape.getBounds().getMinX(), (int) shape.getBounds().getMinY());
+
+            int increment = (int) (fontSize * 2);
+            int yPos = (int) shape.getBounds().getMinY() - increment;
+            for (int i = 0; i < yPositions.size(); i++) {
+                Integer cPos = yPositions.get(i);
+                if (Math.abs(cPos - yPos) < increment / 2) {
+                    yPos -= increment;
+                }
+            }
+            yPositions.add(yPos);
+
+            g2d.setColor(Color.white);
+            g2d.fillRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
+
+            g2d.setColor(Color.gray);
+            g2d.drawRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
+
+            g2d.setColor((Color) o[2]);
+            g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 11));
+            g2d.drawString(o[0].toString(), (int) shape.getBounds().getMinX(), yPos);
         }
 
     }
 
+    /**
+     * Prepare bounds to draw in debug mode
+     */
     public void prepareBounds() {
 
         boundsList.clear();
 
+        // add layers
+        for (AbstractLayer layer : project.getLayersList()) {
+            try {
+                boundsList.add(new Object[]{
+                        "Layer: " + layer.getId(),
+                        layer.getBounds().transform(project.getCrs(), true),
+                        Utils.randColor()
+                });
+            } catch (TransformException | FactoryException e) {
+                logger.error(e);
+            }
+
+        }
+
         // add project bounds
-        Object[] projectBounds = new Object[]{
+        boundsList.add(new Object[]{
                 "Project bounds",
                 project.getMaximumBounds(),
                 Color.BLACK
-        };
-
-        // add layers
-        for (AbstractLayer layer : project.getLayersList()) {
-            boundsList.add(new Object[]{
-                    "Layer: " + layer.getId(),
-                    layer.getBounds(),
-                    Utils.randColor()
-            });
-
-        }
+        });
 
     }
 
