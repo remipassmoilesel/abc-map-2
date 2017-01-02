@@ -14,8 +14,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  */
 public class DefaultSimpleFeatureBuilder {
 
-    public static final String GEOMETRY_ATTRIBUTE_NAME = "geometry";
-    public static final String STYLE_ID_ATTRIBUTE_NAME = "style_id";
+    public static final String ABCMAP_SPECIAL_FIELD_PREFIX = "abm_";
+    public static final String GEOMETRY_ATTRIBUTE_NAME = ABCMAP_SPECIAL_FIELD_PREFIX + "geometry";
+    public static final String STYLE_ID_ATTRIBUTE_NAME = ABCMAP_SPECIAL_FIELD_PREFIX + "style_id";
 
     private final SimpleFeatureBuilder builder;
     private final SimpleFeatureType currentFeatureType;

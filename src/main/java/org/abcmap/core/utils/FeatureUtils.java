@@ -181,13 +181,17 @@ public class FeatureUtils {
 
     public static Rule createRuleFor(Color foreground, Color background, double thick) {
 
-        // create point symbolizer
+        // create stroke and optional fill
         Stroke stroke = sf.stroke(ff.literal(foreground), null, null, null, null, null, null);
-        Fill fill = sf.fill(null, ff.literal(background), ff.literal(1.0));
+        Fill fill = null;
+        if (background != null) {
+            fill = sf.fill(null, ff.literal(background), ff.literal(1.0));
+        }
 
+        // create point symbolizer
         Mark mark = sf.getCircleMark();
-        mark.setFill(fill);
         mark.setStroke(stroke);
+        mark.setFill(fill);
 
         Graphic graphic = sf.createDefaultGraphic();
         graphic.graphicalSymbols().clear();
