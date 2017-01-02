@@ -4,6 +4,7 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.rendering.CachedRenderingEngine;
 import org.abcmap.core.rendering.RenderingException;
+import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -173,10 +174,10 @@ public class RenderedPartialFactory {
             ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, worldBounds.getCoordinateReferenceSystem());
 
             // check if bounds of partials are on layer
-            ReferencedEnvelope layerBounds = mapContent.layers().get(0).getBounds();
+            // verification is done on Generic2D system, to prevent weird results (eg: ED50 (small domain) / WGS84)
             try {
-
-                if (layerBounds.intersects(area.toBounds(layerBounds.getCoordinateReferenceSystem()))) {
+                ReferencedEnvelope layerBounds = mapContent.layers().get(0).getBounds().transform(GeoUtils.GENERIC_2D, true);
+                if (layerBounds.intersects(area.toBounds(GeoUtils.GENERIC_2D))) {
 
                     // check if partial already exist and is already loaded
                     RenderedPartial part = store.searchInLoadedList(layerId, area);
@@ -205,7 +206,7 @@ public class RenderedPartialFactory {
                     }
 
                 }
-            } catch (TransformException e) {
+            } catch (Exception e) {
                 logger.error(e);
             }
 

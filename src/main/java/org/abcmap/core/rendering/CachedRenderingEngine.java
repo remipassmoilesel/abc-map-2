@@ -311,6 +311,10 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 }
             }
 
+            if(firstResults == null){
+                throw new RenderingException("Invalid bounds, no results founds");
+            }
+
             // update transforms
             worldToScreenTransform = firstResults.getWorldToScreenTransform();
             screenToWorldTransform = firstResults.getScreenToWorldTransform();

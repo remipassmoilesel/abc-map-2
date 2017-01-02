@@ -328,6 +328,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     private void checkWorldEnvelope() {
 
+        // TODO: prevent move out of bounds ?
+
         Dimension panelDimensions = getSize();
 
         double coeffPx = panelDimensions.getWidth() / panelDimensions.getHeight();
