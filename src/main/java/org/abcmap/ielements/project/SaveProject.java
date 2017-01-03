@@ -12,7 +12,7 @@ public class SaveProject extends InteractionElement {
         this.label = "Enregistrer";
         this.help = "Cliquez ici pour enregistrer le projet";
         this.menuIcon = GuiIcons.SMALLICON_SAVE;
-        this.accelerator = shortcuts.SAVE_PROJECT;
+        this.accelerator = shortcutm().SAVE_PROJECT;
     }
 
     @Override
@@ -26,13 +26,13 @@ public class SaveProject extends InteractionElement {
         try {
 
             // show work in progress
-            dialm.showMessageInBox("Le projet est en cours d'enregistrement...");
+            dialm().showMessageInBox("Le projet est en cours d'enregistrement...");
 
             // TODO clean project
             // projectm.cleanCurrentProject();
 
             // project was never saved
-            if (projectm.getProject().getFinalPath() == null) {
+            if (projectm().getProject().getFinalPath() == null) {
                 // propose save as
                 SaveAsProject sap = new SaveAsProject();
                 sap.run();
@@ -41,11 +41,11 @@ public class SaveProject extends InteractionElement {
 
             // save project
             try {
-                projectm.saveProject();
+                projectm().saveProject();
             }
             // error while writing project
             catch (IOException e) {
-                dialm.showProjectWritingError();
+                dialm().showProjectWritingError();
                 logger.error(e);
             }
         } finally {

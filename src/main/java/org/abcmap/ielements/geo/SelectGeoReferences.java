@@ -42,7 +42,7 @@ public class SelectGeoReferences extends InteractionElement {
 
         // ecouter les changements de projet
 //		MapManagerListener mapmListener = new MapManagerListener();
-        mapm.getNotificationManager().addObserver(this);
+        mapm().getNotificationManager().addObserver(this);
 
 //		mapmListener.run();
 

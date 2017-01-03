@@ -65,9 +65,9 @@ public class MoveElementsByCoordinates extends InteractionElement {
         updater = new MoveElementsUpdater();
         notifm.setDefaultListener(updater);
 
-        projectm.getNotificationManager().addObserver(this);
+        projectm().getNotificationManager().addObserver(this);
 
-        mapm.getNotificationManager().addObserver(this);
+        mapm().getNotificationManager().addObserver(this);
 
         updater.updateDegreeForm();
 
@@ -122,7 +122,7 @@ public class MoveElementsByCoordinates extends InteractionElement {
         }
 
         public void updateDegreeForm() {
-            boolean georefMode = mapm.isGeoreferencementEnabled();
+            boolean georefMode = mapm().isGeoreferencementEnabled();
             if (cpanel != null && cpanel.isDegreesFormEnabled() != georefMode) {
                 cpanel.setDegreesFormEnabled(georefMode);
             }

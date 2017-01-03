@@ -37,7 +37,7 @@ public class OpenRecentProject extends InteractionElement implements HasEventNot
         this.fileViewUpdater = new FileViewUpdater();
 
         notifm.setDefaultListener(fileViewUpdater);
-        recentsm.getNotificationManager().addObserver(this);
+        recentm().getNotificationManager().addObserver(this);
 
         fileViewUpdater.run();
 

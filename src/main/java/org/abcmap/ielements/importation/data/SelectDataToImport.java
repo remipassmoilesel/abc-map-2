@@ -35,7 +35,7 @@ public class SelectDataToImport extends InteractionElement {
 
         //TextFieldUpdater txtUpdater = new TextFieldUpdater();
         //notifm.setDefaultUpdatableObject(txtUpdater);
-        configm.getNotificationManager().addObserver(this);
+        configm().getNotificationManager().addObserver(this);
 
         // premiere mise à jour
         //txtUpdater.updateFields();

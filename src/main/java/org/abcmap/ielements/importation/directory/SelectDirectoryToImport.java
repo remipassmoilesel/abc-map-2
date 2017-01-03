@@ -38,7 +38,7 @@ public class SelectDirectoryToImport extends InteractionElement {
 
         JButton btn = new JButton("Parcourir");
 //		btn.addActionListener(new BrowsePathActionListener(txtPath, false, true));
-        panel.add(btn, "align right, " + wrap15);
+        panel.add(btn, "align right, " + wrap15());
         /*
         textfieldUpdater = new TextFieldUpdater();
 //		notifm.setDefaultUpdatableObject(textfieldUpdater);

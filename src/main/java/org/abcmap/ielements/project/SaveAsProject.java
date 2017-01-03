@@ -15,7 +15,7 @@ public class SaveAsProject extends InteractionElement {
         this.label = "Enregistrer sous ...";
         this.help = "Cliquez ici pour enregistrer le projet sous...";
         this.menuIcon = GuiIcons.SMALLICON_SAVEAS;
-        this.accelerator = shortcuts.SAVE_PROJECT_AS;
+        this.accelerator = shortcutm().SAVE_PROJECT_AS;
     }
 
     @Override
@@ -37,8 +37,8 @@ public class SaveAsProject extends InteractionElement {
             // projectm.cleanCurrentProject();
 
             // display browse dialog
-            Window parent = guim.getMainWindow();
-            BrowseDialogResult result = dialm.browseProjectToOpenDialog();
+            Window parent = guim().getMainWindow();
+            BrowseDialogResult result = dialm().browseProjectToOpenDialog();
 
             // user cancel action
             if (result.isActionCanceled() == true) {
@@ -49,24 +49,24 @@ public class SaveAsProject extends InteractionElement {
             boolean saved = false;
             project.setFinalPath(result.getFile().toPath());
             try {
-                projectm.saveProject();
+                projectm().saveProject();
                 saved = true;
             } catch (IOException e) {
                 logger.error(e);
-                dialm.showErrorInBox("Erreur lors de l'enregistrement du projet");
+                dialm().showErrorInBox("Erreur lors de l'enregistrement du projet");
             }
 
             // keep project in recent history
             if (saved) {
                 try {
-                    recentsm.addCurrentProject();
-                    recentsm.saveHistory();
+                    recentm().addCurrentProject();
+                    recentm().saveHistory();
                 } catch (IOException e) {
                     logger.error(e);
                 }
             }
 
-            dialm.showMessageInBox("Le projet a été enregistré");
+            dialm().showMessageInBox("Le projet a été enregistré");
 
         } finally {
             releaseOperationLock();

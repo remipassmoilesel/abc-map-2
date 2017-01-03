@@ -31,7 +31,7 @@ public class ShowToolHelp extends InteractionElement {
         InteractionUpdater interactionUpdater = new InteractionUpdater();
         notifm.setDefaultListener(interactionUpdater);
 
-        drawm.getNotificationManager().addObserver(this);
+        drawm().getNotificationManager().addObserver(this);
 
         interactionUpdater.run();
 

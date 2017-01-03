@@ -45,17 +45,17 @@ public abstract class AbstractZoom extends InteractionElement {
 
         // zoom in
         if (Direction.IN.equals(direction)) {
-            mapm.mainmap.zoomIn();
+            mapm().mainmap.zoomIn();
         }
 
         // zoom out
         else if (Direction.OUT.equals(direction)) {
-            mapm.mainmap.zoomOut();
+            mapm().mainmap.zoomOut();
         }
 
         // reset display
         else if (Direction.CENTER.equals(direction)) {
-            mapm.mainmap.resetDisplay();
+            mapm().mainmap.resetDisplay();
         }
 
         // error
@@ -63,7 +63,7 @@ public abstract class AbstractZoom extends InteractionElement {
             throw new IllegalStateException("Unknown mode: " + direction);
         }
 
-        mapm.mainmap.refresh();
+        mapm().mainmap.refresh();
 
     }
 

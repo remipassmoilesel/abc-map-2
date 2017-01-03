@@ -4,10 +4,11 @@ import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.managers.*;
-import org.abcmap.core.managers.LayoutManager;
+import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.managers.Main;
+import org.abcmap.core.managers.ManagerAccessUtility;
+import org.abcmap.core.managers.TempFilesManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.dock.blockitems.ClickableBlockItem;
 import org.abcmap.gui.components.dock.blockitems.HideableBlockItem;
@@ -33,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * This abstract class contains many utility used to execute user actions.
  */
-public abstract class InteractionElement implements Runnable, ActionListener, HasEventNotificationManager {
+public abstract class InteractionElement extends ManagerAccessUtility implements Runnable, ActionListener, HasEventNotificationManager {
 
     protected static final CustomLogger logger = LogManager.getLogger(TempFilesManager.class);
 
@@ -125,36 +126,10 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
 
     protected EventNotificationManager notifm;
 
-    protected String wrap15 = "wrap 15, ";
-    protected String gapLeft = "gapleft 15px, ";
-
-    protected ProjectManager projectm;
-    protected GuiManager guim;
-    protected DrawManager drawm;
-    protected ShortcutManager shortcuts;
-    protected RecentManager recentsm;
-    protected ConfigurationManager configm;
-    protected MapManager mapm;
-    protected ClipboardManager clipboardm;
-    protected CancelManager cancelm;
-    protected ImportManager importm;
-    protected DialogManager dialm;
-    protected LayoutManager laym;
+    private String wrap15 = "wrap 15, ";
+    private String gapLeft = "gapleft 15px, ";
 
     protected InteractionElement() {
-
-        projectm = Main.getProjectManager();
-        guim = Main.getGuiManager();
-        drawm = Main.getDrawManager();
-        shortcuts = Main.getShortcutManager();
-        recentsm = Main.getRecentManager();
-        configm = Main.getConfigurationManager();
-        mapm = Main.getMapManager();
-        clipboardm = Main.getClipboardManager();
-        cancelm = Main.getCancelManager();
-        importm = Main.getImportManager();
-        dialm = Main.getDialogManager();
-        laym = Main.getLayoutManager();
 
         this.label = "no label";
         this.help = null;
@@ -173,6 +148,14 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
 
     }
 
+    protected String wrap15() {
+        return wrap15;
+    }
+
+    protected String gapLeft() {
+        return gapLeft;
+    }
+
     /**
      * Try to get userActionLock. If locked, return true. If not return false and show a message to user.
      *
@@ -181,7 +164,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
     protected boolean getOperationLock() {
 
         if (operationLock.tryLock() == false) {
-            dialm.showErrorInBox("Cette opération est déjà en cours, veuillez patienter...");
+            dialm().showErrorInBox("Cette opération est déjà en cours, veuillez patienter...");
             return false;
         }
 
@@ -197,12 +180,12 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
      */
     protected Project getCurrentProjectOrShowMessage() {
 
-        if (projectm.isInitialized() == false) {
-            dialm.showErrorInBox("Vous devez d'abord ouvrir ou créer un projet.");
+        if (projectm().isInitialized() == false) {
+            dialm().showErrorInBox("Vous devez d'abord ouvrir ou créer un projet.");
             return null;
         }
 
-        return projectm.getProject();
+        return projectm().getProject();
     }
 
     /**
@@ -485,33 +468,6 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
         }
 
         return instance;
-    }
-
-    /**
-     * Check if project is initialized and return active layer. If project is not initialized, display an error message to user.
-     *
-     * @return
-     */
-    protected AbstractLayer checkProjectAndGetActiveLayer() {
-
-        /*
-        // le projet est initialisé, retourner le calque actif
-        if (projectm.isInitialized()) {
-            try {
-                return projectm.getActiveLayer();
-            } catch (MapLayerException e) {
-                logger.error(e);
-            }
-        }
-
-        // le projet n'est pas initialisé, afficher un message d'erreur et
-        // retourner null.
-        guim.showProjectNonInitializedError();
-
-        */
-
-        return null;
-
     }
 
     /**

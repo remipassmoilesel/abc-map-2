@@ -8,7 +8,7 @@ public class PrintLayouts extends InteractionElement {
         this.label = "Imprimer la mise en page...";
         this.help = "Cliquez ici pour imprimer votre carte mise en page. Vous devez au préalable "
                 + "mettre en page votre carte à l'aide de l'Assistant demise en page.";
-        this.accelerator = shortcuts.PRINT_PROJECT;
+        this.accelerator = shortcutm().PRINT_PROJECT;
     }
 
     @Override

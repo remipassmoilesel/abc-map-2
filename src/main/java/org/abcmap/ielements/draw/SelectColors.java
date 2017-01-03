@@ -28,7 +28,7 @@ public class SelectColors extends InteractionElement {
 //        colorPicker.getListenerHandler().add(new Performer());
 
         notifm.setDefaultListener(new ColorPickerUpdater());
-        drawm.getNotificationManager().addObserver(this);
+        drawm().getNotificationManager().addObserver(this);
 
         return colorPicker;
     }

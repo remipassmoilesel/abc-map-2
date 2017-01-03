@@ -31,7 +31,7 @@ public class SelectPictureAnalyseMode extends InteractionElement {
 
         SliderUpdater sliderUpdater = new SliderUpdater();
         notifm.setDefaultListener(sliderUpdater);
-        configm.getNotificationManager().addObserver(this);
+        configm().getNotificationManager().addObserver(this);
 
         sliderUpdater.run();
 
@@ -46,8 +46,8 @@ public class SelectPictureAnalyseMode extends InteractionElement {
 
             int value = ((JSlider) e.getSource()).getValue();
 
-            if (value != configm.getSurfMode()) {
-                configm.setSurfMode(value);
+            if (value != configm().getSurfMode()) {
+                configm().setSurfMode(value);
             }
 
         }
@@ -70,7 +70,7 @@ public class SelectPictureAnalyseMode extends InteractionElement {
                 return;
             }
 
-            int value = configm.getSurfMode();
+            int value = configm().getSurfMode();
 
             if (slider.getValue() != value) {
 

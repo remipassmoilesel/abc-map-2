@@ -31,8 +31,8 @@ public class OpenProject extends InteractionElement {
         try {
 
             // confirm project closing
-            if (Main.isDebugMode() == false && projectm.isInitialized()) {
-                QuestionResult cc = dialm.showProjectClosingConfirmationDialog();
+            if (Main.isDebugMode() == false && projectm().isInitialized()) {
+                QuestionResult cc = dialm().showProjectClosingConfirmationDialog();
 
                 // user respond cancel or no
                 if (cc.isAnswerYes() == false) {
@@ -40,7 +40,7 @@ public class OpenProject extends InteractionElement {
                 }
             }
 
-            BrowseDialogResult result = dialm.browseProjectToOpenDialog();
+            BrowseDialogResult result = dialm().browseProjectToOpenDialog();
 
             // user canceled operation
             if (result.isActionCanceled()) {
@@ -63,30 +63,30 @@ public class OpenProject extends InteractionElement {
     public void openProject(Path projectToOpen) {
 
         try {
-            projectm.closeProject();
+            projectm().closeProject();
         } catch (IOException e1) {
-            dialm.showErrorInBox("Erreur lors de la fermeture du projet.");
+            dialm().showErrorInBox("Erreur lors de la fermeture du projet.");
             logger.error(e1);
         }
 
         boolean opened = false;
         try {
-            projectm.openProject(projectToOpen);
-            dialm.showErrorInBox("Le projet a été ouvert");
+            projectm().openProject(projectToOpen);
+            dialm().showErrorInBox("Le projet a été ouvert");
             opened = true;
         }
 
         // error while openning project
         catch (Exception e) {
-            dialm.showErrorInBox("Erreur lors de l'ouverture du projet.");
+            dialm().showErrorInBox("Erreur lors de l'ouverture du projet.");
             logger.error(e);
         }
 
         // add project in recents
         if (opened) {
             try {
-                recentsm.addCurrentProject();
-                recentsm.saveHistory();
+                recentm().addCurrentProject();
+                recentm().saveHistory();
             } catch (IOException e) {
                 logger.error(e);
             }

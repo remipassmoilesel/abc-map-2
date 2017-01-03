@@ -19,7 +19,7 @@ public abstract class AbstractElementsSelection extends InteractionElement {
         if (Mode.SELECT_ALL.equals(mode)) {
             this.label = "Sélectionner tout";
             this.help = "Cliquez ici pour sélectionner tous les objets du calque actif.";
-            this.accelerator = shortcuts.SELECT_ALL;
+            this.accelerator = shortcutm().SELECT_ALL;
             this.menuIcon = GuiIcons.SMALLICON_SELECTALL;
         }
 
@@ -27,7 +27,7 @@ public abstract class AbstractElementsSelection extends InteractionElement {
         else {
             this.label = "Dé-sélectionner tout";
             this.help = "Cliquez ici pour dé-sélectionner tous les objets du calque actif.";
-            this.accelerator = shortcuts.UNSELECT_ALL;
+            this.accelerator = shortcutm().UNSELECT_ALL;
             this.menuIcon = GuiIcons.SMALLICON_UNSELECTALL;
         }
 

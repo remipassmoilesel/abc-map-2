@@ -15,7 +15,7 @@ public class ShowUserManual extends InteractionElement {
 
         this.displaySimplyInSearch = true;
 
-        manualFile = new File("./help/manual_" + configm.getConfiguration().LANGUAGE + ".pdf");
+        manualFile = new File("./help/manual_" + configm().getConfiguration().LANGUAGE + ".pdf");
 
     }
 

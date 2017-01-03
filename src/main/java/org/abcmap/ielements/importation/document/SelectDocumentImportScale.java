@@ -54,16 +54,16 @@ public class SelectDocumentImportScale extends InteractionElement {
 
         txtOriginalDimensions = new JTextField();
         txtOriginalDimensions.setEditable(false);
-        panel.add(txtOriginalDimensions, "width 170px!, " + gapLeft + wrap15);
+        panel.add(txtOriginalDimensions, "width 170px!, " + gapLeft() + wrap15());
 
         GuiUtils.addLabel("Echelle de reproduction: ", panel, "wrap");
-        panel.add(cbFactor, "width 50px!, split 2," + gapLeft);
-        GuiUtils.addLabel("%", panel, wrap15);
+        panel.add(cbFactor, "width 50px!, split 2," + gapLeft());
+        GuiUtils.addLabel("%", panel, wrap15());
 
         GuiUtils.addLabel("Dimensions finales de l'image (pixels, MP): ", panel, "wrap");
         txtFinalDimensions = new JTextField();
         txtFinalDimensions.setEditable(false);
-        panel.add(txtFinalDimensions, "width 170px!, " + gapLeft + wrap15);
+        panel.add(txtFinalDimensions, "width 170px!, " + gapLeft() + wrap15());
 
         /*
         memPanel = new ImageMemoryChargePanel();

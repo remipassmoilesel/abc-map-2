@@ -25,7 +25,7 @@ public class SelectRobotImportOptions extends InteractionElement {
 
         robotOptionPanel.getListenerHandler().add(new RobotConfigurationUpdater());
 
-        configm.getNotificationManager().addObserver(this);
+        configm().getNotificationManager().addObserver(this);
         notifm.setDefaultListener(new PanelUpdater());
 
         return robotOptionPanel;

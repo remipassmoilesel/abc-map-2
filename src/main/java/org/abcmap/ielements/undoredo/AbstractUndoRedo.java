@@ -17,14 +17,14 @@ public abstract class AbstractUndoRedo extends InteractionElement {
         if (Mode.UNDO.equals(mode)) {
             this.label = "Annuler";
             this.help = "Cliquez ici pour annuler votre dernière action.";
-            this.accelerator = shortcuts.UNDO;
+            this.accelerator = shortcutm().UNDO;
         }
 
         //
         else {
             this.label = "Rétablir";
             this.help = "Cliquez ici pour rétablir la dernière action annulée.";
-            this.accelerator = shortcuts.REDO;
+            this.accelerator = shortcutm().REDO;
         }
     }
 

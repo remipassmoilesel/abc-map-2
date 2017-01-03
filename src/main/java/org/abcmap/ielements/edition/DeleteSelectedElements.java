@@ -7,7 +7,7 @@ public class DeleteSelectedElements extends InteractionElement {
     public DeleteSelectedElements() {
         label = "Supprimer les élements sélectionnés";
         help = "Cliquez ici pour supprimer les éléments de la carte qui sont sélectionnés.";
-        accelerator = shortcuts.DELETE_SELECTED_ELEMENTS;
+        accelerator = shortcutm().DELETE_SELECTED_ELEMENTS;
         menuIcon = GuiIcons.SMALLICON_DELETE;
     }
 

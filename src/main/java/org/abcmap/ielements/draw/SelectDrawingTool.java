@@ -34,19 +34,19 @@ public class SelectDrawingTool extends InteractionElement {
         public void actionPerformed(ActionEvent e) {
 
             // current tool
-            ToolContainer currentTool = drawm.getCurrentToolContainer();
+            ToolContainer currentTool = drawm().getCurrentToolContainer();
 
             // new tool id
             String toolId = e.getActionCommand();
 
             // no tool set, set new tool
             if (currentTool == null) {
-                drawm.setCurrentTool(toolId);
+                drawm().setCurrentTool(toolId);
             }
 
             // check if tool is not already set
             else if (Utils.safeEquals(currentTool.getId(), toolId) == false) {
-                drawm.setCurrentTool(toolId);
+                drawm().setCurrentTool(toolId);
             }
 
         }

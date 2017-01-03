@@ -28,7 +28,7 @@ public class SetProfileTitle extends InteractionElement {
         profileListener = new ProfileListener();
 
         notifm.setDefaultListener(profileListener);
-        configm.getNotificationManager().addObserver(this);
+        configm().getNotificationManager().addObserver(this);
 
         //TextFieldDelayedAction.delayedActionFor(textField, new TextFieldListener(), false);
 

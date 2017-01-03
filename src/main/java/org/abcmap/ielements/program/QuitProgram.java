@@ -28,9 +28,9 @@ public class QuitProgram extends InteractionElement {
 
             // Check if project should be saved
             // If softare is in debug mode, configmations are not shown
-            if (Main.isDebugMode() == false && projectm.isInitialized()) {
+            if (Main.isDebugMode() == false && projectm().isInitialized()) {
 
-                QuestionResult cc = dialm.showProjectConfirmationDialog(guim.getMainWindow());
+                QuestionResult cc = dialm().showProjectConfirmationDialog(guim().getMainWindow());
 
                 // user canceled action
                 if (cc.isAnswerCancel()) {
@@ -46,30 +46,30 @@ public class QuitProgram extends InteractionElement {
 
             // show support project dialog
             if (Main.isDebugMode() == false) {
-                dialm.showSupportDialogAndWait(guim.getMainWindow());
+                dialm().showSupportDialogAndWait(guim().getMainWindow());
             }
 
             // close project
             try {
-                projectm.closeProject();
+                projectm().closeProject();
             } catch (IOException e1) {
                 logger.error(e1);
             }
 
             // hide all windows
-            guim.setAllWindowVisibles(false);
+            guim().setAllWindowVisibles(false);
 
             // save project
             try {
-                recentsm.saveHistory();
+                recentm().saveHistory();
             } catch (IOException e) {
                 logger.error(e);
             }
 
             // save configuration
-            if (configm.isSaveProfileWhenQuit()) {
+            if (configm().isSaveProfileWhenQuit()) {
                 try {
-                    configm.saveCurrentProfile();
+                    configm().saveCurrentProfile();
                 } catch (IOException e) {
                     logger.error(e);
                 }

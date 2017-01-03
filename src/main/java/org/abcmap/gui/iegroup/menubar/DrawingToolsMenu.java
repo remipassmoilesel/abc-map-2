@@ -39,7 +39,7 @@ public class DrawingToolsMenu extends InteractionElementGroup {
         public void actionPerformed(ActionEvent e) {
             super.actionPerformed(e);
 
-            drawm.setCurrentTool(toolc);
+            drawm().setCurrentTool(toolc);
         }
     }
 

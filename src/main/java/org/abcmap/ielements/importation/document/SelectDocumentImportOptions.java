@@ -43,8 +43,8 @@ public class SelectDocumentImportOptions extends InteractionElement {
 //        rdTile.addActionListener(new TypeImportListener());
 //        rdImage.addActionListener(new TypeImportListener());
 
-        panel.add(rdTile, "split 2, " + gapLeft);
-        panel.add(rdImage, gapLeft + wrap15);
+        panel.add(rdTile, "split 2, " + gapLeft());
+        panel.add(rdImage, gapLeft() + wrap15());
 
         // choix de la page
         GuiUtils.addLabel("Pages à importer: ", panel, "wrap");
@@ -62,9 +62,9 @@ public class SelectDocumentImportOptions extends InteractionElement {
 //        rdAllPages.addActionListener(new PagesCheckBoxListener());
 //        rdNotAllPages.addActionListener(new PagesCheckBoxListener());
 
-        panel.add(rdAllPages, gapLeft + "wrap");
-        panel.add(rdNotAllPages, gapLeft + "split 2");
-        panel.add(txtPages, "gapleft 5px, width 50px," + wrap15);
+        panel.add(rdAllPages, gapLeft() + "wrap");
+        panel.add(rdNotAllPages, gapLeft() + "split 2");
+        panel.add(txtPages, "gapleft 5px, width 50px," + wrap15());
 
         /*
         formUpdater = new Updater();

@@ -88,7 +88,7 @@ public class ManageLayouts extends InteractionElement {
                 project.addLayout(lay);
 
                 // notification
-                projectm.fireLayoutListChanged();
+                projectm().fireLayoutListChanged();
             }
 
             // remove all sheets
@@ -96,20 +96,20 @@ public class ManageLayouts extends InteractionElement {
                 project.removeAllLayouts();
 
                 // notification
-                projectm.fireLayoutListChanged();
+                projectm().fireLayoutListChanged();
             }
 
             // print sheets
             else if (PRINT.equals(action)) {
-                dialm.showMessageInBox("Impression en cours de préparation ...");
+                dialm().showMessageInBox("Impression en cours de préparation ...");
                 try {
-                    laym.printLayouts();
+                    layoutm().printLayouts();
                 }
 
                 // error while printing
                 catch (IOException e) {
                     logger.error(e);
-                    dialm.showErrorInBox("Erreur lors de l'impression");
+                    dialm().showErrorInBox("Erreur lors de l'impression");
                 }
 
                 // already printing
@@ -117,7 +117,7 @@ public class ManageLayouts extends InteractionElement {
                     logger.error(e);
 
                     if (LayoutManagerException.isAlreadyPrinting(e)) {
-                        dialm.showErrorInBox("Une autre opération d'impression est en cours, veuillez patienter ...");
+                        dialm().showErrorInBox("Une autre opération d'impression est en cours, veuillez patienter ...");
                     }
                 }
             }

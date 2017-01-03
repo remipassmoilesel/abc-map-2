@@ -39,14 +39,14 @@ public class SelectDrawCaracteristics extends InteractionElement {
 
         cbTexture = new ComboTexture();
 //        cbTexture.addActionListener(new Performer(DrawConstants.MODIFY_TEXTURE));
-        panel.add(cbTexture, compWidth + wrap15);
+        panel.add(cbTexture, compWidth + wrap15());
 
         // type de trait
         GuiUtils.addLabel("Type de trait:", panel, "wrap");
 
         cbStroke = new ComboLineStyle();
 //        cbStroke.addActionListener(new Performer(DrawConstants.MODIFY_LINESTYLE));
-        panel.add(cbStroke, compWidth + wrap15);
+        panel.add(cbStroke, compWidth + wrap15());
 
         // epaisseur du trait
         GuiUtils.addLabel("Epaisseur de trait:", panel, "wrap");
@@ -54,12 +54,12 @@ public class SelectDrawCaracteristics extends InteractionElement {
         cbThickness = new JComboBox<Integer>(PREDEFINED_SIZE);
         cbThickness.setEditable(true);
 //        cbThickness.addActionListener(new Performer(DrawConstants.MODIFY_LINESTYLE));
-        panel.add(cbThickness, compWidth + wrap15);
+        panel.add(cbThickness, compWidth + wrap15());
 
         // ecouter les changements en provenance du gestionnaire d'evenement
 //        notifm.setDefaultUpdatableObject(new CustomFormUpdater());
-        drawm.getNotificationManager().addObserver(this);
-        projectm.getNotificationManager().addObserver(this);
+        drawm().getNotificationManager().addObserver(this);
+        projectm().getNotificationManager().addObserver(this);
 
         return panel;
     }

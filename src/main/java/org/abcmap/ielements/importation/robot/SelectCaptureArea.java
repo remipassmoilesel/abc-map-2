@@ -27,13 +27,13 @@ public class SelectCaptureArea extends InteractionElement {
     protected Component createPrimaryGUI() {
 
         formUpdater = new Updater();
-        configm.getNotificationManager().addObserver(this);
+        configm().getNotificationManager().addObserver(this);
         notifm.setDefaultListener(formUpdater);
 
         JPanel panel = new JPanel(new MigLayout("insets 0"));
 
         capturePanel = new CaptureAreaSelectionPanel();
-        panel.add(capturePanel, wrap15);
+        panel.add(capturePanel, wrap15());
 
         memoryIndicatorUpdater = new MemoryPanelUpdater();
         capturePanel.getListenerHandler().add(new ConfigurationUpdater());

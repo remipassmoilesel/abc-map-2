@@ -19,12 +19,12 @@ public abstract class AbstractPaste extends InteractionElement {
             label = "Coller comme tuile";
             help = "Coller comme tuile";
             menuIcon = GuiIcons.SMALLICON_PASTEASTILE;
-            accelerator = shortcuts.PASTE_AS_TILE;
+            accelerator = shortcutm().PASTE_AS_TILE;
         } else {
             label = "Coller";
             help = "Coller";
             menuIcon = GuiIcons.SMALLICON_PASTE;
-            accelerator = shortcuts.PASTE;
+            accelerator = shortcutm().PASTE;
         }
 
     }

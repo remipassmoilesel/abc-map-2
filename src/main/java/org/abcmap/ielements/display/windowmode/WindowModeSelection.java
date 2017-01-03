@@ -35,12 +35,12 @@ public class WindowModeSelection extends InteractionElement {
 
                 if (GuiManagerEvent.isWindowModeNotification(arg)) {
 
-                    selector.setSelectedItem(guim.getMainWindow().getWindowMode());
+                    selector.setSelectedItem(guim().getMainWindow().getWindowMode());
                 }
             }
         });
 
-        guim.getNotificationManager().addObserver(this);
+        guim().getNotificationManager().addObserver(this);
 
         return selector;
     }
@@ -55,7 +55,7 @@ public class WindowModeSelection extends InteractionElement {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            MainWindow mainWindow = guim.getMainWindow();
+            MainWindow mainWindow = guim().getMainWindow();
 
             if (mainWindow == null) {
                 return;
