@@ -2,7 +2,7 @@ package org.abcmap.core.rendering;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbstractLayer;
@@ -59,7 +59,7 @@ public class PlainRenderingEngine {
     private Project project;
 
     public PlainRenderingEngine() {
-        this.pman = MainManager.getProjectManager();
+        this.pman = Main.getProjectManager();
         this.project = pman.getProject();
         this.renderer = GeoUtils.buildRenderer();
 

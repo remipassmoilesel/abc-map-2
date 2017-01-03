@@ -4,7 +4,7 @@ import com.vividsolutions.jts.awt.ShapeWriter;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.managers.DrawManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
@@ -67,8 +67,8 @@ public abstract class AbstractFeatureBuilder {
      */
     public AbstractFeatureBuilder(FeatureLayer layer, StyleContainer style) {
 
-        this.drawm = MainManager.getDrawManager();
-        this.project = MainManager.getProjectManager().getProject();
+        this.drawm = Main.getDrawManager();
+        this.project = Main.getProjectManager().getProject();
         this.style = style;
         this.layer = layer;
         this.featureBuilder = layer.getFeatureBuilder();

@@ -7,7 +7,7 @@ import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.threads.ThreadManager;
@@ -81,8 +81,8 @@ public class MainWindow extends AbstractCustomWindow implements HasEventNotifica
 
     public MainWindow() {
 
-        guim = MainManager.getGuiManager();
-        projectm = MainManager.getProjectManager();
+        guim = Main.getGuiManager();
+        projectm = Main.getProjectManager();
 
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         this.addWindowListener(new MainWindowListener());

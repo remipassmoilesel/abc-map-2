@@ -20,9 +20,9 @@ public class RecentHistoryReseter implements ActionListener {
 
         this.mode = mode;
 
-        this.recentsm = MainManager.getRecentManager();
-        this.guim = MainManager.getGuiManager();
-        this.dialm = MainManager.getDialogManager();
+        this.recentsm = Main.getRecentManager();
+        this.guim = Main.getGuiManager();
+        this.dialm = Main.getDialogManager();
     }
 
     @Override

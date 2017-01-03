@@ -6,7 +6,7 @@ import org.abcmap.TestUtils;
 import org.abcmap.core.tileanalyser.InterestPointContainer;
 import org.abcmap.core.tileanalyser.InterestPointFactory;
 import org.abcmap.core.tileanalyser.InterestPointStorage;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,11 +34,11 @@ public class InterestPointManagementTest {
 
         String root = "/pictures/belledonne_";
 
-        Project project = MainManager.getProjectManager().getProject();
+        Project project = Main.getProjectManager().getProject();
         Path databasePath = project.getDatabasePath();
         InterestPointStorage dao = new InterestPointStorage(databasePath);
 
-        Params surfConfig = MainManager.getConfigurationManager().getSurfConfiguration();
+        Params surfConfig = Main.getConfigurationManager().getSurfConfiguration();
 
         // search points in pictures
         InterestPointFactory mpf = new InterestPointFactory(surfConfig);

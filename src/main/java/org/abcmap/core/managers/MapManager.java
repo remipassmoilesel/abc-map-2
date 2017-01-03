@@ -12,14 +12,12 @@ import java.awt.geom.Point2D;
 /**
  * Created by remipassmoilesel on 08/12/16.
  */
-public class MapManager implements HasEventNotificationManager {
+public class MapManager extends ManagerAccessUtility implements HasEventNotificationManager {
 
     private final EventNotificationManager notifm;
-    private final GuiManager guim;
     public MainMapBinding mainmap;
 
     public MapManager() {
-        guim = MainManager.getGuiManager();
         notifm = new EventNotificationManager(MapManager.this);
         mainmap = new MainMapBinding();
     }
@@ -32,7 +30,7 @@ public class MapManager implements HasEventNotificationManager {
      * @return
      */
     public CachedMapPane getMainMap() {
-        return guim.getMainWindow().getMap();
+        return guim().getMainWindow().getMap();
     }
 
     /**

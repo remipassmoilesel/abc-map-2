@@ -143,18 +143,18 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
 
     protected InteractionElement() {
 
-        projectm = MainManager.getProjectManager();
-        guim = MainManager.getGuiManager();
-        drawm = MainManager.getDrawManager();
-        shortcuts = MainManager.getShortcutManager();
-        recentsm = MainManager.getRecentManager();
-        configm = MainManager.getConfigurationManager();
-        mapm = MainManager.getMapManager();
-        clipboardm = MainManager.getClipboardManager();
-        cancelm = MainManager.getCancelManager();
-        importm = MainManager.getImportManager();
-        dialm = MainManager.getDialogManager();
-        laym = MainManager.getLayoutManager();
+        projectm = Main.getProjectManager();
+        guim = Main.getGuiManager();
+        drawm = Main.getDrawManager();
+        shortcuts = Main.getShortcutManager();
+        recentsm = Main.getRecentManager();
+        configm = Main.getConfigurationManager();
+        mapm = Main.getMapManager();
+        clipboardm = Main.getClipboardManager();
+        cancelm = Main.getCancelManager();
+        importm = Main.getImportManager();
+        dialm = Main.getDialogManager();
+        laym = Main.getLayoutManager();
 
         this.label = "no label";
         this.help = null;
@@ -449,7 +449,7 @@ public abstract class InteractionElement implements Runnable, ActionListener, Ha
 
             try {
                 InteractionElement ie = InteractionElement.getSimpleInstanceOf(cl);
-                if (ie.isOnlyDebugMode() == false || (ie.isOnlyDebugMode() && MainManager.isDebugMode())) {
+                if (ie.isOnlyDebugMode() == false || (ie.isOnlyDebugMode() && Main.isDebugMode())) {
                     ielements.add(ie);
                 }
             } catch (InstantiationException e) {

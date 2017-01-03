@@ -1,6 +1,6 @@
 package org.abcmap.gui.components.layers;
 
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbstractLayer;
@@ -35,7 +35,7 @@ public class LayerListRenderer extends JLabel implements ListCellRenderer<Abstra
 
         GuiUtils.throwIfNotOnEDT();
 
-        this.projectm = MainManager.getProjectManager();
+        this.projectm = Main.getProjectManager();
 
         this.defaultActiveLayerColor = new Color(43, 3, 188);
         this.defaultActiveLayerColorWhenListDisabled = new Color(155, 168, 188);

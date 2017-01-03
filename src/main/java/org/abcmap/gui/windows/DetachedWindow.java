@@ -3,7 +3,7 @@ package org.abcmap.gui.windows;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.gui.components.buttons.HtmlButton;
@@ -67,7 +67,7 @@ public class DetachedWindow extends AbstractCustomWindow implements HasEventNoti
     public DetachedWindow() {
         super();
 
-        this.guim = MainManager.getGuiManager();
+        this.guim = Main.getGuiManager();
         this.notifm = new EventNotificationManager(this);
 
         this.setSize(WINDOW_PREF_SIZE);

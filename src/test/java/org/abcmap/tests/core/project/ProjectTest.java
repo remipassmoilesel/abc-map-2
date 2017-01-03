@@ -1,7 +1,7 @@
 package org.abcmap.tests.core.project;
 
 import org.abcmap.Initialization;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.MapManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
@@ -25,8 +25,8 @@ public class ProjectTest {
         // initialize managers
         Initialization.doInit(null);
 
-        ProjectManager projectm = MainManager.getProjectManager();
-        MapManager mapm = MainManager.getMapManager();
+        ProjectManager projectm = Main.getProjectManager();
+        MapManager mapm = Main.getMapManager();
 
         // create a fake project
         projectm.createFakeProject(null);

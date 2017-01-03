@@ -1,6 +1,6 @@
 package org.abcmap.core.styles;
 
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.layers.AbstractLayer;
 import org.abcmap.core.project.layers.FeatureLayer;
@@ -25,7 +25,7 @@ public class StyleLibrary {
     private ArrayList<StyleContainer> styleCollection;
 
     public StyleLibrary() {
-        projectMan = MainManager.getProjectManager();
+        projectMan = Main.getProjectManager();
         styleCollection = new ArrayList<>();
 
         ftstyles = new HashMap<String, FeatureTypeStyle>();

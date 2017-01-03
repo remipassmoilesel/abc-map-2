@@ -4,7 +4,7 @@ import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.LayoutDAO;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.TempFilesManager;
 import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.dao.ProjectMetadataDAO;
@@ -33,7 +33,7 @@ public class ProjectWriter {
     private final TempFilesManager tempMan;
 
     public ProjectWriter() {
-        tempMan = MainManager.getTempFilesManager();
+        tempMan = Main.getTempFilesManager();
     }
 
     /**

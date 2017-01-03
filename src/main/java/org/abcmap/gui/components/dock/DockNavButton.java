@@ -1,7 +1,7 @@
 package org.abcmap.gui.components.dock;
 
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GuiUtils;
 
@@ -29,7 +29,7 @@ public class DockNavButton extends JLabel {
     public DockNavButton(String type) {
         super();
 
-        this.guim = MainManager.getGuiManager();
+        this.guim = Main.getGuiManager();
 
         this.type = type;
 

@@ -22,9 +22,7 @@ import java.util.ArrayList;
 /**
  * Here are managed all operations around drawing draw on map
  */
-public class DrawManager implements HasEventNotificationManager {
-
-    private final ProjectManager projectm;
+public class DrawManager extends ManagerAccessUtility implements HasEventNotificationManager {
 
     /**
      * Present thick of lines, used if a new builder is returned
@@ -49,8 +47,6 @@ public class DrawManager implements HasEventNotificationManager {
     private EventNotificationManager notifm;
 
     public DrawManager() {
-
-        this.projectm = MainManager.getProjectManager();
 
         this.activeForeground = Color.blue;
         this.activeBackground = Color.green;
@@ -127,11 +123,11 @@ public class DrawManager implements HasEventNotificationManager {
      */
     public StyleContainer getStyle(Color fg, Color bg, int thick) {
 
-        if (projectm.isInitialized() == false) {
+        if (projectm().isInitialized() == false) {
             throw new IllegalStateException("Project not initialized");
         }
 
-        return projectm.getProject().getStyle(fg, bg, thick);
+        return projectm().getProject().getStyle(fg, bg, thick);
     }
 
     /**
@@ -178,7 +174,7 @@ public class DrawManager implements HasEventNotificationManager {
      */
     private FeatureLayer getActiveFeatureLayerOrThrow() throws IllegalStateException {
 
-        AbstractLayer layer = projectm.getProject().getActiveLayer();
+        AbstractLayer layer = projectm().getProject().getActiveLayer();
         if (layer instanceof FeatureLayer == false) {
             throw new IllegalStateException("Active layer is not a feature layer");
         }
@@ -222,7 +218,7 @@ public class DrawManager implements HasEventNotificationManager {
      */
     public boolean setCurrentTool(ToolContainer toolContainer) {
 
-        CachedMapPane map = MainManager.getMapManager().getMainMap();
+        CachedMapPane map = Main.getMapManager().getMainMap();
 
         // stop previous tool if needed
         if (currentToolContainer != null) {

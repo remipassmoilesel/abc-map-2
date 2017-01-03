@@ -28,7 +28,7 @@ import java.util.Random;
 /**
  * Here are managed all operations concerning projects
  */
-public class ProjectManager implements HasEventNotificationManager {
+public class ProjectManager extends ManagerAccessUtility implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(ProjectManager.class);
     private static final String FAKE_PROJECT_1 = "--create-fake-project";
@@ -36,15 +36,11 @@ public class ProjectManager implements HasEventNotificationManager {
     private final ProjectBackupInterval backupTimer;
     private final EventNotificationManager notifm;
     private Project currentProject;
-    private final TempFilesManager tempMan;
+
 
     public ProjectManager() {
-
         this.currentProject = null;
-        tempMan = MainManager.getTempFilesManager();
-
         notifm = new EventNotificationManager(ProjectManager.this);
-
         backupTimer = new ProjectBackupInterval(ConfigurationConstants.BACKUP_INTERVAL);
     }
 
@@ -67,7 +63,7 @@ public class ProjectManager implements HasEventNotificationManager {
         // get a new temp path
         Path dir = null;
         try {
-            dir = tempMan.createProjectTempDirectory();
+            dir = tempm().createProjectTempDirectory();
         } catch (IOException e) {
             throw new IOException("Error while creating temp directory", e);
         }
@@ -119,7 +115,7 @@ public class ProjectManager implements HasEventNotificationManager {
 
         // delete files
         try {
-            tempMan.deleteTempFile(currentProject.getTempDirectory());
+            tempm().deleteTempFile(currentProject.getTempDirectory());
         } catch (IOException e) {
             throw new IOException("Error while deleting temp files", e);
         }
@@ -140,7 +136,7 @@ public class ProjectManager implements HasEventNotificationManager {
         // get a new temp path
         Path dir = null;
         try {
-            dir = tempMan.createProjectTempDirectory();
+            dir = tempm().createProjectTempDirectory();
         } catch (IOException e) {
             throw new IOException("Error while creating temp directory", e);
         }
@@ -223,7 +219,7 @@ public class ProjectManager implements HasEventNotificationManager {
             int featureNumber = 10;
             ReferencedEnvelope bounds = tileLayer.getBounds();
             PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
-            LineBuilder builder = new LineBuilder((org.abcmap.core.project.layers.FeatureLayer) fakeProject.getActiveLayer(), MainManager.getDrawManager().getActiveStyle());
+            LineBuilder builder = new LineBuilder((org.abcmap.core.project.layers.FeatureLayer) fakeProject.getActiveLayer(), Main.getDrawManager().getActiveStyle());
             for (int i = 0; i < featureNumber; i++) {
                 builder.newLine(new Coordinate(rand.next(), rand.next()));
                 for (int j = 0; j < 5; j++) {

@@ -8,7 +8,7 @@ import org.abcmap.core.events.manager.EventListener;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.MapManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.gui.components.progressbar.HasProgressbarManager;
@@ -64,9 +64,9 @@ public class StatusBar extends JPanel implements HasEventNotificationManager, Ha
 
         GuiUtils.throwIfNotOnEDT();
 
-        this.projectm = MainManager.getProjectManager();
-        this.mapm = MainManager.getMapManager();
-        this.guim = MainManager.getGuiManager();
+        this.projectm = Main.getProjectManager();
+        this.mapm = Main.getMapManager();
+        this.guim = Main.getGuiManager();
 
         // dimensions of all elements
         int height = 25;

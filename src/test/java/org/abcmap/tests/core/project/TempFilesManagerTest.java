@@ -1,7 +1,7 @@
 package org.abcmap.tests.core.project;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.TempFilesManager;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class TempFilesManagerTest {
     @Test
     public void tests() throws IOException {
 
-        TempFilesManager tempfiles = MainManager.getTempFilesManager();
+        TempFilesManager tempfiles = Main.getTempFilesManager();
 
         Path file = tempfiles.createTemporaryFile("testfile", null);
         assertTrue("Temporary file creation test", Files.exists(file));

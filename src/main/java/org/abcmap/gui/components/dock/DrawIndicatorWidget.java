@@ -4,7 +4,7 @@ import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.DrawManagerEvent;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.events.manager.Event;
 import org.abcmap.core.events.manager.EventListener;
@@ -34,8 +34,8 @@ public class DrawIndicatorWidget extends JPanel implements HasEventNotificationM
     public DrawIndicatorWidget() {
         super(new MigLayout("insets 3, fillx"));
 
-        drawm = MainManager.getDrawManager();
-        guim = MainManager.getGuiManager();
+        drawm = Main.getDrawManager();
+        guim = Main.getGuiManager();
 
         setBorder(BorderFactory.createEtchedBorder());
 
@@ -62,7 +62,7 @@ public class DrawIndicatorWidget extends JPanel implements HasEventNotificationM
 
         toolLabel = new JLabel();
         toolLabel.addMouseListener(toolsAL);
-        toolLabel.setCursor(MainManager.getGuiManager().getClickableCursor());
+        toolLabel.setCursor(Main.getGuiManager().getClickableCursor());
 
         fgColor = new ColorButton(null);
         fgColor.addMouseListener(colorsAL);

@@ -1,6 +1,6 @@
 package org.abcmap.ielements.program;
 
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.dialogs.QuestionResult;
 import org.abcmap.ielements.InteractionElement;
@@ -14,7 +14,7 @@ public class QuitProgram extends InteractionElement {
 
         this.label = "Quitter";
         this.help = "Cliquez ici pour quitter le programme.";
-        this.accelerator = MainManager.getShortcutManager().QUIT_PROGRAM;
+        this.accelerator = Main.getShortcutManager().QUIT_PROGRAM;
     }
 
     @Override
@@ -28,7 +28,7 @@ public class QuitProgram extends InteractionElement {
 
             // Check if project should be saved
             // If softare is in debug mode, configmations are not shown
-            if (MainManager.isDebugMode() == false && projectm.isInitialized()) {
+            if (Main.isDebugMode() == false && projectm.isInitialized()) {
 
                 QuestionResult cc = dialm.showProjectConfirmationDialog(guim.getMainWindow());
 
@@ -45,7 +45,7 @@ public class QuitProgram extends InteractionElement {
             }
 
             // show support project dialog
-            if (MainManager.isDebugMode() == false) {
+            if (Main.isDebugMode() == false) {
                 dialm.showSupportDialogAndWait(guim.getMainWindow());
             }
 
@@ -75,7 +75,7 @@ public class QuitProgram extends InteractionElement {
                 }
             }
 
-            MainManager.enableBackgroundWorker(false);
+            //Main.enableBackgroundWorker(false);
 
             // wait a little before quit
             try {

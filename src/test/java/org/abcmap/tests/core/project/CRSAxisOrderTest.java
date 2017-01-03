@@ -2,7 +2,7 @@ package org.abcmap.tests.core.project;
 
 import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLUtils;
@@ -33,7 +33,7 @@ public class CRSAxisOrderTest {
     public void test() throws IOException, FactoryException {
 
         // open h2 database
-        ProjectManager pman = MainManager.getProjectManager();
+        ProjectManager pman = Main.getProjectManager();
         Path database = pman.getProject().getDatabasePath();
         JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(database);
 

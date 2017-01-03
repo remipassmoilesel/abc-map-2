@@ -1,7 +1,7 @@
 package org.abcmap.gui.menu;
 
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.components.buttons.HtmlMenuItem;
 import org.abcmap.ielements.InteractionElement;
 
@@ -24,7 +24,7 @@ public class DialogMenuItem extends HtmlMenuItem {
 
         super(elmt.getLabel());
 
-        guim = MainManager.getGuiManager();
+        guim = Main.getGuiManager();
 
         setIcon(elmt.getMenuIcon());
         setAccelerator(elmt.getAccelerator());

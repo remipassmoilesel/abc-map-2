@@ -2,7 +2,7 @@ package org.abcmap.gui.utils;
 
 import org.abcmap.core.draw.LayerElement;
 import org.abcmap.core.managers.DrawManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.MapManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.events.manager.Event;
@@ -46,9 +46,9 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
 
     public FormUpdater() {
 
-        projectm = MainManager.getProjectManager();
-        drawm = MainManager.getDrawManager();
-        mapm = MainManager.getMapManager();
+        projectm = Main.getProjectManager();
+        drawm = Main.getDrawManager();
+        mapm = Main.getMapManager();
 
         eventFilters = new ArrayList<>();
         toolFilters = new ArrayList<>();

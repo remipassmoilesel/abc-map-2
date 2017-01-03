@@ -1,7 +1,7 @@
 package org.abcmap.tests.core.rendering;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.rendering.CachedRenderingEngine;
@@ -31,7 +31,7 @@ public class CachedRenderingEngineTest {
     public void tests() throws Exception {
 
         // create a fake project
-        ProjectManager pman = MainManager.getProjectManager();
+        ProjectManager pman = Main.getProjectManager();
         pman.createFakeProject(null);
         Project project = pman.getProject();
 

@@ -2,7 +2,7 @@ package org.abcmap.gui.components.progressbar;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
@@ -130,7 +130,7 @@ public class ProgressbarManager {
                 try {
                     tasks.remove(task);
                 } catch (IndexOutOfBoundsException e) {
-                    if (MainManager.isDebugMode()) {
+                    if (Main.isDebugMode()) {
                         logger.error(e);
                     }
                 }

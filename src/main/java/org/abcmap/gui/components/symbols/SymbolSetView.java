@@ -3,7 +3,7 @@ package org.abcmap.gui.components.symbols;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.draw.DrawManagerException;
 import org.abcmap.core.managers.DrawManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.utils.listeners.HasListenerHandler;
 import org.abcmap.core.utils.listeners.ListenerHandler;
 import org.abcmap.gui.utils.GuiUtils;
@@ -43,7 +43,7 @@ class SymbolSetView extends JPanel implements HasListenerHandler<ActionListener>
     public SymbolSetView() {
         super();
 
-        drawm = MainManager.getDrawManager();
+        drawm = Main.getDrawManager();
 
         this.selectedCode = null;
         this.setName = null;

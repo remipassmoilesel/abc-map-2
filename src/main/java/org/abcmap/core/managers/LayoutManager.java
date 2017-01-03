@@ -31,19 +31,13 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *
  */
-public class LayoutManager {
+public class LayoutManager extends ManagerAccessUtility {
 
     private static final CustomLogger logger = LogManager.getLogger(LayoutManager.class);
 
-    private final ProjectManager pman;
-    private final TempFilesManager tmpm;
-    private final DialogManager dialm;
     private final ReentrantLock printLock;
 
     public LayoutManager() {
-        pman = MainManager.getProjectManager();
-        tmpm = MainManager.getTempFilesManager();
-        dialm = MainManager.getDialogManager();
         printLock = new ReentrantLock();
     }
 
@@ -63,11 +57,11 @@ public class LayoutManager {
 
         try {
 
-            if (pman.isInitialized() == false) {
+            if (projectm().isInitialized() == false) {
                 throw new LayoutManagerException(LayoutManagerException.PROJECT_NON_INITIALIZED);
             }
 
-            Project project = pman.getProject();
+            Project project = projectm().getProject();
 
             // draw layouts in files
             CachedRenderingEngine renderingEngine = new CachedRenderingEngine(project);
@@ -97,7 +91,7 @@ public class LayoutManager {
                 renderingEngine.paint((Graphics2D) img.getGraphics());
 
                 // write image to disk
-                Path tmp = tmpm.createTemporaryFile("layout_", ".png");
+                Path tmp = tempm().createTemporaryFile("layout_", ".png");
                 ImageIO.write(img, "png", Files.newOutputStream(tmp));
 
                 //GuiUtils.showImage(img);
@@ -164,14 +158,14 @@ public class LayoutManager {
                     try {
                         prnJob.print(attr);
                     } catch (PrinterException e) {
-                        dialm.showErrorInBox("Erreur lors de l'impression");
+                        dialm().showErrorInBox("Erreur lors de l'impression");
                         logger.error(e);
                     }
                 }
 
             } catch (Exception e) {
                 logger.error(e);
-                dialm.showErrorInBox("Erreur lors de l'impression");
+                dialm().showErrorInBox("Erreur lors de l'impression");
             }
 
 

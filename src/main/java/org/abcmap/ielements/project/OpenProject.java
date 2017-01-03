@@ -1,6 +1,6 @@
 package org.abcmap.ielements.project;
 
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.dialogs.QuestionResult;
 import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
@@ -15,7 +15,7 @@ public class OpenProject extends InteractionElement {
     public OpenProject() {
         this.label = "Ouvrir un projet";
         this.help = "...";
-        this.accelerator = MainManager.getShortcutManager().OPEN_PROJECT;
+        this.accelerator = Main.getShortcutManager().OPEN_PROJECT;
         this.menuIcon = GuiIcons.SMALLICON_OPENPROJECT;
     }
 
@@ -31,7 +31,7 @@ public class OpenProject extends InteractionElement {
         try {
 
             // confirm project closing
-            if (MainManager.isDebugMode() == false && projectm.isInitialized()) {
+            if (Main.isDebugMode() == false && projectm.isInitialized()) {
                 QuestionResult cc = dialm.showProjectClosingConfirmationDialog();
 
                 // user respond cancel or no

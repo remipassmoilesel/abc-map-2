@@ -2,7 +2,7 @@ package org.abcmap.gui.wizards;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.GuiStyle;
@@ -42,8 +42,8 @@ public class WizardStepPanel extends JPanel {
     public WizardStepPanel(Wizard wizard) {
         super(new MigLayout("fillx, insets 5 10 5 5"));
 
-        guim = MainManager.getGuiManager();
-        projectm = MainManager.getProjectManager();
+        guim = Main.getGuiManager();
+        projectm = Main.getProjectManager();
 
         parent = wizard;
         stepName = "";

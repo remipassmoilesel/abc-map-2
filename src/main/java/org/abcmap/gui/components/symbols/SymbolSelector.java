@@ -3,7 +3,7 @@ package org.abcmap.gui.components.symbols;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.managers.DrawManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.utils.listeners.HasListenerHandler;
 import org.abcmap.core.utils.listeners.ListenerHandler;
 import org.abcmap.gui.utils.GuiUtils;
@@ -33,7 +33,7 @@ public class SymbolSelector extends JPanel implements HasListenerHandler<ActionL
 
         super(new MigLayout("insets 0"));
 
-        this.drawm = MainManager.getDrawManager();
+        this.drawm = Main.getDrawManager();
         this.listenerHandler = new ListenerHandler<>();
 
         // selection of symbol sets

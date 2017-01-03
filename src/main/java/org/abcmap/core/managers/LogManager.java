@@ -57,7 +57,7 @@ public class LogManager {
         Handler[] handlers = rootLogger.getHandlers();
 
         // remove console logging if not in debug mode
-        if (MainManager.isDebugMode() == false) {
+        if (Main.isDebugMode() == false) {
             if (handlers[0] instanceof ConsoleHandler) {
                 rootLogger.removeHandler(handlers[0]);
             }

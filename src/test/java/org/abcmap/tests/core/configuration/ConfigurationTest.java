@@ -3,7 +3,7 @@ package org.abcmap.tests.core.configuration;
 import org.abcmap.TestUtils;
 import org.abcmap.core.configuration.ConfigurationContainer;
 import org.abcmap.core.managers.ConfigurationManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class ConfigurationTest {
     @Test
     public void configurationTest() throws IOException {
 
-        ConfigurationManager configm = MainManager.getConfigurationManager();
+        ConfigurationManager configm = Main.getConfigurationManager();
 
         // basic equality test
         assertTrue("Equality test", configm.getConfiguration().equals(configm.getConfiguration()));

@@ -3,7 +3,7 @@ package org.abcmap;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 
 import java.awt.*;
@@ -40,7 +40,7 @@ public class TestUtils {
      */
     public static void softwareInit() throws IOException {
 
-        if (MainManager.isInitialized() == false) {
+        if (Main.isInitialized() == false) {
             try {
                 Initialization.doInit(new String[]{});
             } catch (InvocationTargetException | InterruptedException e) {
@@ -63,7 +63,7 @@ public class TestUtils {
 
         softwareInit();
 
-        ProjectManager pman = MainManager.getProjectManager();
+        ProjectManager pman = Main.getProjectManager();
 
         // close previous project if necessary
         if (pman.isInitialized()) {

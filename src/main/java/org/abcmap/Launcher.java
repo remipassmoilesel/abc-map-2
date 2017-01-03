@@ -1,7 +1,7 @@
 package org.abcmap;
 
 
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 
 import java.nio.file.Paths;
 
@@ -19,7 +19,7 @@ public class Launcher {
             Initialization.doInit(args);
 
             // show gui
-            MainManager.getGuiManager().showGui();
+            Main.getGuiManager().showGui();
 
         } catch (Throwable e) {
             LaunchError.showErrorAndDie(e);

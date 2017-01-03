@@ -2,7 +2,7 @@ package org.abcmap.core.project.backup;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectWriter;
@@ -32,7 +32,7 @@ public class ProjectBackupTask extends TimerTask{
     public void run() {
 
         if(pman == null){
-            this.pman = MainManager.getProjectManager();
+            this.pman = Main.getProjectManager();
         }
 
         ThreadManager.runLater(()->{

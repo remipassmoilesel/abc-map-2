@@ -4,7 +4,7 @@ import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.managers.ConfigurationManager;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.ImportManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.GuiStyle;
 import org.abcmap.gui.components.InvalidInputException;
 import org.abcmap.gui.components.color.ColorDialogButton;
@@ -35,9 +35,9 @@ public class CropDimensionsDialog extends JDialog {
     public CropDimensionsDialog(CropConfigurationWindow cropwin) {
         super();
 
-        this.guim = MainManager.getGuiManager();
-        this.configm = MainManager.getConfigurationManager();
-        this.importm = MainManager.getImportManager();
+        this.guim = Main.getGuiManager();
+        this.configm = Main.getConfigurationManager();
+        this.importm = Main.getImportManager();
 
         guim.setWindowIconFor(this);
 

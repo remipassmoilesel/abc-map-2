@@ -23,11 +23,11 @@ public class ToolOptionPanel extends JPanel implements HasEventNotificationManag
         super(new MigLayout("insets 5"));
         // super(new MigLayout("debug, insets 5"));
 
-        this.guim = MainManager.getGuiManager();
-        this.mapm = MainManager.getMapManager();
-        this.projectm = MainManager.getProjectManager();
-        this.drawm = MainManager.getDrawManager();
-        this.cancelm = MainManager.getCancelManager();
+        this.guim = Main.getGuiManager();
+        this.mapm = Main.getMapManager();
+        this.projectm = Main.getProjectManager();
+        this.drawm = Main.getDrawManager();
+        this.cancelm = Main.getCancelManager();
 
         this.observer = new EventNotificationManager(this);
 

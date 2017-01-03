@@ -27,7 +27,7 @@ import java.util.HashMap;
 /**
  * Manage all operations around GUI. Some can be delegated to others managers like DialogManager.
  */
-public class GuiManager implements HasEventNotificationManager {
+public class GuiManager extends ManagerAccessUtility implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(GuiManager.class);
 
@@ -41,20 +41,17 @@ public class GuiManager implements HasEventNotificationManager {
      */
     private HashMap<Windows, JFrame> registeredWindows;
 
-    private ProjectManager projectm;
     private EventNotificationManager notifm;
     private Window wizardDetachedWindow;
     private ArrayList<CachedMapPane> mapPanes;
 
     public GuiManager() {
 
-        this.projectm = MainManager.getProjectManager();
-
         this.notifm = new EventNotificationManager(this);
         notifm.setDefaultListener(new GuiUpdater());
 
         // listen project manager events
-        projectm.getNotificationManager().addObserver(this);
+        projectm().getNotificationManager().addObserver(this);
 
         initialisationOperations = new ArrayList<>();
         registeredWindows = new HashMap<>();
@@ -75,7 +72,7 @@ public class GuiManager implements HasEventNotificationManager {
 
             // rename main window when project change
             if (ProjectEvent.isNewProjectLoadedEvent(arg)) {
-                Path finalPath = projectm.getProject().getFinalPath();
+                Path finalPath = projectm().getProject().getFinalPath();
                 String name;
                 if (finalPath == null) {
                     name = "Nouveau projet";

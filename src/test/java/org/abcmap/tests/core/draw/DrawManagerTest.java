@@ -7,7 +7,7 @@ import org.abcmap.core.draw.builder.LineBuilder;
 import org.abcmap.core.draw.builder.PointBuilder;
 import org.abcmap.core.draw.builder.PolygonBuilder;
 import org.abcmap.core.managers.DrawManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
@@ -32,8 +32,8 @@ public class DrawManagerTest {
     @Test
     public void tests() throws IOException, DrawManagerException, InterruptedException {
 
-        DrawManager dm = MainManager.getDrawManager();
-        ProjectManager pm = MainManager.getProjectManager();
+        DrawManager dm = Main.getDrawManager();
+        ProjectManager pm = Main.getProjectManager();
         FeatureLayer activeLayer = (FeatureLayer) pm.getProject().getActiveLayer();
 
         int pointNumber = 20;

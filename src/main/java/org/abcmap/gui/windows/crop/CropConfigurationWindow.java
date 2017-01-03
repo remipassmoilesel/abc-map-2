@@ -4,7 +4,7 @@ import org.abcmap.core.events.ConfigurationEvent;
 import org.abcmap.core.managers.ConfigurationManager;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.ImportManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.events.manager.*;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.windows.FullScreenPictureWindow;
@@ -35,9 +35,9 @@ public class CropConfigurationWindow extends FullScreenPictureWindow implements 
 
     public CropConfigurationWindow() {
 
-        this.importm = MainManager.getImportManager();
-        this.configm = MainManager.getConfigurationManager();
-        this.guim = MainManager.getGuiManager();
+        this.importm = Main.getImportManager();
+        this.configm = Main.getConfigurationManager();
+        this.guim = Main.getGuiManager();
 
         this.selection = new CropSelectionRectangle();
 

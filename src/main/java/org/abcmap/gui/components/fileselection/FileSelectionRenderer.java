@@ -1,7 +1,7 @@
 package org.abcmap.gui.components.fileselection;
 
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.gui.GuiColors;
 import org.abcmap.gui.utils.GuiUtils;
@@ -27,8 +27,8 @@ public class FileSelectionRenderer extends JLabel implements ListCellRenderer<Fi
 
         GuiUtils.throwIfNotOnEDT();
 
-        this.projectm = MainManager.getProjectManager();
-        this.guim = MainManager.getGuiManager();
+        this.projectm = Main.getProjectManager();
+        this.guim = Main.getGuiManager();
 
         this.fileNotExistColor = new Color(55, 0, 0);
         this.fileExistColor = new Color(0, 0, 200);

@@ -21,14 +21,9 @@ import java.lang.reflect.InvocationTargetException;
  * <p>
  * This allow to not specify parent window of dialogs, by default main window will be choosed.
  */
-public class DialogManager {
+public class DialogManager extends ManagerAccessUtility {
 
     private static final CustomLogger logger = LogManager.getLogger(DialogManager.class);
-    private final GuiManager guim;
-
-    public DialogManager() {
-        this.guim = MainManager.getGuiManager();
-    }
 
     /**
      * Utility used to display messages in boxes on main window
@@ -65,7 +60,7 @@ public class DialogManager {
     public void showMessageInBox(Integer timeMilliSec, String message, Color background) {
 
         if (messagebox == null) {
-            messagebox = new MessageBoxManager(MainManager.getGuiManager().getMainWindow());
+            messagebox = new MessageBoxManager(Main.getGuiManager().getMainWindow());
         }
 
         if (timeMilliSec == null) {
@@ -82,7 +77,7 @@ public class DialogManager {
      * @param
      */
     public void showSupportDialog() {
-        showSupportDialog(guim.getMainWindow());
+        showSupportDialog(guim().getMainWindow());
     }
 
     /**
@@ -105,7 +100,7 @@ public class DialogManager {
      * @param
      */
     public void showSupportDialogAndWait() {
-        showSupportDialogAndWait(guim.getMainWindow());
+        showSupportDialogAndWait(guim().getMainWindow());
     }
 
     /**
@@ -171,7 +166,7 @@ public class DialogManager {
      * Predefined error message
      */
     public void showErrorInDialog(String message, boolean wait) {
-        showErrorInDialog(guim.getMainWindow(), message, wait);
+        showErrorInDialog(guim().getMainWindow(), message, wait);
     }
 
     /**
@@ -217,10 +212,10 @@ public class DialogManager {
      * @return
      */
     public BrowseDialogResult browseProjectToOpenDialog() {
-        return SimpleBrowseDialog.browseProjectToOpenAndWait(guim.getMainWindow());
+        return SimpleBrowseDialog.browseProjectToOpenAndWait(guim().getMainWindow());
     }
 
     public QuestionResult showProjectClosingConfirmationDialog() {
-        return ClosingConfirmationDialog.showProjectConfirmationAndWait(guim.getMainWindow());
+        return ClosingConfirmationDialog.showProjectConfirmationAndWait(guim().getMainWindow());
     }
 }

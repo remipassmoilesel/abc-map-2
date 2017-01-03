@@ -3,7 +3,7 @@ package org.abcmap.gui.components.importation;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.managers.ConfigurationManager;
 import org.abcmap.core.managers.ImportManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.components.InvalidInputException;
 import org.abcmap.gui.components.buttons.HtmlCheckbox;
@@ -43,8 +43,8 @@ public class CropDimensionsPanel extends JPanel {
 
         this.mode = mode;
 
-        this.importm = MainManager.getImportManager();
-        this.confm = MainManager.getConfigurationManager();
+        this.importm = Main.getImportManager();
+        this.confm = Main.getConfigurationManager();
 
         this.textFieldEnabler = new TextFieldEnablerAL();
 

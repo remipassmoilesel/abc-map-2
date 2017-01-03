@@ -3,7 +3,7 @@ package org.abcmap.gui.components.layers;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbstractLayer;
@@ -18,7 +18,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Collections;
 
 /**
  * Manage layers in project
@@ -45,7 +44,7 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
         this.showExceptions = false;
 
-        this.projectm = MainManager.getProjectManager();
+        this.projectm = Main.getProjectManager();
 
         // updates form values
         this.formUpdater = new FormUpdater();

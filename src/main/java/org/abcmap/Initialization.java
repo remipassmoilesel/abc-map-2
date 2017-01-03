@@ -5,7 +5,7 @@ import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.gui.GuiColors;
 import org.abcmap.gui.tools.containers.ToolLibrary;
@@ -57,7 +57,7 @@ public class Initialization {
         }
 
         // set dev mode
-        MainManager.setDebugMode(devMode);
+        Main.setDebugMode(devMode);
         EventNotificationManager.setDebugMode(devMode);
 
         // configure tier libraries
@@ -65,7 +65,7 @@ public class Initialization {
 
         // initialize managers
         try {
-            MainManager.init();
+            Main.init();
         } catch (Exception e) {
             // TODO: enable log from here
             e.printStackTrace();
@@ -74,7 +74,7 @@ public class Initialization {
         }
 
         // gui initialization
-        GuiManager guim = MainManager.getGuiManager();
+        GuiManager guim = Main.getGuiManager();
         guim.configureUiManager();
         GuiColors.init();
 
@@ -82,7 +82,7 @@ public class Initialization {
             guim.constructGui();
         });
 
-        ProjectManager pman = MainManager.getProjectManager();
+        ProjectManager pman = Main.getProjectManager();
 
         // open specified project
         if (projectToOpen != null) {
@@ -98,8 +98,8 @@ public class Initialization {
             // add it to recents files
             if (opened) {
                 try {
-                    MainManager.getRecentManager().addCurrentProject();
-                    MainManager.getRecentManager().saveHistory();
+                    Main.getRecentManager().addCurrentProject();
+                    Main.getRecentManager().saveHistory();
                 } catch (IOException e) {
                     logger.error(e);
                 }
@@ -116,7 +116,7 @@ public class Initialization {
         }
 
         // set default tool
-        MainManager.getDrawManager().setCurrentTool(ToolLibrary.LINE_TOOL);
+        Main.getDrawManager().setCurrentTool(ToolLibrary.LINE_TOOL);
 
         // run gui initialization operation when all others operations started
         SwingUtilities.invokeAndWait(() -> {

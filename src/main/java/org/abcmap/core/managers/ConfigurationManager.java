@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 /**
  * Manage configuration of software. Here you can store and use settings.
  */
-public class ConfigurationManager implements HasEventNotificationManager {
+public class ConfigurationManager extends ManagerAccessUtility implements HasEventNotificationManager {
 
     private final XStream xmlSerializer;
     private final EventNotificationManager notifm;

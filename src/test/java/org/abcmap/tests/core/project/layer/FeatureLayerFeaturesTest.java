@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
 import org.abcmap.core.project.layers.FeatureLayer;
@@ -36,7 +36,7 @@ public class FeatureLayerFeaturesTest {
     @Test
     public void tests() throws IOException {
 
-        Project project = MainManager.getProjectManager().getProject();
+        Project project = Main.getProjectManager().getProject();
         FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
 
         // add a feature and retrieve it

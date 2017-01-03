@@ -2,7 +2,7 @@ package org.abcmap.gui.components.dock;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.components.CustomComponent;
 import org.abcmap.gui.components.buttons.HtmlLabel;
@@ -49,7 +49,7 @@ public class DockMenuWidget extends CustomComponent {
 
     public DockMenuWidget() {
 
-        this.guim = MainManager.getGuiManager();
+        this.guim = Main.getGuiManager();
 
         setLayout(new MigLayout("insets 5"));
         setOpaque(true);

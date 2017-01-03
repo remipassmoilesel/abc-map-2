@@ -1,7 +1,7 @@
 package org.abcmap.gui.wizards;
 
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.ielements.InteractionElementGroup;
 import org.abcmap.gui.iegroup.docks.GroupWizard;
 import org.abcmap.gui.utils.GuiUtils;
@@ -49,7 +49,7 @@ public class Wizard {
     protected boolean newWindowButtonEnabled;
 
     public Wizard() {
-        guim = MainManager.getGuiManager();
+        guim = Main.getGuiManager();
 
         this.steps = new ArrayList<>();
         this.currentStep = 0;

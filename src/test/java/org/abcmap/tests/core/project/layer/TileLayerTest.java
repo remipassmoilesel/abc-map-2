@@ -2,7 +2,7 @@ package org.abcmap.tests.core.project.layer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.TileLayer;
@@ -34,7 +34,7 @@ public class TileLayerTest {
     public void tests() throws IOException, FactoryException, InterruptedException {
 
         // create temp directories
-        ProjectManager pman = MainManager.getProjectManager();
+        ProjectManager pman = Main.getProjectManager();
         Project project = pman.getProject();
         TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 2);
 

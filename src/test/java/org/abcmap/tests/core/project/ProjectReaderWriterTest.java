@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.dao.LayerIndexDAO;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.PMConstants;
 import org.abcmap.core.project.Project;
@@ -55,7 +55,7 @@ public class ProjectReaderWriterTest {
         ProjectReader reader = new ProjectReader();
 
         // test creation
-        ProjectManager pman = MainManager.getProjectManager();
+        ProjectManager pman = Main.getProjectManager();
         Project newProject = pman.createNewProject();
         newProject.getMetadataContainer().updateValue(PMConstants.TITLE, "New title of the death");
 

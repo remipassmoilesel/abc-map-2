@@ -9,13 +9,11 @@ import java.io.IOException;
 /**
  * Created by remipassmoilesel on 08/12/16.
  */
-public class RecentManager implements HasEventNotificationManager {
+public class RecentManager extends ManagerAccessUtility implements HasEventNotificationManager {
 
     private final EventNotificationManager notifm;
-    private final ProjectManager projectm;
 
     public RecentManager() {
-        projectm = MainManager.getProjectManager();
         notifm = new EventNotificationManager(RecentManager.class);
     }
 
@@ -39,10 +37,10 @@ public class RecentManager implements HasEventNotificationManager {
      * Add current project to recent history
      */
     public void addCurrentProject() {
-        if (projectm.isInitialized()) {
+        if (projectm().isInitialized()) {
             return;
         }
-        add(projectm.getProject());
+        add(projectm().getProject());
     }
 
     public EventNotificationManager getNotificationManager() {

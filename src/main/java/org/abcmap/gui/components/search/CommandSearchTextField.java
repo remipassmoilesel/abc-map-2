@@ -1,7 +1,7 @@
 package org.abcmap.gui.components.search;
 
 import org.abcmap.core.configuration.ConfigurationConstants;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.utils.CoeffComparator;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.ielements.InteractionElement;
@@ -154,7 +154,7 @@ public class CommandSearchTextField extends InteractiveTextField {
                 GuiUtils.addLabel("Aucune commande ne correspond.", ctr, "wrap");
 
                 // affichage du packet parent pour debogage
-                if (MainManager.isDebugMode()) {
+                if (Main.isDebugMode()) {
                     GuiUtils.addLabel("Nom du package parent: " + ConfigurationConstants.IE_PACKAGE_ROOT, ctr, "wrap");
                     GuiUtils.addLabel("Pattern: " + Utils.join(", ", Arrays.asList(patterns)), ctr, "wrap");
                 }

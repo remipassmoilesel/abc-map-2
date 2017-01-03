@@ -1,17 +1,14 @@
 package org.abcmap.tests.core.project;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.utils.SQLUtils;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import static org.junit.Assert.assertTrue;
 
@@ -30,7 +27,7 @@ public class ProjectConnectionTest {
     @Test
     public void tests() throws IOException {
 
-        Project project = MainManager.getProjectManager().getProject();
+        Project project = Main.getProjectManager().getProject();
 
         String tableName = ("DATA_" + System.nanoTime()).toUpperCase();
 

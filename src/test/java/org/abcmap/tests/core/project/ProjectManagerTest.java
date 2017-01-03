@@ -1,7 +1,7 @@
 package org.abcmap.tests.core.project;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.apache.commons.io.FileUtils;
@@ -34,7 +34,7 @@ public class ProjectManagerTest {
         Files.createDirectories(tempDir);
 
         Path savedPath = tempDir.resolve("saved.abm");
-        ProjectManager pman = MainManager.getProjectManager();
+        ProjectManager pman = Main.getProjectManager();
 
         // create a new project
         boolean created = false;

@@ -34,9 +34,9 @@ public class CropConfigurator {
 
     public CropConfigurator(String mode) {
 
-        this.importm = MainManager.getImportManager();
-        this.configm = MainManager.getConfigurationManager();
-        this.guim = MainManager.getGuiManager();
+        this.importm = Main.getImportManager();
+        this.configm = Main.getConfigurationManager();
+        this.guim = Main.getGuiManager();
 
         this.mode = mode;
 
@@ -56,7 +56,7 @@ public class CropConfigurator {
 
             BufferedImage bg = null;
 
-            visibleFrames = MainManager.getGuiManager().getVisibleWindows();
+            visibleFrames = Main.getGuiManager().getVisibleWindows();
 
             // configuration from directory
             if (CropConfigurator.FOR_DIRECTOY_IMPORT.equals(mode)) {

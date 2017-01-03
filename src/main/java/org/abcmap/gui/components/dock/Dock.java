@@ -2,7 +2,7 @@ package org.abcmap.gui.components.dock;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.ielements.InteractionElementGroup;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.HasDisplayableSpace;
@@ -44,7 +44,7 @@ public class Dock extends JPanel implements HasDisplayableSpace {
 
     public Dock(DockOrientation orientation) {
 
-        guim = MainManager.getGuiManager();
+        guim = Main.getGuiManager();
 
         setLayout(new MigLayout("insets 0, gap 3, fill"));
 

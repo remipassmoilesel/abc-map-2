@@ -1,6 +1,6 @@
 package org.abcmap.gui.iegroup.menubar;
 
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.ielements.InteractionElement;
 import org.abcmap.ielements.InteractionElementGroup;
 
@@ -20,7 +20,7 @@ public class GuiMenuBar extends JMenuBar {
         groups.add(new ProfileMenu());
         groups.add(new HelpMenu());
 
-        if (MainManager.isDebugMode()) {
+        if (Main.isDebugMode()) {
             groups.add(new DebugMenu());
         }
 

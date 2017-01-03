@@ -37,9 +37,9 @@ public class LayerListButtonsAL implements ActionListener {
 
     public LayerListButtonsAL(String mode) {
         this.mode = mode;
-        this.projectm = MainManager.getProjectManager();
-        this.cancelm = MainManager.getCancelManager();
-        this.guim = MainManager.getGuiManager();
+        this.projectm = Main.getProjectManager();
+        this.cancelm = Main.getCancelManager();
+        this.guim = Main.getGuiManager();
     }
 
     @Override

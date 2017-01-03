@@ -1,6 +1,6 @@
 package org.abcmap.ielements.copy;
 
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.ielements.InteractionElement;
 
@@ -26,12 +26,12 @@ public abstract class AbstractCopyToClipboard extends InteractionElement {
             this.label = "Copier";
             this.help = "Cliquez ici pour copier les objets sélectionnés dans le presse-papier.";
             this.menuIcon = GuiIcons.SMALLICON_COPY;
-            this.accelerator = MainManager.getShortcutManager().COPY;
+            this.accelerator = Main.getShortcutManager().COPY;
         } else if (CUT_MODE.equals(mode)) {
             this.label = "Couper";
             this.help = "Cliquez ici pour couper les objets sélectionnés et les déplacer dans le presse-papier.";
             // this.menuIcon = GuiIcons.cut;
-            this.accelerator = MainManager.getShortcutManager().CUT;
+            this.accelerator = Main.getShortcutManager().CUT;
         }
 
     }

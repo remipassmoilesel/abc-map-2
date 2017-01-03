@@ -41,7 +41,7 @@ public class TempFilesManager {
      */
     public Path createTemporaryFile(String prefix, String suffix) throws IOException {
 
-        ProjectManager projectm = MainManager.getProjectManager();
+        ProjectManager projectm = Main.getProjectManager();
         if (projectm.isInitialized() == false) {
             throw new IllegalStateException("Project not initialized");
         }

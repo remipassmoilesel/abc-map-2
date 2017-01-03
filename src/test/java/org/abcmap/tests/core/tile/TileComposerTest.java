@@ -3,7 +3,7 @@ package org.abcmap.tests.core.tile;
 import com.labun.surf.Params;
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.core.tileanalyser.TileAnalyseException;
@@ -40,14 +40,14 @@ public class TileComposerTest {
 
         String root = "/tiles/osm_";
 
-        Project project = MainManager.getProjectManager().getProject();
+        Project project = Main.getProjectManager().getProject();
         Path databasePath = project.getDatabasePath();
 
         // create a tile layer
         TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 2);
 
         // get surf configuration
-        Params surfConfig = MainManager.getConfigurationManager().getSurfConfiguration();
+        Params surfConfig = Main.getConfigurationManager().getSurfConfiguration();
 
         // create a tile composer, to get best positions for tiles
         TileComposer composer = new TileComposer(databasePath, surfConfig, 40, 5);

@@ -2,7 +2,7 @@ package org.abcmap.gui.tools.containers;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ShortcutManager;
 import org.abcmap.core.project.ProjectWriter;
 import org.abcmap.core.utils.Utils;
@@ -72,7 +72,7 @@ public class ToolContainer {
     protected ShortcutManager shortcuts;
 
     public ToolContainer() {
-        this.shortcuts = MainManager.getShortcutManager();
+        this.shortcuts = Main.getShortcutManager();
     }
 
     /**

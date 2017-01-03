@@ -2,7 +2,7 @@ package org.abcmap.gui.components;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.draw.LayerElement;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
@@ -50,7 +50,7 @@ public class SelectedObjectPanel extends JPanel implements HasEventNotificationM
     public SelectedObjectPanel() {
         super(new MigLayout("insets 5"));
 
-        this.projectm = MainManager.getProjectManager();
+        this.projectm = Main.getProjectManager();
         this.listenerHandler = new ListenerHandler<>();
         this.filters = new ArrayList<>();
 

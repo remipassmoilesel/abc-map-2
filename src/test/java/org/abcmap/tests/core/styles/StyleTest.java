@@ -1,7 +1,7 @@
 package org.abcmap.tests.core.styles;
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
@@ -60,7 +60,7 @@ public class StyleTest {
 
         assertTrue("Style util test", feat.getAttribute(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals(style.getId()));
 
-        Project project = MainManager.getProjectManager().getProject();
+        Project project = Main.getProjectManager().getProject();
         StyleLibrary styleLib = project.getStyleLibrary();
 
         // style cache test

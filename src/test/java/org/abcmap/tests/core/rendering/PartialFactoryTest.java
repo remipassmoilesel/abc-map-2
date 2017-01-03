@@ -3,7 +3,7 @@ package org.abcmap.tests.core.rendering;
 import com.vividsolutions.jts.geom.Coordinate;
 import junit.framework.TestCase;
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.TileLayer;
 import org.abcmap.core.rendering.RenderingException;
@@ -43,7 +43,7 @@ public class PartialFactoryTest {
         String root = "/tiles/osm_";
 
         // get partial store
-        Project project = MainManager.getProjectManager().getProject();
+        Project project = Main.getProjectManager().getProject();
 
         // create a tile layer
         TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 0);

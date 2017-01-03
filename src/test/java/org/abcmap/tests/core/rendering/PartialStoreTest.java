@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 import junit.framework.TestCase;
 import org.abcmap.TestUtils;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.rendering.partials.PartialOutlineFeatureBuilder;
 import org.abcmap.core.rendering.partials.RenderedPartial;
@@ -57,7 +57,7 @@ public class PartialStoreTest {
     public void tests() throws IOException, SQLException, InterruptedException {
 
         // get partial store
-        Project project = MainManager.getProjectManager().getProject();
+        Project project = Main.getProjectManager().getProject();
         RenderedPartialStore store = project.getRenderedPartialStore();
 
         // side of partial in world unit

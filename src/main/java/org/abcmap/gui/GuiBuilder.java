@@ -1,7 +1,7 @@
 package org.abcmap.gui;
 
 import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.components.dock.DockBuilder;
 import org.abcmap.gui.components.dock.DockOrientation;
@@ -41,7 +41,7 @@ public class GuiBuilder {
     private GuiManager guim;
 
     public GuiBuilder() {
-        guim = MainManager.getGuiManager();
+        guim = Main.getGuiManager();
     }
 
     public void constructGui() {

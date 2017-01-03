@@ -1,7 +1,7 @@
 package org.abcmap.gui.windows.crop;
 
 import org.abcmap.core.managers.DrawManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.shapes.Handle;
 
 import java.awt.*;
@@ -52,7 +52,7 @@ public class CropSelectionRectangle {
     public CropSelectionRectangle() {
         super();
 
-        drawm = MainManager.getDrawManager();
+        drawm = Main.getDrawManager();
 
         this.interactionAreaMargin = 5;
         this.thickness = 5;

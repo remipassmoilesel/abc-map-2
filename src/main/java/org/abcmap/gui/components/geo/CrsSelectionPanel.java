@@ -1,7 +1,7 @@
 package org.abcmap.gui.components.geo;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.MapManager;
 import org.abcmap.core.utils.listeners.HasListenerHandler;
 import org.abcmap.core.utils.listeners.ListenerHandler;
@@ -36,7 +36,7 @@ public class CrsSelectionPanel extends JPanel implements HasListenerHandler<Acti
     public CrsSelectionPanel() {
         super(new MigLayout("insets 0"));
 
-        mapm = MainManager.getMapManager();
+        mapm = Main.getMapManager();
 
         this.listenerHandler = new ListenerHandler<>();
 

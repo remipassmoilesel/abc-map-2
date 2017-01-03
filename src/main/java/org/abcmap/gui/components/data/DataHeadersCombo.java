@@ -1,7 +1,7 @@
 package org.abcmap.gui.components.data;
 
 import org.abcmap.core.managers.ImportManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.utils.Utils;
@@ -23,7 +23,7 @@ public class DataHeadersCombo extends JComboBox<String> implements HasEventNotif
     public DataHeadersCombo() {
         super();
 
-        importm = MainManager.getImportManager();
+        importm = Main.getImportManager();
 
         setEditable(false);
 

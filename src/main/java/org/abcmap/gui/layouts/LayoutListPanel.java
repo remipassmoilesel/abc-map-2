@@ -6,12 +6,10 @@ import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layouts.LayoutSheet;
-import org.abcmap.gui.GuiIcons;
-import org.abcmap.gui.components.buttons.HtmlCheckbox;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.windows.MainWindow;
 
@@ -61,8 +59,8 @@ public class LayoutListPanel extends JPanel {
         super(new BorderLayout());
 
         this.project = project;
-        projectm = MainManager.getProjectManager();
-        guim = MainManager.getGuiManager();
+        projectm = Main.getProjectManager();
+        guim = Main.getGuiManager();
 
         // keep created panels to avoid too much work
         layoutPanels = new ArrayList<>();

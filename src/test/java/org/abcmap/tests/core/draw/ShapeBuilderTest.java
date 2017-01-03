@@ -7,7 +7,7 @@ import org.abcmap.TestUtils;
 import org.abcmap.core.draw.builder.LineBuilder;
 import org.abcmap.core.draw.builder.PointBuilder;
 import org.abcmap.core.draw.builder.PolygonBuilder;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
@@ -39,7 +39,7 @@ public class ShapeBuilderTest {
     @Test
     public void tests() throws IOException {
 
-        Project project = MainManager.getProjectManager().getProject();
+        Project project = Main.getProjectManager().getProject();
         FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
 
         // test point building
