@@ -6,7 +6,7 @@ import org.abcmap.core.managers.LogManager;
 /**
  * Types of layer
  */
-public enum LayerType {
+public enum AbmLayerType {
 
 
     /**
@@ -29,7 +29,7 @@ public enum LayerType {
      */
     SHAPE_FILE;
 
-    private static final CustomLogger logger = LogManager.getLogger(LayerType.class);
+    private static final CustomLogger logger = LogManager.getLogger(AbmLayerType.class);
 
     /**
      * Return the corresponding enum object or null.
@@ -37,9 +37,9 @@ public enum LayerType {
      * @param name
      * @return
      */
-    public static LayerType safeValueOf(String name) {
+    public static AbmLayerType safeValueOf(String name) {
         try {
-            return LayerType.valueOf(name);
+            return AbmLayerType.valueOf(name);
         } catch (Exception e) {
             logger.error(e);
             return null;

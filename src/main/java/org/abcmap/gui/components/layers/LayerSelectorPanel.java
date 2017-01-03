@@ -6,7 +6,7 @@ import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GuiUtils;
@@ -31,8 +31,8 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
     private ProjectManager projectm;
 
-    private DefaultListModel<AbstractLayer> listModel;
-    private JList<AbstractLayer> jlist;
+    private DefaultListModel<AbmAbstractLayer> listModel;
+    private JList<AbmAbstractLayer> jlist;
     private JSlider opacitySlider;
     private EventNotificationManager notifm;
     private FormUpdater formUpdater;
@@ -134,10 +134,10 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
             }
 
             Project project = projectm.getProject();
-            AbstractLayer activeLayer = project.getActiveLayer();
+            AbmAbstractLayer activeLayer = project.getActiveLayer();
 
             // get selected layer. If null, stop operation
-            AbstractLayer lay = jlist.getSelectedValue();
+            AbmAbstractLayer lay = jlist.getSelectedValue();
             if (lay == null) {
                 return;
             }
@@ -175,7 +175,7 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
             float value = Float.valueOf(slider.getValue()) / 100;
 
             // change layer only if needed
-            AbstractLayer lay = project.getActiveLayer();
+            AbmAbstractLayer lay = project.getActiveLayer();
             if (lay.getOpacity() != value) {
                 ThreadManager.runLater(() -> {
                     lay.setOpacity(value);
@@ -217,7 +217,7 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
             else {
 
                 Project project = projectm.getProject();
-                AbstractLayer activeLayer = project.getActiveLayer();
+                AbmAbstractLayer activeLayer = project.getActiveLayer();
 
                 if (opacitySlider.isEnabled() == false) {
                     opacitySlider.setEnabled(true);
@@ -233,7 +233,7 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
                 }
 
                 // update layer list
-                ArrayList<AbstractLayer> layers = project.getLayersList();
+                ArrayList<AbmAbstractLayer> layers = project.getLayersList();
 
                 if (jlist.isEnabled() == false) {
                     jlist.setEnabled(true);

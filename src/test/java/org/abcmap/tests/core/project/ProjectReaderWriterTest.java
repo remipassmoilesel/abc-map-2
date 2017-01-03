@@ -10,7 +10,7 @@ import org.abcmap.core.project.PMConstants;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.project.layouts.LayoutSheet;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.JTSFactoryFinder;
@@ -83,7 +83,7 @@ public class ProjectReaderWriterTest {
         assertTrue("AbstractLayer index test", lidao.readAllEntries().size() == 3);
 
         // add layer elements
-        FeatureLayer l = (FeatureLayer) newProject.getLayersList().get(0);
+        AbmFeatureLayer l = (AbmFeatureLayer) newProject.getLayersList().get(0);
         for (int i = 0; i < 100; i++) {
             l.addShape(geom.createPoint(new Coordinate(i, i)));
         }

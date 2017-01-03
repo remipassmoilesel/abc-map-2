@@ -17,9 +17,9 @@ import org.opengis.filter.FilterFactory;
 /**
  * This object is a wrapper of Geotools layer
  */
-public abstract class AbstractLayer implements Comparable<AbstractLayer> {
+public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
 
-    protected static final CustomLogger logger = LogManager.getLogger(AbstractLayer.class);
+    protected static final CustomLogger logger = LogManager.getLogger(AbmAbstractLayer.class);
     protected final static StyleFactory sf = FeatureUtils.getStyleFactory();
     protected final static FilterFactory ff = FeatureUtils.getFilterFactory();
     protected final static GeometryFactory geom = GeoUtils.getGeometryFactory();
@@ -34,7 +34,7 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
      *
      * @param entry
      */
-    public AbstractLayer(Project owner, LayerIndexEntry entry) {
+    public AbmAbstractLayer(Project owner, LayerIndexEntry entry) {
         this.project = owner;
         this.indexEntry = entry;
         this.layerStyle = sf.createStyle();
@@ -82,7 +82,7 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
      *
      * @return
      */
-    public LayerType getType() {
+    public AbmLayerType getType() {
         return indexEntry.getType();
     }
 
@@ -155,7 +155,7 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
     }
 
     @Override
-    public int compareTo(AbstractLayer other) {
+    public int compareTo(AbmAbstractLayer other) {
 
         // other layer have a smaller zindex, it have to be under this
         if (other.getZindex() < this.getZindex()) {
@@ -215,7 +215,7 @@ public abstract class AbstractLayer implements Comparable<AbstractLayer> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AbstractLayer layer = (AbstractLayer) o;
+        AbmAbstractLayer layer = (AbmAbstractLayer) o;
 
         return indexEntry != null ? indexEntry.equals(layer.indexEntry) : layer.indexEntry == null;
 

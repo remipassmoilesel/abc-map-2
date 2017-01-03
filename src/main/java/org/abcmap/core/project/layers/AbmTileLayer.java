@@ -49,7 +49,7 @@ import java.util.List;
  * - The effective coverage layer, with tiles
  * - A feature layer with draw to do geometric researches
  */
-public class TileLayer extends AbstractLayer {
+public class AbmTileLayer extends AbmAbstractLayer {
 
     /**
      * Tile store, where are actually stored tiles
@@ -66,11 +66,11 @@ public class TileLayer extends AbstractLayer {
     private final Style outlineStyle;
     private FeatureTypeStyle outlineFeatureType;
 
-    public TileLayer(String layerId, String title, boolean visible, int zindex, Project owner, boolean create) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.TILES), owner, create);
+    public AbmTileLayer(String layerId, String title, boolean visible, int zindex, Project owner, boolean create) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.TILES), owner, create);
     }
 
-    public TileLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
+    public AbmTileLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
 
         super(owner, entry);
 

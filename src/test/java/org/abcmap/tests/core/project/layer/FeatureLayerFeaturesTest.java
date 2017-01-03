@@ -6,8 +6,8 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.junit.Before;
@@ -37,7 +37,7 @@ public class FeatureLayerFeaturesTest {
     public void tests() throws IOException {
 
         Project project = Main.getProjectManager().getProject();
-        FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
+        AbmFeatureLayer activeLayer = (AbmFeatureLayer) project.getActiveLayer();
 
         // add a feature and retrieve it
         SimpleFeature point1 = activeLayer.addShape(geom.createPoint(new Coordinate(25, 58)));
@@ -49,16 +49,16 @@ public class FeatureLayerFeaturesTest {
         // add a feature and update it
         Geometry geomPoint = geom.createPoint(new Coordinate(2556, 548));
         SimpleFeature point3 = activeLayer.addShape(geomPoint);
-        point3.setAttribute(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME, "arbitrary_value");
+        point3.setAttribute(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME, "arbitrary_value");
         activeLayer.updateFeature(point3);
 
         final int[] count = {0};
         activeLayer.executeVisit((SimpleFeature f) -> {
 
             if (count[0] == 0) {
-                assertTrue("Update feature test 1", f.getAttribute(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals(""));
+                assertTrue("Update feature test 1", f.getAttribute(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals(""));
             } else if (count[0] == 1) {
-                assertTrue("Update feature test 2", f.getAttribute(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals("arbitrary_value"));
+                assertTrue("Update feature test 2", f.getAttribute(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME).equals("arbitrary_value"));
             }
 
             count[0]++;

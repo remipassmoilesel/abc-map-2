@@ -67,7 +67,7 @@ public class Project {
     /**
      * Only one layer is alterable at a time, the active layer
      */
-    private AbstractLayer activeLayer;
+    private AbmAbstractLayer activeLayer;
 
     /**
      * Final path of the project, where the user want to save it.
@@ -84,7 +84,7 @@ public class Project {
     /**
      * List of mainLayersList. Layers wrap Geotools mainLayersList.
      */
-    private ArrayList<AbstractLayer> mainLayersList;
+    private ArrayList<AbmAbstractLayer> mainLayersList;
 
     /**
      * Metadata about project
@@ -176,8 +176,8 @@ public class Project {
      *
      * @return
      */
-    public ArrayList<AbstractLayer> getLayersList() {
-        ArrayList<AbstractLayer> list = new ArrayList<>(mainLayersList);
+    public ArrayList<AbmAbstractLayer> getLayersList() {
+        ArrayList<AbmAbstractLayer> list = new ArrayList<>(mainLayersList);
         Collections.sort(list);
         return list;
     }
@@ -197,7 +197,7 @@ public class Project {
         double maxy = 0.0d;
         boolean firstLoop = true;
 
-        for (AbstractLayer lay : getLayersList()) {
+        for (AbmAbstractLayer lay : getLayersList()) {
 
             ReferencedEnvelope bounds = lay.getInternalLayer().getBounds();
 
@@ -246,12 +246,12 @@ public class Project {
      * @param visible
      * @param zindex
      */
-    public AbstractLayer addNewFeatureLayer(String name, boolean visible, int zindex) throws IOException {
+    public AbmAbstractLayer addNewFeatureLayer(String name, boolean visible, int zindex) throws IOException {
 
         // create a layer wrapper and store it
-        AbstractLayer layer = null;
+        AbmAbstractLayer layer = null;
         try {
-            layer = new FeatureLayer(null, name, visible, zindex, this, true);
+            layer = new AbmFeatureLayer(null, name, visible, zindex, this, true);
         } catch (Exception e) {
             throw new IOException("Error while adding tile layer: ", e);
         }
@@ -267,10 +267,10 @@ public class Project {
      * @param zindex
      * @return
      */
-    public AbstractLayer addNewTileLayer(String name, boolean visible, int zindex) throws IOException {
-        TileLayer layer = null;
+    public AbmAbstractLayer addNewTileLayer(String name, boolean visible, int zindex) throws IOException {
+        AbmTileLayer layer = null;
         try {
-            layer = new TileLayer(null, name, visible, zindex, this, true);
+            layer = new AbmTileLayer(null, name, visible, zindex, this, true);
         } catch (Exception e) {
             throw new IOException("Error while adding tile layer: ", e);
         }
@@ -283,7 +283,7 @@ public class Project {
      * @param layer
      * @return
      */
-    protected AbstractLayer addLayer(AbstractLayer layer) {
+    protected AbmAbstractLayer addLayer(AbmAbstractLayer layer) {
         mainLayersList.add(layer);
         return layer;
     }
@@ -384,7 +384,7 @@ public class Project {
      *
      * @param layer
      */
-    public void setActiveLayer(AbstractLayer layer) {
+    public void setActiveLayer(AbmAbstractLayer layer) {
 
         if (getLayersList().indexOf(layer) < 0) {
             throw new IllegalArgumentException("Invalid layer: " + layer);
@@ -400,7 +400,7 @@ public class Project {
      *
      * @return
      */
-    public AbstractLayer getActiveLayer() {
+    public AbmAbstractLayer getActiveLayer() {
         return activeLayer;
     }
 
@@ -436,7 +436,7 @@ public class Project {
      */
     protected ArrayList<LayerIndexEntry> getLayerIndexEntries() {
         ArrayList<LayerIndexEntry> indexes = new ArrayList<>();
-        for (AbstractLayer layer : getLayersList()) {
+        for (AbmAbstractLayer layer : getLayersList()) {
             indexes.add(layer.getIndexEntry());
         }
         return indexes;
@@ -513,15 +513,15 @@ public class Project {
 
         MapContent content = new MapContent();
 
-        ArrayList<AbstractLayer> layers = getLayersList();
+        ArrayList<AbmAbstractLayer> layers = getLayersList();
 
         // add mainLayersList
-        for (AbstractLayer layer : layers) {
+        for (AbmAbstractLayer layer : layers) {
 
             // optionally add tile outlines
             content.addLayer(layer.getInternalLayer());
-            if (includeTileOutlines && layer instanceof TileLayer) {
-                content.addLayer(((TileLayer) layer).getOutlineLayer());
+            if (includeTileOutlines && layer instanceof AbmTileLayer) {
+                content.addLayer(((AbmTileLayer) layer).getOutlineLayer());
             }
         }
 
@@ -562,9 +562,9 @@ public class Project {
      *
      * @param layerId
      */
-    public AbstractLayer getLayerById(String layerId) {
+    public AbmAbstractLayer getLayerById(String layerId) {
 
-        for (AbstractLayer lay : getLayersList()) {
+        for (AbmAbstractLayer lay : getLayersList()) {
             if (Utils.safeEquals(lay.getId(), layerId)) {
                 return lay;
             }
@@ -584,7 +584,7 @@ public class Project {
      */
     public void removeLayer(int index) {
 
-        ArrayList<AbstractLayer> list = getLayersList();
+        ArrayList<AbmAbstractLayer> list = getLayersList();
         if (index < 0 || index > list.size()) {
             throw new IllegalArgumentException("Illegal index: " + index);
         }
@@ -599,7 +599,7 @@ public class Project {
      *
      * @param lay
      */
-    public void removeLayer(AbstractLayer lay) {
+    public void removeLayer(AbmAbstractLayer lay) {
 
         mainLayersList.remove(lay);
 
@@ -621,9 +621,9 @@ public class Project {
      * @param layToMove
      * @param newIndex
      */
-    public ArrayList<AbstractLayer> moveLayerToIndex(AbstractLayer layToMove, int newIndex) {
+    public ArrayList<AbmAbstractLayer> moveLayerToIndex(AbmAbstractLayer layToMove, int newIndex) {
 
-        ArrayList<AbstractLayer> list = getLayersList();
+        ArrayList<AbmAbstractLayer> list = getLayersList();
 
         // check arguments
         if (list.indexOf(layToMove) < 0) {
@@ -642,7 +642,7 @@ public class Project {
 
         // reset zindex
         for (int i = 0; i < list.size(); i++) {
-            AbstractLayer lay = list.get(i);
+            AbmAbstractLayer lay = list.get(i);
             lay.setZindex(i);
         }
 
@@ -722,7 +722,7 @@ public class Project {
      * @return
      */
     public int getHigherZindex() {
-        ArrayList<AbstractLayer> list = getLayersList();
+        ArrayList<AbmAbstractLayer> list = getLayersList();
         return list.get(list.size() - 1).getZindex();
     }
 
@@ -731,12 +731,12 @@ public class Project {
     }
 
 
-    public AbstractLayer addNewShapeFileLayer(Path p) throws IOException {
+    public AbmAbstractLayer addNewShapeFileLayer(Path p) throws IOException {
 
         // create a layer wrapper and store it
-        AbstractLayer layer = null;
+        AbmAbstractLayer layer = null;
         try {
-            layer = new ShapeFileLayer(null, p.toString(), true, getHigherZindex(), this, p);
+            layer = new AbmShapeFileLayer(null, p.toString(), true, getHigherZindex(), this, p);
         } catch (Exception e) {
             throw new IOException("Error while adding shapefile layer: ", e);
         }

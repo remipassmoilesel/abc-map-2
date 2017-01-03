@@ -1,13 +1,13 @@
 package org.abcmap.core.draw.builder;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
 import org.opengis.feature.simple.SimpleFeature;
 
-public class PointBuilder extends AbstractFeatureBuilder {
+public class PointBuilder extends AbmAbstractFeatureBuilder {
 
-    public PointBuilder(FeatureLayer layer, StyleContainer style) {
+    public PointBuilder(AbmFeatureLayer layer, StyleContainer style) {
         super(layer, style);
     }
 

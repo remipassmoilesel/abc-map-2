@@ -1,6 +1,6 @@
 package org.abcmap.core.utils;
 
-import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
+import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.tiles.TileFeatureBuilder;
 import org.geotools.data.FeatureStore;
@@ -35,8 +35,8 @@ public class FeatureUtils {
      * @param name
      * @return
      */
-    public static DefaultSimpleFeatureBuilder getDefaultFeatureBuilder(String name, CoordinateReferenceSystem crs) {
-        return new DefaultSimpleFeatureBuilder(name, crs);
+    public static AbmSimpleFeatureBuilder getDefaultFeatureBuilder(String name, CoordinateReferenceSystem crs) {
+        return new AbmSimpleFeatureBuilder(name, crs);
     }
 
     /**
@@ -131,7 +131,7 @@ public class FeatureUtils {
 
         // apply style to feature
         for (SimpleFeature feature : features) {
-            feature.setAttribute(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME, style.getId());
+            feature.setAttribute(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME, style.getId());
         }
 
     }
@@ -148,7 +148,7 @@ public class FeatureUtils {
             throw new NullPointerException("Feature cannot be null");
         }
 
-        return (String) feature.getAttribute(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME);
+        return (String) feature.getAttribute(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME);
     }
 
     /**

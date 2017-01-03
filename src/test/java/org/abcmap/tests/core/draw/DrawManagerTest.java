@@ -9,7 +9,7 @@ import org.abcmap.core.draw.builder.PolygonBuilder;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class DrawManagerTest {
 
         DrawManager dm = Main.getDrawManager();
         ProjectManager pm = Main.getProjectManager();
-        FeatureLayer activeLayer = (FeatureLayer) pm.getProject().getActiveLayer();
+        AbmFeatureLayer activeLayer = (AbmFeatureLayer) pm.getProject().getActiveLayer();
 
         int pointNumber = 20;
         int lineNumber = 20;

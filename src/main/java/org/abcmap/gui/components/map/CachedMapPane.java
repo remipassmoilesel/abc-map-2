@@ -13,7 +13,7 @@ import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.rendering.CachedRenderingEngine;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.geo.MapNavigationBar;
@@ -227,7 +227,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         if (drawLayerBounds == true) {
 
             // add layers
-            for (AbstractLayer layer : project.getLayersList()) {
+            for (AbmAbstractLayer layer : project.getLayersList()) {
                 try {
                     debugBoundsList.add(new Object[]{
                             "Layer: " + layer.getId(),

@@ -3,7 +3,7 @@ package org.abcmap.tests.core.rendering;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
+import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
@@ -66,7 +66,7 @@ public class MultiThreadRenderingTest {
     private static MapContent prepareMapWithDatabase(int featureNumber, ReferencedEnvelope bounds) throws IOException {
 
         PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
-        DefaultSimpleFeatureBuilder builder = new DefaultSimpleFeatureBuilder("default", crs);
+        AbmSimpleFeatureBuilder builder = new AbmSimpleFeatureBuilder("default", crs);
 
         Path databasePath = Paths.get("tmp/rendererTest_" + System.currentTimeMillis());
         JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(databasePath);
@@ -98,7 +98,7 @@ public class MultiThreadRenderingTest {
 
         PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
         DefaultFeatureCollection coll = new DefaultFeatureCollection();
-        DefaultSimpleFeatureBuilder builder = new DefaultSimpleFeatureBuilder("default", crs);
+        AbmSimpleFeatureBuilder builder = new AbmSimpleFeatureBuilder("default", crs);
 
         for (int i = 0; i < featureNumber; i++) {
             ArrayList<Coordinate> points = new ArrayList<>();
@@ -420,7 +420,7 @@ public class MultiThreadRenderingTest {
         r.symbolizers().add(polygonSym);
 
         // apply on specified id
-        Filter filter = ff.equal(ff.property(DefaultSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME), ff.literal(FAKE_STYLE_ID), true);
+        Filter filter = ff.equal(ff.property(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME), ff.literal(FAKE_STYLE_ID), true);
         r.setFilter(filter);
 
         Style style = sf.createStyle();

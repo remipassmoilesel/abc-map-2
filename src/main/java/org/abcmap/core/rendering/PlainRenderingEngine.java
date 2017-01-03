@@ -5,8 +5,8 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbstractLayer;
-import org.abcmap.core.project.layers.TileLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
+import org.abcmap.core.project.layers.AbmTileLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -92,7 +92,7 @@ public class PlainRenderingEngine {
         // for example TileLayer that have one raster layer and one shape layer
         int abcmapIndex = 0;
         int geotoolsIndex = 0;
-        for (AbstractLayer lay : project.getLayersList()) {
+        for (AbmAbstractLayer lay : project.getLayersList()) {
 
             Layer glay = geotoolsLayers.get(geotoolsIndex);
 
@@ -102,7 +102,7 @@ public class PlainRenderingEngine {
                 glay.setVisible(false);
             }
 
-            if (lay instanceof TileLayer) {
+            if (lay instanceof AbmTileLayer) {
                 geotoolsIndex++;
                 Layer outlines = geotoolsLayers.get(geotoolsIndex);
                 glay.setVisible(abcmapIndex == id);

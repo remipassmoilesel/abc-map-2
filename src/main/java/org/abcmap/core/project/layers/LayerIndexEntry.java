@@ -25,7 +25,7 @@ public class LayerIndexEntry implements DataModel {
     private String layerId;
 
     @DatabaseField(columnName = TYPE_FIELD_NAME)
-    private LayerType type;
+    private AbmLayerType type;
 
     @DatabaseField(columnName = NAME_FIELD_NAME)
     private String name;
@@ -42,7 +42,7 @@ public class LayerIndexEntry implements DataModel {
     public LayerIndexEntry() {
     }
 
-    public LayerIndexEntry(String layerId, String name, boolean visible, int zindex, LayerType type) {
+    public LayerIndexEntry(String layerId, String name, boolean visible, int zindex, AbmLayerType type) {
 
         this.name = name;
         this.visible = visible;
@@ -63,7 +63,7 @@ public class LayerIndexEntry implements DataModel {
      *
      * @return
      */
-    public LayerType getType() {
+    public AbmLayerType getType() {
         return type;
     }
 
@@ -72,7 +72,7 @@ public class LayerIndexEntry implements DataModel {
      *
      * @param type
      */
-    public void setType(LayerType type) {
+    public void setType(AbmLayerType type) {
         this.type = type;
     }
 

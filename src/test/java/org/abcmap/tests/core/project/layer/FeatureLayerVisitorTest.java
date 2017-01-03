@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.utils.GeoUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,7 +28,7 @@ public class FeatureLayerVisitorTest {
     public void tests() throws IOException {
 
         Project project = Main.getProjectManager().getProject();
-        FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
+        AbmFeatureLayer activeLayer = (AbmFeatureLayer) project.getActiveLayer();
 
         GeometryFactory geom = GeoUtils.getGeometryFactory();
 

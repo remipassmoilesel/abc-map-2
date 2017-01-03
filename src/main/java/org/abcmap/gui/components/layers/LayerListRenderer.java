@@ -3,7 +3,7 @@ package org.abcmap.gui.components.layers;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GuiUtils;
 
@@ -16,7 +16,7 @@ import java.awt.*;
  *
  * @author remipassmoilesel
  */
-public class LayerListRenderer extends JLabel implements ListCellRenderer<AbstractLayer> {
+public class LayerListRenderer extends JLabel implements ListCellRenderer<AbmAbstractLayer> {
 
 
     private ProjectManager projectm;
@@ -46,13 +46,13 @@ public class LayerListRenderer extends JLabel implements ListCellRenderer<Abstra
     }
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends AbstractLayer> list, AbstractLayer layer, int index,
+    public Component getListCellRendererComponent(JList<? extends AbmAbstractLayer> list, AbmAbstractLayer layer, int index,
                                                   boolean isSelected, boolean cellHasFocus) {
 
         GuiUtils.throwIfNotOnEDT();
 
         Project project = projectm.getProject();
-        AbstractLayer activeLayer = project.getActiveLayer();
+        AbmAbstractLayer activeLayer = project.getActiveLayer();
 
         // project not initialized
         if (layer == null || activeLayer == null) {

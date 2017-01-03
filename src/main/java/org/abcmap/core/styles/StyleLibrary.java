@@ -2,8 +2,8 @@ package org.abcmap.core.styles;
 
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.layers.AbstractLayer;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.styling.FeatureTypeStyle;
 import org.geotools.styling.Rule;
@@ -121,8 +121,8 @@ public class StyleLibrary {
      * @param layer
      * @param features
      */
-    public FeatureTypeStyle applyStyle(StyleContainer style, AbstractLayer layer, SimpleFeature... features) {
-        return applyStyle(style, (FeatureLayer) layer, features);
+    public FeatureTypeStyle applyStyle(StyleContainer style, AbmAbstractLayer layer, SimpleFeature... features) {
+        return applyStyle(style, (AbmFeatureLayer) layer, features);
     }
 
     /**
@@ -131,7 +131,7 @@ public class StyleLibrary {
      * @param layer
      * @param features
      */
-    public FeatureTypeStyle applyStyle(StyleContainer style, FeatureLayer layer, SimpleFeature... features) {
+    public FeatureTypeStyle applyStyle(StyleContainer style, AbmFeatureLayer layer, SimpleFeature... features) {
 
         if (style == null) {
             throw new NullPointerException("Style cannot be null");

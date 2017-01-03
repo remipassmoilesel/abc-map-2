@@ -3,7 +3,7 @@ package org.abcmap.tests.core.project.layer;
 import org.abcmap.TestUtils;
 import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.project.layers.LayerIndexEntry;
-import org.abcmap.core.project.layers.LayerType;
+import org.abcmap.core.project.layers.AbmLayerType;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -41,7 +41,7 @@ public class LayerIndexDAOTest {
         // create layer index entries
         ArrayList<LayerIndexEntry> written = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            LayerIndexEntry lie = new LayerIndexEntry(null, "AbstractLayer " + i, true, i, LayerType.FEATURES);
+            LayerIndexEntry lie = new LayerIndexEntry(null, "AbstractLayer " + i, true, i, AbmLayerType.FEATURES);
             written.add(lie);
             dao.create(lie);
         }

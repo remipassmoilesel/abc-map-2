@@ -9,7 +9,7 @@ import org.abcmap.core.draw.builder.PointBuilder;
 import org.abcmap.core.draw.builder.PolygonBuilder;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.junit.Before;
@@ -40,7 +40,7 @@ public class ShapeBuilderTest {
     public void tests() throws IOException {
 
         Project project = Main.getProjectManager().getProject();
-        FeatureLayer activeLayer = (FeatureLayer) project.getActiveLayer();
+        AbmFeatureLayer activeLayer = (AbmFeatureLayer) project.getActiveLayer();
 
         // test point building
         PointBuilder pointB = new PointBuilder(activeLayer, project.getStyle(Color.black, Color.white, 5));

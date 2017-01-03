@@ -3,7 +3,7 @@ package org.abcmap.gui.components.layers;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.*;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.dialogs.RenameLayerDialog;
 import org.abcmap.gui.utils.GuiUtils;
@@ -52,7 +52,7 @@ public class LayerListButtonsAL implements ActionListener {
         }
 
         Project project = projectm.getProject();
-        AbstractLayer lay = project.getActiveLayer();
+        AbmAbstractLayer lay = project.getActiveLayer();
 
         if (CHANGE_VISIBILITY.equals(mode)) {
             changeLayerVisibility(lay);
@@ -85,7 +85,7 @@ public class LayerListButtonsAL implements ActionListener {
         // TODO: fire event ?
     }
 
-    private void changeLayerVisibility(AbstractLayer lay) {
+    private void changeLayerVisibility(AbmAbstractLayer lay) {
         //TODO: save operation in cancelm
 
         lay.setVisible(!lay.isVisible());
@@ -94,12 +94,12 @@ public class LayerListButtonsAL implements ActionListener {
         projectm.fireLayerChanged(lay);
     }
 
-    private void moveLayer(AbstractLayer lay, int step) {
+    private void moveLayer(AbmAbstractLayer lay, int step) {
 
         //TODO: save operation in cancelm
 
         Project project = projectm.getProject();
-        ArrayList<AbstractLayer> layers = project.getLayersList();
+        ArrayList<AbmAbstractLayer> layers = project.getLayersList();
         int newIndex = layers.indexOf(lay) + step;
 
         // move layer only if new index is in bounds
@@ -111,7 +111,7 @@ public class LayerListButtonsAL implements ActionListener {
         projectm.fireLayerListChanged();
     }
 
-    private void removeLayer(AbstractLayer lay) {
+    private void removeLayer(AbmAbstractLayer lay) {
 
         //TODO: save operation in cancelm
 
@@ -132,7 +132,7 @@ public class LayerListButtonsAL implements ActionListener {
         //TODO: save operation in cancelm
 
         Project project = projectm.getProject();
-        AbstractLayer lay;
+        AbmAbstractLayer lay;
         try {
 
             // create a new layer
@@ -150,7 +150,7 @@ public class LayerListButtonsAL implements ActionListener {
 
     }
 
-    private void renameLayer(AbstractLayer lay) {
+    private void renameLayer(AbmAbstractLayer lay) {
 
         //TODO: save operation in cancelm
 
@@ -170,7 +170,7 @@ public class LayerListButtonsAL implements ActionListener {
     }
 
 
-    private void duplicateLayer(final AbstractLayer lay) {
+    private void duplicateLayer(final AbmAbstractLayer lay) {
 
         // TODO: to complete
         ThreadManager.runLater(new Runnable() {

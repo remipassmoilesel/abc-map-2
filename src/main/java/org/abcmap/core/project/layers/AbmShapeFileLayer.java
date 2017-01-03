@@ -1,34 +1,29 @@
 package org.abcmap.core.project.layers;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.Utils;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
-import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.styling.Rule;
-import org.geotools.styling.SLD;
 
-import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Arrays;
 
-public class ShapeFileLayer extends AbstractLayer {
+public class AbmShapeFileLayer extends AbmAbstractLayer {
 
     private SimpleFeatureStore featureStore;
 
     //private final SimpleFeatureStore featureStore;
 
-    public ShapeFileLayer(String layerId, String title, boolean visible, int zindex, Project owner, Path shapeFile) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.SHAPE_FILE), owner, shapeFile);
+    public AbmShapeFileLayer(String layerId, String title, boolean visible, int zindex, Project owner, Path shapeFile) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.SHAPE_FILE), owner, shapeFile);
     }
 
-    public ShapeFileLayer(LayerIndexEntry entry, Project owner, Path shapeFile) throws IOException {
+    public AbmShapeFileLayer(LayerIndexEntry entry, Project owner, Path shapeFile) throws IOException {
 
         super(owner, entry);
 

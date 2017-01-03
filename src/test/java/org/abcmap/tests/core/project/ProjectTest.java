@@ -5,7 +5,7 @@ import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.MapManager;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -40,8 +40,8 @@ public class ProjectTest {
         }
 
         // layer list should be a new list each time, and do not affect project
-        ArrayList<AbstractLayer> list1 = project.getLayersList();
-        ArrayList<AbstractLayer> list2 = project.getLayersList();
+        ArrayList<AbmAbstractLayer> list1 = project.getLayersList();
+        ArrayList<AbmAbstractLayer> list2 = project.getLayersList();
         list1.remove(0);
         assertTrue("Layer list test 1: " + list2.size(), list2.size() > 0);
         assertTrue("Layer list test 2: " + project.getLayersList().size(), project.getLayersList().size() > 0);
@@ -52,7 +52,7 @@ public class ProjectTest {
         project.addNewFeatureLayer(String.valueOf(30), true, 30);
 
         int lastZindex = -1;
-        for (AbstractLayer lay : project.getLayersList()) {
+        for (AbmAbstractLayer lay : project.getLayersList()) {
 
             if (lastZindex == -1) {
                 lastZindex = lay.getZindex();
@@ -65,18 +65,18 @@ public class ProjectTest {
         }
 
         // move layer to first element
-        ArrayList<AbstractLayer> list4 = project.getLayersList();
-        AbstractLayer toFirst = list4.get(list4.size() - 1);
+        ArrayList<AbmAbstractLayer> list4 = project.getLayersList();
+        AbmAbstractLayer toFirst = list4.get(list4.size() - 1);
         list4 = project.moveLayerToIndex(toFirst, 0);
         assertTrue("Layer move test 1: " + list4.indexOf(toFirst), list4.indexOf(toFirst) == 0);
 
         // move layer to last element
-        AbstractLayer toLast = list4.get(0);
+        AbmAbstractLayer toLast = list4.get(0);
         list4 = project.moveLayerToIndex(toLast, list4.size() - 1);
         assertTrue("Layer move test 2: " + list4.indexOf(toLast), list4.indexOf(toLast) == list4.size() - 1);
 
         // move layer to third element
-        AbstractLayer toThird = list4.get(0);
+        AbmAbstractLayer toThird = list4.get(0);
         list4 = project.moveLayerToIndex(toThird, 2);
         assertTrue("Layer move test 3: " + list4.indexOf(toThird), list4.indexOf(toThird) == 2);
 

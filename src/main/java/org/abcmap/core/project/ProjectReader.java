@@ -6,10 +6,10 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.dao.ProjectMetadataDAO;
 import org.abcmap.core.dao.StyleDAO;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.project.layers.LayerIndexEntry;
-import org.abcmap.core.project.layers.LayerType;
-import org.abcmap.core.project.layers.TileLayer;
+import org.abcmap.core.project.layers.AbmLayerType;
+import org.abcmap.core.project.layers.AbmTileLayer;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.ZipUtils;
 
@@ -78,14 +78,14 @@ public class ProjectReader {
         for (LayerIndexEntry entry : indexes) {
 
             // layer contain geometries
-            if (LayerType.FEATURES.equals(entry.getType())) {
-                FeatureLayer layer = new FeatureLayer(entry, newProject, false);
+            if (AbmLayerType.FEATURES.equals(entry.getType())) {
+                AbmFeatureLayer layer = new AbmFeatureLayer(entry, newProject, false);
                 newProject.addLayer(layer);
             }
 
             // Layer contain tiles
-            else if (LayerType.TILES.equals(entry.getType())) {
-                TileLayer layer = new TileLayer(entry, newProject, false);
+            else if (AbmLayerType.TILES.equals(entry.getType())) {
+                AbmTileLayer layer = new AbmTileLayer(entry, newProject, false);
                 newProject.addLayer(layer);
             }
 

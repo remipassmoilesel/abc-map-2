@@ -3,7 +3,7 @@ package org.abcmap.core.draw.builder;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -12,14 +12,14 @@ import java.util.ArrayList;
 /**
  * Abstract tool designed to draw lines or polygon
  */
-public abstract class AbstractLineBuilder extends AbstractFeatureBuilder {
+public abstract class AbstractLineBuilder extends AbmAbstractFeatureBuilder {
 
     /**
      * List of points of shape
      */
     protected ArrayList<Coordinate> shapePoints;
 
-    public AbstractLineBuilder(FeatureLayer layer, StyleContainer style) {
+    public AbstractLineBuilder(AbmFeatureLayer layer, StyleContainer style) {
         super(layer, style);
     }
 

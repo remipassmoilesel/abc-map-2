@@ -5,7 +5,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.TileLayer;
+import org.abcmap.core.project.layers.AbmTileLayer;
 import org.abcmap.core.tileanalyser.TileAnalyseException;
 import org.abcmap.core.tileanalyser.TileComposer;
 import org.abcmap.core.tileanalyser.TileSource;
@@ -44,7 +44,7 @@ public class TileComposerTest {
         Path databasePath = project.getDatabasePath();
 
         // create a tile layer
-        TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 2);
+        AbmTileLayer layer = (AbmTileLayer) project.addNewTileLayer("Tile layer 1", true, 2);
 
         // get surf configuration
         Params surfConfig = Main.getConfigurationManager().getSurfConfiguration();

@@ -5,8 +5,8 @@ import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.managers.*;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbstractLayer;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -72,7 +72,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      *
      * @return
      */
-    protected AbstractLayer getActiveLayerOrShowMessage() {
+    protected AbmAbstractLayer getActiveLayerOrShowMessage() {
 
         Project p = getProjectOrShowMessage();
 
@@ -110,7 +110,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * @param arg0
      * @return
      */
-    protected AbstractLayer getActiveLayerIfLeftClickOrShowMessage(MouseEvent arg0) {
+    protected AbmAbstractLayer getActiveLayerIfLeftClickOrShowMessage(MouseEvent arg0) {
 
         Project p = getProjectIfLeftClickOrShowMessage(arg0);
         if (p == null) {
@@ -126,7 +126,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * @param arg0
      * @return
      */
-    protected FeatureLayer getActiveFeatureLayerIfLeftClickOrShowMessage(MouseEvent arg0) {
+    protected AbmFeatureLayer getActiveFeatureLayerIfLeftClickOrShowMessage(MouseEvent arg0) {
 
         Project p = getProjectIfLeftClickOrShowMessage(arg0);
         if (p == null) {
@@ -134,12 +134,12 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
         }
 
         // this layer cannot be modified
-        if (p.getActiveLayer() instanceof FeatureLayer == false) {
+        if (p.getActiveLayer() instanceof AbmFeatureLayer == false) {
             dialm.showErrorInBox("Vous ne pouvez pas modifier cette couche");
             return null;
         }
 
-        return (FeatureLayer) p.getActiveLayer();
+        return (AbmFeatureLayer) p.getActiveLayer();
     }
 
     /**

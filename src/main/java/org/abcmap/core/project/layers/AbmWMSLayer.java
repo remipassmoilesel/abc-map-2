@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * Distant raster layer
  */
-public class WMSLayer extends AbstractLayer {
+public class AbmWMSLayer extends AbmAbstractLayer {
 
     private WMSEntry wmsEntry;
 
@@ -31,8 +31,8 @@ public class WMSLayer extends AbstractLayer {
      * @param owner
      * @throws IOException
      */
-    public WMSLayer(String name, String url, String wmsName, boolean visible, int zindex, Project owner) throws IOException, WMSException {
-        super(owner, new LayerIndexEntry(null, name, visible, zindex, LayerType.WMS));
+    public AbmWMSLayer(String name, String url, String wmsName, boolean visible, int zindex, Project owner) throws IOException, WMSException {
+        super(owner, new LayerIndexEntry(null, name, visible, zindex, AbmLayerType.WMS));
 
         // create a wms entry
         wmsEntry = new WMSEntry(indexEntry.getLayerId(), url, wmsName);

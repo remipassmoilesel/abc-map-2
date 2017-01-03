@@ -1,7 +1,7 @@
 package org.abcmap.core.project.layers;
 
 import com.vividsolutions.jts.geom.Geometry;
-import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
+import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.SQLUtils;
@@ -23,10 +23,10 @@ import java.util.Set;
 /**
  * Created by remipassmoilesel on 16/11/16.
  */
-public class FeatureLayer extends AbstractLayer {
+public class AbmFeatureLayer extends AbmAbstractLayer {
 
     protected SimpleFeatureStore featureStore;
-    protected DefaultSimpleFeatureBuilder featureBuilder;
+    protected AbmSimpleFeatureBuilder featureBuilder;
 
     /**
      * Create a feature layer object.
@@ -43,11 +43,11 @@ public class FeatureLayer extends AbstractLayer {
      * @param create
      * @throws IOException
      */
-    public FeatureLayer(String layerId, String title, boolean visible, int zindex, Project owner, boolean create) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, LayerType.FEATURES), owner, create);
+    public AbmFeatureLayer(String layerId, String title, boolean visible, int zindex, Project owner, boolean create) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.FEATURES), owner, create);
     }
 
-    public FeatureLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
+    public AbmFeatureLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
         super(owner, entry);
 
         JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(project.getDatabasePath());
@@ -55,7 +55,7 @@ public class FeatureLayer extends AbstractLayer {
         // if true, create a new database entry
         if (create) {
             // create a simple feature type
-            SimpleFeatureType type = DefaultSimpleFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), owner.getCrs());
+            SimpleFeatureType type = AbmSimpleFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), owner.getCrs());
             datastore.createSchema(type);
         }
 
@@ -211,7 +211,7 @@ public class FeatureLayer extends AbstractLayer {
         }
     }
 
-    public DefaultSimpleFeatureBuilder getFeatureBuilder() {
+    public AbmSimpleFeatureBuilder getFeatureBuilder() {
         return featureBuilder;
     }
 }

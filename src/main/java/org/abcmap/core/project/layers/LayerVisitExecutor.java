@@ -14,9 +14,9 @@ import java.io.IOException;
 public class LayerVisitExecutor {
 
     private final static CustomLogger logger = LogManager.getLogger(LayerVisitExecutor.class);
-    private final FeatureLayer layer;
+    private final AbmFeatureLayer layer;
 
-    public LayerVisitExecutor(FeatureLayer layer) {
+    public LayerVisitExecutor(AbmFeatureLayer layer) {
         this.layer = layer;
     }
 

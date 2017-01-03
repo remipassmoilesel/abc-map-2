@@ -1,9 +1,9 @@
 package org.abcmap.gui.tools;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import org.abcmap.core.draw.builder.DefaultSimpleFeatureBuilder;
+import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.draw.builder.LineBuilder;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.feature.simple.SimpleFeature;
@@ -46,7 +46,7 @@ public class LineTool extends MapTool {
     public void mouseClicked(MouseEvent e) {
         super.mouseClicked(e);
 
-        FeatureLayer layer = getActiveFeatureLayerIfLeftClickOrShowMessage(e);
+        AbmFeatureLayer layer = getActiveFeatureLayerIfLeftClickOrShowMessage(e);
         if (layer == null) {
             return;
         }
@@ -74,7 +74,7 @@ public class LineTool extends MapTool {
                 SimpleFeature feat = builder.terminateLine(mainMapScreenToWorldCoordinate(e.getPoint()));
                 builder = null;
 
-                ReferencedEnvelope bounds = JTS.bounds(DefaultSimpleFeatureBuilder.getGeometry(feat), projectm.getProject().getCrs());
+                ReferencedEnvelope bounds = JTS.bounds(AbmSimpleFeatureBuilder.getGeometry(feat), projectm.getProject().getCrs());
 
                 deleteActiveLayerCache(bounds);
             }

@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.TileLayer;
+import org.abcmap.core.project.layers.AbmTileLayer;
 import org.abcmap.core.rendering.RenderingException;
 import org.abcmap.core.rendering.partials.RenderedPartialFactory;
 import org.abcmap.core.rendering.partials.RenderedPartialQueryResult;
@@ -46,7 +46,7 @@ public class PartialFactoryTest {
         Project project = Main.getProjectManager().getProject();
 
         // create a tile layer
-        TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 0);
+        AbmTileLayer layer = (AbmTileLayer) project.addNewTileLayer("Tile layer 1", true, 0);
 
         // TODO: get more realistic coordinates
         ArrayList<Coordinate> positions = new ArrayList();

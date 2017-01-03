@@ -5,7 +5,7 @@ import org.abcmap.TestUtils;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.TileLayer;
+import org.abcmap.core.project.layers.AbmTileLayer;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.referencing.FactoryException;
@@ -36,7 +36,7 @@ public class TileLayerTest {
         // create temp directories
         ProjectManager pman = Main.getProjectManager();
         Project project = pman.getProject();
-        TileLayer layer = (TileLayer) project.addNewTileLayer("Tile layer 1", true, 2);
+        AbmTileLayer layer = (AbmTileLayer) project.addNewTileLayer("Tile layer 1", true, 2);
 
         // add tiles to coverage
         Path tilesRoot = TestUtils.RESOURCES_DIRECTORY.resolve("tiles");

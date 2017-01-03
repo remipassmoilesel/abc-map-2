@@ -8,8 +8,8 @@ import org.abcmap.core.draw.builder.PolygonBuilder;
 import org.abcmap.core.events.DrawManagerEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
-import org.abcmap.core.project.layers.AbstractLayer;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.abcmap.gui.tools.MapTool;
@@ -64,7 +64,7 @@ public class DrawManager extends ManagerAccessUtility implements HasEventNotific
      */
     public LineBuilder getLineBuilder() {
 
-        FeatureLayer layer = getActiveFeatureLayerOrThrow();
+        AbmFeatureLayer layer = getActiveFeatureLayerOrThrow();
 
         LineBuilder builder = new LineBuilder(layer, getActiveStyle());
         return builder;
@@ -77,7 +77,7 @@ public class DrawManager extends ManagerAccessUtility implements HasEventNotific
      * @return
      */
     public PolygonBuilder getPolygonBuilder() {
-        FeatureLayer layer = getActiveFeatureLayerOrThrow();
+        AbmFeatureLayer layer = getActiveFeatureLayerOrThrow();
 
         PolygonBuilder builder = new PolygonBuilder(layer, getActiveStyle());
         return builder;
@@ -89,7 +89,7 @@ public class DrawManager extends ManagerAccessUtility implements HasEventNotific
      * @return
      */
     public PointBuilder getPointBuilder() {
-        FeatureLayer layer = getActiveFeatureLayerOrThrow();
+        AbmFeatureLayer layer = getActiveFeatureLayerOrThrow();
 
         PointBuilder builder = new PointBuilder(layer, getActiveStyle());
         return builder;
@@ -172,14 +172,14 @@ public class DrawManager extends ManagerAccessUtility implements HasEventNotific
      * @return
      * @throws DrawManagerException
      */
-    private FeatureLayer getActiveFeatureLayerOrThrow() throws IllegalStateException {
+    private AbmFeatureLayer getActiveFeatureLayerOrThrow() throws IllegalStateException {
 
-        AbstractLayer layer = projectm().getProject().getActiveLayer();
-        if (layer instanceof FeatureLayer == false) {
+        AbmAbstractLayer layer = projectm().getProject().getActiveLayer();
+        if (layer instanceof AbmFeatureLayer == false) {
             throw new IllegalStateException("Active layer is not a feature layer");
         }
 
-        return (FeatureLayer) layer;
+        return (AbmFeatureLayer) layer;
 
     }
 

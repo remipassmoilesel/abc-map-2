@@ -11,8 +11,9 @@ import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
 import org.abcmap.core.project.backup.ProjectBackupInterval;
-import org.abcmap.core.project.layers.AbstractLayer;
-import org.abcmap.core.project.layers.TileLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
+import org.abcmap.core.project.layers.AbmTileLayer;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -198,7 +199,7 @@ public class ProjectManager extends ManagerAccessUtility implements HasEventNoti
         if (id == null || id.equals(FAKE_PROJECT_1)) {
 
             // create a tile layer
-            TileLayer tileLayer = (TileLayer) fakeProject.addNewTileLayer("Tile layer 1", true, 0);
+            AbmTileLayer tileLayer = (AbmTileLayer) fakeProject.addNewTileLayer("Tile layer 1", true, 0);
 
             String imgPath = "/tiles/osm_large.png";
             InputStream res = ProjectManager.class.getResourceAsStream(imgPath);
@@ -219,7 +220,7 @@ public class ProjectManager extends ManagerAccessUtility implements HasEventNoti
             int featureNumber = 10;
             ReferencedEnvelope bounds = tileLayer.getBounds();
             PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
-            LineBuilder builder = new LineBuilder((org.abcmap.core.project.layers.FeatureLayer) fakeProject.getActiveLayer(), Main.getDrawManager().getActiveStyle());
+            LineBuilder builder = new LineBuilder((AbmFeatureLayer) fakeProject.getActiveLayer(), Main.getDrawManager().getActiveStyle());
             for (int i = 0; i < featureNumber; i++) {
                 builder.newLine(new Coordinate(rand.next(), rand.next()));
                 for (int j = 0; j < 5; j++) {
@@ -262,7 +263,7 @@ public class ProjectManager extends ManagerAccessUtility implements HasEventNoti
     /**
      * @param lay
      */
-    public void fireLayerChanged(AbstractLayer lay) {
+    public void fireLayerChanged(AbmAbstractLayer lay) {
         notifm.fireEvent(new ProjectEvent(ProjectEvent.LAYER_CHANGED, lay));
     }
 

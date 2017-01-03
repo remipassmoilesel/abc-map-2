@@ -6,7 +6,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.FeatureLayer;
+import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.utils.GeoUtils;
 import org.opengis.feature.simple.SimpleFeature;
@@ -24,14 +24,14 @@ import java.awt.geom.AffineTransform;
  * <p>
  * Temporary shapes (before confirmation) can be displayed with graphics by using draw() method
  */
-public abstract class AbstractFeatureBuilder {
+public abstract class AbmAbstractFeatureBuilder {
 
     protected final DrawManager drawm;
 
     /**
      * Feature builder associated with layer
      */
-    protected DefaultSimpleFeatureBuilder featureBuilder;
+    protected AbmSimpleFeatureBuilder featureBuilder;
 
     /**
      * Utility used to build geometries
@@ -46,7 +46,7 @@ public abstract class AbstractFeatureBuilder {
     /**
      * Layer where shape is drawn
      */
-    protected final FeatureLayer layer;
+    protected final AbmFeatureLayer layer;
 
     /**
      * Style container for current shape. Can be null.
@@ -65,7 +65,7 @@ public abstract class AbstractFeatureBuilder {
      *
      * @param layer
      */
-    public AbstractFeatureBuilder(FeatureLayer layer, StyleContainer style) {
+    public AbmAbstractFeatureBuilder(AbmFeatureLayer layer, StyleContainer style) {
 
         this.drawm = Main.getDrawManager();
         this.project = Main.getProjectManager().getProject();
@@ -137,7 +137,7 @@ public abstract class AbstractFeatureBuilder {
      */
     protected void throwIfNotDrawing() {
         if (isDrawing() == false) {
-            throw new ShapeBuilderException("Cannot perform this operation while not drawing");
+            throw new BuilderException("Cannot perform this operation while not drawing");
         }
     }
 
@@ -146,7 +146,7 @@ public abstract class AbstractFeatureBuilder {
      */
     protected void throwIfDrawing() {
         if (isDrawing() == true) {
-            throw new ShapeBuilderException("Cannot perform this operation while drawing");
+            throw new BuilderException("Cannot perform this operation while drawing");
         }
     }
 
@@ -155,7 +155,7 @@ public abstract class AbstractFeatureBuilder {
      *
      * @return
      */
-    protected FeatureLayer getCurrentLayer() {
+    protected AbmFeatureLayer getCurrentLayer() {
         return layer;
     }
 

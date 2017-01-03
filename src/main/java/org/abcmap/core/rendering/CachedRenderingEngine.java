@@ -6,7 +6,7 @@ import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbstractLayer;
+import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.rendering.partials.RenderedPartial;
 import org.abcmap.core.rendering.partials.RenderedPartialFactory;
 import org.abcmap.core.rendering.partials.RenderedPartialQueryResult;
@@ -145,7 +145,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         g2d.setColor(project.getBackgroundColor());
         g2d.fillRect(0, 0, renderedSizePx.width, renderedSizePx.height);
 
-        for (AbstractLayer lay : project.getLayersList()) {
+        for (AbmAbstractLayer lay : project.getLayersList()) {
 
             RenderedPartialQueryResult partialCtr = currentPartials.get(lay.getId());
 
@@ -258,7 +258,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             RenderedPartialQueryResult firstResults = null;
 
             // iterate layers, sorted by z-index
-            for (AbstractLayer lay : project.getLayersList()) {
+            for (AbmAbstractLayer lay : project.getLayersList()) {
 
                 String layId = lay.getId();
 

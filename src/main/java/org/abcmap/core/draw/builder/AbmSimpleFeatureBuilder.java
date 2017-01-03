@@ -12,7 +12,7 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
  * <p>
  * Features building is synchronized.
  */
-public class DefaultSimpleFeatureBuilder {
+public class AbmSimpleFeatureBuilder {
 
     public static final String ABCMAP_SPECIAL_FIELD_PREFIX = "abm_";
     public static final String GEOMETRY_ATTRIBUTE_NAME = ABCMAP_SPECIAL_FIELD_PREFIX + "geometry";
@@ -21,7 +21,7 @@ public class DefaultSimpleFeatureBuilder {
     private final SimpleFeatureBuilder builder;
     private final SimpleFeatureType currentFeatureType;
 
-    public DefaultSimpleFeatureBuilder(String featureName, CoordinateReferenceSystem crs) {
+    public AbmSimpleFeatureBuilder(String featureName, CoordinateReferenceSystem crs) {
         currentFeatureType = getDefaultFeatureType(featureName, crs);
         builder = new SimpleFeatureBuilder(currentFeatureType);
     }
