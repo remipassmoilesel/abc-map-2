@@ -11,12 +11,10 @@ import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.DrawManager;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MainManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbstractLayer;
-import org.abcmap.core.project.layers.FeatureLayer;
 import org.abcmap.core.rendering.CachedRenderingEngine;
-import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
@@ -101,7 +99,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     public CachedMapPane(Project p) {
         super(new MigLayout("fill"));
 
-        drawm = MainManager.getDrawManager();
+        drawm = Main.getDrawManager();
         this.acceptPaintFromTool = false;
 
         setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
@@ -120,7 +118,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         notifm.setDefaultListener((ev) -> {
 
             // new partials are ready, only repaint
-            if (CacheRenderingEvent.isNewPartialsEvent(ev)) {
+            if (CacheRenderingEvent.isNewPartialsEvent(ev) || CacheRenderingEvent.isPartialsUpdatedEvent(ev)) {
                 CachedMapPane.this.repaint();
             }
 
@@ -135,7 +133,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         renderingEngine.getNotificationManager().addObserver(this);
 
         // listen map modifications
-        MainManager.getProjectManager().getNotificationManager().addObserver(this);
+        Main.getProjectManager().getNotificationManager().addObserver(this);
 
         debugBoundsList = new ArrayList<>();
 
@@ -171,26 +169,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         if (acceptPaintFromTool && drawm.getCurrentTool() != null) {
             drawm.getCurrentTool().drawOnMainMap(g2d);
         }
-
-//        System.out.println();
-//        for (AbstractLayer lay : project.getLayersList()) {
-//
-//            System.out.println(lay + " " + lay.getInternalLayer().getFeatureSource().getSchema().getCoordinateReferenceSystem().toString().substring(0, 15));
-//
-//            if (lay instanceof FeatureLayer) {
-//                FeatureLayer flay = (FeatureLayer) lay;
-//                flay.executeVisit((feat) -> {
-//                    System.out.println(feat);
-//                    System.out.println(feat.getFeatureType().getCoordinateReferenceSystem().toString().substring(0, 15));
-//                    System.out.println(feat.getFeatureType().getCoordinateReferenceSystem().equals(GeoUtils.WGS_84));
-//                    System.out.println("feat.getFeatureType().getCoordinateReferenceSystem()");
-//                    System.out.println(feat.getFeatureType().getCoordinateReferenceSystem());
-//                    System.out.println("GeoUtils.WGS_84");
-//                    System.out.println(GeoUtils.WGS_84);
-//                    return true;
-//                });
-//            }
-//        }
 
     }
 

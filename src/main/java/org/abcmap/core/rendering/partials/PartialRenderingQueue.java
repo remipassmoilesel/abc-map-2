@@ -9,7 +9,9 @@ import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
+import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.lite.StreamingRenderer;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.TransformException;
@@ -39,6 +41,9 @@ class PartialRenderingQueue {
 
     private final MapContent mapContent;
     private final long queueId;
+
+    private final long updateIntervalMs;
+    private long lastUpdateRun;
 
     // debug information
     private boolean debugMode = true;
@@ -73,26 +78,53 @@ class PartialRenderingQueue {
         return false;
     }
 
+    /**
+     * Return number of partials waiting for rendering
+     *
+     * @return
+     */
     public static int getWaitingPartialsNumber() {
         return partialsInProgress.size();
     }
 
     private final StreamingRenderer renderer;
     private final RenderedPartialStore store;
-    private final Runnable toNotifyWhenPartialsCome;
+    private final Runnable toRunWhenPartialsUpdated;
     private final double renderedWidthPx;
     private final double renderedHeightPx;
 
     private ArrayList<PartialRenderingTask> tasks;
 
-    PartialRenderingQueue(MapContent content, RenderedPartialStore store, double renderedWidthPx, double renderedHeightPx, Runnable toNotifyWhenPartialsCome) {
+    PartialRenderingQueue(MapContent content, RenderedPartialStore store, double renderedWidthPx, double renderedHeightPx, Runnable toRunWhenPartialsUpdated) {
         this.tasks = new ArrayList<>();
         this.store = store;
         this.renderedWidthPx = renderedWidthPx;
         this.renderedHeightPx = renderedHeightPx;
-        this.toNotifyWhenPartialsCome = toNotifyWhenPartialsCome;
+        this.toRunWhenPartialsUpdated = toRunWhenPartialsUpdated;
         this.mapContent = content;
-        this.renderer = GeoUtils.buildRenderer();
+
+        this.updateIntervalMs = 50;
+        this.lastUpdateRun = -1;
+        this.renderer = GeoUtils.buildRenderer(new RenderListener() {
+            @Override
+            public void featureRenderer(SimpleFeature feature) {
+
+                // notify each time features are rendered, but not too much time
+                if (System.currentTimeMillis() - lastUpdateRun > updateIntervalMs) {
+                    try {
+                        toRunWhenPartialsUpdated.run();
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
+                    lastUpdateRun = System.currentTimeMillis();
+                }
+            }
+
+            @Override
+            public void errorOccurred(Exception e) {
+                logger.error(e);
+            }
+        });
         renderer.setMapContent(mapContent);
 
         queueNumber++;
@@ -147,6 +179,9 @@ class PartialRenderingQueue {
                         int imgWidth = (int) renderedWidthPx;
                         BufferedImage img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
 
+                        // set image now, to draw it on time
+                        part.setImage(img, imgWidth, imgWidth);
+
                         // get layer and CRS
                         Layer layer = mapContent.layers().get(0);
                         CoordinateReferenceSystem layerCrs = layer.getFeatureSource().getSchema().getCoordinateReferenceSystem();
@@ -170,9 +205,6 @@ class PartialRenderingQueue {
                         long before = System.currentTimeMillis();
                         renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), partialWorldBounds);
                         renderTime = System.currentTimeMillis() - before;
-
-                        // keep image
-                        part.setImage(img, imgWidth, imgWidth);
 
                         try {
                             store.addPartial(part);
@@ -231,8 +263,8 @@ class PartialRenderingQueue {
                     partialsInProgress.remove(part);
 
                     // notify of new tile arrival
-                    if (toNotifyWhenPartialsCome != null) {
-                        toNotifyWhenPartialsCome.run();
+                    if (toRunWhenPartialsUpdated != null) {
+                        toRunWhenPartialsUpdated.run();
                     }
                 }
             }

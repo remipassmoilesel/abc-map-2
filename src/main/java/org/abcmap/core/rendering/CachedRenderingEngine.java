@@ -293,8 +293,9 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 // search which partials are necessary to display
                 RenderedPartialQueryResult newPartials = factory.intersect(worldEnvelope, partialSideWu,
                         () -> {
+
                             // notify observers that new partials come
-                            fireNewPartialsLoaded();
+                            firePartialsUpdated();
 
                             // notify thread waiters that new partial come
                             synchronized (CachedRenderingEngine.this) {
@@ -326,8 +327,8 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         }
     }
 
-    private void fireNewPartialsLoaded() {
-        notifm.fireEvent(new CacheRenderingEvent(CacheRenderingEvent.NEW_PARTIALS_AVAILABLE));
+    private void firePartialsUpdated() {
+        notifm.fireEvent(new CacheRenderingEvent(CacheRenderingEvent.PARTIALS_UPDATED));
     }
 
     /**

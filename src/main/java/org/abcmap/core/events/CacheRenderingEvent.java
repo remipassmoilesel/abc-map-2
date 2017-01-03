@@ -7,7 +7,8 @@ import org.abcmap.core.events.manager.Event;
  */
 public class CacheRenderingEvent extends Event {
 
-    public static final String NEW_PARTIALS_AVAILABLE = "NEW_PARTIALS_AVAILABLE";
+    public static final String NEW_PARTIALS_ADDED = "NEW_PARTIALS_ADDED";
+    public static final String PARTIALS_UPDATED = "PARTIALS_UPDATED";
     public static final String PARTIALS_DELETED = "PARTIALS_DELETED";
 
     public CacheRenderingEvent(String name) {
@@ -23,8 +24,10 @@ public class CacheRenderingEvent extends Event {
     }
 
     public static boolean isNewPartialsEvent(Event ev) {
-        return testEvent(CacheRenderingEvent.class, NEW_PARTIALS_AVAILABLE, ev);
+        return testEvent(CacheRenderingEvent.class, NEW_PARTIALS_ADDED, ev);
     }
 
-
+    public static boolean isPartialsUpdatedEvent(Event ev) {
+        return testEvent(CacheRenderingEvent.class, PARTIALS_UPDATED, ev);
+    }
 }

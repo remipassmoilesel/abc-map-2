@@ -85,7 +85,7 @@ public class RenderedPartialFactory {
      * @return
      */
     public RenderedPartialQueryResult intersect(Point2D ulc, Dimension pixelDimension, double partialSideWu, CoordinateReferenceSystem crs,
-                                                Runnable toNotifyWhenPartialsCome) throws RenderingException {
+                                                Runnable toRunWhenPartialsUpdated) throws RenderingException {
 
         // check rendering values
         if (mapContent == null) {
@@ -113,7 +113,7 @@ public class RenderedPartialFactory {
         ReferencedEnvelope env = new ReferencedEnvelope(x1, x2, y1, y2, crs);
 
         // create a new envelope
-        return intersect(env, partialSideWu, toNotifyWhenPartialsCome);
+        return intersect(env, partialSideWu, toRunWhenPartialsUpdated);
 
     }
 
@@ -126,7 +126,7 @@ public class RenderedPartialFactory {
      * @return
      */
     public RenderedPartialQueryResult intersect(ReferencedEnvelope worldBounds, double partialSideWu,
-                                                Runnable toNotifyWhenPartialsCome) throws RenderingException {
+                                                Runnable toRunWhenPartialsUpdated) throws RenderingException {
 
         // check rendering values
         if (mapContent == null) {
@@ -150,7 +150,7 @@ public class RenderedPartialFactory {
         double x = getStartPointFrom(worldBounds.getMinX(), partialSideWu);
         double y = getStartPointFrom(worldBounds.getMinY(), partialSideWu);
 
-        PartialRenderingQueue renderingQueue = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toNotifyWhenPartialsCome);
+        PartialRenderingQueue renderingQueue = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toRunWhenPartialsUpdated);
         renderingQueue.setDebugMode(debugMode);
 
         // count how many tiles are already loaded

@@ -22,7 +22,6 @@ import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.*;
 import org.geotools.swing.JMapFrame;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
@@ -220,24 +219,22 @@ public class GeoUtils {
      * Return a streaming renderer
      */
     public static StreamingRenderer buildRenderer() {
+        return buildRenderer(null);
+    }
+
+    /**
+     * Return a streaming renderer
+     */
+    public static StreamingRenderer buildRenderer(RenderListener listener) {
 
         StreamingRenderer renderer = new StreamingRenderer();
 
         RenderingHints javaHints = new RenderingHints(GuiUtils.getQualityRenderingHints());
         renderer.setJava2DHints(javaHints);
 
-        renderer.addRenderListener(new RenderListener() {
-
-            @Override
-            public void featureRenderer(SimpleFeature feature) {
-//                System.out.println(feature);
-            }
-
-            @Override
-            public void errorOccurred(Exception e) {
-                System.out.println(e);
-            }
-        });
+        if (listener != null) {
+            renderer.addRenderListener(listener);
+        }
 
         return renderer;
     }
