@@ -2,6 +2,7 @@ package org.abcmap.gui.components.map;
 
 import com.vividsolutions.jts.awt.ShapeWriter;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.draw.builder.AffinePointTransformation;
 import org.abcmap.core.events.CacheRenderingEvent;
@@ -15,12 +16,21 @@ import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.rendering.CachedRenderingEngine;
+import org.abcmap.core.utils.FeatureUtils;
+import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
 import org.abcmap.gui.utils.GuiUtils;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.FeatureLayer;
+import org.geotools.map.MapContent;
+import org.geotools.renderer.lite.StreamingRenderer;
+import org.geotools.styling.Style;
+import org.geotools.styling.StyleFactory;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
 
@@ -42,6 +52,10 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
     private static final CustomLogger logger = LogManager.getLogger(CachedMapPane.class);
 
+    private final static StyleFactory sf = FeatureUtils.getStyleFactory();
+    private final static FilterFactory2 ff = FeatureUtils.getFilterFactory();
+    private final static GeometryFactory geom = GeoUtils.getGeometryFactory();
+
     /**
      * Project associated with this panel
      */
@@ -51,6 +65,19 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * Rendering engine associated with pane
      */
     private final CachedRenderingEngine renderingEngine;
+
+    /**
+     * Map content used to display features above all other layers
+     * <p>
+     * This content is in memory, features displayed here are more modifiable faster than in database.
+     */
+    private MapContent inMemoryMapContent;
+
+    /**
+     * Renderer used with mask content
+     */
+    private StreamingRenderer inMemoryLayerRenderer;
+
 
     /**
      * If set to true, panel will ask to current tool to paint if needed
@@ -63,9 +90,10 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     private boolean firstTimeRender;
 
     /**
-     * World envelope (positions) of map rendered on panel
+     * World envelope of map rendered on panel
      */
-    private ReferencedEnvelope currentWorlEnvelope;
+    // TODO: try to delete this field ?
+    private ReferencedEnvelope currentWorldEnvelope;
 
     /**
      * Various mouse listeners which allow user to control map with mouse
@@ -81,6 +109,10 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * If set to true, more information are displayed
      */
     private boolean debugMode;
+
+    /**
+     * If set tot true, layer bounds will be drawn (for debug purposes)
+     */
     private boolean drawLayerBounds;
 
     /**
@@ -135,9 +167,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // listen map modifications
         Main.getProjectManager().getNotificationManager().addObserver(this);
 
-        debugBoundsList = new ArrayList<>();
+        this.inMemoryLayerRenderer = GeoUtils.buildRenderer();
 
+        debugBoundsList = new ArrayList<>();
         setDebugMode(false);
+
     }
 
     @Override
@@ -159,6 +193,14 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // paint map
         renderingEngine.paint(g2d);
 
+        // paint mask
+        if (inMemoryMapContent != null) {
+            // do not use currentWorldEnvelope to prevent bad offsets
+            //maskRenderer.paint(g2d, new Rectangle(getSize()), currentWorldEnvelope);
+
+            inMemoryLayerRenderer.paint(g2d, new Rectangle(getSize()), renderingEngine.getWorldEnvelope());
+        }
+
         // if debug mode enabled, paint world envelope asked
         if (debugMode) {
             paintGrid(g2d);
@@ -173,85 +215,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     }
 
     /**
-     * Paint layers and project bounds
-     *
-     * @param g2d
-     */
-    private void paintBounds(Graphics2D g2d) {
-
-        if (drawLayerBounds == true) {
-            AffineTransform worldToScreenTransform = getWorldToScreenTransform();
-            ShapeWriter shapeWriter = new ShapeWriter(new AffinePointTransformation(worldToScreenTransform));
-
-            ArrayList<Integer> yPositions = new ArrayList<>();
-
-            int fontSize = 11;
-
-            for (Object[] o : debugBoundsList) {
-                g2d.setColor((Color) o[2]);
-                g2d.setStroke(new BasicStroke(2));
-                Shape shape = shapeWriter.toShape(JTS.toGeometry((Envelope) o[1]));
-                g2d.draw(shape);
-
-                int increment = (int) (fontSize * 2);
-                int yPos = (int) shape.getBounds().getMinY() - increment;
-                for (int i = 0; i < yPositions.size(); i++) {
-                    Integer cPos = yPositions.get(i);
-                    if (Math.abs(cPos - yPos) < increment / 2) {
-                        yPos -= increment;
-                    }
-                }
-                yPositions.add(yPos);
-
-                g2d.setColor(Color.white);
-                g2d.fillRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
-
-                g2d.setColor(Color.gray);
-                g2d.drawRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
-
-                g2d.setColor((Color) o[2]);
-                g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 11));
-                g2d.drawString(o[0].toString(), (int) shape.getBounds().getMinX(), yPos);
-            }
-        }
-
-    }
-
-    /**
-     * Prepare bounds to draw in debug mode
-     */
-    public void prepareBounds() {
-
-        debugBoundsList.clear();
-
-        if (drawLayerBounds == true) {
-
-            // add layers
-            for (AbmAbstractLayer layer : project.getLayersList()) {
-                try {
-                    debugBoundsList.add(new Object[]{
-                            "Layer: " + layer.getId(),
-                            layer.getBounds().transform(project.getCrs(), true),
-                            Utils.randColor()
-                    });
-                } catch (TransformException | FactoryException e) {
-                    logger.error(e);
-                }
-
-            }
-
-            // add project bounds
-            debugBoundsList.add(new Object[]{
-                    "Project bounds",
-                    project.getMaximumBounds(),
-                    Color.BLACK
-            });
-
-        }
-
-    }
-
-    /**
      * Paint grid for debug purposes
      *
      * @param g2d
@@ -261,8 +224,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         AffineTransform worldToScreenTransform = getWorldToScreenTransform();
         if (worldToScreenTransform != null) {
 
-            Point2D blc = new Point2D.Double(currentWorlEnvelope.getMinX(), currentWorlEnvelope.getMinY());
-            Point2D urc = new Point2D.Double(currentWorlEnvelope.getMaxX(), currentWorlEnvelope.getMaxY());
+            Point2D blc = new Point2D.Double(currentWorldEnvelope.getMinX(), currentWorldEnvelope.getMinY());
+            Point2D urc = new Point2D.Double(currentWorldEnvelope.getMaxX(), currentWorldEnvelope.getMaxY());
             blc = worldToScreenTransform.transform(blc, null);
             urc = worldToScreenTransform.transform(urc, null);
 
@@ -314,7 +277,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // prepare map to render
         try {
-            renderingEngine.prepareMap(currentWorlEnvelope, panelDimensions);
+            renderingEngine.prepareMap(currentWorldEnvelope, panelDimensions);
         } catch (Exception e) {
             logger.error(e);
         }
@@ -339,21 +302,44 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         Dimension panelDimensions = getSize();
 
         double coeffPx = panelDimensions.getWidth() / panelDimensions.getHeight();
-        double coeffWu = currentWorlEnvelope.getWidth() / currentWorlEnvelope.getHeight();
+        double coeffWu = currentWorldEnvelope.getWidth() / currentWorldEnvelope.getHeight();
 
         if (Math.abs(coeffPx - coeffWu) > 0.001) {
 
-            double widthWu = currentWorlEnvelope.getWidth();
+            double widthWu = currentWorldEnvelope.getWidth();
             double heightWu = widthWu / coeffPx;
 
-            double minx = currentWorlEnvelope.getMinX();
-            double miny = currentWorlEnvelope.getMinY();
-            double maxx = currentWorlEnvelope.getMaxX();
+            double minx = currentWorldEnvelope.getMinX();
+            double miny = currentWorldEnvelope.getMinY();
+            double maxx = currentWorldEnvelope.getMaxX();
             double maxy = miny + heightWu;
 
-            currentWorlEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorlEnvelope.getCoordinateReferenceSystem());
+            currentWorldEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorldEnvelope.getCoordinateReferenceSystem());
         }
 
+    }
+
+    /**
+     * Clear the special layer in memory
+     */
+    public void clearInMemoryLayer() {
+        inMemoryMapContent.dispose();
+        inMemoryMapContent = null;
+    }
+
+    /**
+     * Set content of a special layer, drawn over all others, where all features are stored in memory.
+     *
+     * @param featureCollection
+     * @param style
+     */
+    public void setInMemoryLayerContent(DefaultFeatureCollection featureCollection, Style style) {
+
+        FeatureLayer inMemoryLayer = new FeatureLayer(featureCollection, style);
+        this.inMemoryMapContent = new MapContent();
+        inMemoryMapContent.addLayer(inMemoryLayer);
+
+        inMemoryLayerRenderer.setMapContent(inMemoryMapContent);
     }
 
     /**
@@ -382,16 +368,16 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // zoom in
         if (direction > 0) {
 
-            double zoomStepW = currentWorlEnvelope.getWidth() / 10;
-            double zoomStepH = currentWorlEnvelope.getHeight() * zoomStepW / currentWorlEnvelope.getWidth();
+            double zoomStepW = currentWorldEnvelope.getWidth() / 10;
+            double zoomStepH = currentWorldEnvelope.getHeight() * zoomStepW / currentWorldEnvelope.getWidth();
 
-            minx = currentWorlEnvelope.getMinX() + zoomStepW;
-            maxx = currentWorlEnvelope.getMaxX() - zoomStepW;
+            minx = currentWorldEnvelope.getMinX() + zoomStepW;
+            maxx = currentWorldEnvelope.getMaxX() - zoomStepW;
 
-            miny = currentWorlEnvelope.getMinY() + zoomStepH;
-            maxy = currentWorlEnvelope.getMaxY() - zoomStepH;
+            miny = currentWorldEnvelope.getMinY() + zoomStepH;
+            maxy = currentWorldEnvelope.getMaxY() - zoomStepH;
 
-            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorlEnvelope.getCoordinateReferenceSystem());
+            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorldEnvelope.getCoordinateReferenceSystem());
         }
 
         // zoom out
@@ -399,16 +385,16 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
             // when zooming out, we need to have a 'zoom out step' greater than a 'zoom in step',
             // in order to restore previous envelope before zoom in, and reuse views in cache
-            double zoomStepW = currentWorlEnvelope.getWidth() / 8;
-            double zoomStepH = currentWorlEnvelope.getHeight() * zoomStepW / currentWorlEnvelope.getWidth();
+            double zoomStepW = currentWorldEnvelope.getWidth() / 8;
+            double zoomStepH = currentWorldEnvelope.getHeight() * zoomStepW / currentWorldEnvelope.getWidth();
 
-            minx = currentWorlEnvelope.getMinX() - zoomStepW;
-            maxx = currentWorlEnvelope.getMaxX() + zoomStepW;
+            minx = currentWorldEnvelope.getMinX() - zoomStepW;
+            maxx = currentWorldEnvelope.getMaxX() + zoomStepW;
 
-            miny = currentWorlEnvelope.getMinY() - zoomStepH;
-            maxy = currentWorlEnvelope.getMaxY() + zoomStepH;
+            miny = currentWorldEnvelope.getMinY() - zoomStepH;
+            maxy = currentWorldEnvelope.getMaxY() + zoomStepH;
 
-            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorlEnvelope.getCoordinateReferenceSystem());
+            newEnv = new ReferencedEnvelope(minx, maxx, miny, maxy, currentWorldEnvelope.getCoordinateReferenceSystem());
 
         }
 
@@ -418,7 +404,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         }
 
         if (newEnv.getWidth() < projectWorldWidth * maxZoomFactor) {
-            currentWorlEnvelope = newEnv;
+            currentWorldEnvelope = newEnv;
         }
 
         // check if envelope is proportional
@@ -459,10 +445,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         double miny = projectBounds.getMaxY() - heightWu;
         double maxy = projectBounds.getMaxY();
 
-        currentWorlEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, project.getCrs());
+        currentWorldEnvelope = new ReferencedEnvelope(minx, maxx, miny, maxy, project.getCrs());
 
-        // first time width: 3000px ?
-        //System.out.println("Reset display: " + getSize() + " / " + scale + " / " + worldEnvelope + "");
     }
 
     /**
@@ -617,11 +601,91 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
             throw new IllegalStateException("Coordinate Reference Systems are different: " + worldEnvelope.getCoordinateReferenceSystem() + " / " + project.getCrs());
         }
 
-        this.currentWorlEnvelope = worldEnvelope;
+        this.currentWorldEnvelope = worldEnvelope;
 
         // check if envelope is proportional
         checkWorldEnvelope();
     }
+
+    /**
+     * Paint layers and project bounds
+     *
+     * @param g2d
+     */
+    private void paintBounds(Graphics2D g2d) {
+
+        if (drawLayerBounds == true) {
+            AffineTransform worldToScreenTransform = getWorldToScreenTransform();
+            ShapeWriter shapeWriter = new ShapeWriter(new AffinePointTransformation(worldToScreenTransform));
+
+            ArrayList<Integer> yPositions = new ArrayList<>();
+
+            int fontSize = 11;
+
+            for (Object[] o : debugBoundsList) {
+                g2d.setColor((Color) o[2]);
+                g2d.setStroke(new BasicStroke(2));
+                Shape shape = shapeWriter.toShape(JTS.toGeometry((Envelope) o[1]));
+                g2d.draw(shape);
+
+                int increment = (int) (fontSize * 2);
+                int yPos = (int) shape.getBounds().getMinY() - increment;
+                for (int i = 0; i < yPositions.size(); i++) {
+                    Integer cPos = yPositions.get(i);
+                    if (Math.abs(cPos - yPos) < increment / 2) {
+                        yPos -= increment;
+                    }
+                }
+                yPositions.add(yPos);
+
+                g2d.setColor(Color.white);
+                g2d.fillRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
+
+                g2d.setColor(Color.gray);
+                g2d.drawRect((int) shape.getBounds().getMinX() - 5, yPos - fontSize - 5, 400, fontSize * 2);
+
+                g2d.setColor((Color) o[2]);
+                g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 11));
+                g2d.drawString(o[0].toString(), (int) shape.getBounds().getMinX(), yPos);
+            }
+        }
+
+    }
+
+    /**
+     * Prepare bounds to draw in debug mode
+     */
+    public void prepareBounds() {
+
+        debugBoundsList.clear();
+
+        if (drawLayerBounds == true) {
+
+            // add layers
+            for (AbmAbstractLayer layer : project.getLayersList()) {
+                try {
+                    debugBoundsList.add(new Object[]{
+                            "Layer: " + layer.getId(),
+                            layer.getBounds().transform(project.getCrs(), true),
+                            Utils.randColor()
+                    });
+                } catch (TransformException | FactoryException e) {
+                    logger.error(e);
+                }
+
+            }
+
+            // add project bounds
+            debugBoundsList.add(new Object[]{
+                    "Project bounds",
+                    project.getMaximumBounds(),
+                    Color.BLACK
+            });
+
+        }
+
+    }
+
 
     /**
      * If set to true, panel will ask to current tool to paint if needed
@@ -643,7 +707,10 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * @return
      */
     public ReferencedEnvelope getWorldEnvelope() {
-        return new ReferencedEnvelope(currentWorlEnvelope);
+
+        checkWorldEnvelope();
+
+        return new ReferencedEnvelope(currentWorldEnvelope);
     }
 
     @Override

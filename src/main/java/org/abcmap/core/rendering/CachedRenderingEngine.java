@@ -367,7 +367,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      * @return
      */
     public ReferencedEnvelope getWorldEnvelope() {
-        return worldEnvelope;
+        return new ReferencedEnvelope(worldEnvelope);
     }
 
     /**

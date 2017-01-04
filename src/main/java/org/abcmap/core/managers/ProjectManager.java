@@ -238,6 +238,8 @@ public class ProjectManager extends ManagerAccessUtility implements HasEventNoti
             fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes-ed50/france-communes-ed50.shp"));
             fakeProject.addNewShapeFileLayer(Paths.get("data/cinema/les_salles_de_cinemas_en_ile-de-france.shp"));
 
+
+            // Uncomment to add generated random content
             fakeProject.setActiveLayer(0);
 
             // populate feature layer with random features
@@ -253,6 +255,7 @@ public class ProjectManager extends ManagerAccessUtility implements HasEventNoti
                 }
                 builder.terminateLine(new Coordinate(rand.next(), rand.next()));
             }
+
         }
 
         // invalid argument
