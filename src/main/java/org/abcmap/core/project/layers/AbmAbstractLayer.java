@@ -13,6 +13,7 @@ import org.geotools.map.MapContent;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.opengis.filter.FilterFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
  * This object is a wrapper of Geotools layer
@@ -137,6 +138,17 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
     }
 
     /**
+     * Get coordinate reference system of layer.
+     * <p>
+     * Main CRS is the project CRS, but this CRS can be used to transform envelopes before apply them.
+     *
+     * @return
+     */
+    public CoordinateReferenceSystem getCrs() {
+        return getInternalLayer().getFeatureSource().getSchema().getCoordinateReferenceSystem();
+    }
+
+    /**
      * Return zindex of layer. 0 is bottom
      *
      * @return
@@ -154,6 +166,12 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
         indexEntry.setZindex(zindex);
     }
 
+    /**
+     * Compare layers between them, in order to sort it by z-order
+     *
+     * @param other
+     * @return
+     */
     @Override
     public int compareTo(AbmAbstractLayer other) {
 

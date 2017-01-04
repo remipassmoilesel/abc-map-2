@@ -1,5 +1,6 @@
 package org.abcmap.core.project.layers;
 
+import org.abcmap.core.draw.AbmDefaultFeatureType;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.Utils;
@@ -10,6 +11,7 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.styling.Rule;
 
+import java.awt.*;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -31,9 +33,13 @@ public class AbmShapeFileLayer extends AbmAbstractLayer {
         FileDataStore datastore = FileDataStoreFinder.getDataStore(shapeFile.toFile());
         this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource();
 
-        // add random style
-        Rule rule = FeatureUtils.createRuleFor(Utils.randColor(), null, 0.5f);
-        layerStyle.featureTypeStyles().add(sf.createFeatureTypeStyle(new Rule[]{rule}));
+        // add random color style
+        // TODO: detect type of feature and make corresponding style
+        Color color = Utils.randColor();
+        Rule rule1 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.LINE, color, null, 0.5f);
+        Rule rule2 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.POINT, color, null, 0.5f);
+        Rule rule3 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.POLYGON, color, null, 0.5f);
+        layerStyle.featureTypeStyles().add(sf.createFeatureTypeStyle(new Rule[]{rule1, rule2, rule3}));
 
         // create internal layer
         this.internalLayer = new FeatureLayer(featureStore, layerStyle);

@@ -1,5 +1,6 @@
 package org.abcmap.core.utils;
 
+import org.abcmap.core.draw.AbmDefaultFeatureType;
 import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.tiles.TileFeatureBuilder;
@@ -87,7 +88,7 @@ public class FeatureUtils {
     }
 
     /**
-     * Return a filter factory
+     * Return a filter factory (FilterFactory2)
      *
      * @return
      */
@@ -148,8 +149,9 @@ public class FeatureUtils {
             throw new NullPointerException("Feature cannot be null");
         }
 
-        return (String) feature.getAttribute(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME);
+        return AbmSimpleFeatureBuilder.getStyleId(feature);
     }
+
 
     /**
      * Return a map containing all attributes and values
@@ -179,7 +181,16 @@ public class FeatureUtils {
         store.getDataStore().dispose();
     }
 
-    public static Rule createRuleFor(Color foreground, Color background, double thick) {
+    /**
+     * Create a simple rule for specified geometry class
+     *
+     * @param foreground
+     * @param background
+     * @param thick
+     * @param type
+     * @return
+     */
+    public static Rule createRuleFor(AbmDefaultFeatureType type, Color foreground, Color background, double thick) {
 
         // create stroke and optional fill
         Stroke stroke = sf.stroke(ff.literal(foreground), null, null, null, null, null, null);
@@ -188,32 +199,51 @@ public class FeatureUtils {
             fill = sf.fill(null, ff.literal(background), ff.literal(1.0));
         }
 
-        // create point symbolizer
-        Mark mark = sf.getCircleMark();
-        mark.setStroke(stroke);
-        mark.setFill(fill);
+        // create rule for points
+        if (AbmDefaultFeatureType.POINT.equals(type)) {
 
-        Graphic graphic = sf.createDefaultGraphic();
-        graphic.graphicalSymbols().clear();
-        graphic.graphicalSymbols().add(mark);
-        graphic.setSize(ff.literal(thick));
+            // create point symbolizer
+            Mark mark = sf.getCircleMark();
+            mark.setStroke(stroke);
+            mark.setFill(fill);
 
-        // here we can specify name of geometry field. Set to null allow to not specify it
-        PointSymbolizer pointSym = sf.createPointSymbolizer(graphic, null);
+            Graphic graphic = sf.createDefaultGraphic();
+            graphic.graphicalSymbols().clear();
+            graphic.graphicalSymbols().add(mark);
+            graphic.setSize(ff.literal(thick));
 
-        // create line symbolizer
-        LineSymbolizer lineSym = sf.createLineSymbolizer(stroke, null);
+            PointSymbolizer pointSym = sf.createPointSymbolizer(graphic, null);
+            Rule r = sf.createRule();
+            r.symbolizers().add(pointSym);
 
-        // create polygon symbolizer
-        PolygonSymbolizer polygonSym = sf.createPolygonSymbolizer(stroke, fill, null);
+            return r;
+        }
 
-        // create rule
-        Rule r = sf.createRule();
-        r.symbolizers().add(pointSym);
-        r.symbolizers().add(lineSym);
-        r.symbolizers().add(polygonSym);
+        // create rule for lines
+        else if (AbmDefaultFeatureType.LINE.equals(type)) {
+            LineSymbolizer lineSym = sf.createLineSymbolizer(stroke, null);
+            Rule r = sf.createRule();
+            r.symbolizers().add(lineSym);
+            return r;
+        }
 
-        return r;
+        // create rule for polygon
+        else if (AbmDefaultFeatureType.POLYGON.equals(type)) {
+
+            // create polygon symbolizer
+            PolygonSymbolizer polygonSym = sf.createPolygonSymbolizer(stroke, fill, null);
+
+            // create rule
+            Rule r = sf.createRule();
+            r.symbolizers().add(polygonSym);
+
+            return r;
+        }
+
+        // unknown style
+        else {
+            throw new IllegalArgumentException("Unknown class: " + type);
+        }
 
     }
 }

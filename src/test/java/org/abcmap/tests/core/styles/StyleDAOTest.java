@@ -2,6 +2,7 @@ package org.abcmap.tests.core.styles;
 
 import org.abcmap.TestUtils;
 import org.abcmap.core.dao.StyleDAO;
+import org.abcmap.core.draw.AbmDefaultFeatureType;
 import org.abcmap.core.styles.StyleContainer;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -40,9 +41,9 @@ public class StyleDAOTest {
         StyleDAO dao = new StyleDAO(db);
 
         ArrayList<StyleContainer> stylePatterns = new ArrayList<>();
-        stylePatterns.add(new StyleContainer(Color.blue, Color.white, 5));
-        stylePatterns.add(new StyleContainer(Color.red, Color.blue, 51));
-        stylePatterns.add(new StyleContainer(Color.green, Color.white, 15));
+        stylePatterns.add(new StyleContainer(AbmDefaultFeatureType.LINE, Color.blue, Color.white, 5));
+        stylePatterns.add(new StyleContainer(AbmDefaultFeatureType.LINE, Color.red, Color.blue, 51));
+        stylePatterns.add(new StyleContainer(AbmDefaultFeatureType.LINE, Color.green, Color.white, 15));
 
         ArrayList<StyleContainer> written = new ArrayList<>();
 

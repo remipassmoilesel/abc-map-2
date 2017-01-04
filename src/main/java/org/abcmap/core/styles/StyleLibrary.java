@@ -1,5 +1,6 @@
 package org.abcmap.core.styles;
 
+import org.abcmap.core.draw.AbmDefaultFeatureType;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.layers.AbmAbstractLayer;
@@ -71,9 +72,9 @@ public class StyleLibrary {
      * @param thick
      * @return
      */
-    public StyleContainer getStyle(Color foreground, Color background, int thick) {
+    public StyleContainer getStyle(AbmDefaultFeatureType type, Color foreground, Color background, int thick) {
 
-        StyleContainer container = new StyleContainer(foreground, background, thick);
+        StyleContainer container = new StyleContainer(type, foreground, background, thick);
         int index = styleCollection.indexOf(container);
         if (index != -1) {
             return styleCollection.get(index);

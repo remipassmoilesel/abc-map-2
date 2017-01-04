@@ -1,10 +1,15 @@
 package org.abcmap.core.draw.builder;
 
 import com.vividsolutions.jts.geom.Geometry;
+import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.styling.StyleFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
+import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 /**
@@ -17,6 +22,9 @@ public class AbmSimpleFeatureBuilder {
     public static final String ABCMAP_SPECIAL_FIELD_PREFIX = "abm_";
     public static final String GEOMETRY_ATTRIBUTE_NAME = ABCMAP_SPECIAL_FIELD_PREFIX + "geometry";
     public static final String STYLE_ID_ATTRIBUTE_NAME = ABCMAP_SPECIAL_FIELD_PREFIX + "style_id";
+
+    private final static StyleFactory sf = FeatureUtils.getStyleFactory();
+    private final static FilterFactory2 ff = FeatureUtils.getFilterFactory();
 
     private final SimpleFeatureBuilder builder;
     private final SimpleFeatureType currentFeatureType;
@@ -49,6 +57,15 @@ public class AbmSimpleFeatureBuilder {
     }
 
     /**
+     * Return current feature type
+     *
+     * @return
+     */
+    public SimpleFeatureType getCurrentFeatureType() {
+        return currentFeatureType;
+    }
+
+    /**
      * Get the default feature type, with geometry, a secondary identifier and a style ID.
      * <p>
      *
@@ -67,11 +84,43 @@ public class AbmSimpleFeatureBuilder {
         return tbuilder.buildFeatureType();
     }
 
+    /**
+     * Return geometry associated with a default feature
+     *
+     * @return
+     */
+    public static Filter getGeometryFilter(ReferencedEnvelope envelope) {
+        return ff.bbox(ff.property(GEOMETRY_ATTRIBUTE_NAME), envelope);
+    }
+
+    /**
+     * Return geometry associated with a default feature
+     *
+     * @param feat
+     * @return
+     */
     public static Geometry getGeometry(SimpleFeature feat) {
+
+        if (feat == null) {
+            throw new NullPointerException("Feature cannot be null");
+        }
+
         return (Geometry) feat.getAttribute(GEOMETRY_ATTRIBUTE_NAME);
     }
 
-    public SimpleFeatureType getCurrentFeatureType() {
-        return currentFeatureType;
+
+    /**
+     * Return style id of specified DefaultSimpleFeature
+     *
+     * @param feature
+     * @return
+     */
+    public static String getStyleId(SimpleFeature feature) {
+
+        if (feature == null) {
+            throw new NullPointerException("Feature cannot be null");
+        }
+
+        return (String) feature.getAttribute(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME);
     }
 }

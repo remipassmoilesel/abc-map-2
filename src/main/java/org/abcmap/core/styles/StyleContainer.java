@@ -4,10 +4,13 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
+import org.abcmap.core.draw.AbmDefaultFeatureType;
 import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.Utils;
-import org.geotools.styling.*;
+import org.geotools.styling.Rule;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 
@@ -21,12 +24,14 @@ import java.util.Objects;
 @DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "STYLES")
 public class StyleContainer implements DataModel {
 
+    private static final CustomLogger logger = LogManager.getLogger(StyleContainer.class);
     private final static FilterFactory ff = FeatureUtils.getFilterFactory();
 
     private static final String ID_FIELD_NAME = "ID";
     private static final String FOREGROUND_FIELD_NAME = "FOREGROUND";
     private static final String BACKGROUND_FIELD_NAME = "BACKGROUND";
     private static final String THICK_FIELD_NAME = "THICK";
+    private static final String GEOMETRY_NAME_FIELD_NAME = "GEOMETRY_NAME";
 
     @DatabaseField(id = true, columnName = ID_FIELD_NAME)
     private Long id;
@@ -40,24 +45,29 @@ public class StyleContainer implements DataModel {
     @DatabaseField(columnName = THICK_FIELD_NAME)
     private int thick;
 
+    @DatabaseField(columnName = GEOMETRY_NAME_FIELD_NAME)
+    private String geometryName;
+
     private Rule rule;
 
     public StyleContainer() {
 
     }
 
-    public StyleContainer(Color foreground, Color background, int thick) {
+    public StyleContainer(AbmDefaultFeatureType type, Color foreground, Color background, int thick) {
         this.foreground = Utils.colorToString(foreground);
         this.background = Utils.colorToString(background);
         this.thick = thick;
+        this.geometryName = type.toString();
         generateId();
     }
 
     public StyleContainer(StyleContainer other) {
-        this.id = other.id;
         this.foreground = other.foreground;
         this.background = other.background;
         this.thick = other.thick;
+        this.geometryName = other.geometryName;
+        generateId();
     }
 
     /**
@@ -99,6 +109,14 @@ public class StyleContainer implements DataModel {
      */
     public int getThick() {
         return thick;
+    }
+
+    public String getGeometryName() {
+        return geometryName;
+    }
+
+    public void setGeometryName(String geometryName) {
+        this.geometryName = geometryName;
     }
 
     /**
@@ -150,7 +168,8 @@ public class StyleContainer implements DataModel {
      */
     public static Rule generateRule(StyleContainer container) {
 
-        Rule rule = FeatureUtils.createRuleFor(container.getForeground(), container.getBackground(), container.getThick());
+        AbmDefaultFeatureType type = AbmDefaultFeatureType.valueOf(container.getGeometryName());
+        Rule rule = FeatureUtils.createRuleFor(type, container.getForeground(), container.getBackground(), container.getThick());
 
         // apply on specified id
         Filter filter = ff.equal(ff.property(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME), ff.literal(container.getId()), true);

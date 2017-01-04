@@ -7,6 +7,7 @@ import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.jdbc.JDBCDataStore;
 import org.opengis.feature.simple.SimpleFeature;
@@ -181,6 +182,16 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
     }
 
     /**
+     * Return collection of feature corresponding to this filter
+     *
+     * @param filter
+     * @return
+     */
+    public FeatureCollection getFeatures(Filter filter) throws IOException {
+        return getInternalLayer().getFeatureSource().getFeatures(filter);
+    }
+
+    /**
      * Return selected features or null if nothing found
      */
     public SimpleFeature getFeatureById(String id) {
@@ -211,7 +222,13 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
         }
     }
 
+    /**
+     * Return feature builder used in this layer. This feature builder has a special type name, corresponding to layer ID.
+     *
+     * @return
+     */
     public AbmSimpleFeatureBuilder getFeatureBuilder() {
         return featureBuilder;
     }
+
 }

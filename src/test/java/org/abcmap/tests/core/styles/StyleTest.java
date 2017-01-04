@@ -1,6 +1,7 @@
 package org.abcmap.tests.core.styles;
 
 import org.abcmap.TestUtils;
+import org.abcmap.core.draw.AbmDefaultFeatureType;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
@@ -41,7 +42,7 @@ public class StyleTest {
 
         SimpleFeatureType wrongType = tbuilder.buildFeatureType();
         SimpleFeatureBuilder fb = new SimpleFeatureBuilder(wrongType);
-        StyleContainer style = new StyleContainer(Color.black, Color.white, 5);
+        StyleContainer style = new StyleContainer(AbmDefaultFeatureType.LINE, Color.black, Color.white, 5);
 
         boolean styleApplied = false;
         try {
@@ -64,8 +65,8 @@ public class StyleTest {
         StyleLibrary styleLib = project.getStyleLibrary();
 
         // style cache test
-        StyleContainer style1 = styleLib.getStyle(Color.black, Color.blue, 5);
-        StyleContainer style2 = styleLib.getStyle(Color.black, Color.blue, 5);
+        StyleContainer style1 = styleLib.getStyle(AbmDefaultFeatureType.LINE, Color.black, Color.blue, 5);
+        StyleContainer style2 = styleLib.getStyle(AbmDefaultFeatureType.LINE, Color.black, Color.blue, 5);
 
         assertTrue("Style cache test", style1 == style2);
 

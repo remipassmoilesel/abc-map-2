@@ -1,5 +1,6 @@
 package org.abcmap.core.project;
 
+import org.abcmap.core.draw.AbmDefaultFeatureType;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.layers.*;
@@ -473,8 +474,16 @@ public class Project {
         return Objects.hash(styleLibrary, layouts, finalPath, mainLayersList, metadataContainer, crs);
     }
 
-    public StyleContainer getStyle(Color activeForeground, Color activeBackground, int activeThick) {
-        return getStyleLibrary().getStyle(activeForeground, activeBackground, activeThick);
+    /**
+     * Get style corresponding to arguments, from style library
+     *
+     * @param activeForeground
+     * @param activeBackground
+     * @param activeThick
+     * @return
+     */
+    public StyleContainer getStyle(AbmDefaultFeatureType type, Color activeForeground, Color activeBackground, int activeThick) {
+        return getStyleLibrary().getStyle(type, activeForeground, activeBackground, activeThick);
     }
 
     /**
