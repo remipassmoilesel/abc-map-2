@@ -203,7 +203,8 @@ public class RenderedPartialStore implements HasEventNotificationManager {
         // several partials covering the same area can be added from different threads
         // and unfortunately, ORM lite doesn't support multiple column primary key.
         if (results.size() > 1) {
-            new SQLException("More than one result found: " + results.size()).printStackTrace();
+            SQLException ex = new SQLException("More than one result found: " + results.size() + " : " + part);
+            logger.error(ex);
         }
 
         // one result found, prepare it and return it

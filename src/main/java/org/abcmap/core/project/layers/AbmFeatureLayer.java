@@ -17,9 +17,7 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.identity.Identifier;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by remipassmoilesel on 16/11/16.
@@ -144,6 +142,15 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
      * @param features
      */
     public void removeFeatures(SimpleFeature... features) {
+        removeFeatures(Arrays.asList(features));
+    }
+
+    /**
+     * Remove features from layer
+     *
+     * @param features
+     */
+    public void removeFeatures(List<SimpleFeature> features) {
 
         // create a set
         HashSet<Identifier> ids = new HashSet<>();

@@ -24,7 +24,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Render a map by cut it in several partials. When partials are rendered,
- * they are stored in database in order to avoid resource consumption.
+ * they are stored in database in order to be reused, to prevent resources consumption.
  */
 public class CachedRenderingEngine implements HasEventNotificationManager {
 
@@ -96,7 +96,22 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      */
     private Dimension renderedSizePx;
 
+    /**
+     * Utility used to trasnform coordinates from world bounds to screen bounds.
+     * <p>
+     * This utility use different world bounds than those are requested to render, because
+     * <p>
+     * rendered bounds are always greater
+     */
     private AffineTransform worldToScreenTransform;
+
+    /**
+     * Utility used to trasnform coordinates from screen bounds to world bounds.
+     * <p>
+     * This utility use different world bounds than those are requested to render, because
+     * <p>
+     * rendered bounds are always greater
+     */
     private AffineTransform screenToWorldTransform;
 
     private final EventNotificationManager notifm;
@@ -118,7 +133,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         this.renderedSizePx = new Dimension(1000, 1000);
         this.partialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX()) / 2;
 
-        // listen partial store changes
+        // listen partial store changes and retransmit events
         this.notifm = new EventNotificationManager(this);
         notifm.setDefaultListener((ev) -> {
             // TODO: check if event concern current area
@@ -288,6 +303,12 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                     factory.setMapContent(map);
 
                     project.deleteCacheForLayer(layId, null);
+                }
+
+                // stop eventual previous rendering tasks, if they are not in current result
+                RenderedPartialQueryResult oldPartials = currentPartials.get(layId);
+                if (oldPartials != null) {
+                    oldPartials.stopRendering();
                 }
 
                 // search which partials are necessary to display

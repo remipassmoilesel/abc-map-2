@@ -8,7 +8,6 @@ import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.TransformException;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -161,6 +160,7 @@ public class RenderedPartialFactory {
         double maxY = worldBounds.getMaxY();
 
         // this can be interesting to load partials before user need it
+        // (but maybe we have to load extra partials *after*)
         //double maxX = worldBounds.getMaxX() + partialSideWu;
         //double maxY = worldBounds.getMaxY() + partialSideWu;
         //x -= partialSideWu;
@@ -227,15 +227,14 @@ public class RenderedPartialFactory {
 
         }
 
-        // launch tasks to retrieve or produce partial in a separated thread, if needed
-        if (renderingQueue.size() > 0) {
-            renderingQueue.start();
-        }
 
         // if not enough tiles, return null to avoid errors on transformations
         if (rsparts.size() < 1) {
             return null;
         }
+
+        // launch tasks to retrieve or produce partial in a separated thread
+        renderingQueue.start();
 
         double w = worldBounds.getWidth();
         double h = worldBounds.getHeight();
@@ -270,10 +269,20 @@ public class RenderedPartialFactory {
         return Math.round((coord - mod) * 10000.0) / 10000.0;
     }
 
+    /**
+     * Return the size of partial in world unit
+     *
+     * @return
+     */
     public double getPartialSideWu() {
         return partialSideWu;
     }
 
+    /**
+     * Return the size of partial in pixel
+     *
+     * @return
+     */
     public double getPartialSidePx() {
         return partialSidePx;
     }

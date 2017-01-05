@@ -30,6 +30,7 @@ import org.geotools.map.MapContent;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
@@ -166,8 +167,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // listen map modifications
         Main.getProjectManager().getNotificationManager().addObserver(this);
-
-        this.inMemoryLayerRenderer = GeoUtils.buildRenderer();
 
         debugBoundsList = new ArrayList<>();
         setDebugMode(false);
@@ -323,8 +322,30 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * Clear the special layer in memory
      */
     public void clearInMemoryLayer() {
-        inMemoryMapContent.dispose();
-        inMemoryMapContent = null;
+
+        if (inMemoryMapContent != null) {
+
+            // stop rendering
+            inMemoryLayerRenderer.stopRendering();
+            inMemoryLayerRenderer = null;
+
+            // clear map content
+            inMemoryMapContent.dispose();
+            inMemoryMapContent = null;
+
+        }
+    }
+
+    /**
+     * Set content of a special layer, drawn over all others, where all features are stored in memory.
+     *
+     * @param collection
+     * @param style
+     */
+    public void setInMemoryLayerContent(ArrayList<SimpleFeature> collection, Style style) {
+        DefaultFeatureCollection featColl = new DefaultFeatureCollection();
+        featColl.addAll(collection);
+        setInMemoryLayerContent(featColl, style);
     }
 
     /**
@@ -335,11 +356,24 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     public void setInMemoryLayerContent(DefaultFeatureCollection featureCollection, Style style) {
 
+        clearInMemoryLayer();
+
+        //
+        // We must create a new map content and a new renderer each time, to prevent errors in renderer
+        //
+
+        // create a renderer
+        inMemoryLayerRenderer = GeoUtils.buildRenderer();
+
+        // create a new layer from collection
         FeatureLayer inMemoryLayer = new FeatureLayer(featureCollection, style);
-        this.inMemoryMapContent = new MapContent();
+
+        // create a new map content
+        inMemoryMapContent = new MapContent();
         inMemoryMapContent.addLayer(inMemoryLayer);
 
         inMemoryLayerRenderer.setMapContent(inMemoryMapContent);
+
     }
 
     /**

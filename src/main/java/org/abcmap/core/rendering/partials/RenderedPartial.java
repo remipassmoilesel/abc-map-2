@@ -77,6 +77,7 @@ public class RenderedPartial {
         this.layerId = layerId;
         this.databaseId = -1;
         this.outdated = false;
+
         setImage(image, renderedWidth, renderedHeight);
     }
 

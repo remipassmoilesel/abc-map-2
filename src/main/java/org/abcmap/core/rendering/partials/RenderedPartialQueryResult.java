@@ -39,6 +39,13 @@ public class RenderedPartialQueryResult {
 
     }
 
+    /**
+     * Return a world to screen transform object corresponding to result set area.
+     * <p>
+     * Result set area can be greater than area asked.
+     *
+     * @return
+     */
     public AffineTransform getWorldToScreenTransform() {
         if (worldToScreenTransform == null) {
             worldToScreenTransform = RendererUtilities.worldToScreenTransform(worldBounds, screenBounds);
@@ -46,6 +53,13 @@ public class RenderedPartialQueryResult {
         return worldToScreenTransform;
     }
 
+    /**
+     * Return a screen to world transform object corresponding to result set area.
+     * <p>
+     * Result set area can be greater than area asked.
+     *
+     * @return
+     */
     public AffineTransform getScreenToWorldTransform() {
         if (screenToWorldTransform == null) {
             try {
@@ -57,19 +71,35 @@ public class RenderedPartialQueryResult {
         return screenToWorldTransform;
     }
 
+    /**
+     * Return number of partials already loaded (not being loaded from database or rendering) in this result set
+     *
+     * @return
+     */
     public int getPartialsLoaded() {
         return partialsLoaded;
     }
 
-    public boolean isRenderProcessFinished() {
-        return renderingQueue.isFinished();
-    }
-
+    /**
+     * @return
+     */
     public ArrayList<RenderedPartial> getPartials() {
         return partials;
     }
 
+    /**
+     * Return true if rendering process is finished
+     *
+     * @return
+     */
     public boolean isWorkDone() {
         return renderingQueue.isFinished();
+    }
+
+    /**
+     * Stop current rendering, as soon as possible
+     */
+    public void stopRendering() {
+        renderingQueue.stopRendering();
     }
 }

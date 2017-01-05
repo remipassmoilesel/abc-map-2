@@ -24,11 +24,11 @@ import java.util.ArrayList;
 /**
  * Represent a succession of partial rendering operations
  * <p>
- * Each time a map is renderer, all partial rendering operations are stored in this object to be executed in a separated thread.
- * <p>
- * Each queue have his own StreamingRenderer to avoid multi-threading issues
+ * Each time a map is renderer, all partial rendering operations are stored in this object to be executed in separated threads.
  */
 class PartialRenderingQueue {
+
+    private static final CustomLogger logger = LogManager.getLogger(ListenerHandler.class);
 
     /**
      * List of partials which processing is already scheduled
@@ -37,13 +37,65 @@ class PartialRenderingQueue {
      */
     private static final ArrayList<RenderedPartial> partialsInProgress = new ArrayList<>(10);
 
-    private static final CustomLogger logger = LogManager.getLogger(ListenerHandler.class);
+    /**
+     * If true, Geotools renderer is active
+     */
+    private boolean renderingActive;
 
+    /**
+     * If set to true, rendering will be stopped as soon as possible
+     */
+    private boolean stopRendering;
+
+    /**
+     * Map content associated with rendering queue
+     */
     private final MapContent mapContent;
+
+    /**
+     * Debug id
+     */
     private final long queueId;
 
+    /**
+     * Interval in ms between two execution of optional update callback
+     */
     private final long updateIntervalMs;
+
+    /**
+     * Indicator of last time of execution of update callback
+     */
     private long lastUpdateRun;
+
+    /**
+     * Geotools renderer associated with Partial rendering queue
+     */
+    private final StreamingRenderer renderer;
+
+    /**
+     * Store where rendered partial are keep.
+     */
+    private final RenderedPartialStore store;
+
+    /**
+     * Optional callback called every time an update occur to partial
+     */
+    private final Runnable toRunWhenPartialsUpdated;
+
+    /**
+     * Rendered dimension
+     */
+    private final double renderedWidthPx;
+
+    /**
+     * Rendered dimension
+     */
+    private final double renderedHeightPx;
+
+    /**
+     * List of tasks to render
+     */
+    private ArrayList<PartialRenderingTask> tasks;
 
     // debug information
     private boolean debugMode = true;
@@ -52,10 +104,188 @@ class PartialRenderingQueue {
     private static Font debugFont = new Font("Dialog", Font.BOLD, debugFontSize);
 
     private static long queueNumber = 0;
-    private static long loadedFromDatabase = 0;
-    private static long renderedPartials = 0;
+    private static long partialsLoadedFromDatabase = 0;
+    private static long partialsRendered = 0;
     private static long taskNumber = 0;
 
+    PartialRenderingQueue(MapContent content, RenderedPartialStore store, double renderedWidthPx,
+                          double renderedHeightPx, Runnable toRunWhenPartialsUpdated) {
+
+        queueNumber++;
+        this.queueId = queueNumber;
+
+        this.stopRendering = false;
+
+        this.tasks = new ArrayList<>();
+        this.store = store;
+        this.renderedWidthPx = renderedWidthPx;
+        this.renderedHeightPx = renderedHeightPx;
+        this.toRunWhenPartialsUpdated = toRunWhenPartialsUpdated;
+        this.mapContent = content;
+
+        this.updateIntervalMs = 50;
+        this.lastUpdateRun = -1;
+
+        this.renderingActive = false;
+
+        this.renderer = GeoUtils.buildRenderer(new RenderListener() {
+            @Override
+            public void featureRenderer(SimpleFeature feature) {
+
+                // notify each time features are rendered, but not too much time
+                if (System.currentTimeMillis() - lastUpdateRun > updateIntervalMs) {
+                    try {
+                        if (toRunWhenPartialsUpdated != null) {
+                            toRunWhenPartialsUpdated.run();
+                        }
+                    } catch (Exception e) {
+                        logger.error(e);
+                    }
+                    lastUpdateRun = System.currentTimeMillis();
+                }
+            }
+
+            @Override
+            public void errorOccurred(Exception e) {
+                logger.error(e);
+            }
+        });
+        renderer.setMapContent(mapContent);
+
+
+    }
+
+    /**
+     * Add a partial to this queue. An image will be added to this partial,
+     * <p>
+     * extracted from database or a new rendered one if nothing is found.
+     *
+     * @param part
+     */
+    public void addTask(RenderedPartial part) {
+
+        partialsInProgress.add(part);
+
+        // set partial outdated on start, in case rendering is stopped
+        part.setOutdated(true);
+
+        this.tasks.add(new PartialRenderingTask(part));
+
+    }
+
+    /**
+     * Start processing queue in a separated thread
+     */
+    public void start() {
+        ThreadManager.runLater(() -> {
+
+            // iterate tasks to render
+            for (PartialRenderingTask task : tasks) {
+
+                // run task
+                try {
+                    task.run();
+                } catch (Exception e) {
+                    logger.error(e);
+                }
+
+                task.markAsFinished();
+
+                // stop all if requested, and mark partial as outdated
+                if (stopRendering == true) {
+                    task.getPartial().setOutdated(true);
+                    break;
+                }
+
+                // else mark partial as up to date
+                else {
+                    task.getPartial().setOutdated(false);
+                }
+            }
+        });
+    }
+
+
+    /**
+     * Stop rendering, as soon as possible
+     */
+    public void stopRendering() {
+
+        // activate flag
+        stopRendering = true;
+
+        if (debugMode) {
+            logger.warning("Stop rendering. Queue:  " + queueId + " Task: " + taskNumber);
+        }
+
+        // remove all current partials from list
+        for (PartialRenderingTask task : new ArrayList<>(tasks)) {
+            partialsInProgress.remove(task.getPartial());
+        }
+
+        // stop eventual current rendering
+        if (renderingActive) {
+            try {
+                renderer.stopRendering();
+            } catch (Exception e) {
+                // sometimes exceptions are raised when stop
+                logger.error(e);
+            }
+
+            renderingActive = false;
+        }
+
+    }
+
+    /**
+     * Return true if all rendering tasks are finished
+     *
+     * @return
+     */
+    public boolean isFinished() {
+        for (PartialRenderingTask task : tasks) {
+            if (task.isFinished() == false) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Return number of task that queue have to process
+     *
+     * @return
+     */
+    public int size() {
+        return tasks.size();
+    }
+
+    /**
+     * If set to true, more information will be displayed
+     *
+     * @param debugMode
+     */
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+
+    /**
+     * Return number of partials loaded from database
+     *
+     * @return
+     */
+    public static long getPartialsLoadedFromDatabase() {
+        return partialsLoadedFromDatabase;
+    }
+
+    /**
+     * Return number of partials rendered
+     *
+     * @return
+     */
+    public static long getPartialsRendered() {
+        return partialsRendered;
+    }
 
     /**
      * Return true if specified partial should be processed soon
@@ -87,237 +317,219 @@ class PartialRenderingQueue {
         return partialsInProgress.size();
     }
 
-    private final StreamingRenderer renderer;
-    private final RenderedPartialStore store;
-    private final Runnable toRunWhenPartialsUpdated;
-    private final double renderedWidthPx;
-    private final double renderedHeightPx;
-
-    private ArrayList<PartialRenderingTask> tasks;
-
-    PartialRenderingQueue(MapContent content, RenderedPartialStore store, double renderedWidthPx, double renderedHeightPx, Runnable toRunWhenPartialsUpdated) {
-        this.tasks = new ArrayList<>();
-        this.store = store;
-        this.renderedWidthPx = renderedWidthPx;
-        this.renderedHeightPx = renderedHeightPx;
-        this.toRunWhenPartialsUpdated = toRunWhenPartialsUpdated;
-        this.mapContent = content;
-
-        this.updateIntervalMs = 50;
-        this.lastUpdateRun = -1;
-        this.renderer = GeoUtils.buildRenderer(new RenderListener() {
-            @Override
-            public void featureRenderer(SimpleFeature feature) {
-
-                // notify each time features are rendered, but not too much time
-                if (System.currentTimeMillis() - lastUpdateRun > updateIntervalMs) {
-                    try {
-                        toRunWhenPartialsUpdated.run();
-                    } catch (Exception e) {
-                        logger.error(e);
-                    }
-                    lastUpdateRun = System.currentTimeMillis();
-                }
-            }
-
-            @Override
-            public void errorOccurred(Exception e) {
-                logger.error(e);
-            }
-        });
-        renderer.setMapContent(mapContent);
-
-        queueNumber++;
-        queueId = queueNumber;
-
-    }
-
     /**
-     * Add a partial to this queue. An image will be added to this partial, extracted from database or a new rendered one if nothing is found.
-     *
-     * @param part
+     * Special runnable used to render partials
      */
-    public void addTask(RenderedPartial part) {
+    private class PartialRenderingTask implements Runnable {
 
-        partialsInProgress.add(part);
+        private static final byte INITIALIZED = 0;
+        private static final byte FINISHED = 1;
 
-        this.tasks.add(new PartialRenderingTask() {
+        /**
+         * Current status of partial
+         */
+        protected byte status;
 
-            @Override
-            public void run() {
+        /**
+         * Partial we have to render
+         */
+        private final RenderedPartial partial;
+
+        PartialRenderingTask(RenderedPartial partial) {
+            this.status = INITIALIZED;
+            this.partial = partial;
+        }
+
+        /**
+         * Rendering task
+         */
+        @Override
+        public void run() {
+
+            //
+            // Never return before removing current tile from inProgressList()
+            // >> Use finally() clause below
+            //
+            try {
 
                 GuiUtils.throwIfOnEDT();
 
                 taskNumber++;
 
                 if (debugMode) {
-                    //logger.warning("Launching rendering task. Queue:  " + queueId + " Task: " + taskNumber);
+                    logger.warning("Launching rendering task. Queue:  " + queueId + " Task: " + taskNumber);
                 }
 
+                // stop rendering if needed
+                if (stopRendering == true) {
+                    return;
+                }
+
+                // try to find existing partial in database
+                boolean loadedFromDatabase = false;
+                long renderTime = -1;
                 try {
-                    // try to find existing partial in database
-                    boolean loadedFromDatabase = false;
-                    long renderTime = -1;
-                    try {
-                        loadedFromDatabase = store.updatePartialFromDatabase(part);
-                    } catch (SQLException e) {
-                        logger.error(e);
+                    loadedFromDatabase = store.updatePartialFromDatabase(partial);
+                } catch (SQLException e) {
+                    logger.error(e);
+                }
+
+                // partial have been successful loaded
+                if (loadedFromDatabase == true) {
+                    partialsLoadedFromDatabase++;
+                }
+
+                // partial cannot be loaded, create a new one
+                else {
+
+                    // stop rendering if needed
+                    if (stopRendering == true) {
+                        return;
                     }
 
-                    if (loadedFromDatabase == true) {
-                        PartialRenderingQueue.loadedFromDatabase++;
-                    }
+                    ReferencedEnvelope partialWorldBounds = partial.getEnvelope();
 
-                    // or create a new one
-                    else {
+                    // create an image, and renderer map
+                    int imgWidth = (int) renderedWidthPx;
+                    BufferedImage img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
 
-                        renderedPartials++;
+                    // set image now, to draw it on time
+                    partial.setImage(img, imgWidth, imgWidth);
 
-                        ReferencedEnvelope partialWorldBounds = part.getEnvelope();
+                    // get layer and CRS
+                    Layer layer = mapContent.layers().get(0);
+                    CoordinateReferenceSystem layerCrs = layer.getFeatureSource().getSchema().getCoordinateReferenceSystem();
 
-                        // create an image, and renderer map
-                        int imgWidth = (int) renderedWidthPx;
-                        BufferedImage img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
-
-                        // set image now, to draw it on time
-                        part.setImage(img, imgWidth, imgWidth);
-
-                        // get layer and CRS
-                        Layer layer = mapContent.layers().get(0);
-                        CoordinateReferenceSystem layerCrs = layer.getFeatureSource().getSchema().getCoordinateReferenceSystem();
-
-                        // check crs, if different transform envelope to destination CRS
-                        if (partialWorldBounds.getCoordinateReferenceSystem().equals(layerCrs) == false) {
-
-                            try {
-                                partialWorldBounds = partialWorldBounds.transform(layerCrs, true);
-                            } catch (TransformException | FactoryException e) {
-                                logger.error(e);
-                            }
-
-                        }
-
-                        // get graphics from image and improve drawing quality
-                        Graphics2D g2d = (Graphics2D) img.getGraphics();
-                        GuiUtils.applyQualityRenderingHints(g2d);
-
-                        // draw image
-                        long before = System.currentTimeMillis();
-                        renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), partialWorldBounds);
-                        renderTime = System.currentTimeMillis() - before;
+                    // check crs, if different transform envelope to destination CRS
+                    if (partialWorldBounds.getCoordinateReferenceSystem().equals(layerCrs) == false) {
 
                         try {
-                            store.addPartial(part);
+                            partialWorldBounds = partialWorldBounds.transform(layerCrs, true);
+                        } catch (TransformException | FactoryException e) {
+                            logger.error(e);
+                        }
+
+                    }
+
+                    // get graphics from image and improve drawing quality
+                    Graphics2D g2d = (Graphics2D) img.getGraphics();
+                    GuiUtils.applyQualityRenderingHints(g2d);
+
+                    // draw image
+                    renderingActive = true;
+                    long before = System.currentTimeMillis();
+                    try {
+                        renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), partialWorldBounds);
+                    } finally {
+                        renderTime = System.currentTimeMillis() - before;
+                        renderingActive = false;
+                    }
+
+                    // stop if requested, before store partial
+                    if (stopRendering == true) {
+                        return;
+                    }
+
+                    // or store rendered partial in database
+                    else {
+
+                        partialsRendered++;
+
+                        // set partial up to date here, just after rendering, to prevent multiple insertions in database
+                        // this property should be normally set after, in task management, but it is too late and it can disturb
+                        // multithreading process
+                        partial.setOutdated(false);
+
+                        try {
+                            store.addPartial(partial);
                         } catch (SQLException e) {
                             logger.error(e);
                         }
 
-                        //GuiUtils.showImage(img);
-
                     }
 
-                    // mark as up to date
-                    part.setOutdated(false);
+                    //GuiUtils.showImage(img);
 
-                    // display debug information on partial if needed
-                    if (debugMode) {
-
-                        BufferedImage img = part.getImage();
-                        ReferencedEnvelope bounds = part.getEnvelope();
-                        Graphics2D g2d = (Graphics2D) img.getGraphics();
-
-                        GuiUtils.applyQualityRenderingHints(g2d);
-
-                        String[] lines = new String[]{
-                                "Partial id: " + part.getDebugId(),
-                                "DB id: " + part.getDatabaseId(),
-                                "Image id:" + System.identityHashCode(part.getImage()),
-                                "MinX: " + bounds.getMinX(),
-                                "MinY: " + bounds.getMinY(),
-                                "MaxX: " + bounds.getMaxX(),
-                                "MaxY: " + bounds.getMaxY(),
-                                "Width: " + bounds.getWidth(),
-                                "Loaded from DB: " + loadedFromDatabase,
-                                "RenderTime: " + renderTime + " ms",
-                                "Layer id: " + part.getLayerId(),
-                        };
-
-                        g2d.setColor(Color.WHITE);
-                        g2d.fillRect(0, 0, (int) (renderedWidthPx - 20), debugIncr * (lines.length + 1));
-
-                        g2d.setColor(Color.black);
-                        g2d.setFont(debugFont);
-
-                        int i = debugIncr;
-                        for (String l : lines) {
-                            g2d.drawString(l, 20, i);
-                            i += debugIncr;
-                        }
-
-                        g2d.setColor(Color.GRAY);
-                        g2d.drawRect(0, 0, (int) (renderedWidthPx - 20), debugIncr * (lines.length + 1));
-
-                    }
-
-                } finally {
-                    partialsInProgress.remove(part);
-
-                    // notify of new tile arrival
-                    if (toRunWhenPartialsUpdated != null) {
-                        toRunWhenPartialsUpdated.run();
-                    }
-                }
-            }
-        });
-
-    }
-
-    /**
-     * Start processing queue in a separated thread
-     */
-    public void start() {
-        ThreadManager.runLater(() -> {
-            for (PartialRenderingTask task : tasks) {
-                try {
-                    task.run();
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
-                task.markAsFinished();
-            }
-        });
-    }
+                // display debug information on partial if needed
+                if (debugMode) {
 
-    /**
-     * Return true if all rendering tasks are finished
-     *
-     * @return
-     */
-    public boolean isFinished() {
-        for (PartialRenderingTask task : tasks) {
-            if (task.isFinished() == false) {
-                return false;
+                    // get graphics from partial
+                    BufferedImage img = partial.getImage();
+                    ReferencedEnvelope bounds = partial.getEnvelope();
+                    Graphics2D g2d = (Graphics2D) img.getGraphics();
+
+                    // improve quality of painting
+                    GuiUtils.applyQualityRenderingHints(g2d);
+
+                    // informations to display
+                    String[] lines = new String[]{
+                            "Partial id: " + partial.getDebugId(),
+                            "DB id: " + partial.getDatabaseId(),
+                            "Image id:" + System.identityHashCode(partial.getImage()),
+                            "MinX: " + bounds.getMinX(),
+                            "MinY: " + bounds.getMinY(),
+                            "MaxX: " + bounds.getMaxX(),
+                            "MaxY: " + bounds.getMaxY(),
+                            "Width: " + bounds.getWidth(),
+                            "Loaded from DB: " + loadedFromDatabase,
+                            "RenderTime: " + renderTime + " ms",
+                            "Layer id: " + partial.getLayerId(),
+                    };
+
+                    g2d.setColor(Color.WHITE);
+                    g2d.fillRect(0, 0, (int) (renderedWidthPx - 20), debugIncr * (lines.length + 1));
+
+                    g2d.setColor(Color.black);
+                    g2d.setFont(debugFont);
+
+                    // draw lines below each others
+                    int i = debugIncr;
+                    for (String l : lines) {
+                        g2d.drawString(l, 20, i);
+                        i += debugIncr;
+                    }
+
+                    g2d.setColor(Color.GRAY);
+                    g2d.drawRect(0, 0, (int) (renderedWidthPx - 20), debugIncr * (lines.length + 1));
+
+                }
+
+            } finally {
+
+                partialsInProgress.remove(partial);
+
+                // notify changes
+                if (toRunWhenPartialsUpdated != null) {
+                    toRunWhenPartialsUpdated.run();
+                }
             }
         }
-        return true;
+
+        /**
+         * Return true if task is finished
+         *
+         * @return
+         */
+        public boolean isFinished() {
+            return status == FINISHED;
+        }
+
+        /**
+         * Set task as finished
+         */
+        public void markAsFinished() {
+            status = FINISHED;
+        }
+
+        /**
+         * Get partial to render
+         *
+         * @return
+         */
+        public RenderedPartial getPartial() {
+            return partial;
+        }
     }
-
-    public static long getLoadedFromDatabase() {
-        return loadedFromDatabase;
-    }
-
-    public static long getRenderedPartials() {
-        return renderedPartials;
-    }
-
-    public int size() {
-        return tasks.size();
-    }
-
-    public void setDebugMode(boolean debugMode) {
-        this.debugMode = debugMode;
-    }
-
-
 }
