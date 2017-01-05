@@ -298,10 +298,15 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
                     logger.warning("Layer changed ! " + layId);
 
+                    // dispose old map content
+                    map.dispose();
+
+                    // build a new one
                     map = lay.buildMapContent();
                     layerMapContents.put(layId, map);
                     factory.setMapContent(map);
 
+                    // delete cache
                     project.deleteCacheForLayer(layId, null);
                 }
 
