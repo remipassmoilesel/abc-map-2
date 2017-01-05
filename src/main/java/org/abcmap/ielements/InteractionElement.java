@@ -6,7 +6,7 @@ import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.Main;
-import org.abcmap.core.managers.ManagerAccessUtility;
+import org.abcmap.core.managers.ManagerTreeAccessUtil;
 import org.abcmap.core.managers.TempFilesManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.threads.ThreadManager;
@@ -34,7 +34,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * <p>
  * This abstract class contains many utility used to execute user actions.
  */
-public abstract class InteractionElement extends ManagerAccessUtility implements Runnable, ActionListener, HasEventNotificationManager {
+public abstract class InteractionElement extends ManagerTreeAccessUtil implements Runnable, ActionListener, HasEventNotificationManager {
 
     protected static final CustomLogger logger = LogManager.getLogger(TempFilesManager.class);
 

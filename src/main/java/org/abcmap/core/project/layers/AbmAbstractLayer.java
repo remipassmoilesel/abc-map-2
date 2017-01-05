@@ -6,6 +6,7 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.core.utils.MonitoredMapContent;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.Layer;
@@ -113,7 +114,7 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
      * @return
      */
     public MapContent buildMapContent() {
-        MapContent content = new MapContent();
+        MonitoredMapContent content = new MonitoredMapContent();
         content.addLayer(internalLayer);
         return content;
     }

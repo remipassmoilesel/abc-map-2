@@ -202,6 +202,7 @@ class PartialRenderingQueue {
                     task.getPartial().setOutdated(false);
                 }
             }
+
         });
     }
 

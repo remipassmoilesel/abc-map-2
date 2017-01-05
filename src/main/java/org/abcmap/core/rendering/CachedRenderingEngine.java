@@ -106,7 +106,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     private AffineTransform worldToScreenTransform;
 
     /**
-     * Utility used to trasnform coordinates from screen bounds to world bounds.
+     * Utility used to transform coordinates from screen bounds to world bounds.
      * <p>
      * This utility use different world bounds than those are requested to render, because
      * <p>

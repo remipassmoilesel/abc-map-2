@@ -18,6 +18,7 @@ import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.rendering.CachedRenderingEngine;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
+import org.abcmap.core.utils.MonitoredMapContent;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
@@ -369,7 +370,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         FeatureLayer inMemoryLayer = new FeatureLayer(featureCollection, style);
 
         // create a new map content
-        inMemoryMapContent = new MapContent();
+        inMemoryMapContent = new MonitoredMapContent();
+
         inMemoryMapContent.addLayer(inMemoryLayer);
 
         inMemoryLayerRenderer.setMapContent(inMemoryMapContent);

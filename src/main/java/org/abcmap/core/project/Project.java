@@ -9,10 +9,7 @@ import org.abcmap.core.rendering.partials.RenderedPartialStore;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.tiles.TileStorage;
-import org.abcmap.core.utils.GeoUtils;
-import org.abcmap.core.utils.SQLProcessor;
-import org.abcmap.core.utils.SQLUtils;
-import org.abcmap.core.utils.Utils;
+import org.abcmap.core.utils.*;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.swing.JMapFrame;
@@ -520,8 +517,7 @@ public class Project {
      */
     public MapContent buildGlobalMapContent(boolean includeTileOutlines) {
 
-        MapContent content = new MapContent();
-
+        MonitoredMapContent content = new MonitoredMapContent();
         ArrayList<AbmAbstractLayer> layers = getLayersList();
 
         // add mainLayersList

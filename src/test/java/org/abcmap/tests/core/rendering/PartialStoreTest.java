@@ -323,7 +323,12 @@ public class PartialStoreTest {
         mapContent.addLayer(layer);
         renderer.setMapContent(mapContent);
 
+        System.out.println("content");
+        System.out.println(mapContent);
+
         renderer.paint(g2d, new Rectangle(width, height), layer.getBounds());
+
+        mapContent.dispose();
 
         GuiUtils.showImage(title, renderedImg);
     }
