@@ -5,7 +5,7 @@ package org.abcmap.core.managers;
  * <p>
  * /!\ Warning: be careful if you use this methods in constructors: if you use a manager before it is created, say hello to nullpointerex !
  */
-public class ManagerAccessUtility {
+public class ManagerTreeAccessUtil {
 
     /**
      * Shortcut for getConfigurationManager()

@@ -12,7 +12,7 @@ import java.awt.geom.Point2D;
 /**
  * Created by remipassmoilesel on 08/12/16.
  */
-public class MapManager extends ManagerAccessUtility implements HasEventNotificationManager {
+public class MapManager extends ManagerTreeAccessUtil implements HasEventNotificationManager {
 
     private final EventNotificationManager notifm;
     public MainMapBinding mainmap;

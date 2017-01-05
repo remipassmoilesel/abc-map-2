@@ -23,7 +23,7 @@ import java.util.ArrayList;
 /**
  * Here are managed all operations around drawing draw on map
  */
-public class DrawManager extends ManagerAccessUtility implements HasEventNotificationManager {
+public class DrawManager extends ManagerTreeAccessUtil implements HasEventNotificationManager {
 
     /**
      * Present thick of lines, used if a new builder is returned

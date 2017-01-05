@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
  * <p>
  * This allow to not specify parent window of dialogs, by default main window will be choosed.
  */
-public class DialogManager extends ManagerAccessUtility {
+public class DialogManager extends ManagerTreeAccessUtil {
 
     private static final CustomLogger logger = LogManager.getLogger(DialogManager.class);
 

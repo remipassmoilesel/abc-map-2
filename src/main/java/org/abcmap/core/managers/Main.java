@@ -1,7 +1,6 @@
 package org.abcmap.core.managers;
 
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.threads.ManagedTask;
 
 import java.io.IOException;
 
@@ -10,7 +9,7 @@ import java.io.IOException;
  * <p>
  * From here, all other managers can be reached.
  */
-public class Main extends ManagerAccessUtility{
+public class Main extends ManagerTreeAccessUtil {
 
     private static final CustomLogger logger = LogManager.getLogger(Main.class);
 

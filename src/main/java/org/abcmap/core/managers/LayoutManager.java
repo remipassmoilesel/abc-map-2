@@ -31,7 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  *
  */
-public class LayoutManager extends ManagerAccessUtility {
+public class LayoutManager extends ManagerTreeAccessUtil {
 
     private static final CustomLogger logger = LogManager.getLogger(LayoutManager.class);
 

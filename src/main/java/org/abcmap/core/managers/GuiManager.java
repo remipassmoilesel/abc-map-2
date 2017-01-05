@@ -27,7 +27,7 @@ import java.util.HashMap;
 /**
  * Manage all operations around GUI. Some can be delegated to others managers like DialogManager.
  */
-public class GuiManager extends ManagerAccessUtility implements HasEventNotificationManager {
+public class GuiManager extends ManagerTreeAccessUtil implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(GuiManager.class);
 

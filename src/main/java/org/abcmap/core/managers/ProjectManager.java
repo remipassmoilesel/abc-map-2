@@ -30,7 +30,7 @@ import java.util.Random;
 /**
  * Here are managed all operations concerning projects
  */
-public class ProjectManager extends ManagerAccessUtility implements HasEventNotificationManager {
+public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(ProjectManager.class);
     private static final String FAKE_PROJECT_1 = "--create-fake-project";
