@@ -26,6 +26,8 @@ import java.nio.file.Paths;
  * This issue appear on udig too.
  * <p>
  * Maybe this issue appear because of ED5 domain, too small ?
+ *
+ * This can be see easily with this set of data: https://www.data.gouv.fr/fr/datasets/decoupage-administratif-communal-francais-issu-d-openstreetmap/
  */
 public class CRSGapEd50Wgs84Demonstration {
 
