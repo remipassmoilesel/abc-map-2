@@ -76,8 +76,8 @@ public class ManagerTreeAccessUtil {
      *
      * @return
      */
-    public static ShortcutManager shortcutm() {
-        return Main.getShortcutManager();
+    public static KeyboardManager shortcutm() {
+        return Main.getKeyboardManager();
     }
 
     /**

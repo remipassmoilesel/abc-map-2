@@ -16,10 +16,12 @@ import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.abcmap.gui.layouts.LayoutListPanel;
 import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.gui.utils.KeyAdapter;
 import org.abcmap.ielements.program.QuitProgram;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -130,6 +132,7 @@ public class MainWindow extends AbstractCustomWindow implements HasEventNotifica
             });
 
         });
+
     }
 
     /**

@@ -182,6 +182,28 @@ public class FeatureUtils {
     }
 
     /**
+     * Create a simple style for specified geometry class
+     *
+     * @param type
+     * @param foreground
+     * @param background
+     * @param thick
+     * @return
+     */
+    public static Style createStyleFor(AbmDefaultFeatureType type, Color foreground, Color background, double thick) {
+
+        Rule r = createRuleFor(type, foreground, background, thick);
+
+        FeatureTypeStyle fts = sf.createFeatureTypeStyle();
+        fts.rules().add(r);
+
+        Style style = sf.createStyle();
+        style.featureTypeStyles().add(fts);
+
+        return style;
+    }
+
+    /**
      * Create a simple rule for specified geometry class
      *
      * @param foreground
@@ -240,9 +262,38 @@ public class FeatureUtils {
             return r;
         }
 
+        // generic rule
+        else if (type == null) {
+
+            Rule r = sf.createRule();
+
+            // create point symbolizer
+            Mark mark = sf.getCircleMark();
+            mark.setStroke(stroke);
+            mark.setFill(fill);
+
+            Graphic graphic = sf.createDefaultGraphic();
+            graphic.graphicalSymbols().clear();
+            graphic.graphicalSymbols().add(mark);
+            graphic.setSize(ff.literal(thick));
+
+            PointSymbolizer pointSym = sf.createPointSymbolizer(graphic, null);
+            r.symbolizers().add(pointSym);
+
+            // line symbolizer
+            LineSymbolizer lineSym = sf.createLineSymbolizer(stroke, null);
+            r.symbolizers().add(lineSym);
+
+            // polygon symbolizer
+            PolygonSymbolizer polygonSym = sf.createPolygonSymbolizer(stroke, fill, null);
+            r.symbolizers().add(polygonSym);
+
+            return r;
+        }
+
         // unknown style
         else {
-            throw new IllegalArgumentException("Unknown class: " + type);
+            throw new IllegalArgumentException("Unknown geometry: " + type);
         }
 
     }

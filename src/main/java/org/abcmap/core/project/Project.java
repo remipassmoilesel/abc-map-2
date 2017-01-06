@@ -10,6 +10,7 @@ import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.styles.StyleLibrary;
 import org.abcmap.core.tiles.TileStorage;
 import org.abcmap.core.utils.*;
+import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.swing.JMapFrame;
@@ -662,6 +663,8 @@ public class Project {
      * @param layId
      */
     public void deleteCacheForLayer(String layId, ReferencedEnvelope env) {
+
+        GuiUtils.throwIfOnEDT();
 
         if (getLayerById(layId) == null) {
             throw new IllegalArgumentException("Unable to find layer: " + layId);

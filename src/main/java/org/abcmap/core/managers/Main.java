@@ -23,7 +23,7 @@ public class Main extends ManagerTreeAccessUtil {
     private static CancelManager cancelManager;
     private static GuiManager guiManager;
     private static MapManager mapManager;
-    private static ShortcutManager shortcutManager;
+    private static KeyboardManager keyboardManager;
     private static RecentManager recentManager;
     private static ClipboardManager clipboardManager;
     private static ImportManager importManager;
@@ -47,7 +47,7 @@ public class Main extends ManagerTreeAccessUtil {
         guiManager = new GuiManager();
         cancelManager = new CancelManager();
         mapManager = new MapManager();
-        shortcutManager = new ShortcutManager();
+        keyboardManager = new KeyboardManager();
         recentManager = new RecentManager();
         clipboardManager = new ClipboardManager();
         importManager = new ImportManager();
@@ -85,8 +85,8 @@ public class Main extends ManagerTreeAccessUtil {
         return mapManager;
     }
 
-    public static ShortcutManager getShortcutManager() {
-        return shortcutManager;
+    public static KeyboardManager getKeyboardManager() {
+        return keyboardManager;
     }
 
     public static RecentManager getRecentManager() {

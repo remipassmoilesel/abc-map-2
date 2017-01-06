@@ -14,7 +14,7 @@ public class QuitProgram extends InteractionElement {
 
         this.label = "Quitter";
         this.help = "Cliquez ici pour quitter le programme.";
-        this.accelerator = Main.getShortcutManager().QUIT_PROGRAM;
+        this.accelerator = Main.getKeyboardManager().QUIT_PROGRAM;
     }
 
     @Override

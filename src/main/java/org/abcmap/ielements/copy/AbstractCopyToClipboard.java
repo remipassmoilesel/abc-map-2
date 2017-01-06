@@ -26,12 +26,12 @@ public abstract class AbstractCopyToClipboard extends InteractionElement {
             this.label = "Copier";
             this.help = "Cliquez ici pour copier les objets sélectionnés dans le presse-papier.";
             this.menuIcon = GuiIcons.SMALLICON_COPY;
-            this.accelerator = Main.getShortcutManager().COPY;
+            this.accelerator = Main.getKeyboardManager().COPY;
         } else if (CUT_MODE.equals(mode)) {
             this.label = "Couper";
             this.help = "Cliquez ici pour couper les objets sélectionnés et les déplacer dans le presse-papier.";
             // this.menuIcon = GuiIcons.cut;
-            this.accelerator = Main.getShortcutManager().CUT;
+            this.accelerator = Main.getKeyboardManager().CUT;
         }
 
     }

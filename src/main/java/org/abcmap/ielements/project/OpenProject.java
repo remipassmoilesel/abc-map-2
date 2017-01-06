@@ -15,7 +15,7 @@ public class OpenProject extends InteractionElement {
     public OpenProject() {
         this.label = "Ouvrir un projet";
         this.help = "...";
-        this.accelerator = Main.getShortcutManager().OPEN_PROJECT;
+        this.accelerator = Main.getKeyboardManager().OPEN_PROJECT;
         this.menuIcon = GuiIcons.SMALLICON_OPENPROJECT;
     }
 
