@@ -6,6 +6,7 @@ import org.abcmap.core.project.layouts.LayoutSheet;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.components.buttons.HtmlCheckbox;
 import org.abcmap.gui.components.map.CachedMapPane;
+import org.abcmap.gui.components.map.MouseControlType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +38,7 @@ public class LayoutPanel extends JPanel {
 
         // add map pane in center
         mapPane = new CachedMapPane(project);
-        mapPane.setMouseManagementEnabled(true);
+        mapPane.setMouseManagementEnabled(true, MouseControlType.SIMPLE);
         mapPane.setBorder(BorderFactory.createLineBorder(Color.gray, 2));
         add(mapPane, BorderLayout.CENTER);
 

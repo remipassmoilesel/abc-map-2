@@ -73,12 +73,12 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * <p>
      * This content is in memory, features displayed here are more modifiable faster than in database.
      */
-    private MapContent inMemoryMapContent;
+    private MapContent memoryMapContent;
 
     /**
      * Renderer used with mask content
      */
-    private StreamingRenderer inMemoryLayerRenderer;
+    private StreamingRenderer memoryLayerRenderer;
 
 
     /**
@@ -194,11 +194,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         renderingEngine.paint(g2d);
 
         // paint mask
-        if (inMemoryMapContent != null) {
+        if (memoryMapContent != null) {
             // do not use currentWorldEnvelope to prevent bad offsets
             //maskRenderer.paint(g2d, new Rectangle(getSize()), currentWorldEnvelope);
 
-            inMemoryLayerRenderer.paint(g2d, new Rectangle(getSize()), renderingEngine.getWorldEnvelope());
+            memoryLayerRenderer.paint(g2d, new Rectangle(getSize()), renderingEngine.getWorldEnvelope());
         }
 
         // if debug mode enabled, paint world envelope asked
@@ -322,17 +322,17 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     /**
      * Clear the special layer in memory
      */
-    public void clearInMemoryLayer() {
+    public void clearMemoryLayer() {
 
-        if (inMemoryMapContent != null) {
+        if (memoryMapContent != null) {
 
             // stop rendering
-            inMemoryLayerRenderer.stopRendering();
-            inMemoryLayerRenderer = null;
+            memoryLayerRenderer.stopRendering();
+            memoryLayerRenderer = null;
 
             // clear map content
-            inMemoryMapContent.dispose();
-            inMemoryMapContent = null;
+            memoryMapContent.dispose();
+            memoryMapContent = null;
 
         }
     }
@@ -343,10 +343,10 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * @param collection
      * @param style
      */
-    public void setInMemoryLayerContent(ArrayList<SimpleFeature> collection, Style style) {
+    public void setMemoryLayerContent(ArrayList<SimpleFeature> collection, Style style) {
         DefaultFeatureCollection featColl = new DefaultFeatureCollection();
         featColl.addAll(collection);
-        setInMemoryLayerContent(featColl, style);
+        setMemoryLayerContent(featColl, style);
     }
 
     /**
@@ -355,26 +355,26 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * @param featureCollection
      * @param style
      */
-    public void setInMemoryLayerContent(DefaultFeatureCollection featureCollection, Style style) {
+    public void setMemoryLayerContent(DefaultFeatureCollection featureCollection, Style style) {
 
-        clearInMemoryLayer();
+        clearMemoryLayer();
 
         //
         // We must create a new map content and a new renderer each time, to prevent errors in renderer
         //
 
         // create a renderer
-        inMemoryLayerRenderer = GeoUtils.buildRenderer();
+        memoryLayerRenderer = GeoUtils.buildRenderer();
 
         // create a new layer from collection
         FeatureLayer inMemoryLayer = new FeatureLayer(featureCollection, style);
 
         // create a new map content
-        inMemoryMapContent = new MonitoredMapContent();
+        memoryMapContent = new MonitoredMapContent();
 
-        inMemoryMapContent.addLayer(inMemoryLayer);
+        memoryMapContent.addLayer(inMemoryLayer);
 
-        inMemoryLayerRenderer.setMapContent(inMemoryMapContent);
+        memoryLayerRenderer.setMapContent(memoryMapContent);
 
     }
 
@@ -561,18 +561,21 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         @Override
         public void componentResized(ComponentEvent e) {
             // refresh map if needed
+            // TODO Do not refresh map, just refresh envelope, to prevent uneeded flickering
             refreshMap();
         }
 
         @Override
         public void componentMoved(ComponentEvent e) {
             // refresh map if needed
+            // TODO Do not refresh map, just refresh envelope, to prevent uneeded flickering
             refreshMap();
         }
 
         @Override
         public void componentShown(ComponentEvent e) {
             // refresh map if needed
+            // TODO Do not refresh map, just refresh envelope, to prevent uneeded flickering
             refreshMap();
         }
 
@@ -586,6 +589,13 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * Enable or disable mouse control of map, in order to allow user to move or zoom map
      */
     public void setMouseManagementEnabled(boolean enabled) {
+        setMouseManagementEnabled(enabled, MouseControlType.SIMPLE.DRAG_WITH_SPACE);
+    }
+
+    /**
+     * Enable or disable mouse control of map, in order to allow user to move or zoom map
+     */
+    public void setMouseManagementEnabled(boolean enabled, MouseControlType type) {
 
         // enable management
         if (enabled == true) {
@@ -594,7 +604,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
                 return;
             }
 
-            this.mouseControl = new CachedMapPaneMouseController(this);
+            this.mouseControl = new CachedMapPaneMouseController(this, type);
 
             this.addMouseListener(mouseControl);
             this.addMouseMotionListener(mouseControl);

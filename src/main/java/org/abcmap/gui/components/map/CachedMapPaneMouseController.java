@@ -1,5 +1,7 @@
 package org.abcmap.gui.components.map;
 
+import org.abcmap.core.managers.KeyboardManager;
+import org.abcmap.core.managers.Main;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import javax.swing.*;
@@ -13,21 +15,88 @@ import java.awt.event.MouseWheelEvent;
  */
 public class CachedMapPaneMouseController extends MouseAdapter {
 
+    private final KeyboardManager keym;
     private final CachedMapPane pane;
     private Point lastPosition;
+    private MouseControlType type;
 
-    public CachedMapPaneMouseController(CachedMapPane pane) {
+    public CachedMapPaneMouseController(CachedMapPane pane, MouseControlType type) {
+        this.keym = Main.getKeyboardManager();
+        this.type = type;
         this.pane = pane;
     }
 
     @Override
+    public void mouseMoved(MouseEvent e) {
+        super.mouseMoved(e);
+
+        if (MouseControlType.DRAG_WITH_SPACE.equals(type) == false) {
+            return;
+        }
+
+        // move if space bar down
+        if (keym.isSpaceBarDown()) {
+            moveMap(e);
+            return;
+        }
+
+        // reset position at last move
+        else if (lastPosition != null) {
+            lastPosition = null;
+        }
+
+    }
+
+    /**
+     * Move map, only in SIMPLE mode
+     *
+     * @param e
+     */
+    @Override
     public void mouseDragged(MouseEvent e) {
         super.mouseDragged(e);
+
+        if (MouseControlType.SIMPLE.equals(type) == false) {
+            return;
+        }
 
         // check if left button enabled
         if (SwingUtilities.isLeftMouseButton(e) == false) {
             return;
         }
+
+        moveMap(e);
+
+    }
+
+    /**
+     * Reset last position of drag, only in SIMPLE mode
+     *
+     * @param e
+     */
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        super.mouseReleased(e);
+
+        if (MouseControlType.SIMPLE.equals(type) == false) {
+            return;
+        }
+
+        // check if left button enabled
+        if (SwingUtilities.isLeftMouseButton(e) == false) {
+            return;
+        }
+
+        lastPosition = null;
+
+    }
+
+    /**
+     * Move map relative to mouse position
+     *
+     * @param e
+     */
+    public void moveMap(MouseEvent e) {
 
         // first move, keep position and return
         if (lastPosition == null) {
@@ -52,6 +121,24 @@ public class CachedMapPaneMouseController extends MouseAdapter {
         pane.refreshMap();
 
         lastPosition = m;
+    }
+
+    /**
+     * Change zoom
+     *
+     * @param e
+     */
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent e) {
+        super.mouseWheelMoved(e);
+
+        if (e.getWheelRotation() < 0) {
+            pane.zoomIn();
+        } else {
+            pane.zoomOut();
+        }
+
+        pane.refreshMap();
 
     }
 
@@ -66,30 +153,5 @@ public class CachedMapPaneMouseController extends MouseAdapter {
         return val * scale;
     }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        super.mouseReleased(e);
-
-        // check if left button enabled
-        if (SwingUtilities.isLeftMouseButton(e) == false) {
-            return;
-        }
-
-        lastPosition = null;
-    }
-
-    @Override
-    public void mouseWheelMoved(MouseWheelEvent e) {
-        super.mouseWheelMoved(e);
-
-        if (e.getWheelRotation() < 0) {
-            pane.zoomIn();
-        } else {
-            pane.zoomOut();
-        }
-
-        pane.refreshMap();
-
-    }
 
 }
