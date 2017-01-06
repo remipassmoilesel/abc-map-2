@@ -3,7 +3,7 @@ package org.abcmap.gui.tools.containers;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.Main;
-import org.abcmap.core.managers.ShortcutManager;
+import org.abcmap.core.managers.KeyboardManager;
 import org.abcmap.core.project.ProjectWriter;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.help.InteractionSequence;
@@ -69,10 +69,10 @@ public class ToolContainer {
      */
     protected InteractionSequence[] interactionsSequences;
 
-    protected ShortcutManager shortcuts;
+    protected KeyboardManager shortcuts;
 
     public ToolContainer() {
-        this.shortcuts = Main.getShortcutManager();
+        this.shortcuts = Main.getKeyboardManager();
     }
 
     /**

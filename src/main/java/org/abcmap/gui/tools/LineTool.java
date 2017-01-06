@@ -57,12 +57,12 @@ public class LineTool extends MapTool {
             // first point of line
             if (builder == null) {
                 builder = drawm.getLineBuilder();
-                builder.newLine(mainMapScreenToWorldCoordinate(e.getPoint()));
+                builder.newLine(screenPointToWorldCoordinate(e.getPoint()));
             }
 
             // other points of line
             else {
-                builder.addPoint(mainMapScreenToWorldCoordinate(e.getPoint()));
+                builder.addPoint(screenPointToWorldCoordinate(e.getPoint()));
             }
 
         }
@@ -71,12 +71,12 @@ public class LineTool extends MapTool {
         else if (e.getClickCount() > 1) {
 
             if (builder != null) {
-                SimpleFeature feat = builder.terminateLine(mainMapScreenToWorldCoordinate(e.getPoint()));
+                SimpleFeature feat = builder.terminateLine(screenPointToWorldCoordinate(e.getPoint()));
                 builder = null;
 
                 ReferencedEnvelope bounds = JTS.bounds(AbmSimpleFeatureBuilder.getGeometry(feat), projectm.getProject().getCrs());
 
-                deleteActiveLayerCache(bounds);
+                deleteActiveLayerCacheAndUpdateMap(bounds);
             }
 
         }
@@ -95,7 +95,7 @@ public class LineTool extends MapTool {
             // only use a copy of graphics
             Graphics2D g2dc = (Graphics2D) g2d.create();
 
-            AffineTransform wts = getMainMapWorldToScreen();
+            AffineTransform wts = getWorldToScreenTransform();
             builder.drawCurrentShape(g2dc, wts);
 
             // draw indication on drawing if needed

@@ -1,6 +1,8 @@
 package org.abcmap.gui.tools;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
@@ -9,12 +11,14 @@ import org.abcmap.core.managers.*;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.project.layers.AbmFeatureLayer;
+import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.gui.components.map.CachedMapPane;
-import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.feature.FeatureIterator;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.Filter;
@@ -35,14 +39,15 @@ import java.util.ArrayList;
 /**
  * Tool that can be used to draw shapes on main map panel
  * <p>
- * All helpers refer to main map panels
+ * All utilities and helpers refer to main map panel
  */
 public abstract class MapTool extends MouseAdapter implements HasEventNotificationManager {
 
-    private final static StyleFactory sf = FeatureUtils.getStyleFactory();
-    private final static FilterFactory2 ff = FeatureUtils.getFilterFactory();
+    protected final static GeometryFactory geom = GeoUtils.getGeometryFactory();
+    protected final static StyleFactory sf = FeatureUtils.getStyleFactory();
+    protected final static FilterFactory2 ff = FeatureUtils.getFilterFactory();
 
-    private static final CustomLogger logger = LogManager.getLogger(MapTool.class);
+    protected static final CustomLogger logger = LogManager.getLogger(MapTool.class);
 
     protected EventNotificationManager observer;
     protected DrawManager drawm;
@@ -54,7 +59,6 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
 
     protected int maxSelectedFeatureNumber;
     protected String mode;
-
 
     public MapTool() {
         this.drawm = Main.getDrawManager();
@@ -176,7 +180,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
     /**
      * Refresh main map if possible
      * <p>
-     * Refresh call repaint() after
+     * This method call repaint() after
      */
     protected void refreshMainMap() {
 
@@ -200,102 +204,80 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
     }
 
     /**
-     * Delete active layer cache if possible. Should be called before redraw map.
+     * Delete active layer cache if possible, and repaint map.
      */
-    protected void deleteActiveLayerCache() {
-        deleteActiveLayerCache(null);
+    protected void deleteActiveLayerCacheAndUpdateMap() {
+        deleteActiveLayerCacheAndUpdateMap(null);
     }
 
     /**
-     * Delete active layer cache if possible. Should be called before redraw map.
+     * Delete active layer cache if possible and repaint map.
+     * <p>
+     * If specified envelope is not null, just area around envelope will be deleted
      */
-    protected void deleteActiveLayerCache(ReferencedEnvelope env) {
-
-        GuiUtils.throwIfOnEDT();
+    protected void deleteActiveLayerCacheAndUpdateMap(ReferencedEnvelope env) {
 
         Project project = projectm.getProject();
         if (project == null) {
             return;
         }
 
-        project.deleteCacheForLayer(project.getActiveLayer().getId(), env);
+        ThreadManager.runLater(() -> {
+            project.deleteCacheForLayer(project.getActiveLayer().getId(), env);
+            refreshMainMap();
+        });
 
     }
 
-
     /**
-     * Get point, transform it and return a coordinate object
+     * Transform specified point and return a coordinate object
      *
      * @param p
      * @return
      */
-    protected Coordinate mainMapScreenToWorldCoordinate(Point2D p) {
+    protected Coordinate screenPointToWorldCoordinate(Point2D p) {
         AffineTransform trans = getMainMapPane().getScreenToWorldTransform();
         Point2D worldPoint = trans.transform(p, null);
         return GeoUtils.point2DtoCoordinate(worldPoint);
     }
 
     /**
-     * Get point, transform it and return a coordinate object
+     * Transform specified point and return a coordinate object
      *
      * @param x
      * @param y
      * @return
      */
-    protected Coordinate mainMapScreenToWorldCoordinate(double x, double y) {
-        return mainMapScreenToWorldCoordinate(new Point2D.Double(x, y));
+    protected Coordinate screenPointToWorldCoordinate(double x, double y) {
+        return screenPointToWorldCoordinate(new Point2D.Double(x, y));
     }
 
     /**
-     * Get point, transform it and return a coordinate object
+     * Transform specified point and return a coordinate object
      *
      * @param p
      * @return
      */
-    protected Coordinate mainMapScreenToWorldCoordinate(Point p) {
-        return mainMapScreenToWorldCoordinate((Point2D) p);
+    protected Coordinate screenPointToWorldCoordinate(Point p) {
+        return screenPointToWorldCoordinate((Point2D) p);
     }
 
     /**
-     * Get current world to screen transform associated with main map
-     *
-     * @return
-     */
-    public AffineTransform getMainMapWorldToScreen() {
-        return getMainMapPane().getWorldToScreenTransform();
-    }
-
-    /**
-     * Get current screen to world transform associated with main map
-     *
-     * @return
-     */
-    public AffineTransform getMainMapScreenToWorld() {
-        return getMainMapPane().getScreenToWorldTransform();
-    }
-
-    /**
-     * Get a collection of features localized around position (on main map)
+     * Transform specified point in a world envelope.
      * <p>
-     * Feature max number is limited
+     * 2 px margin is used around screen position
      *
      * @param screenPos
      * @return
      */
-    protected ArrayList<SimpleFeature> getFeaturesAroundMousePosition(Point screenPos) {
+    protected ReferencedEnvelope screenPointToWorldBounds(Point screenPos) {
 
         if (projectm.isInitialized() == false) {
-            logger.error("Project is not initialized");
-            return null;
+            throw new IllegalArgumentException("Project not initialized");
         }
 
         Project project = projectm.getProject();
         AbmAbstractLayer activeLayer = projectm.getProject().getActiveLayer();
-
-        if (activeLayer instanceof AbmFeatureLayer == false) {
-            logger.error("Wrong layer type");
-            return null;
-        }
 
         // Construct a 5x5 pixel rectangle centred on the mouse click position
         Rectangle screenRect = new Rectangle(screenPos.x - 2, screenPos.y - 2, 5, 5);
@@ -319,7 +301,66 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
             logger.warning("CRS do not match, modifying bounding box. Modified: " + bbox);
         }
 
+        return bbox;
+    }
+
+
+    /**
+     * Transform specified point in a rectangular geometry
+     * <p>
+     * 2 px margin is used around screen position
+     *
+     * @param p
+     * @return
+     */
+    protected Geometry screenPointToGeometryBounds(Point p) {
+        return JTS.toGeometry(screenPointToWorldBounds(p));
+    }
+
+    /**
+     * Get current world to screen transform associated with main map
+     *
+     * @return
+     */
+    public AffineTransform getWorldToScreenTransform() {
+        return getMainMapPane().getWorldToScreenTransform();
+    }
+
+    /**
+     * Get current screen to world transform associated with main map
+     *
+     * @return
+     */
+    public AffineTransform getScreenToWorldTransform() {
+        return getMainMapPane().getScreenToWorldTransform();
+    }
+
+    /**
+     * Get a collection of features localized around position (on main map)
+     * <p>
+     * Feature max number is limited
+     *
+     * @param screenPos
+     * @return
+     */
+    protected ArrayList<SimpleFeature> getFeaturesFromProjectAroundMousePosition(Point screenPos) {
+
+        if (projectm.isInitialized() == false) {
+            logger.error("Project is not initialized");
+            return null;
+        }
+
+        AbmAbstractLayer activeLayer = projectm.getProject().getActiveLayer();
+
+        if (activeLayer instanceof AbmFeatureLayer == false) {
+            logger.error("Wrong layer type");
+            return null;
+        }
+
+        ReferencedEnvelope bbox = screenPointToWorldBounds(screenPos);
+
         Filter filter = AbmSimpleFeatureBuilder.getGeometryFilter(bbox);
+
         try {
             FeatureIterator iter = ((AbmFeatureLayer) activeLayer).getFeatures(filter).features();
             ArrayList<SimpleFeature> result = new ArrayList<>();
@@ -329,11 +370,106 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
                 i++;
             }
             iter.close();
+
+            if (i >= maxSelectedFeatureNumber) {
+                logger.warning("Max number of features selected reached: " + maxSelectedFeatureNumber);
+            }
+
             return result;
         } catch (IOException e) {
             logger.error(e);
             return null;
         }
+
+    }
+
+    /**
+     * Get a collection of features localized around position (on main map)
+     * <p>
+     * Feature max number is limited
+     *
+     * Can return null if layer is not a feature layer or if error occur
+     *
+     * @param screenPos
+     * @return
+     */
+    protected ArrayList<SimpleFeature> getFeaturesFromMemoryAroundMousePosition(Point screenPos) {
+
+        if (projectm.isInitialized() == false) {
+            logger.error("Project is not initialized");
+            return null;
+        }
+
+        AbmAbstractLayer activeLayer = projectm.getProject().getActiveLayer();
+
+        if (activeLayer instanceof AbmFeatureLayer == false) {
+            logger.error("Wrong layer type");
+            return null;
+        }
+
+        // get box to compare to features
+        ReferencedEnvelope bbox = screenPointToWorldBounds(screenPos);
+        Filter filter = AbmSimpleFeatureBuilder.getGeometryFilter(bbox);
+
+        // get features and return it
+        return getMainMapPane().getMemoryMapFeatures(filter);
+
+    }
+
+    /**
+     * Add features to the memory layer of main map pane, to let user modify it
+     * <p>
+     * Add features via this method will remove all previous features from memory layer
+     *
+     * @param features
+     */
+    protected void setFeaturesModifiable(ArrayList<SimpleFeature> features) {
+
+        if (projectm.isInitialized() == false) {
+            throw new IllegalStateException("Project not initialized");
+        }
+
+        // create a special style to show modified features
+        Style modificationStyle = FeatureUtils.createStyleFor(null, Color.red, null, 3);
+
+        // set in memory content of main map
+        getMainMapPane().setMemoryLayerContent(features, modificationStyle);
+
+        // repaint main map
+        repaintMainMap();
+
+    }
+
+    /**
+     * Remove features from in memory layers, and push them in active layer
+     *
+     * @param features
+     */
+    protected void commitFeaturesChanges(java.util.List<SimpleFeature> features) {
+
+        if (projectm.isInitialized() == false) {
+            throw new IllegalStateException("Project not initialized");
+        }
+
+        AbmFeatureLayer activeLayer = (AbmFeatureLayer) projectm.getProject().getActiveLayer();
+
+        // update features from active layer
+        for (SimpleFeature feat : features) {
+            activeLayer.updateFeature(feat);
+        }
+
+        // clear memory layer of main map pane
+        getMainMapPane().clearMemoryLayer();
+
+    }
+
+    /**
+     * Add features in memory to let user modify it
+     */
+    protected void cancelFeaturesChanges() {
+
+        // clear memory layer of main map pane
+        getMainMapPane().clearMemoryLayer();
 
     }
 

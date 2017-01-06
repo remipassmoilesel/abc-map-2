@@ -89,13 +89,13 @@ public class ZoomTool extends MapTool {
         // user end area drawing
         Rectangle rect = drawer.getRectangle();
         if (rect != null && rect.getWidth() > minSizePx && rect.getHeight() > minSizePx) {
-            AffineTransform transform = getMainMapWorldToScreen();
+            AffineTransform transform = getWorldToScreenTransform();
 
             // get transformed bottom left corner
-            Coordinate blc = mainMapScreenToWorldCoordinate(rect.x, rect.y + rect.height);
+            Coordinate blc = screenPointToWorldCoordinate(rect.x, rect.y + rect.height);
 
             // get transformed upper right corner
-            Coordinate urc = mainMapScreenToWorldCoordinate(rect.x + rect.width, rect.y);
+            Coordinate urc = screenPointToWorldCoordinate(rect.x + rect.width, rect.y);
 
             // create a new envelope and set it on main map
             ReferencedEnvelope env = new ReferencedEnvelope(blc.x, urc.x, blc.y, urc.y, projectm.getProject().getCrs());

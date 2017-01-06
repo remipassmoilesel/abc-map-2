@@ -9,6 +9,7 @@ import org.geotools.coverage.GridSampleDimension;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.factory.Hints;
+import org.geotools.feature.DefaultFeatureCollection;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
@@ -22,6 +23,7 @@ import org.geotools.renderer.RenderListener;
 import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.*;
 import org.geotools.swing.JMapFrame;
+import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
@@ -427,5 +429,17 @@ public class GeoUtils {
      */
     public static CoordinateReferenceSystem decode(String code) throws FactoryException {
         return crsFactory.createCoordinateReferenceSystem(code);
+    }
+
+    /**
+     * Return bounds of a feature collection list
+     *
+     * @param features
+     * @return
+     */
+    public static ReferencedEnvelope getBoundsFromFeatureList(ArrayList<SimpleFeature> features) {
+        DefaultFeatureCollection dfc = new DefaultFeatureCollection();
+        dfc.addAll(features);
+        return dfc.getBounds();
     }
 }

@@ -24,6 +24,7 @@ import org.abcmap.gui.components.geo.MapNavigationBar;
 import org.abcmap.gui.tools.MapTool;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
@@ -32,6 +33,7 @@ import org.geotools.renderer.lite.StreamingRenderer;
 import org.geotools.styling.Style;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
@@ -67,6 +69,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      * Rendering engine associated with pane
      */
     private final CachedRenderingEngine renderingEngine;
+
+    /**
+     * Maximum number of features displayable in memory
+     */
+    private final int maxFeaturesInMemory;
 
     /**
      * Map content used to display features above all other layers
@@ -132,6 +139,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
     public CachedMapPane(Project p) {
         super(new MigLayout("fill"));
+
+        this.maxFeaturesInMemory = 1000;
 
         drawm = Main.getDrawManager();
         this.acceptPaintFromTool = false;
@@ -350,12 +359,49 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     }
 
     /**
+     * Get map content drawn on top off all layers
+     *
+     * @return
+     */
+    public ArrayList<SimpleFeature> getMemoryMapFeatures(Filter filter) {
+
+        if (memoryMapContent == null || memoryMapContent.layers().size() < 1) {
+            logger.debug("Memory map content is null or empty: " + memoryMapContent);
+            return null;
+        }
+
+        try {
+            ArrayList<SimpleFeature> result = new ArrayList<>();
+            FeatureIterator features = memoryMapContent.layers().get(0).getFeatureSource().getFeatures(filter).features();
+
+            int i = 0;
+            while (features.hasNext()) {
+                result.add((SimpleFeature) features.next());
+
+                if (i > maxFeaturesInMemory) {
+                    throw new IllegalStateException("Too much features in memory");
+                }
+
+                i++;
+            }
+
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Set content of a special layer, drawn over all others, where all features are stored in memory.
      *
      * @param featureCollection
      * @param style
      */
     public void setMemoryLayerContent(DefaultFeatureCollection featureCollection, Style style) {
+
+        if (featureCollection.size() > maxFeaturesInMemory) {
+            throw new IllegalStateException("Too much features to display: " + featureCollection.size());
+        }
 
         clearMemoryLayer();
 
