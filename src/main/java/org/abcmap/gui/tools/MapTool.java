@@ -43,22 +43,37 @@ import java.util.ArrayList;
  */
 public abstract class MapTool extends MouseAdapter implements HasEventNotificationManager {
 
+    protected static final CustomLogger logger = LogManager.getLogger(MapTool.class);
     protected final static GeometryFactory geom = GeoUtils.getGeometryFactory();
     protected final static StyleFactory sf = FeatureUtils.getStyleFactory();
     protected final static FilterFactory2 ff = FeatureUtils.getFilterFactory();
 
-    protected static final CustomLogger logger = LogManager.getLogger(MapTool.class);
+    /**
+     * Maximum number of selected feature
+     */
+    protected int maxSelectedFeatureNumber;
 
-    protected EventNotificationManager observer;
+    /**
+     * Current mode of tool
+     * <p>
+     * Mode change behavior of tools
+     */
+    protected String mode;
+
+    /**
+     * Size in pixel used to compute an interaction area
+     * <p>
+     * This size will be used to create a rectangular area with this value as side
+     */
+    private int interactionAreaSizePx;
+
     protected DrawManager drawm;
     protected GuiManager guim;
     protected ProjectManager projectm;
     protected MapManager mapm;
     protected CancelManager cancelm;
     protected DialogManager dialm;
-
-    protected int maxSelectedFeatureNumber;
-    protected String mode;
+    protected EventNotificationManager observer;
 
     public MapTool() {
         this.drawm = Main.getDrawManager();
@@ -74,6 +89,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
         drawm.getNotificationManager().addObserver(this);
 
         this.maxSelectedFeatureNumber = 1000;
+        this.interactionAreaSizePx = 7;
 
     }
 
@@ -279,8 +295,15 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
         Project project = projectm.getProject();
         AbmAbstractLayer activeLayer = projectm.getProject().getActiveLayer();
 
-        // Construct a 5x5 pixel rectangle centred on the mouse click position
-        Rectangle screenRect = new Rectangle(screenPos.x - 2, screenPos.y - 2, 5, 5);
+        // construct a rectangle centred on the mouse click position
+        int halfInteractionAreaSize = interactionAreaSizePx / 2;
+        Rectangle screenRect = new Rectangle(screenPos.x - halfInteractionAreaSize,
+                screenPos.y - halfInteractionAreaSize, interactionAreaSizePx, interactionAreaSizePx);
+
+        System.out.println();
+        System.out.println(interactionAreaSizePx);
+        System.out.println(halfInteractionAreaSize);
+        System.out.println(screenRect);
 
         // transform it in world unit
         AffineTransform screenToWorld = getMainMapPane().getScreenToWorldTransform();
@@ -387,7 +410,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * Get a collection of features localized around position (on main map)
      * <p>
      * Feature max number is limited
-     *
+     * <p>
      * Can return null if layer is not a feature layer or if error occur
      *
      * @param screenPos
