@@ -41,7 +41,16 @@ public class SimpleRectangleDesigner extends MouseAdapter {
      */
     private Stroke rectangleStroke;
 
+    /**
+     * If set to true, proportions will be respected if user hold control key
+     * <p>
+     * (and draw a suare instead of a rectangle)
+     */
+    private boolean keepProportionsOnControlDown;
+
     public SimpleRectangleDesigner() {
+
+        keepProportionsOnControlDown = false;
 
         rectangleColor = Color.black;
         rectangleStroke = new BasicStroke(2);
@@ -72,7 +81,7 @@ public class SimpleRectangleDesigner extends MouseAdapter {
         }
 
         // click after the first
-        else {
+        if (working == true) {
 
             Point originCopy = new Point(rectangleOrigin);
 
@@ -94,7 +103,7 @@ public class SimpleRectangleDesigner extends MouseAdapter {
             }
 
             // control is down, keep proportions
-            if (arg0.isControlDown() == true) {
+            if (keepProportionsOnControlDown == true && arg0.isControlDown() == true) {
                 dim.width = dim.height;
             }
 
@@ -133,11 +142,12 @@ public class SimpleRectangleDesigner extends MouseAdapter {
     }
 
     /**
-     * Reset rectangle
+     * Reset rectangle and internal flags
      */
     protected void resetRectangle() {
         rectangle = null;
         rectangleOrigin = null;
+        setWorking(false);
     }
 
     public void setWorking(boolean working) {
@@ -181,12 +191,14 @@ public class SimpleRectangleDesigner extends MouseAdapter {
     }
 
     /**
-     * Get current rectangle
+     * Return a copy of current rectangle
+     * <p>
+     * Can return null
      *
      * @return
      */
     public Rectangle getRectangle() {
-        return rectangle;
+        return rectangle != null ? new Rectangle(rectangle) : null;
     }
 
 }
