@@ -89,7 +89,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
         drawm.getNotificationManager().addObserver(this);
 
         this.maxSelectedFeatureNumber = 1000;
-        this.interactionAreaSizePx = 7;
+        this.interactionAreaSizePx = 8;
 
     }
 
@@ -116,6 +116,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      */
     protected AbmAbstractLayer getActiveLayerOrShowMessage() {
 
+        // check project or show message
         Project p = getProjectOrShowMessage();
 
         if (p == null) {
@@ -127,7 +128,9 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
     }
 
     /**
-     * Return true if project is initialized and if left click was used
+     * Return true if project is initialized and if left click was used.
+     * <p>
+     * If not return null.
      *
      * @param arg0
      * @return
@@ -147,7 +150,9 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
     }
 
     /**
-     * Return true if project is initialized and if left click was used
+     * Return true if project is initialized and if left click was used.
+     * <p>
+     * If not return null.
      *
      * @param arg0
      * @return
@@ -252,6 +257,10 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * @return
      */
     protected Coordinate screenPointToWorldCoordinate(Point2D p) {
+
+        // check if project is initialized
+        projectm.checkIfProjectInitializedOrThrow();
+
         AffineTransform trans = getMainMapPane().getScreenToWorldTransform();
         Point2D worldPoint = trans.transform(p, null);
         return GeoUtils.point2DtoCoordinate(worldPoint);
@@ -288,22 +297,44 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      */
     protected ReferencedEnvelope screenPointToWorldBounds(Point screenPos) {
 
-        if (projectm.isInitialized() == false) {
-            throw new IllegalArgumentException("Project not initialized");
-        }
-
-        Project project = projectm.getProject();
-        AbmAbstractLayer activeLayer = projectm.getProject().getActiveLayer();
-
         // construct a rectangle centred on the mouse click position
         int halfInteractionAreaSize = interactionAreaSizePx / 2;
         Rectangle screenRect = new Rectangle(screenPos.x - halfInteractionAreaSize,
                 screenPos.y - halfInteractionAreaSize, interactionAreaSizePx, interactionAreaSizePx);
 
-        System.out.println();
-        System.out.println(interactionAreaSizePx);
-        System.out.println(halfInteractionAreaSize);
-        System.out.println(screenRect);
+        // transform it and return it
+        return screenRectangleToWorldEnvelope(screenRect);
+
+    }
+
+
+    /**
+     * Transform specified point in a rectangular geometry
+     * <p>
+     * 2 px margin is used around screen position
+     *
+     * @param p
+     * @return
+     */
+    protected Geometry screenPointToGeometryBounds(Point p) {
+        return JTS.toGeometry(screenPointToWorldBounds(p));
+    }
+
+    /**
+     * Transform a screen rectangle in a world envelope.
+     * <p>
+     * Final envelope will use CRS of current layer
+     *
+     * @param screenRect
+     * @return
+     */
+    protected ReferencedEnvelope screenRectangleToWorldEnvelope(Rectangle screenRect) {
+
+        // check if project initialized
+        projectm.checkIfProjectInitializedOrThrow();
+
+        Project project = projectm.getProject();
+        AbmAbstractLayer activeLayer = projectm.getProject().getActiveLayer();
 
         // transform it in world unit
         AffineTransform screenToWorld = getMainMapPane().getScreenToWorldTransform();
@@ -327,25 +358,16 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
         return bbox;
     }
 
-
-    /**
-     * Transform specified point in a rectangular geometry
-     * <p>
-     * 2 px margin is used around screen position
-     *
-     * @param p
-     * @return
-     */
-    protected Geometry screenPointToGeometryBounds(Point p) {
-        return JTS.toGeometry(screenPointToWorldBounds(p));
-    }
-
     /**
      * Get current world to screen transform associated with main map
      *
      * @return
      */
     public AffineTransform getWorldToScreenTransform() {
+
+        // check if project is initialized
+        projectm.checkIfProjectInitializedOrThrow();
+
         return getMainMapPane().getWorldToScreenTransform();
     }
 
@@ -355,23 +377,47 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      * @return
      */
     public AffineTransform getScreenToWorldTransform() {
+
+        // check if project is initialized
+        projectm.checkIfProjectInitializedOrThrow();
+
         return getMainMapPane().getScreenToWorldTransform();
     }
 
     /**
-     * Get a collection of features localized around position (on main map)
+     * Get a collection of features localized around position (on main map).
      * <p>
-     * Feature max number is limited
+     * Feature max number is limited.
+     * <p>
+     * Return null if an error occur.
      *
      * @param screenPos
      * @return
      */
     protected ArrayList<SimpleFeature> getFeaturesFromProjectAroundMousePosition(Point screenPos) {
 
-        if (projectm.isInitialized() == false) {
-            logger.error("Project is not initialized");
-            return null;
-        }
+        // prepare a world envelope around click position
+        ReferencedEnvelope envelope = screenPointToWorldBounds(screenPos);
+
+        // return features matching
+        return getFeaturesFromProjectInEnvelope(envelope, true);
+    }
+
+    /**
+     * Return features having a geometry within specified bounds.
+     * <p>
+     * If intersect is true, not only features in bounds will be returned, but also feature which intersects.
+     * <p>
+     * Return null if an error occur
+     *
+     * @param envelope
+     * @param intersect
+     * @return
+     */
+    protected ArrayList<SimpleFeature> getFeaturesFromProjectInEnvelope(ReferencedEnvelope envelope, boolean intersect) {
+
+        // check if project initialized
+        projectm.checkIfProjectInitializedOrThrow();
 
         AbmAbstractLayer activeLayer = projectm.getProject().getActiveLayer();
 
@@ -380,9 +426,16 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
             return null;
         }
 
-        ReferencedEnvelope bbox = screenPointToWorldBounds(screenPos);
+        // create an intersect filter if specified
+        Filter filter;
+        if (intersect == true) {
+            filter = AbmSimpleFeatureBuilder.getIntersectGeometryFilter(envelope);
+        }
 
-        Filter filter = AbmSimpleFeatureBuilder.getGeometryFilter(bbox);
+        // or create an include filter
+        else {
+            filter = AbmSimpleFeatureBuilder.getIncludeGeometryFilter(envelope);
+        }
 
         try {
             FeatureIterator iter = ((AbmFeatureLayer) activeLayer).getFeatures(filter).features();
@@ -418,10 +471,8 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      */
     protected ArrayList<SimpleFeature> getFeaturesFromMemoryAroundMousePosition(Point screenPos) {
 
-        if (projectm.isInitialized() == false) {
-            logger.error("Project is not initialized");
-            return null;
-        }
+        // check if project initialized
+        projectm.checkIfProjectInitializedOrThrow();
 
         AbmAbstractLayer activeLayer = projectm.getProject().getActiveLayer();
 
@@ -432,7 +483,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
 
         // get box to compare to features
         ReferencedEnvelope bbox = screenPointToWorldBounds(screenPos);
-        Filter filter = AbmSimpleFeatureBuilder.getGeometryFilter(bbox);
+        Filter filter = AbmSimpleFeatureBuilder.getIntersectGeometryFilter(bbox);
 
         // get features and return it
         return getMainMapPane().getMemoryMapFeatures(filter);
@@ -448,9 +499,8 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      */
     protected void setFeaturesModifiable(ArrayList<SimpleFeature> features) {
 
-        if (projectm.isInitialized() == false) {
-            throw new IllegalStateException("Project not initialized");
-        }
+        // check if project initialized
+        projectm.checkIfProjectInitializedOrThrow();
 
         // create a special style to show modified features
         Style modificationStyle = FeatureUtils.createStyleFor(null, Color.red, null, 3);
@@ -470,9 +520,8 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
      */
     protected void commitFeaturesChanges(java.util.List<SimpleFeature> features) {
 
-        if (projectm.isInitialized() == false) {
-            throw new IllegalStateException("Project not initialized");
-        }
+        // check if project is initialized
+        projectm.checkIfProjectInitializedOrThrow();
 
         AbmFeatureLayer activeLayer = (AbmFeatureLayer) projectm.getProject().getActiveLayer();
 
@@ -481,20 +530,19 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
             activeLayer.updateFeature(feat);
         }
 
-        // clear memory layer of main map pane
-        getMainMapPane().clearMemoryLayer();
-
     }
 
     /**
-     * Add features in memory to let user modify it
+     * Clear all features from memory layer of main map component
      */
-    protected void cancelFeaturesChanges() {
+    protected void clearMemoryLayer() {
 
-        // clear memory layer of main map pane
+        // check if project is initialized
+        projectm.checkIfProjectInitializedOrThrow();
+
         getMainMapPane().clearMemoryLayer();
-
     }
+
 
     /**
      * Set tool mode, it should change the tool behavior
@@ -514,21 +562,13 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
         return mode;
     }
 
-
-    protected void unselectAllIfCtrlNotPressed(MouseEvent arg0) {
-        if (arg0.isControlDown() == false) {
-            projectm.getProject().setAllElementsSelected(false);
-        }
-    }
-
-
     @Override
     public EventNotificationManager getNotificationManager() {
         return observer;
     }
 
     /**
-     * Optional display by tool
+     * Override this method to draw on map
      *
      * @param g2d
      */
