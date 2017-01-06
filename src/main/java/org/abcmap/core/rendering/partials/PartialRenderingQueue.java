@@ -230,7 +230,7 @@ class PartialRenderingQueue {
                 renderer.stopRendering();
             } catch (Exception e) {
                 // sometimes exceptions are raised when stop
-                logger.error(e);
+                logger.debug(e);
             }
 
             renderingActive = false;
