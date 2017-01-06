@@ -32,10 +32,15 @@ public class SelectionTool extends MapTool {
      */
     private Point lastMousePosition;
 
+    /**
+     * Bounds of feature before moving them
+     */
+    private ReferencedEnvelope boundsBeforeMove;
+
     public SelectionTool() {
         super();
         moving = false;
-        selectedFeatures = new ArrayList<SimpleFeature>();
+        selectedFeatures = new ArrayList<>();
     }
 
     @Override
@@ -74,7 +79,7 @@ public class SelectionTool extends MapTool {
         // make all modifiable
         setFeaturesModifiable(selectedFeatures);
 
-
+        boundsBeforeMove = GeoUtils.getBoundsFromFeatureList(selectedFeatures);
     }
 
     @Override
@@ -88,7 +93,7 @@ public class SelectionTool extends MapTool {
         }
 
         // we are not moving shapes now
-        if(moving == false){
+        if (moving == false) {
 
             // check if mouse is on a shape, if on start moving
             ArrayList<SimpleFeature> featuresUnderMouse = getFeaturesFromMemoryAroundMousePosition(e.getPoint());
@@ -98,7 +103,7 @@ public class SelectionTool extends MapTool {
         }
 
         // we are moving, translate shapes
-        if(moving == true){
+        if (moving == true) {
 
             // compute world unit move
             Point currentPos = e.getPoint();
@@ -143,9 +148,12 @@ public class SelectionTool extends MapTool {
             // commit changes
             commitFeaturesChanges(selectedFeatures);
 
+            // compute total bounds including old area and new area of map
+            ReferencedEnvelope boundsAfterMove = GeoUtils.getBoundsFromFeatureList(selectedFeatures);
+            boundsAfterMove.include(boundsBeforeMove);
+
             // refresh map
-            ReferencedEnvelope listArea = GeoUtils.getBoundsFromFeatureList(selectedFeatures);
-            deleteActiveLayerCacheAndUpdateMap(listArea);
+            deleteActiveLayerCacheAndUpdateMap(boundsAfterMove);
 
             // reset flags
             lastMousePosition = null;
