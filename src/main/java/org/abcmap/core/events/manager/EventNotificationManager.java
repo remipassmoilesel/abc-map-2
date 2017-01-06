@@ -62,7 +62,7 @@ public class EventNotificationManager implements EventListener {
         }
 
         this.owner = owner;
-        this.observers = new ArrayList<EventNotificationManager>(10);
+        this.observers = new ArrayList<>(10);
         this.defaultListener = null;
     }
 
@@ -144,7 +144,7 @@ public class EventNotificationManager implements EventListener {
      * @param observers
      */
     public void addObservers(Collection<HasEventNotificationManager> observers) {
-        for (HasEventNotificationManager o : observers) {
+        for (HasEventNotificationManager o : new ArrayList<>(observers)) {
             addObserver(o);
         }
     }
@@ -183,7 +183,7 @@ public class EventNotificationManager implements EventListener {
         PrintUtils.p("%% Observers: ");
         PrintUtils.p("Observer owner: " + owner.getClass().getSimpleName() + " --- " + owner);
         int i = 0;
-        for (EventNotificationManager o : observers) {
+        for (EventNotificationManager o : new ArrayList<>(observers)) {
             if (o == null) {
                 PrintUtils.p(i + " : " + o);
             } else {
@@ -241,7 +241,7 @@ public class EventNotificationManager implements EventListener {
             }
 
             // iterate all observers
-            for (EventNotificationManager om : observers) {
+            for (EventNotificationManager om : new ArrayList<>(observers)) {
                 try {
                     if (om != null) {
                         om.notificationReceived(event);
