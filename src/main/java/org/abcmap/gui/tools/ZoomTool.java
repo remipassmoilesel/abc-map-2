@@ -17,7 +17,7 @@ import java.awt.geom.AffineTransform;
  */
 public class ZoomTool extends MapTool {
 
-    private final SimpleRectangleDesigner drawer;
+    private final SimpleRectangleDesigner rectangleAreaDesigner;
 
     /**
      * Minimal size in pixel of zoom selection. If selection is lower than this value, no zoom is performed
@@ -26,7 +26,7 @@ public class ZoomTool extends MapTool {
 
     public ZoomTool() {
         super();
-        drawer = new SimpleRectangleDesigner();
+        rectangleAreaDesigner = new SimpleRectangleDesigner();
         minSizePx = 10;
     }
 
@@ -67,8 +67,9 @@ public class ZoomTool extends MapTool {
     public void mouseDragged(MouseEvent e) {
         super.mouseDragged(e);
 
+        // draw a zoom selection on right click drag
         if (SwingUtilities.isRightMouseButton(e)) {
-            drawer.mouseDragged(e);
+            rectangleAreaDesigner.mouseDragged(e);
         }
 
         repaintMainMap();
@@ -84,10 +85,10 @@ public class ZoomTool extends MapTool {
     public void mouseReleased(MouseEvent e) {
         super.mouseReleased(e);
 
-        drawer.mouseReleased(e);
+        rectangleAreaDesigner.mouseReleased(e);
 
         // user end area drawing
-        Rectangle rect = drawer.getRectangle();
+        Rectangle rect = rectangleAreaDesigner.getRectangle();
         if (rect != null && rect.getWidth() > minSizePx && rect.getHeight() > minSizePx) {
             AffineTransform transform = getWorldToScreenTransform();
 
@@ -101,17 +102,16 @@ public class ZoomTool extends MapTool {
             ReferencedEnvelope env = new ReferencedEnvelope(blc.x, urc.x, blc.y, urc.y, projectm.getProject().getCrs());
             getMainMapPane().setWorldEnvelope(env);
 
-            drawer.resetRectangle();
+            rectangleAreaDesigner.resetRectangle();
 
             // repaint map
             refreshMainMap();
-
 
         }
 
         // shape may be too tiny, reset all
         else {
-            drawer.resetRectangle();
+            rectangleAreaDesigner.resetRectangle();
 
             // repaint map
             repaintMainMap();
@@ -127,23 +127,9 @@ public class ZoomTool extends MapTool {
     @Override
     public void drawOnMainMap(Graphics2D g2d) {
         super.drawOnMainMap(g2d);
-        drawer.draw(g2d);
+        rectangleAreaDesigner.draw(g2d);
     }
 
-    /**
-     * Mouse out of panel, reset all
-     *
-     * @param e
-     */
-    @Override
-    public void mouseExited(MouseEvent e) {
-        super.mouseExited(e);
-
-        // hide selection
-        drawer.resetRectangle();
-
-        repaintMainMap();
-    }
 
 
 }
