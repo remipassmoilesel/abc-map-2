@@ -289,6 +289,18 @@ public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNot
     }
 
     /**
+     * Utility used to check if project is enabled.
+     * <p>
+     * If not, a runtime exception is thrown. This should be used on code where project should be enabled.
+     */
+    public void checkIfProjectInitializedOrThrow() {
+        if (isInitialized() == false) {
+            throw new IllegalStateException("Project not initialized");
+        }
+    }
+
+
+    /**
      * Return current project loaded. Can return null.
      *
      * @return
