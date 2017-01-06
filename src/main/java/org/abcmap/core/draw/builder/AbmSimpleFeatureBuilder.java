@@ -4,6 +4,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.utils.FeatureUtils;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.styling.StyleFactory;
 import org.opengis.feature.simple.SimpleFeature;
@@ -85,12 +86,25 @@ public class AbmSimpleFeatureBuilder {
     }
 
     /**
-     * Return geometry associated with a default feature
+     * Return a geometry filter associated with default features
+     * <p>
+     * This filter match when geometries intersect specified bounds
      *
      * @return
      */
-    public static Filter getGeometryFilter(ReferencedEnvelope envelope) {
+    public static Filter getIntersectGeometryFilter(ReferencedEnvelope envelope) {
         return ff.bbox(ff.property(GEOMETRY_ATTRIBUTE_NAME), envelope);
+    }
+
+    /**
+     * Return a geometry filter associated with default features
+     * <p>
+     * This filter match when geometries include specified bounds
+     *
+     * @return
+     */
+    public static Filter getIncludeGeometryFilter(ReferencedEnvelope envelope) {
+        return ff.within(ff.property(GEOMETRY_ATTRIBUTE_NAME), ff.literal(JTS.toGeometry(envelope)));
     }
 
     /**
@@ -123,4 +137,6 @@ public class AbmSimpleFeatureBuilder {
 
         return (String) feature.getAttribute(AbmSimpleFeatureBuilder.STYLE_ID_ATTRIBUTE_NAME);
     }
+
+
 }
