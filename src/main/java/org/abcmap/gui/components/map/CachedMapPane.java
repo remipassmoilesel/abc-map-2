@@ -205,7 +205,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         // paint mask
         if (memoryMapContent != null) {
             // do not use currentWorldEnvelope to prevent bad offsets
-            //maskRenderer.paint(g2d, new Rectangle(getSize()), currentWorldEnvelope);
+            // maskRenderer.paint(g2d, new Rectangle(getSize()), currentWorldEnvelope);
 
             memoryLayerRenderer.paint(g2d, new Rectangle(getSize()), renderingEngine.getWorldEnvelope());
         }
@@ -359,40 +359,9 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     }
 
     /**
-     * Get map content drawn on top off all layers
-     *
-     * @return
-     */
-    public ArrayList<SimpleFeature> getMemoryMapFeatures(Filter filter) {
-
-        if (memoryMapContent == null || memoryMapContent.layers().size() < 1) {
-            logger.debug("Memory map content is null or empty: " + memoryMapContent);
-            return null;
-        }
-
-        try {
-            ArrayList<SimpleFeature> result = new ArrayList<>();
-            FeatureIterator features = memoryMapContent.layers().get(0).getFeatureSource().getFeatures(filter).features();
-
-            int i = 0;
-            while (features.hasNext()) {
-                result.add((SimpleFeature) features.next());
-
-                if (i > maxFeaturesInMemory) {
-                    throw new IllegalStateException("Too much features in memory");
-                }
-
-                i++;
-            }
-
-            return result;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
      * Set content of a special layer, drawn over all others, where all features are stored in memory.
+     * <p>
+     * Throw an exception if there is too much features or if list is empty
      *
      * @param featureCollection
      * @param style
@@ -401,6 +370,11 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         if (featureCollection.size() > maxFeaturesInMemory) {
             throw new IllegalStateException("Too much features to display: " + featureCollection.size());
+        }
+
+        // do not create empty layers of errors will be raised while painting
+        if (featureCollection.size() < 1) {
+            throw new IllegalStateException("Too few features to display: " + featureCollection.size());
         }
 
         clearMemoryLayer();
@@ -423,6 +397,41 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         memoryLayerRenderer.setMapContent(memoryMapContent);
 
     }
+
+    /**
+     * Get map content drawn on top off all layers
+     *
+     * @return
+     */
+    public ArrayList<SimpleFeature> getMemoryMapFeatures(Filter filter) {
+
+        if (memoryMapContent == null || memoryMapContent.layers().size() < 1) {
+            logger.debug("Memory map content is null or empty: " + memoryMapContent);
+            return null;
+        }
+
+        try {
+            ArrayList<SimpleFeature> result = new ArrayList<>();
+
+            FeatureIterator features = memoryMapContent.layers().get(0).getFeatureSource().getFeatures(filter).features();
+
+            int i = 0;
+            while (features.hasNext()) {
+                result.add((SimpleFeature) features.next());
+
+                if (i > maxFeaturesInMemory) {
+                    throw new IllegalStateException("Too much features in memory");
+                }
+
+                i++;
+            }
+
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 
     /**
      * Pixel scale can be used to translate summary pixels to world unit
