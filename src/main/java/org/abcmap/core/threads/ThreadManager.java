@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.BooleanSupplier;
 
 /**
@@ -24,7 +25,7 @@ public class ThreadManager {
     /**
      * Thread pool
      */
-    private static ExecutorService executor;
+    private static ThreadPoolExecutor executor;
 
     /**
      * Run a task in a separated thread
@@ -101,18 +102,24 @@ public class ThreadManager {
     private static ExecutorService getExecutor() {
 
         if (executor == null) {
+            // keep a minimum of 4 threads, to prevent error on event dispatch
+            int minPoolSize = 4;
             int nbProcs = Runtime.getRuntime().availableProcessors();
-            int nbThreads = nbProcs;
-            executor = Executors.newFixedThreadPool(nbThreads, new ThreadFactory() {
+            int threadPoolSize = nbProcs * 2;
+            threadPoolSize = threadPoolSize >= minPoolSize ? threadPoolSize : minPoolSize;
+            executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadPoolSize, new ThreadFactory() {
 
                 @Override
                 public Thread newThread(Runnable r) {
                     executorTaskCount++;
                     Thread t = new Thread(r);
-                    t.setName("Abm_task_" + executorTaskCount);
+                    t.setName("Abm_thread-" + executorTaskCount);
                     return t;
                 }
             });
+
+            // set minimum thread always up
+            //executor.setCorePoolSize(threadPoolSize);
 
             //System.out.println("Initializing thread pool: " + nbProcs + " processors, threads: " + nbThreads);
         }
