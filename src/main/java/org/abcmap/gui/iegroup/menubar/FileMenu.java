@@ -1,11 +1,11 @@
 package org.abcmap.gui.iegroup.menubar;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.program.QuitProgram;
 import org.abcmap.ielements.project.*;
 import org.abcmap.ielements.recents.OpenRecentProject;
 
-public class FileMenu extends InteractionElementGroup {
+public class FileMenu extends GroupOfInteractionElements {
 
     public FileMenu() {
 

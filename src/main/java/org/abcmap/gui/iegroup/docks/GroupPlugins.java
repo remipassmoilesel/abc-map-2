@@ -2,11 +2,11 @@ package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.ielements.InteractionElement;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 
 import java.util.ArrayList;
 
-public class GroupPlugins extends InteractionElementGroup {
+public class GroupPlugins extends GroupOfInteractionElements {
 
     public GroupPlugins() {
         label = "Modules d'extension";

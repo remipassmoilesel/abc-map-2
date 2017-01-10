@@ -1,14 +1,14 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.importation.data.MenuDataImport;
 import org.abcmap.ielements.importation.directory.MenuImportFromDirectory;
 import org.abcmap.ielements.importation.document.MenuImportFromDocument;
 import org.abcmap.ielements.importation.manual.MenuImportManualCapture;
 import org.abcmap.ielements.importation.robot.MenuRobotImport;
 
-public class GroupImportation extends InteractionElementGroup {
+public class GroupImportation extends GroupOfInteractionElements {
 
     public GroupImportation() {
 

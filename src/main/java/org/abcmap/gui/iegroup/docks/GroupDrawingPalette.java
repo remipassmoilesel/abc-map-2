@@ -1,11 +1,11 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.draw.SelectColors;
 import org.abcmap.ielements.draw.SelectDrawCaracteristics;
 
-public class GroupDrawingPalette extends InteractionElementGroup {
+public class GroupDrawingPalette extends GroupOfInteractionElements {
 
 	public GroupDrawingPalette() {
 		label = "Couleurs";

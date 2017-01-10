@@ -1,10 +1,10 @@
 package org.abcmap.ielements.importation.directory;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.importation.SelectCropAreaForDirectory;
 import org.abcmap.ielements.importation.SelectPictureAnalyseMode;
 
-public class MenuImportFromDirectory extends InteractionElementGroup {
+public class MenuImportFromDirectory extends GroupOfInteractionElements {
 
     public MenuImportFromDirectory() {
 

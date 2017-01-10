@@ -5,7 +5,7 @@ import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.GuiStyle;
 import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.ielements.InteractionElement;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.wizards.*;
 
@@ -14,7 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class GroupWizard extends InteractionElementGroup {
+public class GroupWizard extends GroupOfInteractionElements {
 
     private Wizard[] wizards = new Wizard[]{new PresentationWizard(),
             new AutoScreenCaptureWizard(), new GetHelpWizard(),

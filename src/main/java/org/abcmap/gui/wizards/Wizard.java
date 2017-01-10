@@ -2,7 +2,7 @@ package org.abcmap.gui.wizards;
 
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.Main;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.gui.iegroup.docks.GroupWizard;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.HasDisplayableSpace;
@@ -235,7 +235,7 @@ public class Wizard {
      * @param desc
      * @return
      */
-    protected String createShowGroupString(Class<? extends InteractionElementGroup> class1, String desc) {
+    protected String createShowGroupString(Class<? extends GroupOfInteractionElements> class1, String desc) {
         return WizardStepPanel.IE_GROUP_LINK_MARK + class1.getSimpleName() + WizardStepPanel.IE_GROUP_LINK_MARK + desc;
     }
 

@@ -1,12 +1,12 @@
 package org.abcmap.ielements.importation.robot;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.display.window.ShowAutoImportWindow;
 import org.abcmap.ielements.draw.SelectLayer;
 import org.abcmap.ielements.importation.SelectCropAreaForScreen;
 import org.abcmap.ielements.importation.SelectPictureAnalyseMode;
 
-public class MenuRobotImport extends InteractionElementGroup {
+public class MenuRobotImport extends GroupOfInteractionElements {
 
     public MenuRobotImport() {
         this.label = "Capture automatique d'écran...";

@@ -3,7 +3,7 @@ package org.abcmap.gui.components.dock.blockitems;
 import org.abcmap.gui.GuiCursor;
 import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.ielements.InteractionElement;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.gui.utils.GuiUtils;
 
 import java.awt.event.MouseAdapter;
@@ -11,13 +11,13 @@ import java.awt.event.MouseEvent;
 
 public class SubMenuItem extends SimpleBlockItem {
 
-    private InteractionElementGroup interactionGroup;
+    private GroupOfInteractionElements interactionGroup;
 
     protected DockMenuPanel subMenu;
 
     private Dock dock;
 
-    public SubMenuItem(InteractionElementGroup group) {
+    public SubMenuItem(GroupOfInteractionElements group) {
         super(group);
 
         this.interactionGroup = group;
@@ -46,7 +46,7 @@ public class SubMenuItem extends SimpleBlockItem {
         subMenu.reconstruct();
     }
 
-    public void setInteractionGroup(InteractionElementGroup interactionGroup) {
+    public void setInteractionGroup(GroupOfInteractionElements interactionGroup) {
         this.interactionGroup = interactionGroup;
     }
 

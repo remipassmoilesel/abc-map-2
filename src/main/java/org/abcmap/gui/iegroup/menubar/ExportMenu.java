@@ -1,11 +1,11 @@
 package org.abcmap.gui.iegroup.menubar;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.export.ExportLayoutFrames;
 import org.abcmap.ielements.export.ExportMapToPng;
 import org.abcmap.ielements.export.PrintLayouts;
 
-public class ExportMenu extends InteractionElementGroup {
+public class ExportMenu extends GroupOfInteractionElements {
 
     public ExportMenu() {
 

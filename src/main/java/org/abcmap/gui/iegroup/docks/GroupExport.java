@@ -1,10 +1,10 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.export.*;
 
-public class GroupExport extends InteractionElementGroup {
+public class GroupExport extends GroupOfInteractionElements {
 
 	public GroupExport() {
 		label = "Export et impression";

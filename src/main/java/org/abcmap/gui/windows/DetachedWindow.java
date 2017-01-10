@@ -12,7 +12,7 @@ import org.abcmap.gui.components.progressbar.HasProgressbarManager;
 import org.abcmap.gui.components.progressbar.ProgressbarManager;
 import org.abcmap.ielements.InteractionElement;
 import org.abcmap.ielements.display.window.ShowMainWindow;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.gui.utils.HasDisplayableSpace;
 
 import java.awt.Color;
@@ -93,7 +93,7 @@ public class DetachedWindow extends AbstractCustomWindow implements HasEventNoti
         refresh();
     }
 
-    public void displayComponent(InteractionElementGroup group) {
+    public void displayComponent(GroupOfInteractionElements group) {
         this.displayable = group;
     }
 
@@ -142,9 +142,9 @@ public class DetachedWindow extends AbstractCustomWindow implements HasEventNoti
         }
 
         // object to display is a group
-        if (displayable instanceof InteractionElementGroup) {
+        if (displayable instanceof GroupOfInteractionElements) {
 
-            for (InteractionElement e : ((InteractionElementGroup) displayable).getElements()) {
+            for (InteractionElement e : ((GroupOfInteractionElements) displayable).getElements()) {
 
                 if (e.isHiddenInDetachedWindow()) {
                     continue;

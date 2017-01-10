@@ -1,10 +1,10 @@
 package org.abcmap.gui.iegroup.menubar;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.debug.CreateFakeProject;
 import org.abcmap.ielements.debug.ShowLastEvents;
 
-public class DebugMenu extends InteractionElementGroup {
+public class DebugMenu extends GroupOfInteractionElements {
 
     public DebugMenu() {
 

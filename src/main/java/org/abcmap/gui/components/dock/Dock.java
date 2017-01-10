@@ -3,7 +3,7 @@ package org.abcmap.gui.components.dock;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.Main;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.HasDisplayableSpace;
 
@@ -230,7 +230,7 @@ public class Dock extends JPanel implements HasDisplayableSpace {
      * @param iegClass
      * @return
      */
-    public boolean showFirstMenuPanelCorrespondingThis(Class<? extends InteractionElementGroup> iegClass) {
+    public boolean showFirstMenuPanelCorrespondingThis(Class<? extends GroupOfInteractionElements> iegClass) {
         return showFirstMenuPanelCorrespondingThis(iegClass.getSimpleName());
     }
 

@@ -1,6 +1,6 @@
 package org.abcmap.gui.iegroup.menubar;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.copy.Copy;
 import org.abcmap.ielements.copy.Cut;
 import org.abcmap.ielements.copy.Paste;
@@ -17,7 +17,7 @@ import org.abcmap.ielements.undoredo.Redo;
 import org.abcmap.ielements.undoredo.Undo;
 
 
-public class EditionMenu extends InteractionElementGroup {
+public class EditionMenu extends GroupOfInteractionElements {
 
     public EditionMenu() {
 

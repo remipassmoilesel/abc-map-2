@@ -8,7 +8,7 @@ import org.abcmap.gui.components.CustomComponent;
 import org.abcmap.gui.components.buttons.HtmlLabel;
 import org.abcmap.gui.components.dock.blockitems.DockMenuPanel;
 import org.abcmap.ielements.InteractionElement;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.gui.windows.MainWindowMode;
 
 import javax.swing.*;
@@ -28,7 +28,7 @@ public class DockMenuWidget extends CustomComponent {
     /**
      * Element of menu
      */
-    private InteractionElementGroup interactionElementGroup;
+    private GroupOfInteractionElements interactionElementGroup;
 
     /**
      * Widget icon
@@ -101,7 +101,7 @@ public class DockMenuWidget extends CustomComponent {
         lblIcon.repaint();
     }
 
-    public void setInteractionElementGroup(InteractionElementGroup ieg) {
+    public void setInteractionElementGroup(GroupOfInteractionElements ieg) {
 
         this.interactionElementGroup = ieg;
 
@@ -121,7 +121,7 @@ public class DockMenuWidget extends CustomComponent {
         for (InteractionElement e : ieg.getElements()) {
 
             // add separator
-            if (InteractionElementGroup.isSeparator(e)) {
+            if (GroupOfInteractionElements.isSeparator(e)) {
                 menuPanel.addMenuElement(new HtmlLabel(" "));
             }
 
@@ -135,7 +135,7 @@ public class DockMenuWidget extends CustomComponent {
         menuPanel.reconstruct();
     }
 
-    public InteractionElementGroup getInteractionElementGroup() {
+    public GroupOfInteractionElements getInteractionElementGroup() {
         return interactionElementGroup;
     }
 

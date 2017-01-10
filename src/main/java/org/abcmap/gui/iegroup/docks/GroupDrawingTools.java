@@ -1,12 +1,12 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.draw.SelectDrawingTool;
 import org.abcmap.ielements.draw.ShowToolHelp;
 import org.abcmap.ielements.draw.ShowToolOptionPanel;
 
-public class GroupDrawingTools extends InteractionElementGroup {
+public class GroupDrawingTools extends GroupOfInteractionElements {
 
     public GroupDrawingTools() {
         label = "Dessin";

@@ -2,7 +2,7 @@ package org.abcmap.gui.iegroup.menubar;
 
 import org.abcmap.core.managers.Main;
 import org.abcmap.ielements.InteractionElement;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -11,7 +11,7 @@ public class GuiMenuBar extends JMenuBar {
 
     public GuiMenuBar() {
 
-        ArrayList<InteractionElementGroup> groups = new ArrayList<InteractionElementGroup>();
+        ArrayList<GroupOfInteractionElements> groups = new ArrayList<GroupOfInteractionElements>();
         groups.add(new FileMenu());
         groups.add(new EditionMenu());
         groups.add(new DrawingToolsMenu());
@@ -24,7 +24,7 @@ public class GuiMenuBar extends JMenuBar {
             groups.add(new DebugMenu());
         }
 
-        for (InteractionElementGroup ieg : groups) {
+        for (GroupOfInteractionElements ieg : groups) {
 
             JMenu smenu = new JMenu(ieg.getLabel());
 
@@ -34,7 +34,7 @@ public class GuiMenuBar extends JMenuBar {
 
             for (InteractionElement ie : ieg.getElements()) {
 
-                if (InteractionElementGroup.isSeparator(ie)) {
+                if (GroupOfInteractionElements.isSeparator(ie)) {
                     smenu.addSeparator();
                 } else {
                     smenu.add(ie.getMenuGUI());

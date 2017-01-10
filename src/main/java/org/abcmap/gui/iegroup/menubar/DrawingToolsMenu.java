@@ -1,13 +1,13 @@
 package org.abcmap.gui.iegroup.menubar;
 
 import org.abcmap.ielements.InteractionElement;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.gui.tools.containers.ToolContainer;
 import org.abcmap.gui.tools.containers.ToolLibrary;
 
 import java.awt.event.ActionEvent;
 
-public class DrawingToolsMenu extends InteractionElementGroup {
+public class DrawingToolsMenu extends GroupOfInteractionElements {
 
     public DrawingToolsMenu() {
 

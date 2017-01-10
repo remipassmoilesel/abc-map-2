@@ -1,8 +1,8 @@
 package org.abcmap.ielements.importation.document;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 
-public class MenuImportFromDocument extends InteractionElementGroup {
+public class MenuImportFromDocument extends GroupOfInteractionElements {
 
     public MenuImportFromDocument() {
 

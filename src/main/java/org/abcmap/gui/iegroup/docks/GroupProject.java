@@ -1,11 +1,11 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.project.*;
 import org.abcmap.ielements.recents.OpenRecentProject;
 
-public class GroupProject extends InteractionElementGroup {
+public class GroupProject extends GroupOfInteractionElements {
 
     public GroupProject() {
         label = "Projet";

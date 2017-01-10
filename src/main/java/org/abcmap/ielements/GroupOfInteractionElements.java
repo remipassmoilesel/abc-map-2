@@ -9,7 +9,7 @@ import java.util.ArrayList;
 /**
  * Interaction element group. A group can be used to create menus, docks, etc ...
  */
-public class InteractionElementGroup extends InteractionElement {
+public class GroupOfInteractionElements extends InteractionElement {
 
     /**
      * Return true if specified element is a separator
@@ -31,7 +31,7 @@ public class InteractionElementGroup extends InteractionElement {
      */
     protected MainWindowMode windowMode;
 
-    public InteractionElementGroup() {
+    public GroupOfInteractionElements() {
 
         this.label = "no name";
 

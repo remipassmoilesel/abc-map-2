@@ -1,6 +1,6 @@
 package org.abcmap.gui.components.dock;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 
 import javax.swing.JComponent;
 import java.util.List;
@@ -28,9 +28,9 @@ public class DockBuilder {
         for (Object o : widgets) {
 
             // create dock menu widget
-            if (o instanceof InteractionElementGroup) {
+            if (o instanceof GroupOfInteractionElements) {
 
-                InteractionElementGroup ieg = (InteractionElementGroup) o;
+                GroupOfInteractionElements ieg = (GroupOfInteractionElements) o;
 
                 DockMenuWidget btt = new DockMenuWidget();
                 btt.setInteractionElementGroup(ieg);

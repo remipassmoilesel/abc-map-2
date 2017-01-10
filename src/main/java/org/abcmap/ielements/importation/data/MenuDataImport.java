@@ -1,8 +1,8 @@
 package org.abcmap.ielements.importation.data;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 
-public class MenuDataImport extends InteractionElementGroup {
+public class MenuDataImport extends GroupOfInteractionElements {
 
     public MenuDataImport() {
         this.label = "Importer un fichier de données...";

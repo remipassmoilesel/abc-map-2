@@ -1,10 +1,10 @@
 package org.abcmap.gui.iegroup.menubar;
 
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.program.ShowAboutDialog;
 import org.abcmap.ielements.ressources.*;
 
-public class HelpMenu extends InteractionElementGroup {
+public class HelpMenu extends GroupOfInteractionElements {
 
     public HelpMenu() {
 

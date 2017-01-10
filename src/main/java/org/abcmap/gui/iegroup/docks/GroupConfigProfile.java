@@ -1,11 +1,11 @@
 package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
-import org.abcmap.ielements.InteractionElementGroup;
+import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.profiles.*;
 import org.abcmap.ielements.recents.OpenRecentProfile;
 
-public class GroupConfigProfile extends InteractionElementGroup {
+public class GroupConfigProfile extends GroupOfInteractionElements {
 
     public GroupConfigProfile() {
         label = "Profils de configuration";
