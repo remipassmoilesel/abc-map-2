@@ -2,11 +2,15 @@ package org.abcmap.core.threads;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.function.BooleanSupplier;
 
 /**
  * Utility to run tasks in others threads.
@@ -123,5 +127,36 @@ public class ThreadManager {
 
         // stop gently
         getExecutor().shutdown();
+    }
+
+    /**
+     * Allow to run method at specified interval on EDT
+     * <p>
+     * Inside boolean supplier, return false to stop timer
+     *
+     * @param interval
+     * @param run
+     */
+    public static void runTimerOnEDT(int interval, BooleanSupplier run) {
+
+        ActionListener action = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                GuiUtils.throwIfNotOnEDT();
+
+                // perform action and get return value
+                boolean continueTimer = run.getAsBoolean();
+
+                // if return false, stop timer
+                if (continueTimer == false) {
+                    ((Timer) e.getSource()).stop();
+                }
+            }
+        };
+
+        // launch timer
+        Timer timer = new Timer(interval, action);
+        timer.start();
     }
 }
