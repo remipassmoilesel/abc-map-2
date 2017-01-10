@@ -32,6 +32,7 @@ public class DialogManager extends ManagerTreeAccessUtil {
      */
     private MessageBoxManager messagebox;
 
+
     /**
      * Display an message in box
      *
@@ -65,6 +66,11 @@ public class DialogManager extends ManagerTreeAccessUtil {
 
         if (timeMilliSec == null) {
             timeMilliSec = messagebox.getDefaultTime();
+        }
+
+        if (messagebox.isBoxVisible() == true) {
+            // TODO: create a message queue ?
+            logger.debug("Message already shown");
         }
 
         messagebox.setBackgroundColor(background);

@@ -1,7 +1,8 @@
 package org.abcmap.gui.components.messagebox;
 
 import org.abcmap.gui.HtmlLabel;
-import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.gui.transition.FadeTransition;
+import org.abcmap.gui.transition.HasTransition;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,9 +10,9 @@ import java.awt.*;
 /**
  * Message box which an appear on screen to inform user and disappear after a little time
  */
-public class BoxMessagePanel extends HtmlLabel {
+public class BoxMessagePanel extends HtmlLabel implements HasTransition {
 
-    private float transparency = 0.9f;
+    private final FadeTransition fadeTransition;
 
     public BoxMessagePanel() {
         super();
@@ -30,46 +31,24 @@ public class BoxMessagePanel extends HtmlLabel {
 
         setPreferredSize(new Dimension(600, 60));
 
+        this.fadeTransition = new FadeTransition(this);
+
     }
 
     @Override
     protected void paintComponent(Graphics g) {
-        ((Graphics2D) g).setComposite(GuiUtils.createTransparencyComposite(transparency));
+
+        // set transparency before paint
+        fadeTransition.applyTransparency((Graphics2D) g);
+
         super.paintComponent(g);
     }
 
-    /**
-     * Set transparency
-     *
-     * @param transparency
-     */
+    public void startTransition(String t, Runnable whenFinished) {
+        fadeTransition.start(t, whenFinished);
+    }
+
     public void setTransparency(float transparency) {
-        this.transparency = transparency;
-    }
-
-    /**
-     * Get current transparency
-     *
-     * @return
-     */
-    public float getTransparency() {
-        return transparency;
-    }
-
-    /**
-     * Add value to current transparency
-     *
-     * @param increment
-     */
-    public void addTransparencyValue(float increment) {
-
-        transparency += increment;
-
-        // check interval
-        if (transparency > 1) {
-            transparency = 1;
-        } else if (transparency < 0) {
-            transparency = 0;
-        }
+        fadeTransition.setTransparency(transparency);
     }
 }

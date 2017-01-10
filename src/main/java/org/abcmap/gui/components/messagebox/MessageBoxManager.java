@@ -2,9 +2,8 @@ package org.abcmap.gui.components.messagebox;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.color.ColorPicker;
-import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.gui.transition.Transition;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,45 +19,26 @@ public class MessageBoxManager {
 
     private static final CustomLogger logger = LogManager.getLogger(ColorPicker.class);
 
-    private final int transpInterval = 50;
-    private final float transpIncrement = 0.1f;
-
     /**
      * Parent frame of message box
      */
     private JFrame parentFrame;
 
     /**
-     * Where is displayed message
-     */
-    private BoxMessagePanel messagePanel;
-
-    /**
-     * Popup hold message panel
-     */
-    private JPopupMenu popup;
-
-    /**
      * If no time is specified, this one is used
      */
     private Integer defaultTime;
 
+    /**
+     * Background of panel
+     */
+    private Color messagePanelBackground;
+    private boolean boxVisible;
+    private JPopupMenu lastPopupDialog;
+
     public MessageBoxManager(JFrame parent) {
-
         this.parentFrame = parent;
-
-        this.messagePanel = new BoxMessagePanel();
-
-        // Hide box on click
-        messagePanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                popup.setVisible(false);
-            }
-        });
-
         this.defaultTime = 3000;
-
     }
 
     /**
@@ -70,14 +50,6 @@ public class MessageBoxManager {
         showMessage(defaultTime, message);
     }
 
-    public Integer getDefaultTime() {
-        return defaultTime;
-    }
-
-    public void setDefaultTime(Integer defaultTime) {
-        this.defaultTime = defaultTime;
-    }
-
     /**
      * Show a message on EDT
      *
@@ -87,22 +59,35 @@ public class MessageBoxManager {
     public void showMessage(Integer timeMilliSec, final String message) {
         SwingUtilities.invokeLater(() -> {
 
+            BoxMessagePanel messagePanel = new BoxMessagePanel();
+            messagePanel.setBackground(messagePanelBackground);
+
             // do not show if main window is not visible
             if (parentFrame == null) {
+                logger.error("Cannot show message, parent is invisible: " + message);
                 return;
             }
 
-            if (popup == null) {
-                popup = new JPopupMenu();
-                popup.setOpaque(false);
+            // create popup menu
+            JPopupMenu popup = new JPopupMenu();
+            popup.setOpaque(false);
 
-                JPanel support = new JPanel(new BorderLayout());
-                support.add(messagePanel, BorderLayout.CENTER);
+            JPanel support = new JPanel(new BorderLayout());
+            support.add(messagePanel, BorderLayout.CENTER);
+            support.setBorder(null);
 
-                popup.setBorder(null);
-                popup.add(support);
-                popup.pack();
-            }
+            popup.setBorder(null);
+            popup.add(support);
+            popup.pack();
+
+
+            // hide on click
+            messagePanel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    popup.setVisible(false);
+                }
+            });
 
             // set message
             messagePanel.setText("<center>" + message + "</center>");
@@ -117,34 +102,20 @@ public class MessageBoxManager {
             int y = (int) (df.height - (df.height * 0.20f) - dm.height);
 
             try {
+
+                lastPopupDialog = popup;
+
                 messagePanel.setTransparency(0);
                 popup.show(parentFrame.getContentPane(), x, y);
 
-                // fade in label
-                ThreadManager.runLater(() -> {
-
-                    GuiUtils.throwIfOnEDT();
-
-                    synchronized (this) {
-                        while (messagePanel.getTransparency() < 1) {
-                            try {
-                                wait(transpInterval);
-                            } catch (InterruptedException e) {
-                                logger.error(e);
-                            }
-                            messagePanel.addTransparencyValue(transpIncrement);
-                            messagePanel.revalidate();
-                            messagePanel.repaint();
-                        }
-                    }
-                });
-
-                // hide label
-                ThreadManager.runLater(() -> {
+                // show message
+                messagePanel.startTransition(Transition.FADE_OUT, () -> {
+                    // hide it after specified time
                     popup.setVisible(false);
-                }, true, timeMilliSec + 1);
-
-            } catch (Exception e) {
+                });
+            }
+            // sometimes errors can be thrown on show
+            catch (Exception e) {
                 logger.error(e);
             }
 
@@ -157,9 +128,34 @@ public class MessageBoxManager {
      * @param background
      */
     public void setBackgroundColor(Color background) {
-        messagePanel.setBackground(background);
-        messagePanel.revalidate();
-        messagePanel.repaint();
+        this.messagePanelBackground = background;
     }
 
+
+    /**
+     * Return default time value used if no time is specified at display
+     *
+     * @return
+     */
+    public Integer getDefaultTime() {
+        return defaultTime;
+    }
+
+    /**
+     * Set default time used if not time is specified
+     *
+     * @param defaultTime
+     */
+    public void setDefaultTime(Integer defaultTime) {
+        this.defaultTime = defaultTime;
+    }
+
+    /**
+     * Return true if a message is being show
+     *
+     * @return
+     */
+    public boolean isBoxVisible() {
+        return lastPopupDialog != null ? lastPopupDialog.isVisible() : false;
+    }
 }
