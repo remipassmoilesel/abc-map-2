@@ -9,7 +9,7 @@ public class SearchToolbar extends Toolbar {
     public SearchToolbar() {
         setLayout(new MigLayout("insets 6, gap 6"));
         GuiUtils.addLabel("Rechercher: ", this);
-        add(new CommandSearchTextField(), "width 100, height 30");
+        add(new CommandSearchTextField(), "width 100px!, height 30px!");
     }
 
 }

@@ -6,6 +6,7 @@ import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.components.dock.DockBuilder;
 import org.abcmap.gui.components.dock.DockOrientation;
 import org.abcmap.gui.components.dock.DrawIndicatorWidget;
+import org.abcmap.gui.toolbars.DropFilesToolbar;
 import org.abcmap.ielements.importation.manual.MenuImportManualCapture;
 import org.abcmap.ielements.importation.robot.MenuRobotImport;
 import org.abcmap.ielements.toolbar.DisplayToolbar;
@@ -95,7 +96,13 @@ public class GuiBuilder {
         tbs.addToolbar(new FileToolbar());
         tbs.addToolbar(new EditionToolbar());
         tbs.addToolbar(new DisplayToolbar());
-        tbs.addToolbar(new SearchToolbar());
+
+        // add filler
+        tbs.addFiller();
+
+        tbs.addToolbar(new DropFilesToolbar(), "align right");
+
+        //tbs.addToolbar(new SearchToolbar());
 
         mainWindow.getContentPane().add(tbs, BorderLayout.NORTH);
     }

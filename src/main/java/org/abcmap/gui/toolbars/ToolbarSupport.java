@@ -10,12 +10,20 @@ public class ToolbarSupport extends JPanel {
     private static final Integer TOOLBAR_HEIGHT = 40;
 
     public ToolbarSupport() {
-        super(new MigLayout("insets 5, gap 5"));
+        super(new MigLayout("insets 5px, gap 5px"));
         this.setBorder(BorderFactory.createLineBorder(Color.lightGray));
     }
 
     public void addToolbar(Component c) {
-        add(c, "height " + TOOLBAR_HEIGHT);
+        addToolbar(c, "");
+    }
+
+    public void addToolbar(Component c, String constraints) {
+        add(c, "height " + TOOLBAR_HEIGHT + "px!, shrink, " + constraints);
+    }
+
+    public void addFiller() {
+        add(new JPanel(), "height " + TOOLBAR_HEIGHT + "px!, width 100%, grow");
     }
 
     @Deprecated

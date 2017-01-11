@@ -243,4 +243,10 @@ public class GuiIcons {
      */
     public static final ImageIcon GEOLOC_MARK_ACTIVE = getIcon(GEOLOC_DIR + "geoloc_mark_active.png");
     public static final ImageIcon GEOLOC_MARK_INACTIVE = getIcon(GEOLOC_DIR + "geoloc_mark_inactive.png");
+
+    /**
+     *
+     */
+    public static final ImageIcon DROP_FILES_ICON_BLACK = getIcon(ROOT + "drag_n_drop_files_black.png");
+    public static final ImageIcon DROP_FILES_ICON_WHITE = getIcon(ROOT + "drag_n_drop_files_white.png");
 }
