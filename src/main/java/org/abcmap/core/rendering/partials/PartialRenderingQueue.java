@@ -390,12 +390,24 @@ class PartialRenderingQueue {
 
                     ReferencedEnvelope partialWorldBounds = partial.getEnvelope();
 
-                    // create an image, and renderer map
+                    // select image where render map
                     int imgWidth = (int) renderedWidthPx;
-                    BufferedImage img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
+                    BufferedImage img = null;
 
-                    // set image now, to draw it on time
-                    partial.setImage(img, imgWidth, imgWidth);
+                    // previous image if required
+                    if(partial.isToRedraw() == true){
+                        img = partial.getImage();
+                    }
+
+                    // or create a new one
+                    else {
+                        img = new BufferedImage(imgWidth, imgWidth, BufferedImage.TYPE_INT_ARGB);
+
+                        // set image now, to draw it on map while rendering
+                        partial.setImage(img, imgWidth, imgWidth);
+                    }
+
+                    partial.setToRedraw(false);
 
                     // get layer and CRS
                     Layer layer = mapContent.layers().get(0);

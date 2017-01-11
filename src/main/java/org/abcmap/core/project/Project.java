@@ -674,6 +674,24 @@ public class Project {
     }
 
     /**
+     * Invalidate cache for specified layer, on this thread
+     * <p>
+     * Evelope can be null, in this case whole layer will be deleted
+     *
+     * @param layId
+     */
+    public void deleteCacheForLayerAndRedrawInMemory(String layId, ReferencedEnvelope env) {
+
+        GuiUtils.throwIfOnEDT();
+
+        if (getLayerById(layId) == null) {
+            throw new IllegalArgumentException("Unable to find layer: " + layId);
+        }
+
+        partialStore.deletePartialsForLayerAndRedrawInMemory(layId, env);
+    }
+
+    /**
      * Add the first layer in project
      */
     public void addFirstLayer() throws IOException {

@@ -62,6 +62,11 @@ public class RenderedPartial {
     private boolean outdated;
 
     /**
+     * If set to true, rendering operation will draw on previous image
+     */
+    private boolean toRedraw;
+
+    /**
      * If image is set to null, a waiting generated image will be used
      *
      * @param image
@@ -77,6 +82,7 @@ public class RenderedPartial {
         this.layerId = layerId;
         this.databaseId = -1;
         this.outdated = false;
+        this.toRedraw = false;
 
         setImage(image, renderedWidth, renderedHeight);
     }
@@ -261,6 +267,24 @@ public class RenderedPartial {
     }
 
     /**
+     * If set to true, this partial should be soon updated by rendering once again on it.
+     *
+     * @return
+     */
+    public boolean isToRedraw() {
+        return toRedraw;
+    }
+
+    /**
+     * Set to true to indicate this partial should be soon updated by rendering once again on it.
+     *
+     * @return
+     */
+    public void setToRedraw(boolean toRedraw) {
+        this.toRedraw = toRedraw;
+    }
+
+    /**
      * Get a waiting image, an image to display while partial is rendering
      *
      * @return
@@ -290,5 +314,6 @@ public class RenderedPartial {
 
         return waitingImage;
     }
+
 
 }

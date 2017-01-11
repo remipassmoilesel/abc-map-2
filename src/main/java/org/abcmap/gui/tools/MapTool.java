@@ -251,6 +251,25 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
     }
 
     /**
+     * Delete active layer cache if possible and repaint map.
+     * <p>
+     * If specified envelope is not null, just area around envelope will be deleted
+     */
+    protected void deleteActiveLayerCacheAndRedrawMap(ReferencedEnvelope env) {
+
+        Project project = projectm.getProject();
+        if (project == null) {
+            return;
+        }
+
+        ThreadManager.runLater(() -> {
+            project.deleteCacheForLayerAndRedrawInMemory(project.getActiveLayer().getId(), env);
+            refreshMainMap();
+        });
+
+    }
+
+    /**
      * Transform specified point and return a coordinate object
      *
      * @param p

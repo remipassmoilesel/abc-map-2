@@ -76,7 +76,7 @@ public class LineTool extends MapTool {
 
                 ReferencedEnvelope bounds = JTS.bounds(AbmSimpleFeatureBuilder.getGeometry(feat), projectm.getProject().getCrs());
 
-                deleteActiveLayerCacheAndUpdateMap(bounds);
+                deleteActiveLayerCacheAndRedrawMap(bounds);
             }
 
         }

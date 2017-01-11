@@ -304,6 +304,18 @@ public class RenderedPartialStore implements HasEventNotificationManager {
     }
 
     /**
+     * Delete partials associated with layer in database, but redraw those in memory, and only if they intersect the specified referenced envelope.
+     * <p>
+     * Envelope can be null, in this case whole layer will be removed
+     *
+     * @param layerId
+     * @param boundsToDelete
+     */
+    public void deletePartialsForLayerAndRedrawInMemory(String layerId, ReferencedEnvelope boundsToDelete) {
+        deletePartialsForLayer(layerId, boundsToDelete, true);
+    }
+
+    /**
      * Delete partials associated with layer id in memory and in database, but only if they intersect the specified referenced envelope.
      * <p>
      * Envelope can be null, in this case whole layer will be removed
@@ -312,6 +324,20 @@ public class RenderedPartialStore implements HasEventNotificationManager {
      * @param boundsToDelete
      */
     public void deletePartialsForLayer(String layerId, ReferencedEnvelope boundsToDelete) {
+        deletePartialsForLayer(layerId, boundsToDelete, false);
+    }
+
+    /**
+     * Delete partials associated with layer id in memory and in database, but only if they intersect the specified referenced envelope.
+     * <p>
+     * Envelope can be null, in this case whole layer will be removed
+     * <p>
+     * If redrawInMemory is set to true, existing partials in memory will be updated instead of deleted and recreated.
+     *
+     * @param layerId
+     * @param boundsToDelete
+     */
+    public void deletePartialsForLayer(String layerId, ReferencedEnvelope boundsToDelete, boolean redrawInMemory) {
 
         if (layerId == null) {
             throw new NullPointerException("Layer id cannot be null");
@@ -332,6 +358,12 @@ public class RenderedPartialStore implements HasEventNotificationManager {
                 // all layer
                 if (boundsToDelete == null) {
                     part.setOutdated(true);
+
+                    // redraw partial if required
+                    if (redrawInMemory == true) {
+                        part.setToRedraw(true);
+                    }
+
                     //loadedPartials.remove(part);
                 }
 
@@ -339,6 +371,11 @@ public class RenderedPartialStore implements HasEventNotificationManager {
                 else {
                     if (part.getEnvelope().intersects((com.vividsolutions.jts.geom.Envelope) boundsToDelete) == true) {
                         part.setOutdated(true);
+
+                        // redraw partial if required
+                        if (redrawInMemory == true) {
+                            part.setToRedraw(true);
+                        }
                         //loadedPartials.remove(part);
                     }
                 }
