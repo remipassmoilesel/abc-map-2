@@ -15,15 +15,15 @@ import org.abcmap.gui.components.StatusBar;
 import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.abcmap.gui.layouts.LayoutListPanel;
+import org.abcmap.gui.utils.GraphicsConsumer;
 import org.abcmap.gui.utils.GuiUtils;
-import org.abcmap.gui.utils.KeyAdapter;
 import org.abcmap.ielements.program.QuitProgram;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 /**
  * Main window of software
@@ -311,16 +311,25 @@ public class MainWindow extends AbstractCustomWindow implements HasEventNotifica
         return dockW;
     }
 
+    /**
+     * Set west dock of window
+     *
+     * @param dockW
+     */
     public void setWestDock(Dock dockW) {
         this.dockW = dockW;
         getContentPane().add(dockW, BorderLayout.WEST);
     }
 
+    /**
+     * Set east dock of window
+     *
+     * @param dockE
+     */
     public void setEastDock(Dock dockE) {
         this.dockE = dockE;
         getContentPane().add(dockE, BorderLayout.EAST);
     }
-
 
     @Override
     public EventNotificationManager getNotificationManager() {
