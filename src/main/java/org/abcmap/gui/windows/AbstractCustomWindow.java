@@ -47,8 +47,15 @@ public abstract class AbstractCustomWindow extends JFrame {
      */
     private class CustomGlassPane extends JPanel {
 
+        CustomGlassPane() {
+            super();
+            setOpaque(false);
+            setBorder(null);
+        }
+
         @Override
         public void paintComponent(Graphics g) {
+            super.paintComponent(g);
 
             Graphics2D g2d = (Graphics2D) g;
 
@@ -141,19 +148,15 @@ public abstract class AbstractCustomWindow extends JFrame {
 
                 Rectangle bounds = g2d.getClipBounds();
 
-                // translate shapes
+                // create a transform to translate shapes from screen coord space to glass pane coord space
                 Point loc = getGlassPane().getLocationOnScreen();
                 AffineTransform trans = AffineTransform.getTranslateInstance(-loc.x, -loc.y);
 
-                // create area to fill, by subtracting all shpaes to show
+                // create area to fill, by subtracting all shapes to highlight
                 Area toFill = new Area(bounds);
                 for (Rectangle r : new ArrayList<>(shapesToHighlight)) {
-
                     Area toSub = new Area(r);
-                    System.out.println(toSub.getBounds());
                     toSub.transform(trans);
-                    System.out.println(toSub.getBounds());
-
                     toFill.subtract(toSub);
                 }
 
