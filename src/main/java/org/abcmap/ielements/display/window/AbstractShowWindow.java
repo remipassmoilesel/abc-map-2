@@ -18,14 +18,21 @@ public abstract class AbstractShowWindow extends InteractionElement {
 
         hiddenInDetachedWIndows = true;
 
+        // show main window
         if (Mode.MAIN.equals(action)) {
             label = "Afficher la fenêtre principale";
             help = "Cliquez ici pour afficher seulement la fenêtre principale du programme.";
-            menuIcon = GuiIcons.WINDOW_ICON;
-        } else if (Mode.MANUAL_IMPORT.equals(action)) {
+            menuIcon = GuiIcons.WINDOW_ICON_SMALL;
+        }
+
+        // show manual import window
+        else if (Mode.MANUAL_IMPORT.equals(action)) {
             label = "Afficher la fenêtre d'import manuel";
             help = "Cliquez ici pour afficher seulement la fenêtre d'import manuel du programme.";
-        } else if (Mode.AUTO_IMPORT.equals(action)) {
+        }
+
+        // show auto import window
+        else if (Mode.AUTO_IMPORT.equals(action)) {
             label = "Afficher la fenêtre d'import automatique";
             help = "Cliquez ici pour afficher seulement la fenêtre d'import automatique du programme.";
         }
