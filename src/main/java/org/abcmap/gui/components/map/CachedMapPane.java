@@ -136,6 +136,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
     private final EventNotificationManager notifm;
     private final DrawManager drawm;
+    private MouseControlType mouseManagementType;
 
     public CachedMapPane(Project p) {
         super(new MigLayout("fill"));
@@ -652,12 +653,17 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     public void setMouseManagementEnabled(boolean enabled, MouseControlType type) {
 
+        this.mouseManagementType = type;
+
+        // remove mouse control each time
+        if (this.mouseControl != null) {
+            this.removeMouseListener(mouseControl);
+            this.removeMouseMotionListener(mouseControl);
+            this.removeMouseWheelListener(mouseControl);
+        }
+
         // enable management
         if (enabled == true) {
-
-            if (this.mouseControl != null) {
-                return;
-            }
 
             this.mouseControl = new CachedMapPaneMouseController(this, type);
 
@@ -669,17 +675,12 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // disable management
         else {
-
-            if (this.mouseControl == null) {
-                return;
-            }
-
-            this.removeMouseListener(mouseControl);
-            this.removeMouseMotionListener(mouseControl);
-            this.removeMouseWheelListener(mouseControl);
-
             mouseControl = null;
         }
+    }
+
+    public MouseControlType getMouseManagementType() {
+        return mouseManagementType;
     }
 
     /**

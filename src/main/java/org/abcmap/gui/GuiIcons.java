@@ -118,6 +118,7 @@ public class GuiIcons {
      *
 	 */
 
+    public static final ImageIcon TOOL_ZOOM = getIcon(TOOLS_DIR + "tool_zoom.png");
     public static final ImageIcon TOOL_SELECTION = getIcon(TOOLS_DIR + "tool_selection.png");
     public static final ImageIcon TOOL_TEXT = getIcon(TOOLS_DIR + "tool_text.png");
     public static final ImageIcon TOOL_ELLIPSE = getIcon(TOOLS_DIR + "tool_ellipse.png");
@@ -236,6 +237,7 @@ public class GuiIcons {
     public static final ImageIcon MAP_MOVEDOWN = getIcon(MAP_DIR + "map_movedown.png");
     public static final ImageIcon MAP_MOVELEFT = getIcon(MAP_DIR + "map_moveleft.png");
     public static final ImageIcon MAP_MOVERIGHT = getIcon(MAP_DIR + "map_moveright.png");
+    public static final ImageIcon MAP_MOVETOOL = getIcon(MAP_DIR + "map_movetool.png");
     public static final ImageIcon MAP_MOVECENTER = getIcon(MAP_DIR + "map_movecenter.png");
     public static final ImageIcon MAP_ZOOMIN = getIcon(MAP_DIR + "smallicon_zoomin.png");
     public static final ImageIcon MAP_ZOOMOUT = getIcon(MAP_DIR + "smallicon_zoomout.png");

@@ -604,7 +604,7 @@ public class GuiUtils {
      * @param comp
      * @param lst
      */
-    protected static void addSupportedListenersTo(Component comp,
+    public static void addSupportedListenersTo(Component comp,
                                                   ArrayList<EventListener> lst) {
 
 		/*

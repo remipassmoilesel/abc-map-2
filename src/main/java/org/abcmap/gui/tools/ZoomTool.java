@@ -23,6 +23,7 @@ public class ZoomTool extends MapTool {
      * Minimal size in pixel of zoom selection. If selection is lower than this value, no zoom is performed
      */
     private double minSizePx;
+    private Point lastPosition;
 
     public ZoomTool() {
         super();
@@ -72,9 +73,58 @@ public class ZoomTool extends MapTool {
             rectangleAreaDesigner.mouseDragged(e);
         }
 
+        else {
+            moveMap(e);
+        }
+
         repaintMainMap();
 
     }
+
+    /**
+     * Move map relative to mouse position
+     *
+     * @param e
+     */
+    public void moveMap(MouseEvent e) {
+
+        // first move, keep position and return
+        if (lastPosition == null) {
+            lastPosition = e.getPoint();
+            return;
+        }
+
+        // get mouse move
+        Point m = e.getPoint();
+        double mx = lastPosition.getX() - m.getX();
+        double my = lastPosition.getY() - m.getY();
+
+        // scale it
+        mx = scaleValue(mx);
+        my = scaleValue(my);
+
+        // adapt world envelope
+        ReferencedEnvelope translated = getMainMapPane().getWorldEnvelope();
+        translated.translate(mx, -my);
+        getMainMapPane().setWorldEnvelope(translated);
+
+        getMainMapPane().refreshMap();
+
+        lastPosition = m;
+    }
+
+    /**
+     * Scale a distance from panel unit to world unit
+     *
+     * @param val
+     * @return
+     */
+    public double scaleValue(double val) {
+        double scale = getMainMapPane().getScale();
+        return val * scale;
+    }
+
+
 
     /**
      * User release button, zoom if he was drawing and if area is valid
@@ -116,6 +166,8 @@ public class ZoomTool extends MapTool {
             // repaint map
             repaintMainMap();
         }
+
+        lastPosition = null;
 
     }
 

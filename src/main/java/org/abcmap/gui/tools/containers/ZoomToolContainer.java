@@ -8,7 +8,7 @@ public class ZoomToolContainer extends ToolContainer {
     public ZoomToolContainer() {
         this.id = ToolLibrary.ZOOM_TOOL;
         this.readableName = "Zoom";
-        this.icon = GuiIcons.MAP_ZOOMIN;
+        this.icon = GuiIcons.TOOL_ZOOM;
         this.toolClass = ZoomTool.class;
     }
 }

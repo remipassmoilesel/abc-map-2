@@ -1,16 +1,19 @@
 package org.abcmap.gui.components.geo;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.utils.Utils;
+import org.abcmap.core.managers.Main;
 import org.abcmap.gui.GuiCursor;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.components.map.CachedMapPane;
+import org.abcmap.gui.components.map.MouseControlType;
+import org.abcmap.gui.tools.containers.ToolLibrary;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.EventListener;
 
 /**
  * Navigation bar on bottom right corner of map, with zoom and reset buttons
@@ -24,11 +27,13 @@ public class MapNavigationBar extends JPanel {
     private static final String ZOOM_IN = "ZOOM_IN";
     private static final String ZOOM_OUT = "ZOOM_OUT";
     private static final String CENTER = "CENTER";
+    private static final String MAP_MOVETOOL = "MAP_MOVETOOL";
 
     /**
      * Panel to control
      */
     private CachedMapPane pane;
+    private ArrayList<EventListener> listeners;
 
     public MapNavigationBar(CachedMapPane pane) {
         super(new MigLayout("insets 2, gap 2px"));
@@ -41,6 +46,11 @@ public class MapNavigationBar extends JPanel {
 
         // add actions
         ZoomActionListener zoomAl = new ZoomActionListener();
+
+        JButton movetool = new JButton(GuiIcons.MAP_MOVETOOL);
+        movetool.setActionCommand(MAP_MOVETOOL);
+        movetool.addActionListener(zoomAl);
+        add(movetool, "wrap");
 
         JButton zoomin = new JButton(GuiIcons.MAP_ZOOMIN);
         zoomin.setActionCommand(ZOOM_IN);
@@ -85,6 +95,11 @@ public class MapNavigationBar extends JPanel {
             // reset display
             else if (CENTER.equals(ac)) {
                 pane.resetDisplay();
+            }
+
+            // reset display
+            else if (MAP_MOVETOOL.equals(ac)) {
+                Main.drawm().setCurrentTool(ToolLibrary.ZOOM_TOOL);
             }
 
             // error
