@@ -1,7 +1,12 @@
 package org.abcmap.ielements.project;
 
 import org.abcmap.gui.GuiIcons;
+import org.abcmap.gui.dialogs.ClosingConfirmationDialog;
+import org.abcmap.gui.dialogs.QuestionResult;
+import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.InteractionElement;
+
+import java.io.IOException;
 
 public class CloseProject extends InteractionElement {
 
@@ -14,54 +19,55 @@ public class CloseProject extends InteractionElement {
     @Override
     public void run() {
 
-		/*
         GuiUtils.throwIfOnEDT();
 
-		// eviter les appels intempestifs
-		if (threadAccess.askAccess() == false) {
-			return;
-		}
+        if (getOperationLock() == false) {
+            return;
+        }
 
-		// threadAccess.releaseAccess();
+        try {
 
-		// confirmation d'enregistrement de projet uniquement hors debug mode
-		if (MainManager.isDebugMode() == false && projectm.isInitialized()) {
+            // confirm closing
+            if (projectm().isInitialized()) {
 
-			QuestionResult cc = ClosingConfirmationDialog
-					.showProjectConfirmationAndWait(guim.getMainWindow());
+                QuestionResult cc = ClosingConfirmationDialog
+                        .showProjectConfirmationAndWait(guim().getMainWindow());
 
-			// cas l'utilisateur annule, retour
-			if (cc.isAnswerCancel()) {
-				threadAccess.releaseAccess();
-				return;
-			}
+                // user cancel
+                if (cc.isAnswerCancel()) {
+                    releaseOperationLock();
+                    return;
+                }
 
-			// l'utilisateur souhaite sauvegarder
-			else if (cc.isAnswerYes()) {
-				SaveProject saver = new SaveProject();
-				saver.run();
-			}
+                // save project before
+                else if (cc.isAnswerYes()) {
+                    SaveProject saver = new SaveProject();
+                    saver.run();
+                }
 
-		}
+            }
 
-		// fermer le programme
-		closeProject();
+            // close project
+            try {
+                projectm().closeProject();
+            } catch (IOException e) {
+                dialm().showErrorInBox("Erreur lors de la fermeture du programme");
+                logger.error(e);
+            }
 
-		threadAccess.releaseAccess();
-		*/
-    }
+            // create a new project
+            try {
+                projectm().createNewProject();
+            } catch (IOException e) {
+                dialm().showErrorInBox("Erreur lors de la création d'un nouveau projet.");
+                logger.error(e);
+            }
 
-    public void closeProject() {
-		/*
-		// fermeture du projet
-		try {
-			projectm.closeProject();
-		}
 
-		catch (IOException e) {
-			Log.error(e);
-		}
-		*/
+        } finally {
+            releaseOperationLock();
+        }
+
     }
 
 }
