@@ -11,7 +11,7 @@ import org.abcmap.core.managers.TempFilesManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.dock.blockitems.ClickableBlockItem;
-import org.abcmap.gui.components.dock.blockitems.HideableBlockItem;
+import org.abcmap.gui.components.dock.blockitems.FoldableBlockItem;
 import org.abcmap.gui.components.dock.blockitems.SimpleBlockItem;
 import org.abcmap.gui.menu.ClickableMenuItem;
 import org.abcmap.gui.menu.DialogMenuItem;
@@ -273,7 +273,7 @@ public abstract class InteractionElement extends ManagerTreeAccessUtil implement
         }
 
         if (displayInHideableElement) {
-            return HideableBlockItem.create(this, getPrimaryGUI(), false);
+            return FoldableBlockItem.create(this, getPrimaryGUI(), false);
         } else {
             return SimpleBlockItem.create(this, primaryGUI);
         }

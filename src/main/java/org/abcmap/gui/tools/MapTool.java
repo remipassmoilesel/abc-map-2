@@ -251,7 +251,9 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
     }
 
     /**
-     * Delete active layer cache if possible and repaint map.
+     * Delete active layer cache from database and repaint cache in memory above previous cache
+     * <p>
+     * Call this method if you add information to map without change previous shapes
      * <p>
      * If specified envelope is not null, just area around envelope will be deleted
      */

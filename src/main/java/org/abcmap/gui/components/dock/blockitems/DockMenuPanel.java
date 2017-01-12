@@ -2,8 +2,8 @@ package org.abcmap.gui.components.dock.blockitems;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.gui.GuiStyle;
-import org.abcmap.ielements.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,10 +16,19 @@ public class DockMenuPanel extends JPanel {
      */
     private int menuItemWidthPercent = 95;
 
+    /**
+     * Elements of menu. These elements can be of different type
+     */
     protected ArrayList<Object> elements;
 
+    /**
+     * Title displayed on the top of panel
+     */
     protected String title;
 
+    /**
+     * Small description displayed on top of panel
+     */
     protected String description;
 
     public DockMenuPanel() {
@@ -27,11 +36,14 @@ public class DockMenuPanel extends JPanel {
 
         this.title = "No title";
         this.description = null;
-        this.elements = new ArrayList<Object>();
+        this.elements = new ArrayList<>();
 
         reconstruct();
     }
 
+    /**
+     * Reconstruct panel
+     */
     public void reconstruct() {
 
         removeAll();
@@ -52,14 +64,23 @@ public class DockMenuPanel extends JPanel {
             metadatas.add(desc, "width 95%!");
         }
 
-        addItem(metadatas);
+        addComponent(metadatas);
 
         for (Object o : elements) {
 
+            // add a swing components
             if (o instanceof Component) {
-                addItem((Component) o);
-            } else if (o instanceof InteractionElement) {
-                addItem(((InteractionElement) o).getBlockGUI());
+                addComponent((Component) o);
+            }
+
+            //  add an interaction element
+            else if (o instanceof InteractionElement) {
+                addComponent(((InteractionElement) o).getBlockGUI());
+            }
+
+            // unknown element
+            else {
+                throw new IllegalStateException("Unknown element type: " + o);
             }
 
         }
@@ -67,45 +88,96 @@ public class DockMenuPanel extends JPanel {
         refresh();
     }
 
-
-    private void addItem(Component c) {
+    /**
+     * Add a swing component with normalized width
+     *
+     * @param c
+     */
+    protected void addComponent(Component c) {
         super.add(c, "width " + menuItemWidthPercent + "%!, wrap");
     }
 
+    /**
+     * Add interaction element to this menu
+     *
+     * @param o
+     */
     public void addMenuElement(InteractionElement o) {
         elements.add(o);
     }
 
+    /**
+     * Add swing component to this menu
+     *
+     * @param o
+     */
     public void addMenuElement(Component o) {
         elements.add(o);
     }
 
+    /**
+     * Return current displayed elements
+     *
+     * @return
+     */
     public ArrayList<Object> getMenuElements() {
         return new ArrayList<>(elements);
     }
 
+    /**
+     * Remove elements from this panel
+     */
     public void clearMenuElementsList() {
         elements.clear();
     }
 
+    /**
+     * Set description of this panel
+     *
+     * @param description
+     */
     public void setMenuDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Return current description of this panel
+     *
+     * @return
+     */
     public String getMenuDescription() {
         return description;
     }
 
+    /**
+     * Return title of this panel
+     *
+     * @return
+     */
     public String getMenuTitle() {
         return title;
     }
 
+    /**
+     * Set title of this panel
+     *
+     * @param title
+     */
     public void setMenuTitle(String title) {
         this.title = title;
     }
 
     /**
-     * Use instead addMenuComponent()
+     * Repaint this panel
+     */
+    public void refresh() {
+        revalidate();
+        repaint();
+    }
+
+
+    /**
+     * Use instead addMenuElement()
      */
     @Deprecated
     @Override
@@ -114,7 +186,7 @@ public class DockMenuPanel extends JPanel {
     }
 
     /**
-     * Use instead addMenuComponent()
+     * Use instead addMenuElement()
      */
     @Deprecated
     @Override
@@ -123,7 +195,7 @@ public class DockMenuPanel extends JPanel {
     }
 
     /**
-     * Use instead addMenuComponent()
+     * Use instead addMenuElement()
      */
     @Deprecated
     @Override
@@ -132,7 +204,7 @@ public class DockMenuPanel extends JPanel {
     }
 
     /**
-     * Use instead addMenuComponent()
+     * Use instead addMenuElement()
      */
     @Deprecated
     @Override
@@ -141,7 +213,7 @@ public class DockMenuPanel extends JPanel {
     }
 
     /**
-     * Use instead addMenuComponent()
+     * Use instead addMenuElement()
      */
     @Deprecated
     @Override
@@ -150,17 +222,12 @@ public class DockMenuPanel extends JPanel {
     }
 
     /**
-     * Use instead addMenuComponent()
+     * Use instead addMenuElement()
      */
     @Deprecated
     @Override
     public void add(Component comp, Object constraints, int index) {
         super.add(comp, constraints, index);
-    }
-
-    public void refresh() {
-        revalidate();
-        repaint();
     }
 
 }

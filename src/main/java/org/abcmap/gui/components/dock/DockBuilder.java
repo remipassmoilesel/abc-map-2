@@ -33,7 +33,7 @@ public class DockBuilder {
                 GroupOfInteractionElements ieg = (GroupOfInteractionElements) o;
 
                 DockMenuWidget btt = new DockMenuWidget();
-                btt.setInteractionElementGroup(ieg);
+                btt.setGroupOfInteractionElement(ieg);
                 btt.setWindowMode(ieg.getWindowMode());
 
                 dock.addWidget(btt);

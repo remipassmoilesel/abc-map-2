@@ -87,6 +87,7 @@ public class GuiIcons {
      *
      */
     public static final ImageIcon NAVIGATION_WIDGET = DEFAULT_GROUP_ICON;
+    public static final ImageIcon SEARCH_WIDGET = getIcon(ROOT + "search_widget.png");
     public static final ImageIcon CUSTOM_COLOR_BUTTON = getIcon(BUTTONS_DIR + "custom_color_button.png");
 
 	/*
@@ -186,7 +187,8 @@ public class GuiIcons {
      *
 	 */
 
-    public static final ImageIcon WINDOW_ICON = getIcon(ROOT + "window_icon.png");
+    public static final ImageIcon WINDOW_ICON_LARGE = getIcon(ROOT + "window_icon_large.png");
+    public static final ImageIcon WINDOW_ICON_SMALL = getIcon(ROOT + "window_icon_small.png");
 
 	/*
 	 * 
@@ -249,4 +251,5 @@ public class GuiIcons {
      */
     public static final ImageIcon DROP_FILES_ICON_BLACK = getIcon(ROOT + "drag_n_drop_files_black.png");
     public static final ImageIcon DROP_FILES_ICON_WHITE = getIcon(ROOT + "drag_n_drop_files_white.png");
+
 }

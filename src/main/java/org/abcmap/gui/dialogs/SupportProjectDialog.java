@@ -21,7 +21,7 @@ public class SupportProjectDialog extends JDialog {
         setModalityType(ModalityType.APPLICATION_MODAL);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        setIconImage(GuiIcons.WINDOW_ICON.getImage());
+        setIconImage(GuiIcons.WINDOW_ICON_LARGE.getImage());
 
         JPanel content = new JPanel(new MigLayout("insets 20"));
         setContentPane(content);

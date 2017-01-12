@@ -58,6 +58,11 @@ public class GuiManager extends ManagerTreeAccessUtil implements HasEventNotific
 
     }
 
+    /**
+     * Return detached window reference containing wizard
+     *
+     * @return
+     */
     public DetachedWindow getWizardDetachedWindow() {
         return (DetachedWindow) registeredWindows.get(Windows.DETACHED_WIZARD);
     }
@@ -329,12 +334,12 @@ public class GuiManager extends ManagerTreeAccessUtil implements HasEventNotific
      * @param window
      */
     public void setWindowIconFor(Window window) {
-        window.setIconImage(GuiIcons.WINDOW_ICON.getImage());
+        window.setIconImage(GuiIcons.WINDOW_ICON_LARGE.getImage());
     }
 
 
     /**
-     * Afficher la fenêtre de recadrage
+     * Display crop window
      *
      * @param image
      */
@@ -376,7 +381,7 @@ public class GuiManager extends ManagerTreeAccessUtil implements HasEventNotific
 
         Dock[] docks = new Dock[]{getMainWindow().getEastDock(), getMainWindow().getWestDock()};
 
-        for(Dock d : docks){
+        for (Dock d : docks) {
 
             boolean r = d.showFirstMenuPanelCorrespondingThis(className);
 

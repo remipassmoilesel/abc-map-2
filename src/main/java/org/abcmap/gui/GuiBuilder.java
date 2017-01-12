@@ -2,10 +2,7 @@ package org.abcmap.gui;
 
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.Main;
-import org.abcmap.gui.components.dock.Dock;
-import org.abcmap.gui.components.dock.DockBuilder;
-import org.abcmap.gui.components.dock.DockOrientation;
-import org.abcmap.gui.components.dock.DrawIndicatorWidget;
+import org.abcmap.gui.components.dock.*;
 import org.abcmap.gui.toolbars.DropFilesToolbar;
 import org.abcmap.ielements.importation.manual.MenuImportManualCapture;
 import org.abcmap.ielements.importation.robot.MenuRobotImport;
@@ -96,6 +93,7 @@ public class GuiBuilder {
         tbs.addToolbar(new FileToolbar());
         tbs.addToolbar(new EditionToolbar());
         tbs.addToolbar(new DisplayToolbar());
+        //tbs.addToolbar(new SearchToolbar());
 
         // add filler
         tbs.addFiller();
@@ -112,30 +110,31 @@ public class GuiBuilder {
         DockBuilder df = new DockBuilder();
 
         // west dock
-        ArrayList<Object> list = new ArrayList<>();
-        list.add(new GroupWizard());
-        list.add(new GroupProject());
-        list.add(new GroupConfigProfile());
-        list.add(new GroupImportation());
-        list.add(new GroupGeoreferencement());
-        list.add(new GroupLayout());
-        list.add(new GroupExport());
+        ArrayList<Object> wList = new ArrayList<>();
+        wList.add(new SearchWidget());
+        wList.add(new GroupWizard());
+        wList.add(new GroupProject());
+        wList.add(new GroupConfigProfile());
+        wList.add(new GroupImportation());
+        wList.add(new GroupGeoreferencement());
+        wList.add(new GroupLayout());
+        wList.add(new GroupExport());
 
-        df.setWidgets(list);
+        df.setWidgets(wList);
         df.setOrientation(DockOrientation.WEST);
         Dock dockW = df.make();
 
         // east dock
-        ArrayList<Object> list2 = new ArrayList<Object>();
-        list2.add(new DrawIndicatorWidget());
-        list2.add(new GroupLayersAndDimensions());
-        list2.add(new GroupDrawingTools());
-        list2.add(new GroupDrawingPalette());
-        list2.add(new GroupObjectPosition());
-        list2.add(new GroupPlugins());
-        list2.add(new GroupSettings());
+        ArrayList<Object> eList = new ArrayList<>();
+        eList.add(new DrawIndicatorWidget());
+        eList.add(new GroupLayersAndDimensions());
+        eList.add(new GroupDrawingTools());
+        eList.add(new GroupDrawingPalette());
+        eList.add(new GroupObjectPosition());
+        eList.add(new GroupPlugins());
+        eList.add(new GroupSettings());
 
-        df.setWidgets(list2);
+        df.setWidgets(eList);
         df.setOrientation(DockOrientation.EST);
         Dock dockE = df.make();
 

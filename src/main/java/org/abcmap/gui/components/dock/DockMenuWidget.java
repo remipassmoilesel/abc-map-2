@@ -7,9 +7,9 @@ import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.components.CustomComponent;
 import org.abcmap.gui.components.buttons.HtmlLabel;
 import org.abcmap.gui.components.dock.blockitems.DockMenuPanel;
-import org.abcmap.ielements.InteractionElement;
-import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.gui.windows.MainWindowMode;
+import org.abcmap.ielements.GroupOfInteractionElements;
+import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -21,31 +21,36 @@ import java.awt.event.ActionListener;
 public class DockMenuWidget extends CustomComponent {
 
     /**
+     * Listener used to open menu on click
+     */
+    protected final WidgetActionListener openMenuListener;
+
+    /**
      * Side menu
      */
-    private DockMenuPanel menuPanel;
+    protected DockMenuPanel menuPanel;
 
     /**
      * Element of menu
      */
-    private GroupOfInteractionElements interactionElementGroup;
+    protected GroupOfInteractionElements groupOfInteractionElement;
 
     /**
      * Widget icon
      */
-    private JLabel lblIcon;
+    protected JLabel lblIcon;
 
     /**
      * Parent dock, lazy initialized
      */
-    private Dock dock;
+    protected Dock dock;
 
     /**
      * Main window mode associated with dock
      */
-    private MainWindowMode windowMode;
+    protected MainWindowMode windowMode;
 
-    private GuiManager guim;
+    protected GuiManager guim;
 
     public DockMenuWidget() {
 
@@ -61,7 +66,8 @@ public class DockMenuWidget extends CustomComponent {
         lblIcon = new JLabel(GuiIcons.DEFAULT_GROUP_ICON);
         add(lblIcon);
 
-        addActionListener(new WidgetActionListener());
+        openMenuListener = new WidgetActionListener();
+        addActionListener(openMenuListener);
 
     }
 
@@ -73,23 +79,40 @@ public class DockMenuWidget extends CustomComponent {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            // get parent
-            if (dock == null) {
-                dock = Dock.getDockParentForComponent(DockMenuWidget.this);
-            }
+            getDockParent().showWidgetspace(menuPanel);
 
-            dock.showWidgetspace(menuPanel);
-
-            dock.setMenuSelected(DockMenuWidget.this);
+            getDockParent().setMenuSelected(DockMenuWidget.this);
 
             guim.getMainWindow().setWindowMode(windowMode);
         }
     }
 
+    /**
+     * Return dock parent of this component
+     *
+     * @return
+     */
+    protected Dock getDockParent() {
+        if (dock == null) {
+            dock = Dock.getDockParentForComponent(DockMenuWidget.this);
+        }
+        return dock;
+    }
+
+    /**
+     * Set window mode used by this menu. This window mode will be enabled when menu is open.
+     *
+     * @param windowMode
+     */
     public void setWindowMode(MainWindowMode windowMode) {
         this.windowMode = windowMode;
     }
 
+    /**
+     * Set icon of menu. User have to click on this icon to open menu
+     *
+     * @param icon
+     */
     public void setIcon(ImageIcon icon) {
 
         if (icon == null) {
@@ -101,9 +124,14 @@ public class DockMenuWidget extends CustomComponent {
         lblIcon.repaint();
     }
 
-    public void setInteractionElementGroup(GroupOfInteractionElements ieg) {
+    /**
+     * Set the group of interaction elements displayed in this menu
+     *
+     * @param ieg
+     */
+    public void setGroupOfInteractionElement(GroupOfInteractionElements ieg) {
 
-        this.interactionElementGroup = ieg;
+        this.groupOfInteractionElement = ieg;
 
         setIcon(ieg.getBlockIcon());
         setToolTipText(ieg.getLabel());
@@ -135,10 +163,20 @@ public class DockMenuWidget extends CustomComponent {
         menuPanel.reconstruct();
     }
 
-    public GroupOfInteractionElements getInteractionElementGroup() {
-        return interactionElementGroup;
+    /**
+     * Return the group of interaction elements displayed here
+     *
+     * @return
+     */
+    public GroupOfInteractionElements getGroupOfInteractionElement() {
+        return groupOfInteractionElement;
     }
 
+    /**
+     * Return panel used to display group of interaction elements
+     *
+     * @return
+     */
     public DockMenuPanel getMenuPanel() {
         return menuPanel;
     }

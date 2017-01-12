@@ -866,21 +866,25 @@ public class GuiUtils {
     public static JLabel addLabel(String text, Container container,
                                   Object constraints, GuiStyle style) {
 
-        // créer un jlabel
+        // create a jlabel
         HtmlLabel lbl = new HtmlLabel(text);
 
-        // appliquer le style si necessaire
+        // apply style
         if (style != null) {
             lbl.setStyle(style);
         }
 
-        // ajouter au conteneur
+        // add it to container with specified constraints
         if (constraints != null) {
             container.add(lbl, constraints);
-        } else {
+        }
+
+        // or add it without constraints
+        else {
             container.add(lbl);
         }
 
+        // and return it
         return lbl;
     }
 

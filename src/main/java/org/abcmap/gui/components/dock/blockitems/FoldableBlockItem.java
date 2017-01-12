@@ -7,10 +7,10 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-public class HideableBlockItem extends SimpleBlockItem {
+public class FoldableBlockItem extends SimpleBlockItem {
 
-    public static HideableBlockItem create(InteractionElement ie, Component bottom, boolean bottomIsVisible) {
-        HideableBlockItem smi = new HideableBlockItem(ie);
+    public static FoldableBlockItem create(InteractionElement ie, Component bottom, boolean bottomIsVisible) {
+        FoldableBlockItem smi = new FoldableBlockItem(ie);
         smi.setBottomComponent(bottom);
         smi.setBottomComponentVisible(bottomIsVisible);
         smi.reconstruct();
@@ -21,7 +21,7 @@ public class HideableBlockItem extends SimpleBlockItem {
     private boolean bottomElementVisible = true;
     private HideActionListener hideActionListener;
 
-    public HideableBlockItem(InteractionElement elmt) {
+    public FoldableBlockItem(InteractionElement elmt) {
         super(elmt);
 
         changeColorUnderFocus(true);

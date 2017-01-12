@@ -13,8 +13,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Simple focusable component. Must be used as a JPanel.
- * JButton is used here to facilitate keyboard use/focus.
+ * Simple focusable component. Should be used as a JPanel.
+ * JButton is extended here to facilitate keyboard use/focus.
  */
 public class CustomComponent extends JButton {
 
@@ -86,7 +86,7 @@ public class CustomComponent extends JButton {
     }
 
     /**
-     * This component must not be used as a button
+     * This component should not be used as a button
      */
     @Deprecated
     @Override
@@ -95,7 +95,7 @@ public class CustomComponent extends JButton {
     }
 
     /**
-     * This component must not be used as a button
+     * This component should not be used as a button
      */
     @Deprecated
     @Override
