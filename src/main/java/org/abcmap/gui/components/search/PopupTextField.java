@@ -1,41 +1,55 @@
 package org.abcmap.gui.components.search;
 
+import org.abcmap.gui.utils.KeyAdapter;
+
 import javax.swing.*;
 import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
+import java.awt.event.KeyEvent;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class InteractiveTextField extends JTextField {
+/**
+ * Special text field with an associated popup
+ */
+public class PopupTextField extends JTextField {
 
     private static final Pattern WHITE_TEXT = Pattern.compile("^\\W*$");
     private JLabel testLabel;
     private InteractivePopupDisplay popup;
 
-    public InteractiveTextField() {
+    public PopupTextField() {
 
-        this.addCaretListener(new CaretListener() {
+        this.addKeyListener(new KeyAdapter() {
             @Override
-            public void caretUpdate(CaretEvent e) {
-
-                // no text, hide panel
-                Matcher m = WHITE_TEXT.matcher(getText());
-                if (m.find()) {
-                    showPopup(false);
-                }
-
-                // text present, launch search
-                else {
-                    userHaveTypedThis(getText());
-                }
-
-                requestFocus();
-
+            public void keyReleased(KeyEvent e) {
+                checkContentAndShowPopup();
             }
         });
 
         // popup element where are displayed results
         this.popup = new InteractivePopupDisplay(this);
+
+    }
+
+    public synchronized void checkContentAndShowPopup() {
+
+        // no text, hide panel
+        Matcher m = WHITE_TEXT.matcher(getText());
+        if (m.find()) {
+            showPopup(false);
+        }
+
+        // text present, launch search
+        else {
+            userHaveTypedThis(getText());
+        }
+
+        // request focus after popup is shown
+        SwingUtilities.invokeLater(()->{
+            requestFocus();
+            requestFocusInWindow();
+        });
 
     }
 

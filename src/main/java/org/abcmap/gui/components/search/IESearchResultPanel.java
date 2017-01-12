@@ -5,9 +5,9 @@ import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.GuiStyle;
 import org.abcmap.gui.components.CustomComponent;
-import org.abcmap.ielements.InteractionElement;
-import org.abcmap.gui.components.dock.blockitems.HideableBlockItem;
+import org.abcmap.gui.components.dock.blockitems.FoldableBlockItem;
 import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,30 +19,47 @@ import java.awt.event.ActionListener;
  */
 public class IESearchResultPanel extends JPanel {
 
+    /**
+     * This result is displayed as a simple clickable element
+     */
     private static final String SIMPLE = "SIMPLE";
+
+    /**
+     * This result is displayed with complex GUI
+     */
     private static final String SUB_BOX = "SUB_BOX";
 
+    /**
+     * Interaction element associated with this GUI
+     */
     private InteractionElement ielement;
+
+    /**
+     * Optional parent notified when result change size on user interaction
+     */
     private InteractivePopupDisplay popupParent;
 
+    /**
+     * Current display mode: simple or complex
+     */
     private String displayMode;
-    private int maxWidth;
-    private int interactionGuiWidth;
 
-    public IESearchResultPanel(InteractivePopupDisplay popupParent, InteractionElement ie) {
+    public IESearchResultPanel(InteractionElement ie) {
+        this(ie, null);
+    }
+
+    public IESearchResultPanel(InteractionElement ie, InteractivePopupDisplay popupParent) {
+
+        super(new MigLayout("insets 0, gap 0"));
 
         GuiUtils.throwIfNotOnEDT();
 
         this.ielement = ie;
         this.popupParent = popupParent;
 
-        this.maxWidth = CommandSearchTextField.POPUP_WIDTH_PX - 20;
-        this.interactionGuiWidth = 300;
-
         this.setBorder(BorderFactory.createLineBorder(Color.lightGray, 1));
-        this.setLayout(new MigLayout("insets 5"));
 
-
+        // default behavior: element is displayed simple
         displayAsSimpleSearchResult();
 
     }
@@ -65,31 +82,33 @@ public class IESearchResultPanel extends JPanel {
             comp.add(new JLabel(ielement.getMenuIcon()), "width 25px!");
         }
 
-        GuiUtils.addLabel(ielement.getLabel(), comp, null, GuiStyle.SEARCH_RESULT_LABEL);
+        GuiUtils.addLabel(ielement.getLabel(), comp, "width 95%!", GuiStyle.SEARCH_RESULT_LABEL);
 
-        this.add(comp, "width " + maxWidth + "px!, wrap");
+        this.add(comp, "width 95%!, wrap");
 
         // show keyboard shortcut
         if (ielement.getAccelerator() != null) {
 
             String str = "Raccourci: " + Utils.keystrokeToString(ielement.getAccelerator());
 
-            GuiUtils.addLabel(str, this, "width max, wrap", GuiStyle.SEARCH_RESULT_TEXT);
+            GuiUtils.addLabel(str, this, "gapx 5px, width 95%!, wrap", GuiStyle.SEARCH_RESULT_TEXT);
 
         }
 
         // show help
         if (ielement.getHelp() != null) {
-            GuiUtils.addLabel("Aide: " + ielement.getHelp(), this, "gapx 10, span, width max, wrap", GuiStyle.SEARCH_RESULT_TEXT);
+            GuiUtils.addLabel("Aide: " + ielement.getHelp(), this, "gapx 10px, span, width 90%!, wrap", GuiStyle.SEARCH_RESULT_TEXT);
         }
 
         // show message if command is not available by search
         if (ielement.getNoSearchMessage() != null) {
-            GuiUtils.addLabel("Attention: " + ielement.getNoSearchMessage(), this, "gapx 10, span, width max, wrap", GuiStyle.SEARCH_RESULT_NO_SEARCH);
+            GuiUtils.addLabel("Attention: " + ielement.getNoSearchMessage(), this, "gapx 10px, span, width 95%!, wrap", GuiStyle.SEARCH_RESULT_NO_SEARCH);
         }
 
         // adjust panel height
-        popupParent.adjustHeight();
+        if(popupParent != null){
+            popupParent.adjustHeight();
+        }
 
         revalidate();
         repaint();
@@ -112,15 +131,17 @@ public class IESearchResultPanel extends JPanel {
 
         Component gui = ielement.getBlockGUI();
 
-        // if element is hideable, retract it
-        if (gui instanceof HideableBlockItem) {
-            ((HideableBlockItem) gui).refresh(false, true);
+        // if element is foldable, retract it
+        if (gui instanceof FoldableBlockItem) {
+            ((FoldableBlockItem) gui).refresh(false, true);
         }
 
-        add(gui, "width " + interactionGuiWidth);
+        add(gui, "width 95%!");
 
-
-        popupParent.adjustHeight();
+        // notify parent
+        if(popupParent != null){
+            popupParent.adjustHeight();
+        }
 
         revalidate();
         repaint();
@@ -139,12 +160,16 @@ public class IESearchResultPanel extends JPanel {
                 ThreadManager.runLater(ielement);
             }
 
-            // element is complex, extend it
+            // element is complex, extend it or fold it
             else {
 
+                // extend if
                 if (SIMPLE.equals(displayMode)) {
                     displayAsComplexInteractionGui();
-                } else if (SUB_BOX.equals(displayMode)) {
+                }
+
+                // fold it
+                else if (SUB_BOX.equals(displayMode)) {
                     displayAsSimpleSearchResult();
                 }
             }

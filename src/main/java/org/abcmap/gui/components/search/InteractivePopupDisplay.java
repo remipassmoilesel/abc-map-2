@@ -1,104 +1,127 @@
 package org.abcmap.gui.components.search;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-
 import net.miginfocom.swing.MigLayout;
 
-public class InteractivePopupDisplay extends JPopupMenu {
+import javax.swing.*;
+import java.awt.*;
 
-	private JPanel content;
-	private JScrollPane scroll;
+class InteractivePopupDisplay extends JPopupMenu {
 
-	private Component compParent;
+    private JPanel content;
+    private JScrollPane scroll;
 
-	private int maxPopupHeight;
-	private int minPopupHeight;
-	private int preferredPopupWidth;
+    private Component compParent;
 
-	public InteractivePopupDisplay(Component parent) {
+    private int maxPopupHeight;
+    private int minPopupHeight;
+    private int preferredPopupWidth;
 
-		super();
-		this.setLayout(new BorderLayout());
+    InteractivePopupDisplay(Component parent) {
 
-		// taille par defaut de la popup
-		this.preferredPopupWidth = 400;
-		this.minPopupHeight = 450;
-		this.maxPopupHeight = 600;
+        super();
+        this.setLayout(new BorderLayout());
 
-		setPreferredSize(new Dimension(preferredPopupWidth, minPopupHeight));
+        // default dimensions of popup
+        this.preferredPopupWidth = 400;
+        this.minPopupHeight = 450;
+        this.maxPopupHeight = 600;
 
-		// le composant parent
-		this.compParent = parent;
+        setPreferredSize(new Dimension(preferredPopupWidth, minPopupHeight));
 
-		// panneau principal
-		this.content = new JPanel(new MigLayout("insets 5"));
+        // parent near which is displayed popup
+        this.compParent = parent;
 
-		// contenu dans un scroll
-		this.scroll = new JScrollPane(content);
-		scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scroll.getHorizontalScrollBar().setUnitIncrement(150);
+        // main panel of pop up
+        this.content = new JPanel(new MigLayout("insets 5"));
 
-		this.add(scroll, BorderLayout.CENTER);
-	}
+        // all is in a scroll pane
+        this.scroll = new JScrollPane(content);
+        scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getHorizontalScrollBar().setUnitIncrement(150);
 
-	public void showPopup(boolean val) {
+        this.add(scroll, BorderLayout.CENTER);
+    }
 
-		// afficher
-		if (val) {
-			int x = 0;
-			int y = compParent.getHeight();
+    /**
+     * Show or hide pop up
+     *
+     * @param val
+     */
+    public void showPopup(boolean val) {
 
-			this.show(compParent, x, y);
-		}
+        // show popup
+        if (val) {
+            int x = 0;
+            int y = compParent.getHeight();
 
-		// masquer
-		else {
-			this.setVisible(false);
-		}
+            this.show(compParent, x, y);
 
-		this.revalidate();
-		this.repaint();
-	}
+        }
 
-	public JPanel getContentPane() {
-		return content;
-	}
+        // hide popup
+        else {
+            this.setVisible(false);
+        }
 
-	public void proposePopupHeight(Integer height) {
+        this.revalidate();
+        this.repaint();
+    }
 
-		// hauteur nulle: calculer la hauteur max
-		if (height == null)
-			height = computePreferredHeight();
+    /**
+     * Return content pane of pop up
+     *
+     * @return
+     */
+    public JPanel getContentPane() {
+        return content;
+    }
 
-		if (height < minPopupHeight)
-			height = minPopupHeight;
+    /**
+     * Propose a value as height. This value will be used if it is in maximum and minimum bounds.
+     * <p>
+     * If specified argument is null, height will be computed
+     *
+     * @param height
+     */
+    public void proposePopupHeight(Integer height) {
 
-		if (height > maxPopupHeight)
-			height = maxPopupHeight;
+        // if height is null, compute height and width
+        if (height == null) {
+            height = computePreferredHeight();
+        }
 
-		Dimension dim = getPreferredSize();
-		dim.height = height;
-		setPreferredSize(dim);
-	}
+        if (height < minPopupHeight) {
+            height = minPopupHeight;
+        }
 
-	public int computePreferredHeight() {
-		int height = 0;
-		for (Component c : content.getComponents()) {
-			height += c.getPreferredSize().height;
-		}
+        if (height > maxPopupHeight) {
+            height = maxPopupHeight;
+        }
 
-		return height;
-	}
+        Dimension dim = getPreferredSize();
+        dim.height = height;
+        setPreferredSize(dim);
+    }
 
-	public void adjustHeight() {
-		proposePopupHeight(null);
-	}
+    /**
+     * Compute preferred height of component relative to childs of content pane
+     *
+     * @return
+     */
+    public int computePreferredHeight() {
+        int height = 0;
+        for (Component c : content.getComponents()) {
+            height += c.getPreferredSize().height;
+        }
+
+        return height;
+    }
+
+    /**
+     * Adjust height to optimal value
+     */
+    public void adjustHeight() {
+        proposePopupHeight(null);
+    }
 
 }
