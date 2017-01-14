@@ -680,6 +680,18 @@ public class Project {
      *
      * @param layId
      */
+    public void deleteCacheForLayerAndRedrawInMemory(String layId) {
+        deleteCacheForLayerAndRedrawInMemory(layId, null);
+    }
+
+    /**
+     * Invalidate cache for specified layer, on this thread
+     * <p>
+     * Evelope can be null, in this case whole layer will be deleted
+     *
+     * @param layId
+     */
+
     public void deleteCacheForLayerAndRedrawInMemory(String layId, ReferencedEnvelope env) {
 
         GuiUtils.throwIfOnEDT();
@@ -757,7 +769,7 @@ public class Project {
     }
 
 
-    public AbmAbstractLayer addNewShapeFileLayer(Path p) throws IOException {
+    public AbmShapeFileLayer addNewShapeFileLayer(Path p) throws IOException {
 
         // create a layer wrapper and store it
         AbmAbstractLayer layer = null;
@@ -767,6 +779,20 @@ public class Project {
             throw new IOException("Error while adding shapefile layer: ", e);
         }
 
-        return addLayer(layer);
+        return (AbmShapeFileLayer) addLayer(layer);
+    }
+
+    public AbmWMSLayer addNewWMSLayer(String url, String layerName) throws IOException {
+
+        // create a layer wrapper and store it
+        AbmAbstractLayer layer = null;
+        try {
+            layer = new AbmWMSLayer("WMS layer", url, layerName, true, getHigherZindex(), this);
+        } catch (Exception e) {
+            throw new IOException("Error while adding shapefile layer: ", e);
+        }
+
+        return (AbmWMSLayer) addLayer(layer);
+
     }
 }

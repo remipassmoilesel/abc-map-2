@@ -8,14 +8,14 @@ import org.abcmap.core.dao.DataModel;
 import java.util.Objects;
 
 /**
- * Allow to store WMS informations on layers
+ * Allow to store WMS information on layers
  */
 @DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "WMS_INDEX")
 public class WMSEntry implements DataModel {
 
     private static final String ID_FIELD_NAME = "ID";
     private static final String URL_FIELD_NAME = "URL";
-    private static final String WMS_NAME_FIELD_NAME = "WMS_NAME";
+    private static final String WMS_NAME_FIELD_NAME = "WMS_LAYER_NAME";
 
     @DatabaseField(id = true, columnName = ID_FIELD_NAME)
     private String layerId;
@@ -24,16 +24,16 @@ public class WMSEntry implements DataModel {
     private String url;
 
     @DatabaseField(columnName = WMS_NAME_FIELD_NAME)
-    private String wmsName;
+    private String wmsLayerName;
 
     public WMSEntry() {
 
     }
 
-    public WMSEntry(String layerId, String url, String wmsName) {
+    public WMSEntry(String layerId, String url, String wmsLayerName) {
         this.layerId = layerId;
         this.url = url;
-        this.wmsName = wmsName;
+        this.wmsLayerName = wmsLayerName;
     }
 
     public String getLayerId() {
@@ -52,12 +52,12 @@ public class WMSEntry implements DataModel {
         this.url = url;
     }
 
-    public String getWmsName() {
-        return wmsName;
+    public String getWmsLayerName() {
+        return wmsLayerName;
     }
 
-    public void setWmsName(String wmsName) {
-        this.wmsName = wmsName;
+    public void setWMSLayerName(String layerName) {
+        this.wmsLayerName = layerName;
     }
 
     @Override
@@ -67,11 +67,20 @@ public class WMSEntry implements DataModel {
         WMSEntry wmsEntry = (WMSEntry) o;
         return Objects.equals(layerId, wmsEntry.layerId) &&
                 Objects.equals(url, wmsEntry.url) &&
-                Objects.equals(wmsName, wmsEntry.wmsName);
+                Objects.equals(wmsLayerName, wmsEntry.wmsLayerName);
+    }
+
+    @Override
+    public String toString() {
+        return "WMSEntry{" +
+                "layerId='" + layerId + '\'' +
+                ", url='" + url + '\'' +
+                ", WMSlayerName='" + wmsLayerName + '\'' +
+                '}';
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(layerId, url, wmsName);
+        return Objects.hash(layerId, url, wmsLayerName);
     }
 }

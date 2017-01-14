@@ -28,7 +28,7 @@ public class LayerIndexEntry implements DataModel {
     private AbmLayerType type;
 
     @DatabaseField(columnName = NAME_FIELD_NAME)
-    private String name;
+    private String readableName;
 
     @DatabaseField(columnName = VISIBLE_FIELD_NAME)
     private boolean visible;
@@ -42,9 +42,9 @@ public class LayerIndexEntry implements DataModel {
     public LayerIndexEntry() {
     }
 
-    public LayerIndexEntry(String layerId, String name, boolean visible, int zindex, AbmLayerType type) {
+    public LayerIndexEntry(String layerId, String readableName, boolean visible, int zindex, AbmLayerType type) {
 
-        this.name = name;
+        this.readableName = readableName;
         this.visible = visible;
         this.zindex = zindex;
         this.type = type;
@@ -100,7 +100,7 @@ public class LayerIndexEntry implements DataModel {
      * @return
      */
     public String getName() {
-        return name;
+        return readableName;
     }
 
     /**
@@ -110,7 +110,7 @@ public class LayerIndexEntry implements DataModel {
      */
 
     public void setName(String name) {
-        this.name = name;
+        this.readableName = name;
     }
 
     /**
@@ -215,11 +215,11 @@ public class LayerIndexEntry implements DataModel {
                 Double.compare(that.opacity, opacity) == 0 &&
                 Objects.equals(layerId, that.layerId) &&
                 type == that.type &&
-                Objects.equals(name, that.name);
+                Objects.equals(readableName, that.readableName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(layerId, type, name, visible, zindex, opacity);
+        return Objects.hash(layerId, type, readableName, visible, zindex, opacity);
     }
 }

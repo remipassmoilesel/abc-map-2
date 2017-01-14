@@ -108,7 +108,13 @@ public class Initialization {
         }
         // create a fake project
         else if (createFake.isEmpty() == false) {
-            pman.createFakeProject(createFake);
+            try{
+                pman.createFakeProject(createFake);
+            }catch(Exception e){
+                logger.error(e);
+                pman.createNewProject();
+            }
+
         }
         // or create a new project at launch
         else {

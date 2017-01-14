@@ -3,6 +3,7 @@ package org.abcmap.core.managers;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.gui.components.map.CachedMapPane;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -49,6 +50,9 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
             return getMainMap().getScreenToWorldTransform().transform(point, null);
         }
 
+        /**
+         * Zoomin main map
+         */
         public void zoomIn() {
 
             if (getMainMap() == null) {
@@ -59,6 +63,9 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
             refresh();
         }
 
+        /**
+         * Zoom out main map
+         */
         public void zoomOut() {
 
             if (getMainMap() == null) {
@@ -69,6 +76,9 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
             refresh();
         }
 
+        /**
+         * Reset scale of display
+         */
         public void resetDisplay() {
             if (getMainMap() == null) {
                 return;
@@ -79,6 +89,9 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
             map.repaint();
         }
 
+        /**
+         * Refresh current map
+         */
         public void refresh() {
 
             CachedMapPane map = getMainMap();
@@ -88,6 +101,15 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
 
             map.refreshMap();
             map.repaint();
+        }
+
+        public void deleteCache(String id, ReferencedEnvelope bounds) {
+
+            if(projectm().isInitialized() == false){
+                throw new IllegalStateException("Project non initialized");
+            }
+
+            projectm().getProject().deleteCacheForLayer(id, bounds);
         }
     }
 

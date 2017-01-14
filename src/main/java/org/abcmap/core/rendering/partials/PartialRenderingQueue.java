@@ -98,7 +98,7 @@ class PartialRenderingQueue {
     private ArrayList<PartialRenderingTask> tasks;
 
     // debug information
-    private boolean debugMode = true;
+    private boolean debugMode = false;
     private static int debugFontSize = 12;
     private static int debugIncr = debugFontSize + 5;
     private static Font debugFont = new Font("Dialog", Font.BOLD, debugFontSize);
@@ -177,6 +177,7 @@ class PartialRenderingQueue {
      * Start processing queue in a separated thread
      */
     public void start() {
+
         ThreadManager.runLater(() -> {
 
             // iterate tasks to render
@@ -186,7 +187,16 @@ class PartialRenderingQueue {
                 try {
                     task.run();
                 } catch (Exception e) {
-                    logger.error(e);
+
+                    // show all error if required
+                    if (debugMode == true) {
+                        logger.error(e);
+                    }
+
+                    // or just message
+                    else {
+                        logger.error(e.getMessage());
+                    }
                 }
 
                 task.markAsFinished();
@@ -395,7 +405,7 @@ class PartialRenderingQueue {
                     BufferedImage img = null;
 
                     // previous image if required
-                    if(partial.isToRedraw() == true){
+                    if (partial.isToRedraw() == true) {
                         img = partial.getImage();
                     }
 

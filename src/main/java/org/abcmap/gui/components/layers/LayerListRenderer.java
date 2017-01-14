@@ -94,20 +94,28 @@ public class LayerListRenderer extends JLabel implements ListCellRenderer<AbmAbs
 
         }
 
-        // cut name of layer if needed
-        int i = this.getText().length();
-        String txt = this.getText();
+        // show name of layer
+        String name = this.getText();
+        if (name == null) {
+            name = "null";
+            this.setText(name);
+        }
 
-        while (this.getPreferredSize().width > list.getSize().width - 15 && i > 0) {
-            i -= 2;
-            if (i < 1) {
-                i = 1;
-                this.setText(txt.substring(0, i) + "...");
-                this.setSize(getPreferredSize());
-                break;
-            } else {
-                this.setText(txt.substring(0, i) + "...");
-                this.setSize(getPreferredSize());
+        // cut it if layer if needed
+        else {
+            int i = name.length();
+
+            while (this.getPreferredSize().width > list.getSize().width - 15 && i > 0) {
+                i -= 2;
+                if (i < 1) {
+                    i = 1;
+                    this.setText(name.substring(0, i) + "...");
+                    this.setSize(getPreferredSize());
+                    break;
+                } else {
+                    this.setText(name.substring(0, i) + "...");
+                    this.setSize(getPreferredSize());
+                }
             }
         }
         return this;

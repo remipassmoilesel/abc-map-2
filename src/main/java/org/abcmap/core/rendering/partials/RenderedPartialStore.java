@@ -208,14 +208,14 @@ public class RenderedPartialStore implements HasEventNotificationManager {
         }
 
         // one result found, prepare it and return it
-        SerializableRenderedPartial serializ = results.get(0);
+        SerializableRenderedPartial serialized = results.get(0);
 
-        BufferedImage img = serializ.getImage();
+        BufferedImage img = serialized.getImage();
         int w = img.getWidth();
         int h = img.getHeight();
         part.setImage(img, w, h);
 
-        part.setDatabaseId(serializ.getId());
+        part.setDatabaseId(serialized.getId());
 
         // update in memory partial
         addInLoadedList(part);
