@@ -122,7 +122,7 @@ public class Initialization {
         }
 
         // set default tool
-        Main.getDrawManager().setCurrentTool(ToolLibrary.LINE_TOOL);
+        Main.getDrawManager().setCurrentTool(ToolLibrary.ZOOM_TOOL);
 
         // run gui initialization operation when all others operations started
         SwingUtilities.invokeAndWait(() -> {
