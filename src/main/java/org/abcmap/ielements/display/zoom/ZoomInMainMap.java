@@ -1,8 +1,8 @@
 package org.abcmap.ielements.display.zoom;
 
-public class ZoomIn extends AbstractZoom {
+public class ZoomInMainMap extends AbstractZoom {
 
-	public ZoomIn() {
+	public ZoomInMainMap() {
 		super(Direction.IN);
 	}
 

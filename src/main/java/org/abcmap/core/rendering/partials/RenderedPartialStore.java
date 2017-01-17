@@ -493,10 +493,16 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
     }
 
+    /**
+     * Fire an event to notify observers that some partials have been added
+     */
     private void fireNewPartialsAdded() {
         notifm.fireEvent(new CacheRenderingEvent(CacheRenderingEvent.NEW_PARTIALS_ADDED, null));
     }
 
+    /**
+     * Fire an event to notify observers that some partials have been deleted
+     */
     private void firePartialsDeleted() {
         notifm.fireEvent(new CacheRenderingEvent(CacheRenderingEvent.PARTIALS_DELETED, null));
     }

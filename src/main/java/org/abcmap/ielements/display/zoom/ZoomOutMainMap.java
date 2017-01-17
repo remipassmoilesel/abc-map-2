@@ -1,8 +1,8 @@
 package org.abcmap.ielements.display.zoom;
 
-public class ZoomOut extends AbstractZoom {
+public class ZoomOutMainMap extends AbstractZoom {
 
-	public ZoomOut() {
+	public ZoomOutMainMap() {
 		super(Direction.OUT);
 	}
 
