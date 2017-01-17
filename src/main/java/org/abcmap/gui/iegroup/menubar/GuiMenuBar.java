@@ -15,6 +15,7 @@ public class GuiMenuBar extends JMenuBar {
         groups.add(new FileMenu());
         groups.add(new EditionMenu());
         groups.add(new DrawingToolsMenu());
+        groups.add(new DisplayMenu());
         groups.add(new ImportMenu());
         groups.add(new ExportMenu());
         groups.add(new ProfileMenu());
