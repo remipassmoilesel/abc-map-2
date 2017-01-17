@@ -7,6 +7,7 @@ import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GraphicsConsumer;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.windows.MainWindow;
+import org.abcmap.ielements.importation.AddShapeFile;
 import org.abcmap.ielements.importation.AddWMSLayer;
 
 import javax.swing.*;
@@ -16,6 +17,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.dnd.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.TooManyListenersException;
 
@@ -139,22 +141,24 @@ public class DropFilesToolbar extends Toolbar {
 
             Transferable transferable = dtde.getTransferable();
 
-            // resource dropped is a file list
+            // resource dropped is a file list, open the first element as a possible shape file
+            // TODO: considerate drop of images, folders, other formats, etc ...
             if (dtde.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
                 dtde.acceptDrop(dtde.getDropAction());
                 try {
 
-                    java.util.List transferData = (java.util.List) transferable.getTransferData(DataFlavor.javaFileListFlavor);
+                    java.util.List<File> transferData = (java.util.List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                     if (transferData != null && transferData.size() > 0) {
-                        System.out.println();
-                        System.out.println(transferData);
-                        System.out.println(transferData);
-                        System.out.println(transferData.getClass());
+
+                        AddShapeFile anshapefile = new AddShapeFile();
+                        anshapefile.openLayer(transferData.get(0).getAbsolutePath());
+
                         dtde.dropComplete(true);
                     }
 
                 } catch (Exception ex) {
                     logger.error(ex);
+                    dtde.dropComplete(false);
                 }
             }
 
@@ -180,6 +184,7 @@ public class DropFilesToolbar extends Toolbar {
 
                 } catch (Exception ex) {
                     logger.error(ex);
+                    dtde.dropComplete(false);
                 }
             }
 
