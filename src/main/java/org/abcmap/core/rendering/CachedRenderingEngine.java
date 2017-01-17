@@ -10,7 +10,6 @@ import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.rendering.partials.RenderedPartial;
 import org.abcmap.core.rendering.partials.RenderedPartialFactory;
 import org.abcmap.core.rendering.partials.RenderedPartialQueryResult;
-import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
@@ -25,6 +24,10 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * Render a map by cut it in several partials. When partials are rendered,
  * they are stored in database in order to be reused, to prevent resources consumption.
+ * <p>
+ * // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
+ * // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
+ * // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
  */
 public class CachedRenderingEngine implements HasEventNotificationManager {
 
@@ -146,7 +149,9 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     @Override
     protected void finalize() throws Throwable {
         // remove observer on finalizing
-        project.getRenderedPartialStore().getNotificationManager().removeObserver(this);
+        if (project != null) {
+            project.getRenderedPartialStore().getNotificationManager().removeObserver(this);
+        }
     }
 
     public void paint(Graphics2D g2d) {
@@ -277,13 +282,22 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
                 String layId = lay.getId();
 
-                // retrieve map content associated with layer
-                // if content does no exist, create one
+                // Retrieve map content associated with layer. If content does no exist, create one
+                // This map content contains all layers, but only one is visible.
+                // This is useful to use Geotools corrections between layers
                 MapContent map = layerMapContents.get(layId);
                 if (map == null) {
-                    map = lay.buildMapContent();
+                    map = project.buildMapContent(layId);
                     layerMapContents.put(layId, map);
                 }
+
+                // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
+                // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
+                // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
+                // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
+                // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
+                // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
+                // TODO: check if layers have not changed (e.g.: new tile added to tile layer)
 
                 // retrieve partial factory associated with layer
                 RenderedPartialFactory factory = partialFactories.get(layId);
@@ -291,23 +305,6 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                     factory = new RenderedPartialFactory(project.getRenderedPartialStore(), map, layId);
                     factory.setDebugMode(debugMode);
                     partialFactories.put(layId, factory);
-                }
-
-                // if map is not up to date, create a new one and invalidate cache
-                if (GeoUtils.isMapContains(map, lay.getInternalLayer()) == false) {
-
-                    logger.warning("Layer changed ! " + layId);
-
-                    // dispose old map content
-                    map.dispose();
-
-                    // build a new one
-                    map = lay.buildMapContent();
-                    layerMapContents.put(layId, map);
-                    factory.setMapContent(map);
-
-                    // delete cache
-                    project.deleteCacheForLayer(layId, null);
                 }
 
                 // stop eventual previous rendering tasks, if they are not in current result

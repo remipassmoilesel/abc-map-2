@@ -194,7 +194,8 @@ public class RenderedPartial {
     @Override
     public String toString() {
         return "RenderedPartial{" + this.hashCode() + ", " +
-                "imageSoftRef=" + imageSoftRef +
+                ", layerId=" + layerId +
+                ", imageSoftRef=" + imageSoftRef +
                 ", renderedWidth=" + renderedWidth +
                 ", renderedHeight=" + renderedHeight +
                 ", envelope=" + envelope +

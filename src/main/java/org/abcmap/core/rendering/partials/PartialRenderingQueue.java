@@ -99,6 +99,7 @@ class PartialRenderingQueue {
 
     // debug information
     private boolean debugMode = false;
+    private boolean printTasksLaunchAndStop = false;
     private static int debugFontSize = 12;
     private static int debugIncr = debugFontSize + 5;
     private static Font debugFont = new Font("Dialog", Font.BOLD, debugFontSize);
@@ -225,7 +226,7 @@ class PartialRenderingQueue {
         // activate flag
         stopRendering = true;
 
-        if (debugMode) {
+        if (debugMode && printTasksLaunchAndStop) {
             logger.warning("Stop rendering. Queue:  " + queueId + " Task: " + taskNumber);
         }
 
@@ -367,7 +368,7 @@ class PartialRenderingQueue {
 
                 taskNumber++;
 
-                if (debugMode) {
+                if (debugMode && printTasksLaunchAndStop) {
                     logger.warning("Launching rendering task. Queue:  " + queueId + " Task: " + taskNumber);
                 }
 
@@ -418,21 +419,6 @@ class PartialRenderingQueue {
                     }
 
                     partial.setToRedraw(false);
-
-                    // get layer and CRS
-                    Layer layer = mapContent.layers().get(0);
-                    CoordinateReferenceSystem layerCrs = layer.getFeatureSource().getSchema().getCoordinateReferenceSystem();
-
-                    // check crs, if different transform envelope to destination CRS
-                    if (partialWorldBounds.getCoordinateReferenceSystem().equals(layerCrs) == false) {
-
-                        try {
-                            partialWorldBounds = partialWorldBounds.transform(layerCrs, true);
-                        } catch (TransformException | FactoryException e) {
-                            logger.error(e);
-                        }
-
-                    }
 
                     // get graphics from image and improve drawing quality
                     Graphics2D g2d = (Graphics2D) img.getGraphics();

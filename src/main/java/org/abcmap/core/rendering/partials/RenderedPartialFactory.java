@@ -6,11 +6,13 @@ import org.abcmap.core.rendering.CachedRenderingEngine;
 import org.abcmap.core.rendering.RenderingException;
 import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -34,6 +36,11 @@ public class RenderedPartialFactory {
     private final String layerId;
 
     /**
+     * Debug flag used to print CRS of layers to render in console
+     */
+    private final boolean printCrsToRender;
+
+    /**
      * Associated map content
      */
     private MapContent mapContent;
@@ -51,18 +58,26 @@ public class RenderedPartialFactory {
     /**
      * Size of map rendered on partials, in world unit
      */
-    private double partialSideWu;
+    private double partialSideWuY;
 
     /**
      * If set to true, additional information will be displayed on partials
      */
     private boolean debugMode = false;
 
+    /**
+     *
+     * @param store
+     * @param content
+     * @param layerId
+     */
     public RenderedPartialFactory(RenderedPartialStore store, MapContent content, String layerId) {
         this.store = store;
         this.mapContent = content;
         this.layerId = layerId;
         this.partialSidePx = CachedRenderingEngine.DEFAULT_PARTIAL_SIDE_PX;
+
+        this.printCrsToRender = false;
     }
 
     /**
@@ -140,7 +155,19 @@ public class RenderedPartialFactory {
             throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
         }
 
-        this.partialSideWu = partialSideWu;
+        // TODO: to remove
+        if (debugMode && printCrsToRender) {
+            try {
+                System.out.println();
+                System.out.println("World bounds to render: " + worldBounds);
+                System.out.println(mapContent.layers().get(0));
+                System.out.println(mapContent.layers().get(0).getFeatureSource().getFeatures().getSchema().getCoordinateReferenceSystem());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        this.partialSideWuY = partialSideWu;
 
         ArrayList<RenderedPartial> rsparts = new ArrayList<>();
 
@@ -175,39 +202,33 @@ public class RenderedPartialFactory {
 
             // check if bounds of partials are on layer
             // verification is done on Generic2D system, to prevent weird results (eg: ED50 (small domain) / WGS84)
-            try {
-                ReferencedEnvelope layerBounds = mapContent.layers().get(0).getBounds().transform(GeoUtils.GENERIC_2D, true);
-                if (layerBounds.intersects(area.toBounds(GeoUtils.GENERIC_2D))) {
+            // TODO: check if partial is on area to render, to prevent render of part of layers out of bounds
+            // TODO: (like with transformed shape file of France to ED50 system)
 
-                    // check if partial already exist and is already loaded
-                    RenderedPartial part = store.searchInLoadedList(layerId, area);
+            // check if partial already exist and is already loaded
+            RenderedPartial part = store.searchInLoadedList(layerId, area);
 
-                    if (RenderedPartial.isLoaded(part) || PartialRenderingQueue.isRenderInProgress(part)) {
-                        rsparts.add(part);
+            if (RenderedPartial.isLoaded(part) || PartialRenderingQueue.isRenderInProgress(part)) {
+                rsparts.add(part);
 
-                        loaded++;
-                        loadedPartialsReused++;
-                    }
+                loaded++;
+                loadedPartialsReused++;
+            }
 
-                    // partial does not exist or image is not loaded, create it
-                    else {
+            // partial does not exist or image is not loaded, create it
+            else {
 
-                        // create a new partial only if needed
-                        if (part == null) {
-                            part = new RenderedPartial(null, area, (int) partialSidePx, (int) partialSidePx, layerId);
-                            store.addInLoadedList(part);
-                        }
-
-                        // create a task to retrieve or renderer image from map
-                        renderingQueue.addTask(part);
-
-                        rsparts.add(part);
-
-                    }
-
+                // create a new partial only if needed
+                if (part == null) {
+                    part = new RenderedPartial(null, area, (int) partialSidePx, (int) partialSidePx, layerId);
+                    store.addInLoadedList(part);
                 }
-            } catch (Exception e) {
-                logger.error(e);
+
+                // create a task to retrieve or renderer image from map
+                renderingQueue.addTask(part);
+
+                rsparts.add(part);
+
             }
 
             // go to next
@@ -274,8 +295,8 @@ public class RenderedPartialFactory {
      *
      * @return
      */
-    public double getPartialSideWu() {
-        return partialSideWu;
+    public double getPartialSideWuY() {
+        return partialSideWuY;
     }
 
     /**
