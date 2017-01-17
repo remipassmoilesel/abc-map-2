@@ -5,9 +5,7 @@ import org.abcmap.core.managers.Main;
 import org.abcmap.gui.GuiCursor;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.components.map.CachedMapPane;
-import org.abcmap.gui.components.map.MouseControlType;
 import org.abcmap.gui.tools.containers.ToolLibrary;
-import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -52,6 +50,7 @@ public class MapNavigationBar extends JPanel {
         movetool.addActionListener(zoomAl);
         add(movetool, "wrap");
 
+        /*
         JButton zoomin = new JButton(GuiIcons.MAP_ZOOMIN);
         zoomin.setActionCommand(ZOOM_IN);
         zoomin.addActionListener(zoomAl);
@@ -62,13 +61,16 @@ public class MapNavigationBar extends JPanel {
         zoomout.addActionListener(zoomAl);
         add(zoomout, "wrap");
 
+        zoomin.setCursor(GuiCursor.HAND_CURSOR);
+        zoomout.setCursor(GuiCursor.HAND_CURSOR);
+        */
+
         JButton center = new JButton(GuiIcons.MAP_MOVECENTER);
         center.setActionCommand(CENTER);
         center.addActionListener(zoomAl);
         add(center, "right");
 
-        zoomin.setCursor(GuiCursor.HAND_CURSOR);
-        zoomout.setCursor(GuiCursor.HAND_CURSOR);
+        movetool.setCursor(GuiCursor.HAND_CURSOR);
         center.setCursor(GuiCursor.HAND_CURSOR);
     }
 
