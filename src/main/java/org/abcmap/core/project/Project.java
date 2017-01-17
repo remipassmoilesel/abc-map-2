@@ -12,6 +12,7 @@ import org.abcmap.core.tiles.TileStorage;
 import org.abcmap.core.utils.*;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.geotools.swing.JMapFrame;
 import org.opengis.referencing.FactoryException;
@@ -664,7 +665,8 @@ public class Project {
      */
     public void deleteCacheForLayer(String layId, ReferencedEnvelope env) {
 
-        GuiUtils.throwIfOnEDT();
+        // TODO
+        //GuiUtils.throwIfOnEDT();
 
         if (getLayerById(layId) == null) {
             throw new IllegalArgumentException("Unable to find layer: " + layId);
@@ -764,11 +766,6 @@ public class Project {
         return list.get(list.size() - 1).getZindex();
     }
 
-    public void setAllElementsSelected(boolean allElementsSelected) {
-        //TODO
-    }
-
-
     public AbmShapeFileLayer addNewShapeFileLayer(Path p) throws IOException {
 
         // create a layer wrapper and store it
@@ -794,5 +791,37 @@ public class Project {
 
         return (AbmWMSLayer) addLayer(layer);
 
+    }
+
+    /**
+     * This method construct a map content with all layers of project, but with only one layer visible.
+     * <p>
+     * This is useful to render only one layer, but to use CRS corrections provided by Geotools between layers.
+     *
+     * @param layId
+     * @return
+     */
+    public MapContent buildMapContent(String layId) {
+
+        // create a map content from present list of layers
+        MonitoredMapContent content = new MonitoredMapContent();
+        for (AbmAbstractLayer lay : getLayersList()) {
+
+            try {
+
+                // build a layer
+                Layer geotoolsLay = lay.buildGeotoolsLayer();
+                content.addLayer(geotoolsLay);
+
+                // set visibility relative to specified layer id
+                geotoolsLay.setVisible(lay.getId().equals(layId));
+
+            } catch (IOException e) {
+                logger.error(e);
+            }
+
+        }
+
+        return content;
     }
 }
