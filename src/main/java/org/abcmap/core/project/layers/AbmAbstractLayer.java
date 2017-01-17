@@ -16,6 +16,8 @@ import org.geotools.styling.StyleFactory;
 import org.opengis.filter.FilterFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import java.io.IOException;
+
 /**
  * This object is a wrapper of Geotools layer
  */
@@ -41,6 +43,33 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
         this.indexEntry = entry;
         this.layerStyle = sf.createStyle();
     }
+
+    /**
+     * Dispose previous internal layer if needed and create a new one
+     */
+    protected void buildInternalLayer() {
+
+        // dispose previous layer if needed
+        if (this.internalLayer != null) {
+            internalLayer.dispose();
+        }
+
+        // create internal layer
+        try {
+            this.internalLayer = buildGeotoolsLayer();
+        } catch (IOException e) {
+            logger.error(e);
+            this.internalLayer = null;
+        }
+    }
+
+    /**
+     * This method should return a valid Geotools layer, used to render map
+     *
+     * @return
+     * @throws IOException
+     */
+    public abstract Layer buildGeotoolsLayer() throws IOException;
 
     /**
      * This method should be call every time a modification happen to layer
@@ -244,5 +273,6 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
     public int hashCode() {
         return indexEntry != null ? indexEntry.hashCode() : 0;
     }
+
 
 }

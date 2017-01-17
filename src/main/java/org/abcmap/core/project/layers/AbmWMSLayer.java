@@ -9,6 +9,7 @@ import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.map.FeatureLayer;
 
 import java.io.IOException;
 import java.net.URL;
@@ -52,14 +53,11 @@ public class AbmWMSLayer extends AbmAbstractLayer {
             throw new IOException("Unable to create WMS layer", e);
         }
 
-        buildInternalLayer(url, wmsLayerName);
+        buildInternalLayer();
     }
 
-    private void buildInternalLayer(String url, String wmsName) {
-
-        if (internalLayer != null) {
-            internalLayer.dispose();
-        }
+    @Override
+    public org.geotools.map.Layer buildGeotoolsLayer() {
 
         WMSCapabilities capabilities = wmswebMapServer.getCapabilities();
         List<Layer> namedLayers = Arrays.asList(WMSUtils.getNamedLayers(capabilities));
@@ -79,9 +77,6 @@ public class AbmWMSLayer extends AbmAbstractLayer {
                 String layName = lay.getName().trim();
                 String entryName = wmsEntry.getWmsLayerName().trim();
 
-                System.out.println(layName);
-                System.out.println(entryName);
-
                 // or display the layer with the same name
                 // remove extra space and ignore case
                 if (layName.equalsIgnoreCase(entryName)) {
@@ -100,11 +95,7 @@ public class AbmWMSLayer extends AbmAbstractLayer {
         }
 
         // create layer
-        internalLayer = new org.geotools.map.WMSLayer(wmswebMapServer, wmsLayer);
-
-        // update internal parameters
-        wmsEntry.setUrl(url);
-        wmsEntry.setWMSLayerName(wmsName);
+        return new org.geotools.map.WMSLayer(wmswebMapServer, wmsLayer);
 
     }
 
@@ -118,7 +109,8 @@ public class AbmWMSLayer extends AbmAbstractLayer {
      * @param layerName
      */
     public void changeWmsName(String layerName) {
-        buildInternalLayer(wmsEntry.getUrl(), layerName);
+        wmsEntry.setWMSLayerName(layerName);
+        buildInternalLayer();
     }
 
     /**

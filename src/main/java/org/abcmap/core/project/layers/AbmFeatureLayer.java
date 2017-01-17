@@ -10,6 +10,7 @@ import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.map.Layer;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
@@ -46,6 +47,12 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
         this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.FEATURES), owner, create);
     }
 
+    /**
+     * @param entry
+     * @param owner
+     * @param create
+     * @throws IOException
+     */
     public AbmFeatureLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
         super(owner, entry);
 
@@ -62,8 +69,15 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
 
         // create a feature builder associated with the layer
         this.featureBuilder = FeatureUtils.getDefaultFeatureBuilder(entry.getLayerId(), owner.getCrs());
-        this.internalLayer = new org.geotools.map.FeatureLayer(featureStore, layerStyle);
+
+        buildInternalLayer();
     }
+
+    @Override
+    public Layer buildGeotoolsLayer() {
+        return new org.geotools.map.FeatureLayer(featureStore, layerStyle);
+    }
+
 
     /**
      * Return calculated bounds of layer

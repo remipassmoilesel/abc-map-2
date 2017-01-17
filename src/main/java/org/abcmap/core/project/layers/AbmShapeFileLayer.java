@@ -9,6 +9,7 @@ import org.geotools.data.FileDataStoreFinder;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
+import org.geotools.map.Layer;
 import org.geotools.styling.Rule;
 
 import java.awt.*;
@@ -41,9 +42,25 @@ public class AbmShapeFileLayer extends AbmAbstractLayer {
         Rule rule3 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.POLYGON, color, null, 0.5f);
         layerStyle.featureTypeStyles().add(sf.createFeatureTypeStyle(new Rule[]{rule1, rule2, rule3}));
 
+        buildInternalLayer();
+    }
+
+    @Override
+    protected void buildInternalLayer() {
+
+        // dispose previous layer if needed
+        if (this.internalLayer != null) {
+            internalLayer.dispose();
+        }
+
         // create internal layer
         this.internalLayer = new FeatureLayer(featureStore, layerStyle);
 
+    }
+
+    @Override
+    public Layer buildGeotoolsLayer() {
+        return new org.geotools.map.FeatureLayer(featureStore, layerStyle);
     }
 
     @Override
