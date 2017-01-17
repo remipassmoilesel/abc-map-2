@@ -333,6 +333,15 @@ public class Utils {
     /**
      * Return file extension or empty string
      *
+     * @param path
+     * @return
+     */
+    public static String getExtension(Path path) {
+        return getExtension(path.toAbsolutePath().toString());
+    }
+    /**
+     * Return file extension or empty string
+     *
      * @param name
      * @return
      */
