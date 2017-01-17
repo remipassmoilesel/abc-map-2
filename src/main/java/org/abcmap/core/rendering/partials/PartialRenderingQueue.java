@@ -428,6 +428,7 @@ class PartialRenderingQueue {
                     renderingActive = true;
                     long before = System.currentTimeMillis();
                     try {
+                        renderer.getMapContent().getViewport().setMatchingAspectRatio(true);
                         renderer.paint(g2d, new Rectangle(imgWidth, imgWidth), partialWorldBounds);
                     } finally {
                         renderTime = System.currentTimeMillis() - before;

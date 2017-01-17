@@ -10,6 +10,7 @@ import org.abcmap.core.rendering.RenderingException;
 import org.abcmap.core.rendering.partials.RenderedPartialFactory;
 import org.abcmap.core.rendering.partials.RenderedPartialQueryResult;
 import org.abcmap.gui.components.map.CachedMapPane;
+import org.geotools.map.MapContent;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -74,8 +75,10 @@ public class PartialFactoryTest {
         // test partial rendering
         if (SHOW_IN_WINDOW == false) {
 
+            MapContent globalMapContent = project.buildGlobalMapContent(true);
+
             // build partials for a fake layer map content
-            RenderedPartialFactory factory = new RenderedPartialFactory(project.getRenderedPartialStore(), project.buildGlobalMapContent(true), "layer1");
+            RenderedPartialFactory factory = new RenderedPartialFactory(project.getRenderedPartialStore(), globalMapContent, "layer1");
             final int[] renderedTiles = {0};
             RenderedPartialQueryResult queryResult = factory.intersect(worldPosition, dimensionsPx, partialSideWu, DefaultEngineeringCRS.GENERIC_2D, () -> {
                 renderedTiles[0]++;

@@ -180,6 +180,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         Main.getProjectManager().getNotificationManager().addObserver(this);
 
         debugBoundsList = new ArrayList<>();
+
         setDebugMode(false);
 
     }

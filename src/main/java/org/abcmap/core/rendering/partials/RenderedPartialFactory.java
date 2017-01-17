@@ -4,15 +4,12 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.rendering.CachedRenderingEngine;
 import org.abcmap.core.rendering.RenderingException;
-import org.abcmap.core.utils.GeoUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -57,6 +54,9 @@ public class RenderedPartialFactory {
 
     /**
      * Size of map rendered on partials, in world unit
+     * <p>
+     * This size is valid only for Y axis, X axis value should be equals or greater but
+     * Geotools StreamingRenderer should compensate this
      */
     private double partialSideWuY;
 
@@ -66,7 +66,6 @@ public class RenderedPartialFactory {
     private boolean debugMode = false;
 
     /**
-     *
      * @param store
      * @param content
      * @param layerId
@@ -139,7 +138,7 @@ public class RenderedPartialFactory {
      * @param worldBounds
      * @return
      */
-    public RenderedPartialQueryResult intersect(ReferencedEnvelope worldBounds, double partialSideWu,
+    public RenderedPartialQueryResult intersect(ReferencedEnvelope worldBounds, double partialSideYwu,
                                                 Runnable toRunWhenPartialsUpdated) throws RenderingException {
 
         // check rendering values
@@ -151,30 +150,22 @@ public class RenderedPartialFactory {
             throw new RenderingException("World bounds are null");
         }
 
-        if (Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
-            throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
+        if (Double.isInfinite(partialSideYwu) || Double.isNaN(partialSideYwu)) {
+            throw new RenderingException("Invalid partial side world unit value: " + partialSideYwu);
         }
 
-        // TODO: to remove
-        if (debugMode && printCrsToRender) {
-            try {
-                System.out.println();
-                System.out.println("World bounds to render: " + worldBounds);
-                System.out.println(mapContent.layers().get(0));
-                System.out.println(mapContent.layers().get(0).getFeatureSource().getFeatures().getSchema().getCoordinateReferenceSystem());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        // keep partial side size in world unit
+        // this size is valid only for Y axis, X axis value should be equals or greater
+        // but Geotools StreamingRenderer should compensate this
+        this.partialSideWuY = partialSideYwu;
 
-        this.partialSideWuY = partialSideWu;
-
+        // list of partials returned as a part of result
         ArrayList<RenderedPartial> rsparts = new ArrayList<>();
 
         // first position to go from
         // position is rounded in order to have partials that can be reused in future display
-        double x = getStartPointFrom(worldBounds.getMinX(), partialSideWu);
-        double y = getStartPointFrom(worldBounds.getMinY(), partialSideWu);
+        double x = getStartPointFrom(worldBounds.getMinX(), partialSideYwu);
+        double y = getStartPointFrom(worldBounds.getMinY(), partialSideYwu);
 
         PartialRenderingQueue renderingQueue = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toRunWhenPartialsUpdated);
         renderingQueue.setDebugMode(debugMode);
@@ -198,7 +189,7 @@ public class RenderedPartialFactory {
 
             // Compute needed area for next partial
             // CRS must be null, to prevent problems with different systems
-            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideWu, y, y + partialSideWu, worldBounds.getCoordinateReferenceSystem());
+            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideYwu, y, y + partialSideYwu, worldBounds.getCoordinateReferenceSystem());
 
             // check if bounds of partials are on layer
             // verification is done on Generic2D system, to prevent weird results (eg: ED50 (small domain) / WGS84)
@@ -232,17 +223,17 @@ public class RenderedPartialFactory {
             }
 
             // go to next
-            x += partialSideWu;
+            x += partialSideYwu;
 
             // change line when finished,
             // + partialSidePx to be sure that we stop after end of surface to render
             if (x > maxX) {
 
-                y += partialSideWu;
+                y += partialSideYwu;
 
                 // reset x except the last loop
                 if (y < maxY) {
-                    x = getStartPointFrom(worldBounds.getMinX(), partialSideWu);
+                    x = getStartPointFrom(worldBounds.getMinX(), partialSideYwu);
                 }
             }
 
@@ -263,8 +254,8 @@ public class RenderedPartialFactory {
         // compute real screen bounds of asked world area
         // given that we used fixed size partials, area can be larger than asked one
         Rectangle screenBounds = new Rectangle(0, 0,
-                (int) Math.round(w * partialSidePx / partialSideWu),
-                (int) Math.round(h * partialSidePx / partialSideWu));
+                (int) Math.round(w * partialSidePx / partialSideYwu),
+                (int) Math.round(h * partialSidePx / partialSideYwu));
 
         return new RenderedPartialQueryResult(rsparts, worldBounds, screenBounds, loaded, renderingQueue);
     }
