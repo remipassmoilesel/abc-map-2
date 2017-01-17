@@ -771,7 +771,7 @@ public class Project {
         // create a layer wrapper and store it
         AbmAbstractLayer layer = null;
         try {
-            layer = new AbmShapeFileLayer(null, p.toString(), true, getHigherZindex(), this, p);
+            layer = new AbmShapeFileLayer(null, p.getFileName().toString(), true, getHigherZindex(), this, p);
         } catch (Exception e) {
             throw new IOException("Error while adding shapefile layer: ", e);
         }
