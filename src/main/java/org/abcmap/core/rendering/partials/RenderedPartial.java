@@ -294,8 +294,8 @@ public class RenderedPartial {
 
         if (waitingImage == null) {
 
-            int side = renderedWidth;
-            waitingImage = new BufferedImage(side, side, BufferedImage.TYPE_INT_ARGB);
+            int size = renderedWidth;
+            waitingImage = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D g2d = (Graphics2D) waitingImage.getGraphics();
             Graphics2D g2dT = waitingImage.createGraphics();

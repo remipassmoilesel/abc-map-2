@@ -50,7 +50,7 @@ public class RenderedPartialFactory {
     /**
      * Default size in px of each partial
      */
-    private double partialSidePx;
+    private double partialSizePx;
 
     /**
      * Size of map rendered on partials, in world unit
@@ -58,7 +58,7 @@ public class RenderedPartialFactory {
      * This size is valid only for Y axis, X axis value should be equals or greater but
      * Geotools StreamingRenderer should compensate this
      */
-    private double partialSideWuY;
+    private double partialSizeYwu;
 
     /**
      * If set to true, additional information will be displayed on partials
@@ -74,7 +74,7 @@ public class RenderedPartialFactory {
         this.store = store;
         this.mapContent = content;
         this.layerId = layerId;
-        this.partialSidePx = CachedRenderingEngine.DEFAULT_PARTIAL_SIDE_PX;
+        this.partialSizePx = CachedRenderingEngine.DEFAULT_PARTIAL_SIZE_PX;
 
         this.printCrsToRender = false;
     }
@@ -97,7 +97,7 @@ public class RenderedPartialFactory {
      * @param pixelDimension
      * @return
      */
-    public RenderedPartialQueryResult intersect(Point2D ulc, Dimension pixelDimension, double partialSideWu, CoordinateReferenceSystem crs,
+    public RenderedPartialQueryResult intersect(Point2D ulc, Dimension pixelDimension, double partialSizeYWu, CoordinateReferenceSystem crs,
                                                 Runnable toRunWhenPartialsUpdated) throws RenderingException {
 
         // check rendering values
@@ -109,13 +109,13 @@ public class RenderedPartialFactory {
             throw new RenderingException("Invalid dimensions to render: " + pixelDimension);
         }
 
-        if (Double.isInfinite(partialSideWu) || Double.isNaN(partialSideWu)) {
-            throw new RenderingException("Invalid partial side world unit value: " + partialSideWu);
+        if (Double.isInfinite(partialSizeYWu) || Double.isNaN(partialSizeYWu)) {
+            throw new RenderingException("Invalid partial side world unit value: " + partialSizeYWu);
         }
 
         // get width and height in decimal dg
-        double wdg = partialSideWu * pixelDimension.width / partialSidePx;
-        double hdg = partialSideWu * pixelDimension.height / partialSidePx;
+        double wdg = partialSizeYWu * pixelDimension.width / partialSizePx;
+        double hdg = partialSizeYWu * pixelDimension.height / partialSizePx;
 
         // create a new envelope
         double x1 = ulc.getX();
@@ -126,7 +126,7 @@ public class RenderedPartialFactory {
         ReferencedEnvelope env = new ReferencedEnvelope(x1, x2, y1, y2, crs);
 
         // create a new envelope
-        return intersect(env, partialSideWu, toRunWhenPartialsUpdated);
+        return intersect(env, partialSizeYWu, toRunWhenPartialsUpdated);
 
     }
 
@@ -138,7 +138,7 @@ public class RenderedPartialFactory {
      * @param worldBounds
      * @return
      */
-    public RenderedPartialQueryResult intersect(ReferencedEnvelope worldBounds, double partialSideYwu,
+    public RenderedPartialQueryResult intersect(ReferencedEnvelope worldBounds, double partialSizeYwu,
                                                 Runnable toRunWhenPartialsUpdated) throws RenderingException {
 
         // check rendering values
@@ -150,24 +150,24 @@ public class RenderedPartialFactory {
             throw new RenderingException("World bounds are null");
         }
 
-        if (Double.isInfinite(partialSideYwu) || Double.isNaN(partialSideYwu)) {
-            throw new RenderingException("Invalid partial side world unit value: " + partialSideYwu);
+        if (Double.isInfinite(partialSizeYwu) || Double.isNaN(partialSizeYwu)) {
+            throw new RenderingException("Invalid partial side world unit value: " + partialSizeYwu);
         }
 
         // keep partial side size in world unit
         // this size is valid only for Y axis, X axis value should be equals or greater
         // but Geotools StreamingRenderer should compensate this
-        this.partialSideWuY = partialSideYwu;
+        this.partialSizeYwu = partialSizeYwu;
 
         // list of partials returned as a part of result
         ArrayList<RenderedPartial> rsparts = new ArrayList<>();
 
         // first position to go from
         // position is rounded in order to have partials that can be reused in future display
-        double x = getStartPointFrom(worldBounds.getMinX(), partialSideYwu);
-        double y = getStartPointFrom(worldBounds.getMinY(), partialSideYwu);
+        double x = getStartPointFrom(worldBounds.getMinX(), partialSizeYwu);
+        double y = getStartPointFrom(worldBounds.getMinY(), partialSizeYwu);
 
-        PartialRenderingQueue renderingQueue = new PartialRenderingQueue(mapContent, store, partialSidePx, partialSidePx, toRunWhenPartialsUpdated);
+        PartialRenderingQueue renderingQueue = new PartialRenderingQueue(mapContent, store, partialSizePx, partialSizePx, toRunWhenPartialsUpdated);
         renderingQueue.setDebugMode(debugMode);
 
         // count how many tiles are already loaded
@@ -189,7 +189,7 @@ public class RenderedPartialFactory {
 
             // Compute needed area for next partial
             // CRS must be null, to prevent problems with different systems
-            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSideYwu, y, y + partialSideYwu, worldBounds.getCoordinateReferenceSystem());
+            ReferencedEnvelope area = new ReferencedEnvelope(x, x + partialSizeYwu, y, y + partialSizeYwu, worldBounds.getCoordinateReferenceSystem());
 
             // check if bounds of partials are on layer
             // verification is done on Generic2D system, to prevent weird results (eg: ED50 (small domain) / WGS84)
@@ -211,7 +211,7 @@ public class RenderedPartialFactory {
 
                 // create a new partial only if needed
                 if (part == null) {
-                    part = new RenderedPartial(null, area, (int) partialSidePx, (int) partialSidePx, layerId);
+                    part = new RenderedPartial(null, area, (int) partialSizePx, (int) partialSizePx, layerId);
                     store.addInLoadedList(part);
                 }
 
@@ -223,17 +223,17 @@ public class RenderedPartialFactory {
             }
 
             // go to next
-            x += partialSideYwu;
+            x += partialSizeYwu;
 
             // change line when finished,
             // + partialSidePx to be sure that we stop after end of surface to render
             if (x > maxX) {
 
-                y += partialSideYwu;
+                y += partialSizeYwu;
 
                 // reset x except the last loop
                 if (y < maxY) {
-                    x = getStartPointFrom(worldBounds.getMinX(), partialSideYwu);
+                    x = getStartPointFrom(worldBounds.getMinX(), partialSizeYwu);
                 }
             }
 
@@ -254,8 +254,8 @@ public class RenderedPartialFactory {
         // compute real screen bounds of asked world area
         // given that we used fixed size partials, area can be larger than asked one
         Rectangle screenBounds = new Rectangle(0, 0,
-                (int) Math.round(w * partialSidePx / partialSideYwu),
-                (int) Math.round(h * partialSidePx / partialSideYwu));
+                (int) Math.round(w * partialSizePx / partialSizeYwu),
+                (int) Math.round(h * partialSizePx / partialSizeYwu));
 
         return new RenderedPartialQueryResult(rsparts, worldBounds, screenBounds, loaded, renderingQueue);
     }
@@ -270,12 +270,12 @@ public class RenderedPartialFactory {
      * @param coord
      * @return
      */
-    public double getStartPointFrom(double coord, double partialSideWu) {
+    public double getStartPointFrom(double coord, double sizeWu) {
 
-        double mod = coord % partialSideWu;
+        double mod = coord % sizeWu;
 
         if (mod < 0) {
-            mod += partialSideWu;
+            mod += sizeWu;
         }
 
         return Math.round((coord - mod) * 10000.0) / 10000.0;
@@ -286,8 +286,8 @@ public class RenderedPartialFactory {
      *
      * @return
      */
-    public double getPartialSideWuY() {
-        return partialSideWuY;
+    public double getPartialSizeYwu() {
+        return partialSizeYwu;
     }
 
     /**
@@ -295,8 +295,8 @@ public class RenderedPartialFactory {
      *
      * @return
      */
-    public double getPartialSidePx() {
-        return partialSidePx;
+    public double getPartialSizePx() {
+        return partialSizePx;
     }
 
     public static long getLoadedPartialsReused() {

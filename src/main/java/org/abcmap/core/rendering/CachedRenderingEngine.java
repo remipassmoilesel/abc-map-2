@@ -36,7 +36,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     /**
      * Default size in pixel of each partial
      */
-    public static final double DEFAULT_PARTIAL_SIDE_PX = 500d;
+    public static final double DEFAULT_PARTIAL_SIZE_PX = 500d;
 
     /**
      * List of map content associated with layers
@@ -64,9 +64,19 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     private long renderMinIntervalMs = 50;
 
     /**
+     * Minimal size in world unit of map rendered on partial
+     */
+    private double minPartialSizeWu;
+
+    /**
+     * Maximal size in world unit of map rendered on partial
+     */
+    private double maxPartialSizeWu;
+
+    /**
      * Current side of a partial
      */
-    private final double partialSidePx;
+    private final double partialSizePx;
 
     /**
      * Last time of rendering in ms
@@ -76,7 +86,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
     /**
      * Current value of rendered map in partials. In world unit.
      */
-    private double partialSideWu;
+    private double partialSizeYwu;
 
     /**
      * Lock to prevent too much thread rendering
@@ -127,14 +137,16 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         this.currentPartials = new HashMap<>();
 
         // default partial size in pixel
-        this.partialSidePx = DEFAULT_PARTIAL_SIDE_PX;
+        this.partialSizePx = DEFAULT_PARTIAL_SIZE_PX;
 
         // default world envelope
         this.worldEnvelope = project.getMaximumBounds();
 
-        // // first display, use default values
+        // first display, use default values
         this.renderedSizePx = new Dimension(1000, 1000);
-        this.partialSideWu = (worldEnvelope.getMaxX() - worldEnvelope.getMinX()) / 2;
+        this.minPartialSizeWu = 0.0001d;
+        this.maxPartialSizeWu = 90;
+        this.partialSizeYwu = maxPartialSizeWu;
 
         // listen partial store changes and retransmit events
         this.notifm = new EventNotificationManager(this);
@@ -271,7 +283,10 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
             // set essential parameters after verifications
             this.worldEnvelope = worldEnvelope;
             this.renderedSizePx = pixelDim;
-            this.partialSideWu = computePartialSideWu(worldEnvelope);
+            this.partialSizeYwu = computePartialSizeWu(worldEnvelope);
+
+            // check minimal and maximum size of map
+            checkMinAndMaxPartialSizeWu(partialSizeYwu);
 
             logger.debug("Rendering component: " + this);
 
@@ -314,7 +329,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 }
 
                 // search which partials are necessary to display
-                RenderedPartialQueryResult newPartials = factory.intersect(worldEnvelope, partialSideWu,
+                RenderedPartialQueryResult newPartials = factory.intersect(worldEnvelope, partialSizeYwu,
                         () -> {
 
                             // notify observers that new partials come
@@ -350,6 +365,39 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
         }
     }
 
+
+    private void checkMinAndMaxPartialSizeWu(double partialSizeWu) {
+
+        if (partialSizeWu < minPartialSizeWu) {
+            this.partialSizeYwu = minPartialSizeWu;
+        }
+
+        if (partialSizeWu > maxPartialSizeWu) {
+            this.partialSizeYwu = maxPartialSizeWu;
+        }
+    }
+
+    /**
+     * Set the minimum size of rendered map on this partial, in world unit
+     *
+     * @param minPartialSizeWu
+     */
+    public void setMinPartialSizeWu(double minPartialSizeWu) {
+        this.minPartialSizeWu = minPartialSizeWu;
+    }
+
+    /**
+     * Set the maximum size of rendered map on this partial, in world unit
+     *
+     * @param maxPartialSizeWu
+     */
+    public void setMaxPartialSizeWu(double maxPartialSizeWu) {
+        this.maxPartialSizeWu = maxPartialSizeWu;
+    }
+
+    /**
+     * Fire an event meaning that new partials came, or some repainted
+     */
     private void firePartialsUpdated() {
         notifm.fireEvent(new CacheRenderingEvent(CacheRenderingEvent.PARTIALS_UPDATED));
     }
@@ -378,8 +426,8 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      * @param env
      * @return
      */
-    private double computePartialSideWu(ReferencedEnvelope env) {
-        double coeff = renderedSizePx.getWidth() / partialSidePx;
+    private double computePartialSizeWu(ReferencedEnvelope env) {
+        double coeff = renderedSizePx.getWidth() / partialSizePx;
         double worldWidth = env.getMaxX() - env.getMinX();
         return worldWidth / coeff;
     }
@@ -416,8 +464,8 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      *
      * @return
      */
-    public double getPartialSidePx() {
-        return partialSidePx;
+    public double getPartialSizePx() {
+        return partialSizePx;
     }
 
     /**
@@ -439,8 +487,8 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      *
      * @return
      */
-    public double getPartialSideWu() {
-        return partialSideWu;
+    public double getPartialSizeYwu() {
+        return partialSizeYwu;
     }
 
     /**
@@ -449,7 +497,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
      * @return
      */
     public double getScale() {
-        return partialSideWu / partialSidePx;
+        return partialSizeYwu / partialSizePx;
     }
 
     /**
