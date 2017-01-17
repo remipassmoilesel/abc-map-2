@@ -2,6 +2,7 @@ package org.abcmap.gui.components.messagebox;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.color.ColorPicker;
 import org.abcmap.gui.transition.Transition;
 
@@ -33,12 +34,15 @@ public class MessageBoxManager {
      * Background of panel
      */
     private Color messagePanelBackground;
-    private boolean boxVisible;
+
+    /**
+     * Reference of last popup shown
+     */
     private JPopupMenu lastPopupDialog;
 
     public MessageBoxManager(JFrame parent) {
         this.parentFrame = parent;
-        this.defaultTime = 3000;
+        this.defaultTime = 4000;
     }
 
     /**
@@ -111,7 +115,9 @@ public class MessageBoxManager {
                 // show message
                 messagePanel.startTransition(Transition.FADE_OUT, () -> {
                     // hide it after specified time
-                    popup.setVisible(false);
+                    ThreadManager.runLater(() -> {
+                        popup.setVisible(false);
+                    }, true, timeMilliSec);
                 });
             }
             // sometimes errors can be thrown on show
