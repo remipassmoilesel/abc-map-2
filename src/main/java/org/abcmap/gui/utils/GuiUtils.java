@@ -605,7 +605,7 @@ public class GuiUtils {
      * @param lst
      */
     public static void addSupportedListenersTo(Component comp,
-                                                  ArrayList<EventListener> lst) {
+                                               ArrayList<EventListener> lst) {
 
 		/*
          * Every component is processed separately because every listeners cannot be reached with getListeners()
@@ -691,16 +691,16 @@ public class GuiUtils {
      * @param comp
      * @return
      */
-    public static ArrayList<EventListener> removeSupportedListenersFrom(
-            JComponent comp) {
+    public static ArrayList<EventListener> removeSupportedListenersFrom(JComponent comp) {
+
+        if (comp == null) {
+            throw new NullPointerException("Component is null");
+        }
 
         /*
          * Every component is processed separately because every listeners cannot be reached with getListeners()
 		 */
-
-
-        ArrayList<EventListener> lst = new ArrayList<EventListener>();
-
+        ArrayList<EventListener> lst = new ArrayList<>();
 
         if (comp instanceof JTextComponent) {
 
@@ -768,8 +768,7 @@ public class GuiUtils {
             }
 
         } else {
-            throw new IllegalStateException("Unsupported component: "
-                    + comp.getClass());
+            throw new IllegalStateException("Unsupported component: " + comp.getClass());
         }
 
         return lst;
