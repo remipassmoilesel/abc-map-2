@@ -154,7 +154,7 @@ public class SearchWidget extends DockMenuWidget {
                     Component comp = ieGUIs.get(index);
 
                     // add gui
-                    resultsPanel.add(comp, "width 97%!, wrap 5px");
+                    resultsPanel.add(comp, "width 100%!, wrap 5px");
 
                     // compute total height
                     height += comp.getPreferredSize().height;

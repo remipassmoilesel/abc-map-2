@@ -84,25 +84,25 @@ public class IESearchResultPanel extends JPanel {
 
         GuiUtils.addLabel(ielement.getLabel(), comp, "width 95%!", GuiStyle.SEARCH_RESULT_LABEL);
 
-        this.add(comp, "width 95%!, wrap");
+        this.add(comp, "width 98%!, wrap");
 
         // show keyboard shortcut
         if (ielement.getAccelerator() != null) {
 
             String str = "Raccourci: " + Utils.keystrokeToString(ielement.getAccelerator());
 
-            GuiUtils.addLabel(str, this, "gapx 5px, width 95%!, wrap", GuiStyle.SEARCH_RESULT_TEXT);
+            GuiUtils.addLabel(str, this, "gapx 5px, width 98%!, wrap", GuiStyle.SEARCH_RESULT_TEXT);
 
         }
 
         // show help
         if (ielement.getHelp() != null) {
-            GuiUtils.addLabel("Aide: " + ielement.getHelp(), this, "gapx 10px, span, width 90%!, wrap", GuiStyle.SEARCH_RESULT_TEXT);
+            GuiUtils.addLabel("Aide: " + ielement.getHelp(), this, "gapx 10px, span, width 95%!, wrap 10px", GuiStyle.SEARCH_RESULT_TEXT);
         }
 
         // show message if command is not available by search
         if (ielement.getNoSearchMessage() != null) {
-            GuiUtils.addLabel("Attention: " + ielement.getNoSearchMessage(), this, "gapx 10px, span, width 95%!, wrap", GuiStyle.SEARCH_RESULT_NO_SEARCH);
+            GuiUtils.addLabel("Attention: " + ielement.getNoSearchMessage(), this, "gapx 10px, span, width 95%!, wrap 10px", GuiStyle.SEARCH_RESULT_NO_SEARCH);
         }
 
         // adjust panel height
