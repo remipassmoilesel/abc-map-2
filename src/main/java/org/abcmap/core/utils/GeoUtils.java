@@ -347,10 +347,12 @@ public class GeoUtils {
             return knownCrsNames.get(index);
         }
 
-        // CRS has an identifier, return it
-        Set<ReferenceIdentifier> identifiers = crs.getIdentifiers();
-        if (identifiers.size() > 0) {
-            return identifiers.iterator().next().toString();
+        else {
+            try {
+                return CRS.lookupIdentifier(crs, true);
+            } catch (FactoryException e) {
+                logger.error(e);
+            }
         }
 
         // unknown situation, warning
