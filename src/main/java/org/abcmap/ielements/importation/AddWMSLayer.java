@@ -22,7 +22,8 @@ public class AddWMSLayer extends InteractionElement {
     public AddWMSLayer() {
 
         this.label = "Ajouter une couche distante";
-        this.help = "Ajoutez ici une couche de données distantes WMS (Web Map Service). Cette couche peut représenter le monde, un pays, etc ... ";
+        this.help = "Importez une couche de données distante (WMS: Web Map Service). Cette couche peut représenter le monde, un pays, etc ... " +
+                "Plusieurs couches sont accessibles librement sur Internet.";
 
         this.displaySimplyInSearch = false;
     }
@@ -98,7 +99,15 @@ public class AddWMSLayer extends InteractionElement {
             projectm().fireLayerListChanged();
 
             // empty text field
-            GuiUtils.changeTextWithoutFire(wmsTextField, "");
+            SwingUtilities.invokeLater(()->{
+
+                if (wmsTextField != null) {
+                    GuiUtils.changeTextWithoutFire(wmsTextField, "");
+                }
+
+            });
+
+            dialm().showMessageInBox("La couche a été ajoutée au projet: " + url);
         });
 
     }
