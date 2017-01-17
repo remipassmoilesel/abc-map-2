@@ -21,8 +21,8 @@ public class AddWMSLayer extends InteractionElement {
 
     public AddWMSLayer() {
 
-        this.label = "Ajouter une couche WMS";
-        this.help = "....";
+        this.label = "Ajouter une couche distante";
+        this.help = "Ajoutez ici une couche de données distantes WMS (Web Map Service). Cette couche peut représenter le monde, un pays, etc ... ";
 
         this.displaySimplyInSearch = false;
     }
@@ -57,6 +57,7 @@ public class AddWMSLayer extends InteractionElement {
 
         ThreadManager.runLater(() -> {
 
+            // try to open wms layer
             AbmWMSLayer layer;
             try {
                 layer = projectm().getProject().addNewWMSLayer(url, layerName);
@@ -66,6 +67,7 @@ public class AddWMSLayer extends InteractionElement {
                 return;
             }
 
+            // let user select layer name
             final String[] choosenLayerName = new String[]{null};
             try {
                 SwingUtilities.invokeAndWait(new Runnable() {
@@ -95,6 +97,8 @@ public class AddWMSLayer extends InteractionElement {
 
             projectm().fireLayerListChanged();
 
+            // empty text field
+            GuiUtils.changeTextWithoutFire(wmsTextField, "");
         });
 
     }

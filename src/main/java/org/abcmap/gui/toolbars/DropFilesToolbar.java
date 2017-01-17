@@ -2,13 +2,12 @@ package org.abcmap.gui.toolbars;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.Main;
+import org.abcmap.core.managers.*;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GraphicsConsumer;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.windows.MainWindow;
+import org.abcmap.ielements.importation.AddWMSLayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -17,6 +16,7 @@ import java.awt.datatransfer.Transferable;
 import java.awt.dnd.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.TooManyListenersException;
 
 public class DropFilesToolbar extends Toolbar {
@@ -26,11 +26,15 @@ public class DropFilesToolbar extends Toolbar {
     private final MainWindowPainter mainWindowPainter;
     private final GuiManager guim;
     private final DropTarget dropTarget;
+    private final DialogManager dialm;
+    private final ProjectManager projectm;
     private Rectangle rectangleToHighlight;
 
     public DropFilesToolbar() {
 
         this.guim = Main.getGuiManager();
+        this.dialm = Main.getDialogManager();
+        this.projectm = Main.getProjectManager();
 
         setLayout(new MigLayout("insets 6, gap 6"));
 
@@ -53,6 +57,15 @@ public class DropFilesToolbar extends Toolbar {
      * Paint a gray veil on window when mouse is over drop file icon
      */
     private class MainWindowPainter implements GraphicsConsumer {
+
+        private ArrayList<String> textLines = new ArrayList();
+
+        public MainWindowPainter() {
+            textLines = new ArrayList<>();
+            textLines.add("Déposez des ressources ici pour les importer");
+            textLines.add("(fichiers, URL, ...)");
+        }
+
         @Override
         public void paint(Graphics2D g2d) {
 
@@ -69,15 +82,18 @@ public class DropFilesToolbar extends Toolbar {
 
             // draw help below
             int h = img.getHeight(null);
-            y = y + h + 30;
+            y = y + h;
             g2d.setColor(Color.white);
             g2d.setFont(new Font(Font.DIALOG, Font.BOLD, 20));
 
-            String str = "Déposez des fichiers ici pour les importer";
-            x = (int) ((bounds.getWidth() - g2d.getFontMetrics()
-                    .getStringBounds(str, g2d).getWidth()) / 2);
+            FontMetrics fm = g2d.getFontMetrics();
+            for (String l : textLines) {
+                x = (int) ((bounds.getWidth() - fm.getStringBounds(l, g2d).getWidth()) / 2);
+                y += fm.getHeight() + 10;
+                g2d.drawString(l, x, y);
+            }
 
-            g2d.drawString(str, x, y);
+
         }
     }
 
@@ -142,17 +158,22 @@ public class DropFilesToolbar extends Toolbar {
                 }
             }
 
-            // resource dropped is a string, maybe an URL
+            // resource dropped is a string, maybe a WMS URL
             else if (dtde.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 dtde.acceptDrop(dtde.getDropAction());
                 try {
 
-                    java.util.List transferData = (java.util.List) transferable.getTransferData(DataFlavor.stringFlavor);
-                    if (transferData != null && transferData.size() > 0) {
-                        System.out.println();
-                        System.out.println(transferData);
-                        System.out.println(transferData);
-                        System.out.println(transferData.getClass());
+                    String transferData = (String) transferable.getTransferData(DataFlavor.stringFlavor);
+                    if (transferData != null) {
+
+                        // check if WMS URL is correct
+                        if (transferData.length() < 0 || transferData.indexOf("http://") == -1) {
+                            dialm.showErrorInBox("URL invalide: " + transferData);
+                            return;
+                        }
+
+                        AddWMSLayer anwms = new AddWMSLayer();
+                        anwms.openLayer(transferData, null);
 
                         dtde.dropComplete(true);
                     }
