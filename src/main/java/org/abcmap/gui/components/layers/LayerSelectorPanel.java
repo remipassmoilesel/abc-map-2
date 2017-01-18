@@ -164,7 +164,7 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
             GuiUtils.throwIfNotOnEDT();
 
-            // do othing if project is invalid
+            // do nothing if project is invalid
             if (projectm.isInitialized() == false) {
                 return;
             }

@@ -1,5 +1,6 @@
 package org.abcmap.gui.components.layers;
 
+import org.abcmap.core.cancel.LayerListOperation;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.*;
 import org.abcmap.core.project.Project;
@@ -32,13 +33,13 @@ public class LayerListButtonsAL implements ActionListener {
 
     private String mode;
     private ProjectManager projectm;
-    private CancelManager cancelm;
+    private UndoManager undom;
     private GuiManager guim;
 
     public LayerListButtonsAL(String mode) {
         this.mode = mode;
         this.projectm = Main.getProjectManager();
-        this.cancelm = Main.getCancelManager();
+        this.undom = Main.getUndoManager();
         this.guim = Main.getGuiManager();
     }
 
@@ -123,6 +124,10 @@ public class LayerListButtonsAL implements ActionListener {
         int index = project.getLayersList().size() - 1;
         project.setActiveLayer(index);
 
+        // save operation
+        undom.addLayerListOperation(
+                LayerListOperation.LayerListOperationType.LAYER_REMOVED, project, lay);
+
         // fire event
         projectm.fireLayerListChanged();
     }
@@ -132,7 +137,7 @@ public class LayerListButtonsAL implements ActionListener {
         //TODO: save operation in cancelm
 
         Project project = projectm.getProject();
-        AbmAbstractLayer lay;
+        AbmAbstractLayer lay = null;
         try {
 
             // create a new layer
@@ -141,12 +146,16 @@ public class LayerListButtonsAL implements ActionListener {
             // set new layer active
             project.setActiveLayer(lay);
 
+            // save operation
+            undom.addLayerListOperation(
+                    LayerListOperation.LayerListOperationType.LAYER_ADDED, project, lay);
+
+            // fire event
+            projectm.fireLayerListChanged();
+
         } catch (IOException e) {
             logger.error(e);
         }
-
-        // fire event
-        projectm.fireLayerListChanged();
 
     }
 
