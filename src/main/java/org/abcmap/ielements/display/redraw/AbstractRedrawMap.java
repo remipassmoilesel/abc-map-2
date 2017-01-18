@@ -37,7 +37,7 @@ public abstract class AbstractRedrawMap extends InteractionElement {
 
     @Override
     public void run() {
-        
+
         GuiUtils.throwIfOnEDT();
 
         Project project = getCurrentProjectOrShowMessage();

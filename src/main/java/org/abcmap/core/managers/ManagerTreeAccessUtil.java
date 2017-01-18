@@ -49,8 +49,8 @@ public class ManagerTreeAccessUtil {
      *
      * @return
      */
-    public static CancelManager cancelm() {
-        return Main.getCancelManager();
+    public static UndoManager undom() {
+        return Main.getUndoManager();
     }
 
     /**

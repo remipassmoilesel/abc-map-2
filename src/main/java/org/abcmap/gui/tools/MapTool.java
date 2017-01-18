@@ -71,7 +71,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
     protected GuiManager guim;
     protected ProjectManager projectm;
     protected MapManager mapm;
-    protected CancelManager cancelm;
+    protected UndoManager cancelm;
     protected DialogManager dialm;
     protected EventNotificationManager observer;
 
@@ -80,7 +80,7 @@ public abstract class MapTool extends MouseAdapter implements HasEventNotificati
         this.guim = Main.getGuiManager();
         this.projectm = Main.getProjectManager();
         this.mapm = Main.getMapManager();
-        this.cancelm = Main.getCancelManager();
+        this.cancelm = Main.getUndoManager();
         this.dialm = Main.getDialogManager();
 
         this.mode = null;

@@ -20,7 +20,7 @@ public class Main extends ManagerTreeAccessUtil {
     private static TempFilesManager tempFilesManager;
     private static ProjectManager projectManager;
     private static DrawManager drawManager;
-    private static CancelManager cancelManager;
+    private static UndoManager undoManager;
     private static GuiManager guiManager;
     private static MapManager mapManager;
     private static KeyboardManager keyboardManager;
@@ -45,7 +45,7 @@ public class Main extends ManagerTreeAccessUtil {
         projectManager = new ProjectManager();
         drawManager = new DrawManager();
         guiManager = new GuiManager();
-        cancelManager = new CancelManager();
+        undoManager = new UndoManager();
         mapManager = new MapManager();
         keyboardManager = new KeyboardManager();
         recentManager = new RecentManager();
@@ -73,8 +73,8 @@ public class Main extends ManagerTreeAccessUtil {
         return drawManager;
     }
 
-    public static CancelManager getCancelManager() {
-        return cancelManager;
+    public static UndoManager getUndoManager() {
+        return undoManager;
     }
 
     public static GuiManager getGuiManager() {

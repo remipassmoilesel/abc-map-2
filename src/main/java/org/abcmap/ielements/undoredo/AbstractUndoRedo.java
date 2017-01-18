@@ -1,5 +1,6 @@
 package org.abcmap.ielements.undoredo;
 
+import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.InteractionElement;
 
 public abstract class AbstractUndoRedo extends InteractionElement {
@@ -31,16 +32,17 @@ public abstract class AbstractUndoRedo extends InteractionElement {
     @Override
     public void run() {
 
-		/*
-        // mode annuler
-		if (GoToWebsiteMode.UNDO.equals(mode)) {
-			cancelm.undo();
-		}
+        GuiUtils.throwIfOnEDT();
 
-		// mode retablir
-		else {
-			cancelm.redo();
-		}
-		*/
+        // cancel operation
+        if (Mode.UNDO.equals(mode)) {
+            undom().undoOrShowMessage();
+        }
+
+        // redo operation
+        else {
+            undom().redoOrShowMessage();
+        }
+
     }
 }

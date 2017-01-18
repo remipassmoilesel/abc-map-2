@@ -17,7 +17,7 @@ public class ToolOptionPanel extends JPanel implements HasEventNotificationManag
     protected String gapLeft;
     protected String largeWrap;
     protected GuiManager guim;
-    protected CancelManager cancelm;
+    protected UndoManager cancelm;
 
     public ToolOptionPanel() {
         super(new MigLayout("insets 5"));
@@ -27,7 +27,7 @@ public class ToolOptionPanel extends JPanel implements HasEventNotificationManag
         this.mapm = Main.getMapManager();
         this.projectm = Main.getProjectManager();
         this.drawm = Main.getDrawManager();
-        this.cancelm = Main.getCancelManager();
+        this.cancelm = Main.getUndoManager();
 
         this.observer = new EventNotificationManager(this);
 
