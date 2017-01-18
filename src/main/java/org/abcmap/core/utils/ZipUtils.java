@@ -51,32 +51,37 @@ public class ZipUtils {
             root = Paths.get(".");
         }
 
-        OutputStream output = Files.newOutputStream(archiveDestination);
-
-        ZipArchiveOutputStream zos = null;
+        OutputStream os = Files.newOutputStream(archiveDestination);
         try {
-            zos = (ZipArchiveOutputStream) new ArchiveStreamFactory().createArchiveOutputStream(ArchiveStreamFactory.ZIP, output);
-        } catch (ArchiveException e) {
-            throw new IOException(e);
-        }
-
-        for (Path p : files) {
-
-            int toRemove = root.toAbsolutePath().normalize().toString().length();
-            String entryName = p.toAbsolutePath().normalize().toString().substring(toRemove + 1);
-
-            ZipArchiveEntry entry = new ZipArchiveEntry(entryName);
-            zos.putArchiveEntry(entry);
-
-            if (Files.isRegularFile(p)) {
-                InputStream is = Files.newInputStream(p);
-                IOUtils.copy(is, zos);
-                is.close();
+            ZipArchiveOutputStream zos = null;
+            try {
+                zos = (ZipArchiveOutputStream) new ArchiveStreamFactory().createArchiveOutputStream(ArchiveStreamFactory.ZIP, os);
+            } catch (ArchiveException e) {
+                throw new IOException(e);
             }
-            zos.closeArchiveEntry();
-        }
 
-        zos.close();
+            for (Path p : files) {
+
+                int toRemove = root.toAbsolutePath().normalize().toString().length();
+                String entryName = p.toAbsolutePath().normalize().toString().substring(toRemove + 1);
+
+                ZipArchiveEntry entry = new ZipArchiveEntry(entryName);
+                zos.putArchiveEntry(entry);
+
+                if (Files.isRegularFile(p)) {
+                    InputStream is = Files.newInputStream(p);
+                    IOUtils.copy(is, zos);
+                    is.close();
+                }
+                zos.closeArchiveEntry();
+            }
+
+            zos.close();
+        } finally {
+            if (os != null) {
+                os.close();
+            }
+        }
     }
 
     /**
@@ -178,31 +183,39 @@ public class ZipUtils {
     public static void compressFolder(Path source, Path destination) throws IOException {
 
         OutputStream archiveStream = new FileOutputStream(destination.toFile());
-        ArchiveOutputStream archive = null;
+
         try {
-            archive = new ArchiveStreamFactory().createArchiveOutputStream(ArchiveStreamFactory.ZIP, archiveStream);
-        } catch (ArchiveException e) {
-            throw new IOException(e);
+            ArchiveOutputStream archive = null;
+            try {
+                archive = new ArchiveStreamFactory().createArchiveOutputStream(ArchiveStreamFactory.ZIP, archiveStream);
+            } catch (ArchiveException e) {
+                throw new IOException(e);
+            }
+
+            Collection<File> fileList = FileUtils.listFiles(source.toFile(), null, true);
+
+            for (File file : fileList) {
+
+                int toRemove = source.toAbsolutePath().normalize().toString().length();
+                String entryName = file.toPath().toAbsolutePath().normalize().toString().substring(toRemove + 1);
+
+                ZipArchiveEntry entry = new ZipArchiveEntry(entryName);
+                archive.putArchiveEntry(entry);
+
+                BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
+
+                IOUtils.copy(input, archive);
+                input.close();
+                archive.closeArchiveEntry();
+            }
+
+            archive.finish();
+            archiveStream.close();
+
+        } finally {
+            if (archiveStream != null) {
+                archiveStream.close();
+            }
         }
-
-        Collection<File> fileList = FileUtils.listFiles(source.toFile(), null, true);
-
-        for (File file : fileList) {
-
-            int toRemove = source.toAbsolutePath().normalize().toString().length();
-            String entryName = file.toPath().toAbsolutePath().normalize().toString().substring(toRemove + 1);
-
-            ZipArchiveEntry entry = new ZipArchiveEntry(entryName);
-            archive.putArchiveEntry(entry);
-
-            BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
-
-            IOUtils.copy(input, archive);
-            input.close();
-            archive.closeArchiveEntry();
-        }
-
-        archive.finish();
-        archiveStream.close();
     }
 }
