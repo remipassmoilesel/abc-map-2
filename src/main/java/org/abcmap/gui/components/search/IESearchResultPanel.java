@@ -49,8 +49,7 @@ public class IESearchResultPanel extends JPanel {
     }
 
     public IESearchResultPanel(InteractionElement ie, InteractivePopupDisplay popupParent) {
-
-        super(new MigLayout("insets 0, gap 0"));
+        super(new MigLayout("insets 2, gap 0, fillx"));
 
         GuiUtils.throwIfNotOnEDT();
 
@@ -125,9 +124,9 @@ public class IESearchResultPanel extends JPanel {
         displayMode = SUB_BOX;
         removeAll();
 
-        JButton jbt = new JButton("Fermer");
+        JButton jbt = new JButton("X");
         jbt.addActionListener(new CustomActionListener());
-        add(jbt, "wrap");
+        add(jbt, "align right, wrap");
 
         Component gui = ielement.getBlockGUI();
 
@@ -136,7 +135,7 @@ public class IESearchResultPanel extends JPanel {
             ((FoldableBlockItem) gui).refresh(false, true);
         }
 
-        add(gui, "width 95%!");
+        add(gui, "width 98%!");
 
         // notify parent
         if(popupParent != null){
