@@ -171,7 +171,7 @@ public class DropFilesToolbar extends Toolbar {
                     if (transferData != null) {
 
                         // check if WMS URL is correct
-                        if (transferData.length() < 0 || transferData.indexOf("http://") == -1) {
+                        if (transferData.isEmpty() == true || transferData.matches("^https?://.+") == false) {
                             dialm.showErrorInBox("URL invalide: " + transferData);
                             return;
                         }

@@ -6,7 +6,7 @@ import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.utils.Utils;
-import org.abcmap.core.wms.PredefinedWmsServer;
+import org.abcmap.core.wms.WmsServerCredentials;
 import org.abcmap.core.wms.ServerConstantsJson;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.abcmap.gui.utils.GuiUtils;
@@ -33,14 +33,14 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
 
     private final EventNotificationManager notifm;
     public MainMapBinding mainmap;
-    private ArrayList<PredefinedWmsServer> listOfWmsServers;
+    private ArrayList<WmsServerCredentials> listOfWmsServers;
 
     public MapManager() {
         notifm = new EventNotificationManager(MapManager.this);
         mainmap = new MainMapBinding();
         listOfWmsServers = new ArrayList<>();
 
-        listOfWmsServers.addAll(getLocaleListOfPredefinedWMSServers());
+        listOfWmsServers.addAll(getLocaleListOfPredefinedWmsServers());
     }
 
     /**
@@ -61,7 +61,7 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
      *
      * @return
      */
-    public ArrayList<PredefinedWmsServer> getDistantListOfPredefinedWmsServers() throws IOException {
+    public ArrayList<WmsServerCredentials> getDistantListOfPredefinedWmsServers() throws IOException {
         String rawListStr = Utils.getHttpResourceAsString(ConfigurationConstants.DISTANT_WMS_SERVERS_LIST_URL, 2000);
         return parseJsonWmsServerList(rawListStr);
     }
@@ -73,7 +73,7 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
      *
      * @return
      */
-    public ArrayList<PredefinedWmsServer> getListOfPredefinedWmsServers() {
+    public ArrayList<WmsServerCredentials> getListOfPredefinedWmsServers() {
         return new ArrayList<>(listOfWmsServers);
     }
 
@@ -86,13 +86,13 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
      * @param url
      * @return
      */
-    public PredefinedWmsServer getPredefinedWMSServer(String name, String url) {
+    public WmsServerCredentials getPredefinedWmsServer(String name, String url) {
 
         if (name == null && url == null) {
             throw new NullPointerException("At least one of parameter should not be null");
         }
 
-        for (PredefinedWmsServer server : listOfWmsServers) {
+        for (WmsServerCredentials server : listOfWmsServers) {
             if (name != null && server.getName().equals(name)) {
                 return server;
             }
@@ -109,7 +109,7 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
      * <p>
      * Return an empty list if an error occur, or if nothing found
      */
-    public ArrayList<PredefinedWmsServer> getLocaleListOfPredefinedWMSServers() {
+    public ArrayList<WmsServerCredentials> getLocaleListOfPredefinedWmsServers() {
 
         try (BufferedInputStream res = new BufferedInputStream(
                 MapManager.class.getResourceAsStream(ConfigurationConstants.LOCAL_WMS_SERVER_LIST))) {
@@ -136,11 +136,11 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
      * @param jsonStr
      * @return
      */
-    private ArrayList<PredefinedWmsServer> parseJsonWmsServerList(String jsonStr) throws IOException {
+    private ArrayList<WmsServerCredentials> parseJsonWmsServerList(String jsonStr) throws IOException {
 
         try {
 
-            ArrayList<PredefinedWmsServer> result = new ArrayList<>();
+            ArrayList<WmsServerCredentials> result = new ArrayList<>();
             JSONArray jsonArray = new JSONArray(jsonStr);
 
             for (Object o : jsonArray) {
@@ -151,7 +151,7 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
                     if (ServerConstantsJson.wms.equals(json.getString(ServerConstantsJson.type))) {
                         String name = json.getString(ServerConstantsJson.name);
                         String url = json.getString(ServerConstantsJson.url);
-                        result.add(new PredefinedWmsServer(name, url));
+                        result.add(new WmsServerCredentials(name, url));
                     }
                 }
             }
@@ -173,11 +173,11 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
         GuiUtils.throwIfOnEDT();
 
         // get distant list of WMS servers
-        ArrayList<PredefinedWmsServer> distantList = getDistantListOfPredefinedWmsServers();
+        ArrayList<WmsServerCredentials> distantList = getDistantListOfPredefinedWmsServers();
 
         // update list with elements which are not already in list
         int updates = 0;
-        for(PredefinedWmsServer server : distantList){
+        for(WmsServerCredentials server : distantList){
             if(listOfWmsServers.contains(server) == false){
                 listOfWmsServers.add(server);
                 updates ++;

@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Predefined WMS server, which can be loaded from locale server list or distant.
  */
-public class PredefinedWmsServer {
+public class WmsServerCredentials {
 
 
     /**
@@ -22,7 +22,7 @@ public class PredefinedWmsServer {
      */
     private String url;
 
-    public PredefinedWmsServer(String name, String url) {
+    public WmsServerCredentials(String name, String url) {
         this.name = name;
         this.url = url;
     }
@@ -76,7 +76,7 @@ public class PredefinedWmsServer {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PredefinedWmsServer that = (PredefinedWmsServer) o;
+        WmsServerCredentials that = (WmsServerCredentials) o;
         return Objects.equals(name, that.name) &&
                 Objects.equals(url, that.url);
     }

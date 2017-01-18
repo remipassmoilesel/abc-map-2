@@ -1,6 +1,7 @@
 package org.abcmap.gui.dialogs;
 
 import net.miginfocom.swing.MigLayout;
+import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -20,9 +21,14 @@ public class WMSSelectionDialog extends JDialog {
         setSize(400, 300);
         setLocationRelativeTo(null);
 
+        setTitle("Sélection de la couche");
+
         // create a content pane
-        contentPane = new JPanel(new MigLayout("fillx"));
+        contentPane = new JPanel(new MigLayout("fill"));
         setContentPane(contentPane);
+
+        // add an explication
+        GuiUtils.addLabel("Sélectionnez le nom de la couche à ajouter ci-dessous.", contentPane, "wrap 15");
 
         // add selection list
         mainList = new JList<>();
@@ -34,7 +40,7 @@ public class WMSSelectionDialog extends JDialog {
         JScrollPane scroll = new JScrollPane(mainList);
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-        contentPane.add(scroll, "width 95%!, height 80%!, align center, wrap 15px");
+        contentPane.add(scroll, "width 95%!, grow, align center, wrap 15px");
 
         // add buttons
         JButton cancel = new JButton("Annuler");
