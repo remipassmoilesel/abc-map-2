@@ -6,4 +6,4 @@ log/*
 tmp/*
 tests-playground/*
 data/*
-.gitignore
+.sonar
