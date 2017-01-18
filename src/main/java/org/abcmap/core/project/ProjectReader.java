@@ -103,7 +103,7 @@ public class ProjectReader {
         }
 
         // set the first layer active
-        newProject.setActiveLayer(0);
+        newProject.setFirstLayerActive();
 
 
         return newProject;

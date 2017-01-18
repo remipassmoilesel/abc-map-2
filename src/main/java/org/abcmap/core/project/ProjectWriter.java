@@ -60,7 +60,7 @@ public class ProjectWriter {
         project.addFirstLayer();
 
         // set the first layer active
-        project.setActiveLayer(0);
+        project.setFirstLayerActive();
 
         return project;
     }

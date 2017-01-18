@@ -278,12 +278,17 @@ public class Project {
     }
 
     /**
-     * Add specified layer to project and write the layer index. Return the layer or null if an error occur.
+     * Add specified layer to project and write the layer index.
      *
      * @param layer
      * @return
      */
-    protected AbmAbstractLayer addLayer(AbmAbstractLayer layer) {
+    public AbmAbstractLayer addLayer(AbmAbstractLayer layer) {
+
+        if (layer == null) {
+            throw new NullPointerException("Layer is null");
+        }
+
         mainLayersList.add(layer);
         return layer;
     }
@@ -608,6 +613,10 @@ public class Project {
      */
     public void removeLayer(AbmAbstractLayer lay) {
 
+        if (lay == null) {
+            throw new NullPointerException("Layer is null");
+        }
+
         mainLayersList.remove(lay);
 
         if (mainLayersList.size() < 1) {
@@ -823,5 +832,12 @@ public class Project {
         }
 
         return content;
+    }
+
+    /**
+     * Shortcut to set the first layer of project active
+     */
+    public void setFirstLayerActive() {
+        setActiveLayer(0);
     }
 }
