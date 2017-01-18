@@ -2,6 +2,8 @@ package org.abcmap;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,6 +17,14 @@ import java.net.URI;
  * /!\ This class absolutely need to be standalone.
  */
 public class LaunchError {
+
+    private static final CustomLogger logger = LogManager.getLogger(LaunchError.class);
+
+    /**
+     * Only static methods here
+     */
+    private LaunchError() {
+    }
 
     private static final String MESSAGE_FR = "Erreur lors du lancement d'Abc-Map. Le logiciel n'a pas pu s'initialiser correctement. " +
             "Veuillez consulter l'aide en ligne pour plus d'informations: " + ConfigurationConstants.WEBSITE_URL;
@@ -32,11 +42,22 @@ public class LaunchError {
         System.err.println("");
     }
 
-
+    /**
+     * Show an error and die
+     * <p>
+     * If a cause is specified, output will be shown in console
+     */
     public static void showErrorAndDie() {
         showErrorAndDie(null);
     }
 
+    /**
+     * Show an error and die
+     * <p>
+     * If a cause is specified, output will be shown in console
+     *
+     * @param cause
+     */
     public static void showErrorAndDie(Throwable cause) {
 
         showConsoleError();
@@ -63,6 +84,7 @@ public class LaunchError {
                         String enError = "<p>Unable to open your web browser. Website is available at: " + ConfigurationConstants.WEBSITE_URL + ".</p>";
                         String frError = "<p>Impossible d'ouvrir votre navigateur. Le site est disponible à l'adresse: " + ConfigurationConstants.WEBSITE_URL + "</p>";
                         JOptionPane.showMessageDialog(null, "<html>" + enError + frError + "</html>");
+                        logger.error(e1);
                     }
                 };
 
