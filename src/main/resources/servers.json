@@ -1,0 +1,19 @@
+[
+  {
+    "type": "wms",
+    "name": "dmsolutions.ca",
+    "url": "http://www2.dmsolutions.ca/cgi-bin/mswms_gmap"
+  },
+
+  {
+    "type": "wms",
+    "name": "lizardtech.com",
+    "url": "http://wms.lizardtech.com/lizardtech/iserv/ows"
+  },
+
+  {
+    "type": "wms",
+    "name": "mundialis.de",
+    "url": "http://ows.mundialis.de/services/service"
+  }
+]

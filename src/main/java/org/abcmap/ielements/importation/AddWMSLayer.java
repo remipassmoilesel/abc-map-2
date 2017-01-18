@@ -3,6 +3,8 @@ package org.abcmap.ielements.importation;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.project.layers.AbmWMSLayer;
 import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.core.wms.PredefinedWmsServer;
+import org.abcmap.gui.components.PredefinedWmsServerRenderer;
 import org.abcmap.gui.dialogs.WMSSelectionDialog;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.InteractionElement;
@@ -11,13 +13,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 
 /**
- * Created by remipassmoilesel on 13/01/17.
+ * Allow user to add a new WMS layer, by enter URL or by selecting a predefined one.
  */
 public class AddWMSLayer extends InteractionElement {
 
+    private ArrayList<PredefinedWmsServer> predefinedServers;
+    /**
+     * Text field where user can enter a custom WMS url
+     */
     private JTextField wmsTextField;
+
+    /**
+     * Combo box where user can select a predefined WMS server
+     */
+    private JComboBox<PredefinedWmsServer> selectWmsServer;
+    private DefaultComboBoxModel<PredefinedWmsServer> wmsServerSelectModel;
+
+    /**
+     * Label which indicate to user that he have to select a server in combo list
+     */
+    private final PredefinedWmsServer defaultFakeWmsServer;
 
     public AddWMSLayer() {
 
@@ -26,22 +44,72 @@ public class AddWMSLayer extends InteractionElement {
                 "Plusieurs couches sont accessibles librement sur Internet.";
 
         this.displaySimplyInSearch = false;
+
+        // retrieve list of servers in an other thread
+        defaultFakeWmsServer = new PredefinedWmsServer("Sélectionnez un serveur", "http://no-where.com");
+
+        wmsServerSelectModel = new DefaultComboBoxModel<>();
+        wmsServerSelectModel.addElement(defaultFakeWmsServer);
+
+        // load predefined servers
+        predefinedServers = mapm().getListOfPredefinedWmsServers();
+        for (PredefinedWmsServer server : predefinedServers) {
+            wmsServerSelectModel.addElement(server);
+        }
     }
 
     @Override
     protected Component createPrimaryGUI() {
 
-        wmsTextField = new JTextField();
-
         JPanel panel = new JPanel(new MigLayout("insets 0, gap 5px"));
+
+        // predefined WMS selection
+        selectWmsServer = new JComboBox<>();
+        selectWmsServer.setRenderer(new PredefinedWmsServerRenderer());
+        selectWmsServer.setModel(wmsServerSelectModel);
+        selectWmsServer.setSelectedItem(defaultFakeWmsServer);
+
+        // when a server is selected, display URL in text field
+        selectWmsServer.addActionListener((ev) -> {
+
+            PredefinedWmsServer server = (PredefinedWmsServer) selectWmsServer.getSelectedItem();
+            if (defaultFakeWmsServer.equals(server)) {
+                GuiUtils.changeTextWithoutFire(wmsTextField, "");
+            } else {
+                GuiUtils.changeTextWithoutFire(wmsTextField, server.getUrl());
+            }
+        });
+
+        GuiUtils.addLabel("Serveur prédéfini: ", panel, "wrap");
+        panel.add(selectWmsServer, "width 95%, " + wrap15());
+
+        // manual url input
+        wmsTextField = new JTextField();
+        wmsTextField.addCaretListener((ev) -> {
+
+            if (mapm().getPredefinedWMSServer(null, wmsTextField.getText()) == null) {
+                // user use text field, reset combo box
+                GuiUtils.changeWithoutFire(selectWmsServer, defaultFakeWmsServer);
+            }
+
+        });
         GuiUtils.addLabel("Adresse du serveur: ", panel, "wrap");
         panel.add(wmsTextField, "width 95%, wrap");
 
+        // valid button
         JButton buttonValid = new JButton("Ajouter");
         panel.add(buttonValid, "wrap");
-
         buttonValid.addActionListener((event) -> {
-            openLayer(wmsTextField.getText(), null);
+
+            // get combo value
+            PredefinedWmsServer server = (PredefinedWmsServer) selectWmsServer.getSelectedItem();
+
+            // if the default value is selected, use text field
+            if (defaultFakeWmsServer.equals(server)) {
+                server = new PredefinedWmsServer("Custom server", wmsTextField.getText());
+            }
+
+            openLayer(server.getUrl(), null);
         });
 
         return panel;
@@ -99,7 +167,7 @@ public class AddWMSLayer extends InteractionElement {
             projectm().fireLayerListChanged();
 
             // empty text field
-            SwingUtilities.invokeLater(()->{
+            SwingUtilities.invokeLater(() -> {
 
                 if (wmsTextField != null) {
                     GuiUtils.changeTextWithoutFire(wmsTextField, "");

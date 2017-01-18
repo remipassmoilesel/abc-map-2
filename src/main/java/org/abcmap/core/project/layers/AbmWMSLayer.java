@@ -1,15 +1,14 @@
 package org.abcmap.core.project.layers;
 
 import org.abcmap.core.project.Project;
-import org.abcmap.core.wms.WMSEntry;
-import org.abcmap.core.wms.WMSException;
-import org.abcmap.core.wms.WMSdao;
+import org.abcmap.core.wms.WmsLayerEntry;
+import org.abcmap.core.wms.WmsException;
+import org.abcmap.core.wms.WMSDao;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMSUtils;
 import org.geotools.data.wms.WebMapServer;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.map.FeatureLayer;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,7 +21,7 @@ import java.util.List;
  */
 public class AbmWMSLayer extends AbmAbstractLayer {
 
-    private WMSEntry wmsEntry;
+    private WmsLayerEntry wmsEntry;
     private List<Layer> possibleLayers;
     private WebMapServer wmswebMapServer;
 
@@ -35,14 +34,14 @@ public class AbmWMSLayer extends AbmAbstractLayer {
      * @param owner
      * @throws IOException
      */
-    public AbmWMSLayer(String readableName, String url, String wmsLayerName, boolean visible, int zindex, Project owner) throws IOException, WMSException {
+    public AbmWMSLayer(String readableName, String url, String wmsLayerName, boolean visible, int zindex, Project owner) throws IOException, WmsException {
         super(owner, new LayerIndexEntry(null, readableName, visible, zindex, AbmLayerType.WMS));
 
         // create a wms entry
-        wmsEntry = new WMSEntry(indexEntry.getLayerId(), url, wmsLayerName);
+        wmsEntry = new WmsLayerEntry(indexEntry.getLayerId(), url, wmsLayerName);
 
         // create an entry in WMS index
-        WMSdao dao = new WMSdao(project.getDatabasePath());
+        WMSDao dao = new WMSDao(project.getDatabasePath());
         dao.create(wmsEntry);
         dao.close();
 

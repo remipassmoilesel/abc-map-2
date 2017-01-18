@@ -11,7 +11,7 @@ import java.util.Objects;
  * Allow to store WMS information on layers
  */
 @DatabaseTable(tableName = ConfigurationConstants.SQL_TABLE_PREFIX + "WMS_INDEX")
-public class WMSEntry implements DataModel {
+public class WmsLayerEntry implements DataModel {
 
     private static final String ID_FIELD_NAME = "ID";
     private static final String URL_FIELD_NAME = "URL";
@@ -26,11 +26,11 @@ public class WMSEntry implements DataModel {
     @DatabaseField(columnName = WMS_NAME_FIELD_NAME)
     private String wmsLayerName;
 
-    public WMSEntry() {
+    public WmsLayerEntry() {
 
     }
 
-    public WMSEntry(String layerId, String url, String wmsLayerName) {
+    public WmsLayerEntry(String layerId, String url, String wmsLayerName) {
         this.layerId = layerId;
         this.url = url;
         this.wmsLayerName = wmsLayerName;
@@ -64,7 +64,7 @@ public class WMSEntry implements DataModel {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        WMSEntry wmsEntry = (WMSEntry) o;
+        WmsLayerEntry wmsEntry = (WmsLayerEntry) o;
         return Objects.equals(layerId, wmsEntry.layerId) &&
                 Objects.equals(url, wmsEntry.url) &&
                 Objects.equals(wmsLayerName, wmsEntry.wmsLayerName);

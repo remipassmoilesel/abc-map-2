@@ -67,6 +67,11 @@ public class ConfigurationConstants {
     public static final Charset DEFAULT_CHARSET = Charset.forName("utf-8");
     public static final int SCROLLBAR_UNIT_INCREMENT = 20;
 
+    /**
+     * Locale list of WMS servers which can be used to add WMS Layers
+     */
+    public static final String LOCAL_WMS_SERVER_LIST = "/servers.json";
+
     /*
      * Configuration profiles settings
      */
@@ -93,5 +98,7 @@ public class ConfigurationConstants {
             new Params(4, 4, 0.0001f, 2, false, false, false, 1, false),
             new Params(4, 4, 0.00001f, 2, false, false, false, 1, false),
             new Params(4, 4, 0.000001f, 2, false, false, false, 1, false),};
+
+
 
 }

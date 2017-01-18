@@ -795,7 +795,7 @@ public class Project {
         try {
             layer = new AbmWMSLayer("WMS layer", url, layerName, true, getHigherZindex(), this);
         } catch (Exception e) {
-            throw new IOException("Error while adding shapefile layer: ", e);
+            throw new IOException("Error while adding wms layer: ", e);
         }
 
         return (AbmWMSLayer) addLayer(layer);
