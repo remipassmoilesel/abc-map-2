@@ -87,30 +87,27 @@ public class Initialization {
         // open specified project
         if (projectToOpen != null) {
 
-            boolean opened = false;
             try {
-                pman.openProject(projectToOpen);
-                opened = true;
-            } catch (IOException e) {
-                logger.error(e);
-            }
 
-            // add it to recents files
-            if (opened) {
+                pman.openProject(projectToOpen);
+
                 try {
                     Main.getRecentManager().addCurrentProject();
                     Main.getRecentManager().saveHistory();
                 } catch (IOException e) {
                     logger.error(e);
                 }
+
+            } catch (IOException e) {
+                logger.error(e);
             }
 
         }
         // create a fake project
         else if (createFake.isEmpty() == false) {
-            try{
+            try {
                 pman.createFakeProject(createFake);
-            }catch(Exception e){
+            } catch (Exception e) {
                 logger.error(e);
                 pman.createNewProject();
             }
