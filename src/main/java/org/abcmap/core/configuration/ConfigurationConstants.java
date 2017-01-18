@@ -71,6 +71,7 @@ public class ConfigurationConstants {
      * Locale list of WMS servers which can be used to add WMS Layers
      */
     public static final String LOCAL_WMS_SERVER_LIST = "/servers.json";
+    public static final String DISTANT_WMS_SERVERS_LIST_URL = "http://localhost/servers.json";
 
     /*
      * Configuration profiles settings

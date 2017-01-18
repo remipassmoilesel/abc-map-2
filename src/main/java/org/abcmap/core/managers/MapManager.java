@@ -1,12 +1,15 @@
 package org.abcmap.core.managers;
 
 import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.events.MapManagerEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.utils.Utils;
 import org.abcmap.core.wms.PredefinedWmsServer;
 import org.abcmap.core.wms.ServerConstantsJson;
 import org.abcmap.gui.components.map.CachedMapPane;
+import org.abcmap.gui.utils.GuiUtils;
 import org.apache.commons.io.IOUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
@@ -35,7 +38,9 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
     public MapManager() {
         notifm = new EventNotificationManager(MapManager.this);
         mainmap = new MainMapBinding();
-        listOfWmsServers = new ArrayList<PredefinedWmsServer>();
+        listOfWmsServers = new ArrayList<>();
+
+        listOfWmsServers.addAll(getLocaleListOfPredefinedWMSServers());
     }
 
     /**
@@ -50,17 +55,25 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
     }
 
     /**
-     * Return a list of predefined WMS server which can be used to add WMS layer
+     * Try to download and parse distant list of WMS servers
+     * <p>
+     * If nothing is found or if an error occur, return an empty list
+     *
+     * @return
+     */
+    public ArrayList<PredefinedWmsServer> getDistantListOfPredefinedWmsServers() throws IOException {
+        String rawListStr = Utils.getHttpResourceAsString(ConfigurationConstants.DISTANT_WMS_SERVERS_LIST_URL, 2000);
+        return parseJsonWmsServerList(rawListStr);
+    }
+
+    /**
+     * Return the current list of predefined WMS server which can be used to add WMS layer.
+     * <p>
+     * This list should contains locale list and distant list if any.
      *
      * @return
      */
     public ArrayList<PredefinedWmsServer> getListOfPredefinedWmsServers() {
-
-        // nothing found in list, load local server list
-        if (listOfWmsServers.isEmpty() == true) {
-            listOfWmsServers.addAll(getLocaleListOfPredefinedWMSServers());
-        }
-
         return new ArrayList<>(listOfWmsServers);
     }
 
@@ -92,11 +105,11 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
     }
 
     /**
-     * Load local list of predefined WMS servers
+     * Load the locale list of predefined WMS servers
+     * <p>
+     * Return an empty list if an error occur, or if nothing found
      */
     public ArrayList<PredefinedWmsServer> getLocaleListOfPredefinedWMSServers() {
-
-        ArrayList<PredefinedWmsServer> result = new ArrayList<>();
 
         try (BufferedInputStream res = new BufferedInputStream(
                 MapManager.class.getResourceAsStream(ConfigurationConstants.LOCAL_WMS_SERVER_LIST))) {
@@ -106,7 +119,29 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
             }
 
             String rawListStr = IOUtils.toString(res);
-            JSONArray jsonArray = new JSONArray(rawListStr);
+            return parseJsonWmsServerList(rawListStr);
+
+        } catch (IOException e) {
+            logger.error(e);
+        }
+
+        return new ArrayList<>();
+    }
+
+    /**
+     * Parse a JSON string and return a list of wms server
+     * <p>
+     * Throw an IOException if an error occur
+     *
+     * @param jsonStr
+     * @return
+     */
+    private ArrayList<PredefinedWmsServer> parseJsonWmsServerList(String jsonStr) throws IOException {
+
+        try {
+
+            ArrayList<PredefinedWmsServer> result = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray(jsonStr);
 
             for (Object o : jsonArray) {
 
@@ -121,11 +156,38 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
                 }
             }
 
-        } catch (IOException e) {
-            logger.error(e);
+            return result;
+
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    /**
+     * Fire an event meaning that list of predefined servers changed
+     * <p>
+     * Return the number of updates found
+     */
+    public int updateListOfPredefinedWmsServers() throws IOException {
+
+        GuiUtils.throwIfOnEDT();
+
+        // get distant list of WMS servers
+        ArrayList<PredefinedWmsServer> distantList = getDistantListOfPredefinedWmsServers();
+
+        // update list with elements which are not already in list
+        int updates = 0;
+        for(PredefinedWmsServer server : distantList){
+            if(listOfWmsServers.contains(server) == false){
+                listOfWmsServers.add(server);
+                updates ++;
+            }
         }
 
-        return result;
+        // fire an event
+        notifm.fireEvent(new MapManagerEvent(MapManagerEvent.PREDEFINED_WMS_LIST_CHANGED));
+
+        return updates;
     }
 
     /**

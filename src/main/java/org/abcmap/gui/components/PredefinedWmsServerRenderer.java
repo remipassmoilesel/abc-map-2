@@ -21,8 +21,14 @@ public class PredefinedWmsServerRenderer extends JLabel implements ListCellRende
     public Component getListCellRendererComponent(JList<? extends PredefinedWmsServer> list, PredefinedWmsServer server,
                                                   int index, boolean isSelected, boolean cellHasFocus) {
 
-        this.setText(server.getName());
+        // show server name
+        if (server == null) {
+            this.setText("Name is null");
+        } else {
+            this.setText(server.getName());
+        }
 
+        // change color if selected
         if (isSelected) {
             setBackground(list.getSelectionBackground());
             setForeground(list.getSelectionForeground());

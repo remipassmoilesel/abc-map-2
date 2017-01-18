@@ -1,7 +1,7 @@
 package org.abcmap.ielements.position;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.events.MapEvent;
+import org.abcmap.core.events.MapManagerEvent;
 import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.events.manager.Event;
 import org.abcmap.core.events.manager.EventNotificationManager;
@@ -109,7 +109,7 @@ public class MoveElementsByCoordinates extends InteractionElement {
         @Override
         public void notificationReceived(Event arg) {
 
-            if (arg instanceof MapEvent) {
+            if (arg instanceof MapManagerEvent) {
                 updateDegreeForm();
             } else if (arg instanceof ProjectEvent) {
                 updateCoordinateForm();

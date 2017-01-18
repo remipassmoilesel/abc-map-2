@@ -1,7 +1,7 @@
 package org.abcmap.gui.components;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.events.MapEvent;
+import org.abcmap.core.events.MapManagerEvent;
 import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.events.manager.Event;
 import org.abcmap.core.events.manager.EventListener;
@@ -203,7 +203,7 @@ public class StatusBar extends JPanel implements HasEventNotificationManager, Ha
                 }
             }
 
-            if (arg instanceof MapEvent) {
+            if (arg instanceof MapManagerEvent) {
                 refresh();
             }
         }

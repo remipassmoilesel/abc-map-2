@@ -24,20 +24,33 @@ public class LocaleListOfWMSServersTest extends ManagerTreeAccessUtil {
     @Test
     public void tests() throws Exception {
 
+        //
+        // Test local list
+        //
+
         //System.out.println(mapm().getListOfPredefinedWmsServers());
 
-        ArrayList<PredefinedWmsServer> list = mapm().getListOfPredefinedWmsServers();
-        assertTrue("List of WMS servers test 1", list != null);
-        assertTrue("List of WMS servers test 2", list.size() > 1);
+        ArrayList<PredefinedWmsServer> localeList = mapm().getLocaleListOfPredefinedWMSServers();
+        assertTrue("Locale list of WMS servers test 1", localeList != null);
+        assertTrue("Locale list of WMS servers test 2", localeList.size() > 1);
 
-        for (PredefinedWmsServer server : list) {
-            assertTrue("List of WMS servers test: " + server, server.getName() != null);
-            assertTrue("List of WMS servers test: " + server, server.getUrl() != null);
+        for (PredefinedWmsServer server : localeList) {
+            assertTrue("Locale list of WMS servers test: " + server, server.getName() != null);
+            assertTrue("Locale list of WMS servers test: " + server, server.getUrl() != null);
         }
 
         // test search
-        assertTrue("Search in list of WMS servers test: ", mapm().getPredefinedWMSServer(list.get(0).getName(), null) != null);
-        assertTrue("Search in list of WMS servers test: ", mapm().getPredefinedWMSServer(null, list.get(0).getUrl()) != null);
+        assertTrue("Search in locale list of WMS servers test: ",
+                mapm().getPredefinedWMSServer(localeList.get(0).getName(), null) != null);
+        assertTrue("Search in locale list of WMS servers test: ",
+                mapm().getPredefinedWMSServer(null, localeList.get(0).getUrl()) != null);
+
+        //
+        // Test distant list
+        //
+
+        ArrayList<PredefinedWmsServer> distantList = mapm().getDistantListOfPredefinedWmsServers();
+        assertTrue("Distant list of WMS servers test: " + distantList.size(), distantList.size() > 0);
 
     }
 

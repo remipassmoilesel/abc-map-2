@@ -4,6 +4,11 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.gui.utils.GuiUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -66,6 +71,55 @@ public class Utils {
             }
         }
         return null;
+    }
+
+    /**
+     * Try to get a distant resource and return it as a string
+     * <p>
+     * Require:
+     * <p>
+     * <dependency>
+     * <groupId>org.apache.httpcomponents</groupId>
+     * <artifactId>httpclient</artifactId>
+     * <version>4.5.2</version>
+     * </dependency>
+     *
+     * @param url
+     * @return
+     */
+    public static String getHttpResourceAsString(String url, int timeoutMs) throws IOException {
+
+        StringBuffer result = new StringBuffer();
+
+        // configure a client with specified time out
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(timeoutMs).build();
+        CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(requestConfig).build();
+
+        try {
+
+            // make get request
+            HttpGet request = new HttpGet(url);
+            HttpResponse response = client.execute(request);
+
+            // check response code
+            if (response.getStatusLine().getStatusCode() != 200) {
+                throw new IOException("Invalid response: " + response.getStatusLine() + " for resource " + url);
+            }
+
+            BufferedReader rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+            try {
+                String line = "";
+                while ((line = rd.readLine()) != null) {
+                    result.append(line);
+                }
+            } finally {
+                rd.close();
+            }
+        } finally {
+            client.close();
+        }
+
+        return result.toString();
     }
 
     /**
@@ -339,6 +393,7 @@ public class Utils {
     public static String getExtension(Path path) {
         return getExtension(path.toAbsolutePath().toString());
     }
+
     /**
      * Return file extension or empty string
      *

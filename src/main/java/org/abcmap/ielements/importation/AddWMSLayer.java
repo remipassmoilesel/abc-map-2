@@ -45,17 +45,46 @@ public class AddWMSLayer extends InteractionElement {
 
         this.displaySimplyInSearch = false;
 
-        // retrieve list of servers in an other thread
+        // create combo box model
+        wmsServerSelectModel = new DefaultComboBoxModel<>();
+        predefinedServers = new ArrayList<>();
+
+        // create fake element showing to user "Please select ..."
         defaultFakeWmsServer = new PredefinedWmsServer("Sélectionnez un serveur", "http://no-where.com");
 
-        wmsServerSelectModel = new DefaultComboBoxModel<>();
+        // listen changes on list of WMS servers
+        notifm.setDefaultListener((ev) -> {
+            SwingUtilities.invokeLater(() -> {
+                updateListOfWmsServers();
+            });
+        });
+        mapm().getNotificationManager().addObserver(this);
+
+        // first update
+        updateListOfWmsServers();
+    }
+
+    /**
+     * Update combo box model and WMS servers list
+     */
+    private void updateListOfWmsServers() {
+
+        GuiUtils.throwIfNotOnEDT();
+
+        ArrayList<PredefinedWmsServer> newList = mapm().getListOfPredefinedWmsServers();
+
+        // clear previous combo model and add fake element
+        wmsServerSelectModel.removeAllElements();
         wmsServerSelectModel.addElement(defaultFakeWmsServer);
 
         // load predefined servers
-        predefinedServers = mapm().getListOfPredefinedWmsServers();
+        predefinedServers.clear();
+
+        predefinedServers.addAll(newList);
         for (PredefinedWmsServer server : predefinedServers) {
             wmsServerSelectModel.addElement(server);
         }
+
     }
 
     @Override
@@ -71,12 +100,13 @@ public class AddWMSLayer extends InteractionElement {
 
         // when a server is selected, display URL in text field
         selectWmsServer.addActionListener((ev) -> {
-
             PredefinedWmsServer server = (PredefinedWmsServer) selectWmsServer.getSelectedItem();
-            if (defaultFakeWmsServer.equals(server)) {
-                GuiUtils.changeTextWithoutFire(wmsTextField, "");
-            } else {
-                GuiUtils.changeTextWithoutFire(wmsTextField, server.getUrl());
+            if (server != null) {
+                if (defaultFakeWmsServer.equals(server)) {
+                    GuiUtils.changeTextWithoutFire(wmsTextField, "");
+                } else {
+                    GuiUtils.changeTextWithoutFire(wmsTextField, server.getUrl());
+                }
             }
         });
 
@@ -97,9 +127,9 @@ public class AddWMSLayer extends InteractionElement {
         panel.add(wmsTextField, "width 95%, wrap");
 
         // valid button
-        JButton buttonValid = new JButton("Ajouter");
-        panel.add(buttonValid, "wrap");
-        buttonValid.addActionListener((event) -> {
+        JButton validBtn = new JButton("Ajouter la couche");
+        panel.add(validBtn, "wrap");
+        validBtn.addActionListener((event) -> {
 
             // get combo value
             PredefinedWmsServer server = (PredefinedWmsServer) selectWmsServer.getSelectedItem();
@@ -110,6 +140,25 @@ public class AddWMSLayer extends InteractionElement {
             }
 
             openLayer(server.getUrl(), null);
+        });
+
+        // search servers online button
+        JButton searchBtn = new JButton("Chercher d'autres couches");
+        panel.add(searchBtn, "wrap");
+        searchBtn.addActionListener((event) -> {
+            ThreadManager.runLater(() -> {
+                try {
+                    int updates = mapm().updateListOfPredefinedWmsServers();
+                    if (updates > 0) {
+                        dialm().showMessageInBox("Mise à jour effectuée");
+                    } else {
+                        dialm().showMessageInBox("Rien à mettre à jour");
+                    }
+                } catch (IOException e) {
+                    logger.error(e);
+                    dialm().showMessageInBox("Impossible d'accéder au site de mise à jour");
+                }
+            });
         });
 
         return panel;

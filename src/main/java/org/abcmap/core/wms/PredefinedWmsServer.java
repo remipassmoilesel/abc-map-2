@@ -3,11 +3,23 @@ package org.abcmap.core.wms;
 import java.util.Objects;
 
 /**
- * Created by remipassmoilesel on 18/01/17.
+ * Predefined WMS server, which can be loaded from locale server list or distant.
  */
 public class PredefinedWmsServer {
 
+
+    /**
+     * Name of WMS server, which can be used to display this server
+     *
+     * @return
+     */
     private String name;
+
+    /**
+     * URL of WMS server, which can be used to create a WMS layer
+     *
+     * @return
+     */
     private String url;
 
     public PredefinedWmsServer(String name, String url) {
@@ -15,18 +27,39 @@ public class PredefinedWmsServer {
         this.url = url;
     }
 
+    /**
+     * Name of WMS server, which can be used to display this server
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Name of WMS server, which can be used to display this server
+     *
+     * @return
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+
+    /**
+     * URL of WMS server, which can be used to create a WMS layer
+     *
+     * @return
+     */
     public String getUrl() {
         return url;
     }
 
+    /**
+     * URL of WMS server, which can be used to create a WMS layer
+     *
+     * @param url
+     */
     public void setUrl(String url) {
         this.url = url;
     }
