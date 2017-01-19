@@ -38,7 +38,7 @@ public class SimpleBlockItem extends JPanel implements HasExpandableHelp {
     protected SimpleBlockItem() {
 
         // layout
-        super(new MigLayout("insets 5"));
+        super(new MigLayout("insets 7 5 3 5"));
 
         focusPainter = new FocusPainter(GuiColors.PANEL_BACKGROUND);
 
