@@ -88,7 +88,6 @@ public class NotificationHistoryPanel extends JPanel {
 
         public void showObservers(boolean state) {
 
-
             this.removeAll();
 
             this.add(labelNbrObservers);
@@ -100,15 +99,21 @@ public class NotificationHistoryPanel extends JPanel {
 
                 for (EventNotificationManager om : observers) {
 
-                    String className = om.getClass().getName();
-                    String owner = om.getOwner().getClass().getName();
-                    String text = "<html>#" + i + ":";
-                    text += "<br>Owner class: " + owner + " / " + className;
-                    text += "</html>";
+                    HtmlLabel label;
+                    if(om == null){
+                        label = new HtmlLabel("Observer is null");
+                        label.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                    }
 
-                    HtmlLabel label = new HtmlLabel(text);
-                    label.setBorder(BorderFactory
-                            .createLineBorder(Color.lightGray));
+                    else {
+                        String className = om.getClass().getName();
+                        String owner = om.getOwner().getClass().getName();
+                        String text = "#" + i + ": <br>Owner class: " + owner + " / " + className;
+
+                        label = new HtmlLabel(text);
+                        label.setBorder(BorderFactory.createLineBorder(Color.lightGray));
+                    }
+
 
                     this.add(label, "span, width 98%!, wrap");
 
