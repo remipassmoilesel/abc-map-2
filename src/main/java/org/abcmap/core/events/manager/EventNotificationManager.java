@@ -133,6 +133,11 @@ public class EventNotificationManager implements EventListener {
      * @param notifm
      */
     private void addObserverIfNecessary(EventNotificationManager notifm) {
+
+        if (notifm == null) {
+            throw new NullPointerException("Observer is null");
+        }
+
         if (observers.contains(notifm) == false) {
             observers.add(notifm);
         }
