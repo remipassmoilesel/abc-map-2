@@ -2,6 +2,7 @@ package org.abcmap.gui.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.ielements.GroupOfInteractionElements;
+import org.abcmap.ielements.importation.AddShapefileLayer;
 import org.abcmap.ielements.importation.AddWMSLayer;
 import org.abcmap.ielements.importation.data.MenuDataImport;
 import org.abcmap.ielements.importation.directory.MenuImportFromDirectory;
@@ -17,6 +18,7 @@ public class GroupImportation extends GroupOfInteractionElements {
         blockIcon = GuiIcons.GROUP_IMPORT;
 
         addInteractionElement(new AddWMSLayer());
+        addInteractionElement(new AddShapefileLayer());
         addInteractionElement(new MenuImportFromDirectory());
         addInteractionElement(new MenuImportFromDocument());
         addInteractionElement(new MenuRobotImport());

@@ -19,7 +19,7 @@ import java.util.Arrays;
 /**
  * Created by remipassmoilesel on 13/01/17.
  */
-public class AddShapeFile extends InteractionElement {
+public class AddShapefileLayer extends InteractionElement {
 
     /**
      * Text field where user specify path of files
@@ -31,7 +31,7 @@ public class AddShapeFile extends InteractionElement {
      */
     private ArrayList<String> shapefilePossibleExtensions = new ArrayList<>();
 
-    public AddShapeFile() {
+    public AddShapefileLayer() {
 
         this.label = "Ajouter un fichier de formes";
         this.help = "Ajoutez ici un fichier de forme (.shp) au projet courant. Vous pouvez spécifier le chemin d'un fichier SHP ou d'un dossier. " +
@@ -61,7 +61,7 @@ public class AddShapeFile extends InteractionElement {
         GuiUtils.addLabel("Chemin du fichier ou du dossier: ", panel, "wrap");
         panel.add(shapefileTextField, "width 95%, wrap");
 
-        JButton buttonValid = new JButton("Ajouter");
+        JButton buttonValid = new JButton("Ajouter la couche");
         panel.add(buttonValid, "wrap");
 
         buttonValid.addActionListener((event) -> {

@@ -7,7 +7,7 @@ import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GraphicsConsumer;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.windows.MainWindow;
-import org.abcmap.ielements.importation.AddShapeFile;
+import org.abcmap.ielements.importation.AddShapefileLayer;
 import org.abcmap.ielements.importation.AddWMSLayer;
 
 import javax.swing.*;
@@ -150,7 +150,7 @@ public class DropFilesToolbar extends Toolbar {
                     java.util.List<File> transferData = (java.util.List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                     if (transferData != null && transferData.size() > 0) {
 
-                        AddShapeFile anshapefile = new AddShapeFile();
+                        AddShapefileLayer anshapefile = new AddShapefileLayer();
                         anshapefile.openLayer(transferData.get(0).getAbsolutePath());
 
                         dtde.dropComplete(true);
