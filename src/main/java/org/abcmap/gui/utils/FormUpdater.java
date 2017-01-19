@@ -115,7 +115,7 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
     }
 
     @Override
-    public void notificationReceived(Event arg) {
+    public void eventReceived(Event arg) {
 
         // filter les arguments
         if (eventFilters.size() > 0) {

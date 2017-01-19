@@ -28,9 +28,9 @@ public class SplashScreen extends JDialog implements HasEventNotificationManager
         setLocationRelativeTo(null);
 
         om = new EventNotificationManager(this);
-        om.setDefaultListener(new EventListener() {
+        om.addEventListener(new EventListener() {
             @Override
-            public void notificationReceived(Event arg) {
+            public void eventReceived(Event arg) {
                 SplashScreen.this.dispose();
             }
         });

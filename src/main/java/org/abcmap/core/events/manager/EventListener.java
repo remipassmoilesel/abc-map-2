@@ -12,5 +12,5 @@ public interface EventListener {
      *
      * @param arg
      */
-    public void notificationReceived(Event arg);
+    public void eventReceived(Event arg);
 }

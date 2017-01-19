@@ -51,7 +51,7 @@ public class LayerSelectorPanel extends JPanel implements HasEventNotificationMa
 
         // listen project
         this.notifm = new EventNotificationManager(this);
-        notifm.setDefaultListener((ev) -> {
+        notifm.addEventListener((ev) -> {
             // TODO filter events
             SwingUtilities.invokeLater(formUpdater);
         });

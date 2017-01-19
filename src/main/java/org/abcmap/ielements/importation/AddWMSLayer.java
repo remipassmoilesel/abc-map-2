@@ -53,7 +53,7 @@ public class AddWMSLayer extends InteractionElement {
         defaultFakeWmsServer = new WmsServerCredentials("Sélectionnez un serveur", "http://no-where.com");
 
         // listen changes on list of WMS servers
-        notifm.setDefaultListener((ev) -> {
+        notifm.addEventListener((ev) -> {
             SwingUtilities.invokeLater(() -> {
                 updateListOfWmsServers();
             });

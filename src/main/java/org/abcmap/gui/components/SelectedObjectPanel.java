@@ -65,7 +65,7 @@ public class SelectedObjectPanel extends JPanel implements HasEventNotificationM
 
         SelectionViewUpdater formUpdater = new SelectionViewUpdater();
         notifm = new EventNotificationManager(this);
-        notifm.setDefaultListener(formUpdater);
+        notifm.addEventListener(formUpdater);
 
         projectm.getNotificationManager().addObserver(this);
 

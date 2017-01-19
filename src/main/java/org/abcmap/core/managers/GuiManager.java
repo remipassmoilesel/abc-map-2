@@ -48,7 +48,7 @@ public class GuiManager extends ManagerTreeAccessUtil implements HasEventNotific
     public GuiManager() {
 
         this.notifm = new EventNotificationManager(this);
-        notifm.setDefaultListener(new GuiUpdater());
+        notifm.addEventListener(new GuiUpdater());
 
         // listen project manager events
         projectm().getNotificationManager().addObserver(this);
@@ -73,7 +73,7 @@ public class GuiManager extends ManagerTreeAccessUtil implements HasEventNotific
     private class GuiUpdater implements EventListener {
 
         @Override
-        public void notificationReceived(Event arg) {
+        public void eventReceived(Event arg) {
 
             // rename main window when project change
             if (ProjectEvent.isNewProjectLoadedEvent(arg)) {

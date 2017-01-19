@@ -30,7 +30,7 @@ public class DataHeadersCombo extends JComboBox<String> implements HasEventNotif
         // listen import manager
         ComboUpdater cbUpdater = new ComboUpdater();
         notifm = new EventNotificationManager(this);
-        notifm.setDefaultListener(cbUpdater);
+        notifm.addEventListener(cbUpdater);
         importm.getNotificationManager().addObserver(this);
 
         // first update

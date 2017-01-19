@@ -59,7 +59,7 @@ public class CropConfigurationWindow extends FullScreenPictureWindow implements 
 
         // listen configuration changes
         this.observer = new EventNotificationManager(this);
-        observer.setDefaultListener(new CropSelectionUpdater());
+        observer.addEventListener(new CropSelectionUpdater());
 
     }
 
@@ -69,7 +69,7 @@ public class CropConfigurationWindow extends FullScreenPictureWindow implements 
     private class CropSelectionUpdater implements EventListener, Runnable {
 
         @Override
-        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
+        public void eventReceived(org.abcmap.core.events.manager.Event arg) {
             if (arg instanceof ConfigurationEvent) {
                 SwingUtilities.invokeLater(this);
             }

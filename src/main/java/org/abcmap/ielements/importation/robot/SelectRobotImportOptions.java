@@ -26,7 +26,7 @@ public class SelectRobotImportOptions extends InteractionElement {
         robotOptionPanel.getListenerHandler().add(new RobotConfigurationUpdater());
 
         configm().getNotificationManager().addObserver(this);
-        notifm.setDefaultListener(new PanelUpdater());
+        notifm.addEventListener(new PanelUpdater());
 
         return robotOptionPanel;
 
@@ -53,7 +53,7 @@ public class SelectRobotImportOptions extends InteractionElement {
     private class PanelUpdater implements EventListener {
 
         @Override
-        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
+        public void eventReceived(org.abcmap.core.events.manager.Event arg) {
 
             /*
             // récuperer la configuration actuelle

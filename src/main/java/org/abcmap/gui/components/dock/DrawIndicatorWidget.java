@@ -41,9 +41,9 @@ public class DrawIndicatorWidget extends JPanel implements HasEventNotificationM
 
         // listen draw manager
         om = new EventNotificationManager(this);
-        om.setDefaultListener(new EventListener() {
+        om.addEventListener(new EventListener() {
             @Override
-            public void notificationReceived(final Event arg) {
+            public void eventReceived(final Event arg) {
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {

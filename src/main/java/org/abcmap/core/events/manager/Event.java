@@ -9,10 +9,10 @@ public class Event {
 
     public static Integer instances = 0;
 
-    private Object value;
-    private String name;
-    private String creationTime;
-    private Integer instanceNumber;
+    private final Object value;
+    private final String name;
+    private final String creationTime;
+    private final Integer instanceNumber;
 
     public Event(String name) {
         this(name, null);

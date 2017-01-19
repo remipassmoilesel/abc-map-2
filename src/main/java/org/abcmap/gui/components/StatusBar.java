@@ -119,7 +119,7 @@ public class StatusBar extends JPanel implements HasEventNotificationManager, Ha
         // watch project and map
         this.updater = new Updater();
         this.notifm = new EventNotificationManager(this);
-        notifm.setDefaultListener(updater);
+        notifm.addEventListener(updater);
 
         projectm.getNotificationManager().addObserver(this);
         mapm.getNotificationManager().addObserver(this);
@@ -192,7 +192,7 @@ public class StatusBar extends JPanel implements HasEventNotificationManager, Ha
         }
 
         @Override
-        public void notificationReceived(Event arg) {
+        public void eventReceived(Event arg) {
 
             // enable / disable mouse when project change
             if (arg instanceof ProjectEvent) {

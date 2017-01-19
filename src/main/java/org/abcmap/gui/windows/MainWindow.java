@@ -15,7 +15,6 @@ import org.abcmap.gui.components.StatusBar;
 import org.abcmap.gui.components.dock.Dock;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.abcmap.gui.layouts.LayoutListPanel;
-import org.abcmap.gui.utils.GraphicsConsumer;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.program.QuitProgram;
 
@@ -23,7 +22,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 
 /**
  * Main window of software
@@ -109,7 +107,7 @@ public class MainWindow extends AbstractCustomWindow implements HasEventNotifica
         // listen project manager to change content when project change
         notifm = new EventNotificationManager(this);
         projectm.getNotificationManager().addObserver(this);
-        notifm.setDefaultListener((notif) -> {
+        notifm.addEventListener((notif) -> {
 
             SwingUtilities.invokeLater(() -> {
 

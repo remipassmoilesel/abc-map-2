@@ -63,7 +63,7 @@ public class MoveElementsByCoordinates extends InteractionElement {
         mover = new ElementMover();
 
         updater = new MoveElementsUpdater();
-        notifm.setDefaultListener(updater);
+        notifm.addEventListener(updater);
 
         projectm().getNotificationManager().addObserver(this);
 
@@ -107,7 +107,7 @@ public class MoveElementsByCoordinates extends InteractionElement {
     private class MoveElementsUpdater implements EventListener {
 
         @Override
-        public void notificationReceived(Event arg) {
+        public void eventReceived(Event arg) {
 
             if (arg instanceof MapManagerEvent) {
                 updateDegreeForm();

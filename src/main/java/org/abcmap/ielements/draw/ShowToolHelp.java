@@ -29,7 +29,7 @@ public class ShowToolHelp extends InteractionElement {
         toolHelpPanel.setMessageNoHelp("<html><i>Aide sur l'outil indisponible.</i></html>");
 
         InteractionUpdater interactionUpdater = new InteractionUpdater();
-        notifm.setDefaultListener(interactionUpdater);
+        notifm.addEventListener(interactionUpdater);
 
         drawm().getNotificationManager().addObserver(this);
 
@@ -59,7 +59,7 @@ public class ShowToolHelp extends InteractionElement {
          * Reception d'un evenement
          */
         @Override
-        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
+        public void eventReceived(org.abcmap.core.events.manager.Event arg) {
             /*
             if (DrawManagerEvent.TOOL_CHANGED.equals(arg.getName())) {
                 SwingUtilities.invokeLater(this);

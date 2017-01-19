@@ -27,7 +27,7 @@ public class SelectColors extends InteractionElement {
 
 //        colorPicker.getListenerHandler().add(new Performer());
 
-        notifm.setDefaultListener(new ColorPickerUpdater());
+        notifm.addEventListener(new ColorPickerUpdater());
         drawm().getNotificationManager().addObserver(this);
 
         return colorPicker;
@@ -66,7 +66,7 @@ public class SelectColors extends InteractionElement {
     private class ColorPickerUpdater implements EventListener {
 
         @Override
-        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
+        public void eventReceived(org.abcmap.core.events.manager.Event arg) {
 
 			/*
 			// filtrer les evenements

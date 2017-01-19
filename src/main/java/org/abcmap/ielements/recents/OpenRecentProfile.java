@@ -35,7 +35,7 @@ public class OpenRecentProfile extends InteractionElement {
 
         this.recentManagerListener = new RecentManagerListener();
 
-        notifm.setDefaultListener(recentManagerListener);
+        notifm.addEventListener(recentManagerListener);
         recentm().getNotificationManager().addObserver(this);
 
         panel.add(fileSelectionPanel, "width 98%!");

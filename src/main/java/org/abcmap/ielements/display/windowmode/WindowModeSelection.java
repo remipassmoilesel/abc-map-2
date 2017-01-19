@@ -29,9 +29,9 @@ public class WindowModeSelection extends InteractionElement {
 
         selector.addActionListener(new ComboWindowModeListener());
 
-        notifm.setDefaultListener(new EventListener() {
+        notifm.addEventListener(new EventListener() {
             @Override
-            public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
+            public void eventReceived(org.abcmap.core.events.manager.Event arg) {
 
                 if (GuiManagerEvent.isWindowModeNotification(arg)) {
 

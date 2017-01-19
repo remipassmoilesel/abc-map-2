@@ -29,7 +29,7 @@ public class SetProjectTitle extends InteractionElement {
 
         projectListener = new ProjectListener();
 
-        notifm.setDefaultListener(projectListener);
+        notifm.addEventListener(projectListener);
         projectm().getNotificationManager().addObserver(this);
 
         //TextFieldDelayedAction.delayedActionFor(textField, new TextFieldListener(), false);

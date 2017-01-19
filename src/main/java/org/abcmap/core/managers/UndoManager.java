@@ -23,7 +23,7 @@ public class UndoManager extends ManagerTreeAccessUtil implements HasEventNotifi
 
         // listen project changes to reset history
         this.notifm = new EventNotificationManager(this);
-        notifm.setDefaultListener((ev) -> {
+        notifm.addEventListener((ev) -> {
             if(ProjectEvent.isNewProjectLoadedEvent(ev)){
                 internalManager.discardAllEdits();
                 logger.debug("Undo/redo history have been discarded");

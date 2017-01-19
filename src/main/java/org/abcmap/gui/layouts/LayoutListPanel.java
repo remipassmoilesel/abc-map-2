@@ -75,7 +75,7 @@ public class LayoutListPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
 
         // listen project manager for changes
-        projectm.getNotificationManager().addSimpleListener(this, (ev) -> {
+        projectm.getNotificationManager().addObserver(this, (ev) -> {
             if (ev instanceof ProjectEvent && ev.getName().equals(ProjectEvent.LAYOUTS_LIST_CHANGED)) {
                 SwingUtilities.invokeLater(() -> {
                     reconstruct();

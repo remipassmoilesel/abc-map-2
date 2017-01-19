@@ -28,7 +28,7 @@ public class SetProfileComment extends InteractionElement {
 
         profileListener = new ProfileListener();
 
-        notifm.setDefaultListener(profileListener);
+        notifm.addEventListener(profileListener);
         configm().getNotificationManager().addObserver(this);
 
         //TextFieldDelayedAction.delayedActionFor(textField, new CommentListener(), false);

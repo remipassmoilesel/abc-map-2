@@ -23,7 +23,7 @@ public class NotificationHistoryPanel extends JPanel {
         GuiUtils.throwIfNotOnEDT();
 
         this.elmt = elmt;
-        this.ev = elmt.getNotification();
+        this.ev = elmt.getEvent();
         this.om = elmt.getObserverManager();
         this.owner = elmt.getOwner();
 

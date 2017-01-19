@@ -159,7 +159,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
 
         // repaint when new partials are ready
         notifm = new EventNotificationManager(this);
-        notifm.setDefaultListener((ev) -> {
+        notifm.addEventListener((ev) -> {
 
             // new partials are ready, only repaint
             if (CacheRenderingEvent.isNewPartialsEvent(ev) || CacheRenderingEvent.isPartialsUpdatedEvent(ev)) {

@@ -5,7 +5,6 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.PrintUtils;
-import org.abcmap.gui.utils.GuiUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,14 +21,14 @@ import java.util.Collection;
  *
  * @author remipassmoilesel
  */
-public class EventNotificationManager implements EventListener {
+public class EventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(EventNotificationManager.class);
 
     /**
      * Maximum events saved in history
      */
-    public static final Integer MAX_EVENT_SAVED_DEBUG = 200;
+    public static final Integer MAX_EVENT_SAVED_ON_DEBUG = 200;
 
     /**
      * Event history
@@ -42,9 +41,9 @@ public class EventNotificationManager implements EventListener {
     protected final ArrayList<EventNotificationManager> observers;
 
     /**
-     * Default object to update
+     * List of listeners called when an event is received
      */
-    protected EventListener defaultListener;
+    protected ArrayList<EventListener> eventListeners;
 
     /**
      * The owner of this notification manager
@@ -53,6 +52,9 @@ public class EventNotificationManager implements EventListener {
      */
     protected Object owner;
 
+    /**
+     * If set to true, events transmitted will be stored
+     */
     private static boolean debugMode = false;
 
     public EventNotificationManager(Object owner) {
@@ -63,7 +65,7 @@ public class EventNotificationManager implements EventListener {
 
         this.owner = owner;
         this.observers = new ArrayList<>(10);
-        this.defaultListener = null;
+        this.eventListeners = new ArrayList<>();
     }
 
     /**
@@ -79,27 +81,33 @@ public class EventNotificationManager implements EventListener {
         }
 
         // notify event in a separated thread
-        Notifier noti = new Notifier(notif);
+        EventReceivedNotifier noti = new EventReceivedNotifier(observers, notif);
         ThreadManager.runLater(noti);
 
     }
 
     /**
-     * Default updatable object.
+     * Add an event listener
+     * <p>
+     * Each time an event will be received, this listener will be run.
      *
      * @param listener
      */
-    public void setDefaultListener(EventListener listener) {
+    public void addEventListener(EventListener listener) {
 
-        if (defaultListener == this) {
+        if (listener == this) {
             throw new IllegalArgumentException("Notifier cannot notify itself. This: " + this + ", Object: " + listener);
         }
 
-        this.defaultListener = listener;
+        if (listener == null) {
+            throw new NullPointerException("Listener is null");
+        }
+
+        this.eventListeners.add(listener);
     }
 
     /**
-     * Add an observer watching this object
+     * Add a notification manager watching this manager
      *
      * @param observer
      */
@@ -108,20 +116,28 @@ public class EventNotificationManager implements EventListener {
     }
 
     /**
-     * Allow to register a simple listener without implementing interface HasNotificationManager
+     * Allow to register a simple observer even if it
+     * <p>
+     * doesn't implements HasNotificationManager interface.
      *
      * @param owner
      * @param listener
      */
-    public EventNotificationManager addSimpleListener(Object owner, EventListener listener) {
+    public EventNotificationManager addObserver(Object owner, EventListener listener) {
 
+        // check parameters
+        if (owner == null) {
+            throw new NullPointerException("Owner cannot be null: " + listener);
+        }
         if (listener == null) {
-            throw new NullPointerException("Listener is null: " + listener);
+            throw new NullPointerException("Listener cannot be null: " + listener);
         }
 
+        // create a notification manager
         EventNotificationManager notifm = new EventNotificationManager(owner);
-        notifm.setDefaultListener(listener);
+        notifm.addEventListener(listener);
 
+        // and observe it
         addObserverIfNecessary(notifm);
 
         return notifm;
@@ -144,7 +160,9 @@ public class EventNotificationManager implements EventListener {
     }
 
     /**
-     * Add observer list
+     * Add observers list. All of these objects will be notified if this notification
+     * <p>
+     * manager send an event
      *
      * @param observers
      */
@@ -157,7 +175,7 @@ public class EventNotificationManager implements EventListener {
     /**
      * Get the owner of this notification manager
      * <p>
-     * Owner can be a HasNotificationManager object or not, and can be null.
+     * Owner can implements HasNotificationManager interface or not.
      *
      * @return
      */
@@ -182,23 +200,6 @@ public class EventNotificationManager implements EventListener {
     }
 
     /**
-     * Print observers in console, for debug purposes
-     */
-    public void printObservers() {
-        PrintUtils.p("%% Observers: ");
-        PrintUtils.p("Observer owner: " + owner.getClass().getSimpleName() + " --- " + owner);
-        int i = 0;
-        for (EventNotificationManager o : new ArrayList<>(observers)) {
-            if (o == null) {
-                PrintUtils.p(i + " : " + o);
-            } else {
-                PrintUtils.p(i + " : " + o.getClass().getSimpleName() + " --- " + o);
-            }
-            i++;
-        }
-    }
-
-    /**
      * Get all observer list.
      * <p>
      * /!\ Live list
@@ -212,53 +213,28 @@ public class EventNotificationManager implements EventListener {
     /**
      * Method called when an notification is received.
      * <p>
-     * Set default updatable object or override this.
+     * You can override it to execute actions
      */
-    @Override
-    public void notificationReceived(Event arg) {
-        if (defaultListener != null) {
-            defaultListener.notificationReceived(arg);
-        }
+    protected void eventReceived(Event arg) {
+
     }
 
     /**
-     * Notify observers in a separated Thread
+     * Notify listeners by calling notificationReceived(arg); method
      *
-     * @author remipassmoilesel
+     * @param arg
      */
-    private class Notifier implements Runnable {
+    protected void notifyListeners(Event arg) {
 
-        private Event event;
-
-        public Notifier(Event event) {
-            this.event = event;
-        }
-
-        @Override
-        public void run() {
-
-            // check we are not in EDT
-            GuiUtils.throwIfOnEDT();
-
-            // Check notification is not null or throw
-            if (event == null) {
-                throw new IllegalStateException("Event is null: " + EventNotificationManager.this);
+        for (EventListener listener : eventListeners) {
+            try {
+                listener.eventReceived(arg);
+            } catch (Exception e) {
+                logger.error(e);
             }
-
-            // iterate all observers
-            for (EventNotificationManager om : new ArrayList<>(observers)) {
-                try {
-                    if (om != null) {
-                        om.notificationReceived(event);
-                    }
-                } catch (Exception e) {
-                    logger.error(e);
-                }
-            }
-
         }
-
     }
+
 
     /**
      * Set debug mode for all notification managers
@@ -308,17 +284,33 @@ public class EventNotificationManager implements EventListener {
 
         // create notif history element
         NotificationHistoryElement cehe = new NotificationHistoryElement();
-        cehe.setNotification(notif);
+        cehe.setEvent(notif);
         cehe.setOwner(owner);
         cehe.setReceivers(observers);
         cehe.setObserverManager(this);
         lastTransmittedEvents.add(cehe);
 
         // remove last elements
-        while (lastTransmittedEvents.size() > MAX_EVENT_SAVED_DEBUG) {
+        while (lastTransmittedEvents.size() > MAX_EVENT_SAVED_ON_DEBUG) {
             lastTransmittedEvents.remove(0);
         }
 
     }
 
+    /**
+     * Print observers in console, for debug purposes
+     */
+    public void printObservers() {
+        PrintUtils.p("%% Observers: ");
+        PrintUtils.p("Observer owner: " + owner.getClass().getSimpleName() + " --- " + owner);
+        int i = 0;
+        for (EventNotificationManager o : new ArrayList<>(observers)) {
+            if (o == null) {
+                PrintUtils.p(i + " : " + o);
+            } else {
+                PrintUtils.p(i + " : " + o.getClass().getSimpleName() + " --- " + o);
+            }
+            i++;
+        }
+    }
 }

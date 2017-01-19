@@ -56,7 +56,7 @@ public class EventNotificationsManagerTest {
 
         // add more observers
         for (int i = 0; i < observersNumber; i++) {
-            source.getNotificationManager().addSimpleListener("owner", (notif) -> {
+            source.getNotificationManager().addObserver("owner", (notif) -> {
                 notificationsReceived.add(notif);
             });
         }
@@ -98,7 +98,7 @@ public class EventNotificationsManagerTest {
         private EventNotificationManager notifm = new EventNotificationManager(this);
 
         NotificationTester() {
-            notifm.setDefaultListener((notification) -> {
+            notifm.addEventListener((notification) -> {
                 notificationsReceived.add(notification);
             });
         }

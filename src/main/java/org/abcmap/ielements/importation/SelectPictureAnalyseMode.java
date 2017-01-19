@@ -30,7 +30,7 @@ public class SelectPictureAnalyseMode extends InteractionElement {
         slider.addChangeListener(new SliderListener());
 
         SliderUpdater sliderUpdater = new SliderUpdater();
-        notifm.setDefaultListener(sliderUpdater);
+        notifm.addEventListener(sliderUpdater);
         configm().getNotificationManager().addObserver(this);
 
         sliderUpdater.run();
@@ -57,7 +57,7 @@ public class SelectPictureAnalyseMode extends InteractionElement {
     private class SliderUpdater implements EventListener, Runnable {
 
         @Override
-        public void notificationReceived(org.abcmap.core.events.manager.Event arg) {
+        public void eventReceived(org.abcmap.core.events.manager.Event arg) {
             SwingUtilities.invokeLater(this);
         }
 

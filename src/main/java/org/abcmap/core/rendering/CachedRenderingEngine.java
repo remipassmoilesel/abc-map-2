@@ -150,7 +150,7 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
         // listen partial store changes and retransmit events
         this.notifm = new EventNotificationManager(this);
-        notifm.setDefaultListener((ev) -> {
+        notifm.addEventListener((ev) -> {
             // TODO: check if event concern current area
             notifm.fireEvent(ev);
         });
