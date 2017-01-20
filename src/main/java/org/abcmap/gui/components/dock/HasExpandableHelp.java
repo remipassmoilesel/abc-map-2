@@ -1,9 +1,20 @@
 package org.abcmap.gui.components.dock;
 
+/**
+ * Visual components implementing this interface should have a space where a small help can be displayed
+ */
 public interface HasExpandableHelp {
 
-	public void expandHelp(boolean val);
+    /**
+     * Show or hide help on element
+     *
+     * @param showHelp
+     */
+    public void expandHelp(boolean showHelp);
 
-	public boolean isHelpExpanded();
-	
+    /**
+     * Return true if help is expanded
+     */
+    public boolean isHelpExpanded();
+
 }

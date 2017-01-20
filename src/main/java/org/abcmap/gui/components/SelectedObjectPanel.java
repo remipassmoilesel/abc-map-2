@@ -102,7 +102,7 @@ public class SelectedObjectPanel extends JPanel implements HasEventNotificationM
             sampleDisplayer.setSample(sample);
 
             // display element type
-            setLblTypeOfSampleText(drawm.getReadableNameFor(sample.getClass()));
+            setLblTypeOfSampleText(drawm().getReadableNameFor(sample.getClass()));
 
             fireEvent();
             refresh();
