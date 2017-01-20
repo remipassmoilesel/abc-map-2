@@ -1,12 +1,9 @@
 package org.abcmap.gui.utils;
 
 import org.abcmap.core.draw.LayerElement;
-import org.abcmap.core.managers.DrawManager;
-import org.abcmap.core.managers.Main;
-import org.abcmap.core.managers.MapManager;
-import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.events.manager.Event;
 import org.abcmap.core.events.manager.EventListener;
+import org.abcmap.core.managers.ManagerTreeAccessUtil;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.buttons.HtmlCheckbox;
 import org.abcmap.gui.components.color.ColorButton;
@@ -23,7 +20,7 @@ import java.util.ArrayList;
  *
  * @author remipassmoilesel
  */
-public class FormUpdater implements EventListener, Runnable, ActionListener {
+public class FormUpdater extends ManagerTreeAccessUtil implements EventListener, Runnable, ActionListener {
 
     /**
      * Event filter: block notifications by event type
@@ -40,15 +37,7 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
      */
     protected boolean testProjectBeforeUpdate;
 
-    protected ProjectManager projectm;
-    protected DrawManager drawm;
-    protected MapManager mapm;
-
     public FormUpdater() {
-
-        projectm = Main.getProjectManager();
-        drawm = Main.getDrawManager();
-        mapm = Main.getMapManager();
 
         eventFilters = new ArrayList<>();
         toolFilters = new ArrayList<>();
@@ -68,7 +57,7 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
         GuiUtils.throwIfNotOnEDT();
 
         if (testProjectBeforeUpdate) {
-            if (projectm.isInitialized() == false) {
+            if (projectm().isInitialized() == false) {
                 return;
             }
         }
@@ -83,7 +72,7 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
      * @return
      */
     protected LayerElement getFirstSelectedElement(Class filter) {
-        return drawm.getFirstSelectedElement(filter);
+        return drawm().getFirstSelectedElement(filter);
     }
 
     /**
@@ -92,7 +81,7 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
      * @return
      */
     protected LayerElement getFirstSelectedElement() {
-        return drawm.getFirstSelectedElement();
+        return drawm().getFirstSelectedElement();
     }
 
     /**
@@ -101,7 +90,7 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
      * @return
      */
     protected LayerElement getFirstSelectedElement(ArrayList<Class<? extends LayerElement>> filters) {
-        return drawm.getFirstSelectedElement(filters);
+        return drawm().getFirstSelectedElement(filters);
     }
 
     /**
@@ -109,7 +98,7 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
      */
     protected void updateFields() {
 
-        // pas d'actions hors de l'EDT
+        // no actions out of EDT
         GuiUtils.throwIfNotOnEDT();
 
     }
@@ -117,7 +106,7 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
     @Override
     public void eventReceived(Event arg) {
 
-        // filter les arguments
+        // filter arguments if needed
         if (eventFilters.size() > 0) {
             if (eventFilters.contains(arg.getClass()) == false) {
                 return;
@@ -133,7 +122,7 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
     public void updateAllLater() {
 
         if (toolFilters.size() > 0) {
-            if (toolFilters.contains(drawm.getCurrentTool().getClass()) == false) {
+            if (toolFilters.contains(drawm().getCurrentTool().getClass()) == false) {
                 return;
             }
         }
@@ -175,26 +164,68 @@ public class FormUpdater implements EventListener, Runnable, ActionListener {
         }
     }
 
+    /**
+     * Utility used to update form components without firing events
+     * <p>
+     * Components are updated only if value if different than current value
+     *
+     * @param comp
+     * @param value
+     */
     protected void updateComponentWithoutFire(JTextComponent comp, String value) {
-        GuiUtils.changeText(comp, value);
+        if (Utils.safeEquals(comp.getText(), value) == false) {
+            GuiUtils.changeText(comp, value);
+        }
+        comp.revalidate();
+        comp.repaint();
     }
 
+    /**
+     * Utility used to update form components without firing events
+     * <p>
+     * Components are updated only if value if different than current value
+     *
+     * @param comp
+     * @param value
+     */
     protected void updateComponentWithoutFire(HtmlCheckbox comp, boolean value) {
         if (Utils.safeEquals(comp.isSelected(), value) == false) {
             GuiUtils.setSelected(comp, value);
         }
+        comp.revalidate();
+        comp.repaint();
     }
 
+    /**
+     * Utility used to update form components without firing events
+     * <p>
+     * Components are updated only if value if different than current value
+     *
+     * @param comp
+     * @param value
+     */
     protected void updateComponentWithoutFire(AbstractButton comp, boolean value) {
         if (Utils.safeEquals(comp.isSelected(), value) == false) {
             GuiUtils.setSelected(comp, value);
         }
+        comp.revalidate();
+        comp.repaint();
     }
 
+    /**
+     * Utility used to update form components without firing events
+     * <p>
+     * Components are updated only if value if different than current value
+     *
+     * @param comp
+     * @param value
+     */
     protected void updateComponentWithoutFire(JComboBox comp, Object value) {
         if (Utils.safeEquals(comp.getSelectedItem(), value) == false) {
             GuiUtils.changeWithoutFire(comp, value);
         }
+        comp.revalidate();
+        comp.repaint();
     }
 
 }
