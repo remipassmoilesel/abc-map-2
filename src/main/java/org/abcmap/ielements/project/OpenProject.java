@@ -109,11 +109,19 @@ public class OpenProject extends InteractionElement {
             logger.error(e1);
         }
 
-        boolean opened = false;
         try {
             projectm().openProject(projectToOpen);
-            dialm().showErrorInBox("Le projet a été ouvert");
-            opened = true;
+            dialm().showMessageInBox("Le projet a été ouvert");
+
+            // add project in recent history
+            try {
+                recentm().addCurrentProject();
+                recentm().fireHistoryChanged();
+                recentm().saveHistory();
+            } catch (IOException e) {
+                logger.error(e);
+            }
+
         }
 
         // error while openning project
@@ -122,16 +130,7 @@ public class OpenProject extends InteractionElement {
             logger.error(e);
         }
 
-        // add project in recents
-        if (opened) {
-            try {
-                recentm().addCurrentProject();
-                recentm().fireHistoryChanged();
-                recentm().saveHistory();
-            } catch (IOException e) {
-                logger.error(e);
-            }
-        }
+
     }
 
 }

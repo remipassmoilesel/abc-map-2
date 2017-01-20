@@ -66,8 +66,9 @@ public class ProjectReader {
         }
 
         Project newProject = new Project(newDatabase);
+        newProject.setFinalPath(projectFile);
 
-        // read metadatas
+        // read metadata
         readMetadatas(newDatabase, newProject);
 
         // recreate layers
@@ -105,13 +106,12 @@ public class ProjectReader {
         // set the first layer active
         newProject.setFirstLayerActive();
 
-
         return newProject;
     }
 
 
     /**
-     * Write metadatas and layer index to specified destination
+     * Write metadata and layer index to specified destination
      *
      * @param project
      * @param source
