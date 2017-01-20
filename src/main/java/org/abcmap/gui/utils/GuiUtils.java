@@ -432,15 +432,25 @@ public class GuiUtils {
         comp.setBounds(b);
     }
 
+    /**
+     * Throw a runtime exception if the current thread is NOT the Event Dispatch Thread
+     * <p>
+     * This is a debug util
+     */
     public static void throwIfNotOnEDT() {
         if (SwingUtilities.isEventDispatchThread() == false) {
-            throw new IllegalStateException("Running out of EDT");
+            throw new IllegalStateException("This code MUST run on Event Dispatch Thread (Swing thread)");
         }
     }
 
+    /**
+     * Throw a runtime exception if the current thread is the Event Dispatch Thread
+     * <p>
+     * This is a debug util
+     */
     public static void throwIfOnEDT() {
         if (SwingUtilities.isEventDispatchThread() == true) {
-            throw new IllegalStateException("Running in EDT");
+            throw new IllegalStateException("This code MUST NOT run on Event Dispatch Thread (Swing thread)");
         }
     }
 
