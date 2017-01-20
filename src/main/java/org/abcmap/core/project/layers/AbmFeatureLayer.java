@@ -40,32 +40,33 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
      * @param visible
      * @param zindex
      * @param owner
-     * @param create
      * @throws IOException
      */
-    public AbmFeatureLayer(String layerId, String title, boolean visible, int zindex, Project owner, boolean create) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.FEATURES), owner, create);
+    public AbmFeatureLayer(String layerId, String title, boolean visible, int zindex, Project owner) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.FEATURES), owner);
     }
 
     /**
      * @param entry
      * @param owner
-     * @param create
      * @throws IOException
      */
-    public AbmFeatureLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
+    public AbmFeatureLayer(LayerIndexEntry entry, Project owner) throws IOException {
         super(owner, entry);
 
         JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(project.getDatabasePath());
 
-        // if true, create a new database entry
-        if (create) {
+        // open an existing feature store or create a new one
+        try {
+            this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
+        } catch (IOException e) {
+            logger.debug(e);
+
             // create a simple feature type
             SimpleFeatureType type = AbmSimpleFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), owner.getCrs());
             datastore.createSchema(type);
+            this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
         }
-
-        this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
 
         // create a feature builder associated with the layer
         this.featureBuilder = FeatureUtils.getDefaultFeatureBuilder(entry.getLayerId(), owner.getCrs());
