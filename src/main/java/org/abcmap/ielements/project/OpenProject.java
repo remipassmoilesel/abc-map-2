@@ -130,7 +130,6 @@ public class OpenProject extends InteractionElement {
             logger.error(e);
         }
 
-
     }
 
 }
