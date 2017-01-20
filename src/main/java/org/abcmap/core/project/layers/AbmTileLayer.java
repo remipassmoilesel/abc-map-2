@@ -2,6 +2,7 @@ package org.abcmap.core.project.layers;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
+import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.tiles.TileContainer;
 import org.abcmap.core.tiles.TileFeatureBuilder;
@@ -57,7 +58,7 @@ public class AbmTileLayer extends AbmAbstractLayer {
      * Tile store, where are actually stored tiles
      */
     private final TileStorage tileStorage;
-    private final SimpleFeatureStore featureStore;
+    private SimpleFeatureStore featureStore;
     private final TileFeatureBuilder featureBuilder;
 
     /**
@@ -68,12 +69,11 @@ public class AbmTileLayer extends AbmAbstractLayer {
     private final Style outlineStyle;
     private FeatureTypeStyle outlineFeatureType;
 
-    public AbmTileLayer(String layerId, String title, boolean visible, int zindex, Project owner, boolean create) throws IOException {
-        this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.TILES), owner, create);
+    public AbmTileLayer(String layerId, String title, boolean visible, int zindex, Project owner) throws IOException {
+        this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.TILES), owner);
     }
 
-    public AbmTileLayer(LayerIndexEntry entry, Project owner, boolean create) throws IOException {
-
+    public AbmTileLayer(LayerIndexEntry entry, Project owner) throws IOException {
         super(owner, entry);
 
         JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(project.getDatabasePath());
@@ -83,20 +83,21 @@ public class AbmTileLayer extends AbmAbstractLayer {
         // uppercase mandatory
         coverageName = entry.getLayerId().toUpperCase();
 
-        // if true, create database entries
-        if (create) {
+        // open an existing feature store or create a new one
+        try {
+            this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
+        } catch (IOException e) {
+            logger.debug(e);
 
             // create a tile storage entry
             tileStorage.createCoverageStorage(entry.getLayerId());
 
             // create an outline feature entry
             SimpleFeatureType type = TileFeatureBuilder.getTileFeatureType(entry.getLayerId(), owner.getCrs());
-
             datastore.createSchema(type);
 
+            this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
         }
-
-        this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
 
         // create a feature builder to create outlines
         this.featureBuilder = FeatureUtils.getTileFeatureBuilder(entry.getLayerId(), owner.getCrs());
