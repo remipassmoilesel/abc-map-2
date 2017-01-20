@@ -3,7 +3,6 @@ package org.abcmap.gui.components.fileselection;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.gui.GuiColors;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
@@ -16,25 +15,23 @@ import java.io.File;
  */
 public class FileSelectionRenderer extends JLabel implements ListCellRenderer<File> {
 
-    private ProjectManager projectm;
-    private GuiManager guim;
-
+    /**
+     * Color used when file exist
+     */
     private Color fileExistColor;
+
+    /**
+     * Color used when file not exist
+     */
     private Color fileNotExistColor;
-    private Color selectedColor;
 
     public FileSelectionRenderer() {
 
         GuiUtils.throwIfNotOnEDT();
 
-        this.projectm = Main.getProjectManager();
-        this.guim = Main.getGuiManager();
-
         this.fileNotExistColor = new Color(55, 0, 0);
         this.fileExistColor = new Color(0, 0, 200);
-        this.selectedColor = GuiColors.FOCUS_COLOR_BACKGROUND.brighter().brighter();
 
-        // caracteristiques du label
         setOpaque(true);
         setHorizontalAlignment(LEFT);
         setVerticalAlignment(CENTER);
@@ -46,22 +43,24 @@ public class FileSelectionRenderer extends JLabel implements ListCellRenderer<Fi
 
         GuiUtils.throwIfNotOnEDT();
 
+        // set text of label
         setText(file.getName());
 
+        // change foreground color relative to file existence
         // file exist
         if (file.isFile()) {
             setForeground(fileExistColor);
             setToolTipText(file.getAbsolutePath());
         }
-
         // file does not exist
         else {
             setForeground(fileNotExistColor);
             setToolTipText("Ce fichier n'existe pas: " + file.getAbsolutePath());
         }
 
-        if (file.equals(list.getSelectedValue())) {
-            setBackground(selectedColor);
+        // apply background colors relative to selection
+        if (isSelected) {
+            setBackground(list.getSelectionBackground());
         } else {
             setBackground(list.getBackground());
         }

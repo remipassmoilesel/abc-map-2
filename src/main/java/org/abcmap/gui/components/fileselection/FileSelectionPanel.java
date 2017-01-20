@@ -25,13 +25,13 @@ public class FileSelectionPanel extends JPanel {
 
     public FileSelectionPanel() {
 
-        super(new MigLayout("insets 5"));
+        super(new MigLayout("insets 0, fillx"));
 
         this.activeFile = null;
 
-        this.filesModel = new DefaultListModel<File>();
+        this.filesModel = new DefaultListModel<>();
 
-        jlist = new JList<File>(filesModel);
+        jlist = new JList<>(filesModel);
         jlist.setAlignmentY(Component.TOP_ALIGNMENT);
         jlist.setAlignmentX(Component.LEFT_ALIGNMENT);
         jlist.setBorder(BorderFactory.createLineBorder(Color.gray));
@@ -43,19 +43,24 @@ public class FileSelectionPanel extends JPanel {
         JScrollPane sp = new JScrollPane(jlist);
         sp.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        add(sp, "span, width 90%, height 130px!, wrap 8px");
+        add(sp, "span, width 95%!, height 130px!, wrap 8px");
+
+        JPanel buttonsPanel = new JPanel(new MigLayout("insets 0, gap 5"));
 
         actionButton = new JButton("Ouvrir");
-        add(actionButton);
+        buttonsPanel.add(actionButton);
 
-        resetButton = new JButton("Effacer l'historique");
-        add(resetButton, "wrap");
+        resetButton = new JButton("Effacer tout");
+        buttonsPanel.add(resetButton);
 
-    }
+        // set active to null on reset
+        resetButton.addActionListener((ev) -> {
+            activeFile = null;
+            jlist.setSelectedValue(null, false);
+        });
 
-    public FileSelectionPanel(Collection<File> files) {
-        this();
-        addFiles(files);
+        add(buttonsPanel, "width 95%!");
+
     }
 
     /**
@@ -102,6 +107,22 @@ public class FileSelectionPanel extends JPanel {
     /**
      * Add files to list and display them
      *
+     * @param paths
+     */
+    public void addPaths(Collection<String> paths) {
+
+        for (String p : paths) {
+            filesModel.addElement(new File(p));
+        }
+
+        jlist.revalidate();
+        jlist.repaint();
+
+    }
+
+    /**
+     * Add files to list and display them
+     *
      * @param files
      */
     public void addFiles(Collection<File> files) {
@@ -124,6 +145,9 @@ public class FileSelectionPanel extends JPanel {
         return activeFile;
     }
 
+    /**
+     * Revalidate and repaint component
+     */
     public void refresh() {
         revalidate();
         repaint();
