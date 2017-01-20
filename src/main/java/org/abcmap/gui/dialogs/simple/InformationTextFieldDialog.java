@@ -1,12 +1,10 @@
 package org.abcmap.gui.dialogs.simple;
 
-import java.awt.Window;
-
-import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import java.awt.*;
 
 /**
- * Simple information dialog
+ * Simple information dialog with a text field
  * <p>
  * Buttons can be changed by overriding getButtons()
  */
@@ -15,16 +13,10 @@ public class InformationTextFieldDialog extends SimpleInformationDialog {
     protected String textFieldValue;
     private JTextField textField;
 
-    public static void showLater(final Window parent, final String message,
-                                 final String textFieldValue) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                InformationTextFieldDialog itd = new InformationTextFieldDialog(parent, message,
-                        textFieldValue);
-                itd.setVisible(true);
-
-            }
+    public static void showLater(final Window parent, final String message, final String textFieldValue) {
+        SwingUtilities.invokeLater(() -> {
+            InformationTextFieldDialog itd = new InformationTextFieldDialog(parent, message, textFieldValue);
+            itd.setVisible(true);
         });
     }
 
@@ -41,6 +33,7 @@ public class InformationTextFieldDialog extends SimpleInformationDialog {
         this.textFieldValue = textFieldValue;
     }
 
+    @Override
     public void reconstruct() {
 
         super.reconstruct();
@@ -53,7 +46,7 @@ public class InformationTextFieldDialog extends SimpleInformationDialog {
 
         contentPane.add(textField, "width 80%");
 
-        addDefaultButtons();
+        createButtonPanel();
 
         contentPane.revalidate();
         contentPane.repaint();

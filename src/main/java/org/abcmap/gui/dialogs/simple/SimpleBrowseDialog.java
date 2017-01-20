@@ -11,161 +11,192 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * This utility regroup several methods to open browse dialogs
+ */
 public class SimpleBrowseDialog {
 
     private static final CustomLogger logger = LogManager.getLogger(Project.class);
 
+    /**
+     * Only static methods here
+     */
+    private SimpleBrowseDialog() {
+    }
+
+    /**
+     * Open a dialog to browse directory
+     *
+     * @param parent
+     * @return
+     */
     public static BrowseDialogResult browseDirectory(Window parent) {
         return browseDirectory(ConfigurationConstants.SYSTEM_HOME_PATH, parent, "O.K.");
     }
 
+    /**
+     * Open a dialog to browse directory on current thread
+     *
+     * @param parent
+     * @return
+     */
     public static BrowseDialogResult browseDirectoryAndWait(final Window parent) {
 
-        final BrowseDialogResult result = new BrowseDialogResult();
+        GuiUtils.throwIfOnEDT();
+
+        final BrowseDialogResult[] result = new BrowseDialogResult[1];
 
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    result.update(browseDirectory(parent));
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                result[0] = browseDirectory(parent);
             });
         } catch (InvocationTargetException | InterruptedException e) {
             logger.error(e);
             return null;
         }
 
-        return result;
+        return result[0];
     }
 
+    /**
+     * Open a dialog to browse path where save project
+     *
+     * @param parent
+     * @return
+     */
     public static BrowseDialogResult browseProjectToSave(Window parent) {
         return browseFileToSave(parent, BrowseFileFilter.PROJECTS_FILEFILTER);
     }
 
+    /**
+     * Open a dialog to browse project to open
+     *
+     * @param parent
+     * @return
+     */
     public static BrowseDialogResult browseProjectToOpen(Window parent) {
         return browseFileToOpen(parent, BrowseFileFilter.PROJECTS_FILEFILTER);
     }
 
+    /**
+     * Open a dialog to browse project to open on current thread
+     *
+     * @param parent
+     * @return
+     */
     public static BrowseDialogResult browseProjectToOpenAndWait(final Window parent) {
 
-        final BrowseDialogResult result = new BrowseDialogResult();
+        GuiUtils.throwIfOnEDT();
+
+        final BrowseDialogResult[] result = new BrowseDialogResult[1];
 
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    result.update(browseProjectToOpen(parent));
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                result[0] = browseProjectToOpen(parent);
             });
         } catch (InvocationTargetException | InterruptedException e) {
             logger.error(e);
             return null;
         }
 
-        return result;
+        return result[0];
 
     }
 
+    /**
+     * Open a dialog to browse a path where save a project
+     *
+     * @param parent
+     * @return
+     */
     public static BrowseDialogResult browseProfileToSave(Window parent) {
         return browseFileToSave(parent, BrowseFileFilter.PROFILES_FILEFILTER);
     }
 
+    /**
+     * Open a dialog to browse a path where save a profile, on current thread
+     *
+     * @param parent
+     * @return
+     */
     public static BrowseDialogResult browseProfileToSaveAndWait(final Window parent) {
 
-        final BrowseDialogResult result = new BrowseDialogResult();
+        GuiUtils.throwIfOnEDT();
+
+        final BrowseDialogResult[] result = new BrowseDialogResult[1];
 
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    result.update(browseProfileToSave(parent));
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                result[0] = browseProfileToSave(parent);
             });
         } catch (InvocationTargetException | InterruptedException e) {
             logger.error(e);
             return null;
         }
 
-        return result;
+        return result[0];
 
     }
 
+    /**
+     * Open a dialog to browse a profile to open
+     *
+     * @param parent
+     * @return
+     */
     public static BrowseDialogResult browseProfileToOpen(Window parent) {
         return browseFileToOpen(parent, BrowseFileFilter.PROFILES_FILEFILTER);
     }
 
+    /**
+     * Open a dialog to browse a profile to open, on current thread
+     *
+     * @param parent
+     * @return
+     */
     public static BrowseDialogResult browseProfileToOpenAndWait(final Window parent) {
 
-        final BrowseDialogResult result = new BrowseDialogResult();
+        GuiUtils.throwIfOnEDT();
+
+        final BrowseDialogResult[] result = new BrowseDialogResult[1];
 
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    result.update(browseProfileToOpen(parent));
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                result[0] = browseProfileToOpen(parent);
             });
         } catch (InvocationTargetException | InterruptedException e) {
             logger.error(e);
             return null;
         }
 
-        return result;
+        return result[0];
     }
 
-    public static BrowseDialogResult browseFileToSave(Window parent, BrowseFileFilter filter) {
-        return browseFile(ConfigurationConstants.SYSTEM_HOME_PATH, parent, "Enregistrer", filter,
-                true);
+    /**
+     * Open a dialog to browse a path where save a profile
+     *
+     * @param parent
+     * @return
+     */
+    private static BrowseDialogResult browseFileToSave(Window parent, BrowseFileFilter filter) {
+        return browseFile(ConfigurationConstants.SYSTEM_HOME_PATH, parent, "Enregistrer", filter, true);
     }
 
-    public static BrowseDialogResult browseFileToSaveAndWait(final Window parent,
-                                                             final BrowseFileFilter filter) {
-
-        final BrowseDialogResult result = new BrowseDialogResult();
-
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    result.update(browseFileToSave(parent, filter));
-                }
-            });
-        } catch (InvocationTargetException | InterruptedException e) {
-            logger.error(e);
-            return null;
-        }
-
-        return result;
-    }
-
-    public static BrowseDialogResult browseFileToOpen(Window parent, BrowseFileFilter filter) {
+    private static BrowseDialogResult browseFileToOpen(Window parent, BrowseFileFilter filter) {
         return browseFile(ConfigurationConstants.SYSTEM_HOME_PATH, parent, "Ouvrir", filter, false);
     }
 
-    public static BrowseDialogResult browseFileToOpenAndWait(final Window parent,
-                                                             final BrowseFileFilter filter) {
-
-        final BrowseDialogResult result = new BrowseDialogResult();
-
-        try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    result.update(browseFile(ConfigurationConstants.SYSTEM_HOME_PATH, parent,
-                            "Ouvrir", filter, false));
-                }
-            });
-        } catch (InvocationTargetException | InterruptedException e) {
-            logger.error(e);
-            return null;
-        }
-
-        return result;
-
-    }
-
-    public static BrowseDialogResult browseDirectory(String currentDirectoryPath, Component parent,
-                                                     String approveButtonText) {
+    /**
+     * Show a browse dialog to select directories
+     *
+     * @param currentDirectoryPath
+     * @param parent
+     * @param approveButtonText
+     * @return
+     */
+    private static BrowseDialogResult browseDirectory(String currentDirectoryPath,
+                                                      Component parent,
+                                                      String approveButtonText) {
 
         GuiUtils.throwIfNotOnEDT();
 
@@ -183,41 +214,55 @@ public class SimpleBrowseDialog {
 
     }
 
-    public static BrowseDialogResult browseFile(String currentDirectoryPath, Window parent,
-                                                String approveButtonText, BrowseFileFilter filter, boolean confirmOverwriting) {
+    /**
+     * Show a browse dialog to select files
+     *
+     * @param currentDirectoryPath
+     * @param parent
+     * @param approveButtonText
+     * @param filter
+     * @param confirmOverwriting
+     * @return
+     */
+    private static BrowseDialogResult browseFile(String currentDirectoryPath,
+                                                 Window parent,
+                                                 String approveButtonText,
+                                                 BrowseFileFilter filter,
+                                                 boolean confirmOverwriting) {
 
         GuiUtils.throwIfNotOnEDT();
 
-        // preparation de la boite de dialogue
+        // create a dialog
         JFileChooser fc = new JFileChooser(currentDirectoryPath);
         fc.setDialogTitle("Parcourir");
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 
-        // filter
+        // add a filter if provided
         if (filter != null) {
             fc.addChoosableFileFilter(filter);
         }
 
         int returnVal;
-        boolean askAgain;
+        boolean askAgain = false;
         do {
 
-            askAgain = true;
-
-            // affichage du dialog
+            // display dialog
             returnVal = fc.showDialog(parent, approveButtonText);
 
-            // check if file exist
-            if (confirmOverwriting && fc.getSelectedFile() != null && fc.getSelectedFile().isFile()) {
-                QuestionResult result = SimpleQuestionDialog.askQuestion(parent, "Ecraser le fichier ?");
-                if (result.getReturnVal().equals(QuestionResult.YES)) {
-                    askAgain = false;
+            // user answer yes
+            if (JFileChooser.APPROVE_OPTION == returnVal) {
+                
+                // confirm overwriting if needed
+                if (confirmOverwriting && fc.getSelectedFile().isFile()) {
+                    QuestionResult result = SimpleQuestionDialog.askQuestion(parent, "Le fichier existe déjà, voulez vous l'écraser ?");
+                    if (result.isAnswerNo() == true) {
+                        askAgain = true;
+                    }
                 }
-            } else {
-                askAgain = false;
+
             }
 
-        } while (askAgain);
+        } while (askAgain == true);
 
         // return result
         BrowseDialogResult bdr = new BrowseDialogResult();

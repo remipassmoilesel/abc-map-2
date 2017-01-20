@@ -9,12 +9,13 @@ import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * Dialog which can
+ */
 public class SimpleQuestionDialog extends SimpleInformationDialog {
 
     private static final CustomLogger logger = LogManager.getLogger(SimpleQuestionDialog.class);
@@ -23,6 +24,14 @@ public class SimpleQuestionDialog extends SimpleInformationDialog {
         return askQuestion(parent, "Question", message);
     }
 
+    /**
+     * Ask a question with specified parameters
+     *
+     * @param parent
+     * @param title
+     * @param message
+     * @return
+     */
     public static QuestionResult askQuestion(Window parent, String title,
                                              String message) {
 
@@ -37,28 +46,48 @@ public class SimpleQuestionDialog extends SimpleInformationDialog {
         return sd.getResult();
     }
 
+    /**
+     * Ask a question with specified parameters, on current thread
+     *
+     * @param parent
+     * @param title
+     * @param message
+     * @return
+     */
     public static QuestionResult askQuestionAndWait(final Window parent,
                                                     String title, final String message) {
 
-        final QuestionResult result = new QuestionResult();
+        final QuestionResult[] result = new QuestionResult[1];
 
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    result.update(askQuestion(parent, message));
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                result[0] = askQuestion(parent, message);
             });
         } catch (InvocationTargetException | InterruptedException e) {
             logger.error(e);
         }
 
-        return result;
+        return result[0];
     }
 
+    /**
+     * Text of "YES" button
+     */
     private String yesText;
+
+    /**
+     * Text of "NO" button
+     */
     private String noText;
+
+    /**
+     * Text of "CANCEL" button
+     */
     private String cancelText;
+
+    /**
+     * Result after user answer
+     */
     private QuestionResult result;
 
     public SimpleQuestionDialog(Window parent) {
@@ -80,42 +109,32 @@ public class SimpleQuestionDialog extends SimpleInformationDialog {
     }
 
     @Override
-    protected void addDefaultButtons() {
+    protected JPanel createButtonPanel() {
 
-        buttonsPanel = new JPanel(new MigLayout());
+        JPanel buttonsPanel = new JPanel(new MigLayout("insets 5"));
 
         JButton buttonYes = new JButton(yesText);
-        buttonYes.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result.setReturnVal(QuestionResult.YES);
-                dispose();
-            }
+        buttonYes.addActionListener((ev) -> {
+            result.setReturnVal(QuestionResult.YES);
+            dispose();
         });
         buttonsPanel.add(buttonYes);
 
         JButton buttonNo = new JButton(noText);
-        buttonNo.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result.setReturnVal(QuestionResult.NO);
-                dispose();
-            }
+        buttonNo.addActionListener((ev) -> {
+            result.setReturnVal(QuestionResult.NO);
+            dispose();
         });
         buttonsPanel.add(buttonNo);
 
         JButton buttonCancel = new JButton(cancelText);
-        buttonCancel.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                result.setReturnVal(QuestionResult.CANCEL);
-                dispose();
-            }
+        buttonCancel.addActionListener((ev) -> {
+            result.setReturnVal(QuestionResult.CANCEL);
+            dispose();
         });
         buttonsPanel.add(buttonCancel);
 
-        contentPane.add(buttonsPanel, "align right, gapright 15px, wrap 15px,");
-
+        return buttonsPanel;
     }
 
     private class ClosingWindowListener extends WindowAdapter {
@@ -126,18 +145,36 @@ public class SimpleQuestionDialog extends SimpleInformationDialog {
         }
     }
 
+    /**
+     * Set text of "YES" button
+     *
+     * @param okText
+     */
     public void setYesText(String okText) {
         this.yesText = okText;
     }
 
+    /**
+     * Set text of "NO" button
+     *
+     * @param noText
+     */
     public void setNoText(String noText) {
         this.noText = noText;
     }
 
+    /**
+     * Set text of "CANCEL" button
+     *
+     * @param cancelText
+     */
     public void setCancelText(String cancelText) {
         this.cancelText = cancelText;
     }
 
+    /**
+     * Get answer of user
+     */
     public QuestionResult getResult() {
         return result;
     }

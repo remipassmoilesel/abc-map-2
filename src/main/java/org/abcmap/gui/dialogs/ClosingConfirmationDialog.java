@@ -13,10 +13,16 @@ public class ClosingConfirmationDialog extends SimpleQuestionDialog {
 
     private static final CustomLogger logger = LogManager.getLogger(ClosingConfirmationDialog.class);
 
-    public static enum ConfirmationType {
+    public enum ConfirmationType {
         PROJECT, PROFILE,
     }
 
+    /**
+     * Show a dialog to confirm project closing
+     *
+     * @param parent
+     * @return
+     */
     public static QuestionResult showProjectConfirmation(Window parent) {
 
         GuiUtils.throwIfNotOnEDT();
@@ -27,26 +33,37 @@ public class ClosingConfirmationDialog extends SimpleQuestionDialog {
         return ccd.getResult();
     }
 
+    /**
+     * Show a dialog to confirm project closing, on current thread
+     *
+     * @param parent
+     * @return
+     */
     public static QuestionResult showProjectConfirmationAndWait(final Window parent) {
 
-        final QuestionResult result = new QuestionResult();
+        GuiUtils.throwIfOnEDT();
+
+        final QuestionResult[] result = new QuestionResult[1];
 
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    result.update(showProjectConfirmation(parent));
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                result[0] = showProjectConfirmation(parent);
             });
         } catch (InvocationTargetException | InterruptedException e) {
             logger.error(e);
             return null;
         }
 
-        return result;
+        return result[0];
 
     }
 
+    /**
+     * Show a dialog to confirm profile closing
+     *
+     * @param parent
+     * @return
+     */
     public static QuestionResult showProfileConfirmation(Window parent) {
 
         GuiUtils.throwIfNotOnEDT();
@@ -57,33 +74,42 @@ public class ClosingConfirmationDialog extends SimpleQuestionDialog {
         return ccd.getResult();
     }
 
+    /**
+     * Show a dialog to confirm profile closing, on current thread
+     *
+     * @param parent
+     * @return
+     */
     public static QuestionResult showProfileConfirmationAndWait(final Window parent) {
 
-        final QuestionResult result = new QuestionResult();
+        final QuestionResult[] result = new QuestionResult[1];
 
         try {
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    result.update(showProfileConfirmation(parent));
-                }
+            SwingUtilities.invokeAndWait(() -> {
+                result[0] = showProfileConfirmation(parent);
             });
         } catch (InvocationTargetException | InterruptedException e) {
             logger.error(e);
             return null;
         }
 
-        return result;
+        return result[0];
 
     }
 
+    /**
+     * Construct a confirmation dialog
+     *
+     * @param parent
+     * @param type
+     */
     public ClosingConfirmationDialog(Window parent, ConfirmationType type) {
         super(parent);
 
         if (ConfirmationType.PROJECT.equals(type)) {
-            setMessage("Voulez vous enregistrer le projet courant ?");
+            setMessage("Avant de fermer le projet courant, voulez vous l'enregistrer ?");
         } else if (ConfirmationType.PROFILE.equals(type)) {
-            setMessage("Voulez vous enregistrer le profil de configuration courant ?");
+            setMessage("Avant de fermer le profil de configuration courant, voulez vous l'enregistrer ?");
         }
 
         setYesText("Enregistrer");

@@ -8,8 +8,6 @@ import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -44,9 +42,8 @@ public class SimpleInformationDialog extends JDialog {
     protected JPanel contentPane;
 
     /**
-     * Panel where are stored buttons
+     * Panel where buttons are added
      */
-
     protected JPanel buttonsPanel;
 
     public SimpleInformationDialog(Window parent) {
@@ -73,7 +70,7 @@ public class SimpleInformationDialog extends JDialog {
         GuiUtils.throwIfNotOnEDT();
 
         setTitle(dialogTitle);
-        contentPane = new JPanel(new MigLayout("insets 5"));
+        contentPane = new JPanel(new MigLayout("fillx, insets 5"));
 
         JLabel iconLbl = new JLabel(largeIcon);
         iconLbl.setVerticalAlignment(SwingConstants.TOP);
@@ -81,7 +78,7 @@ public class SimpleInformationDialog extends JDialog {
 
         HtmlLabel title = new HtmlLabel(dialogTitle);
         title.setStyle(GuiStyle.DIALOG_TITLE_1);
-        contentPane.add(title, "gaptop 10px, wrap 10px");
+        contentPane.add(title, "grow, gaptop 10px, wrap 10px");
 
         // take care of font changes
         JEditorPane messageArea = new JEditorPane("text/html", message);
@@ -90,9 +87,10 @@ public class SimpleInformationDialog extends JDialog {
 
         messageArea.setOpaque(false);
         messageArea.setEditable(false);
-        contentPane.add(messageArea, "width 300px!, wrap 10px,");
+        contentPane.add(messageArea, "grow, width 300px::500px, wrap 10px,");
 
-        addDefaultButtons();
+        buttonsPanel = createButtonPanel();
+        contentPane.add(buttonsPanel, "grow, gapright 10px, wrap 15px");
 
         setContentPane(contentPane);
 
@@ -105,28 +103,38 @@ public class SimpleInformationDialog extends JDialog {
     }
 
     /**
-     * Get a panel with default buttons
+     * Create a panel with default buttons and add it to dialog
+     * <p>
+     * Override it to change buttons configuration
      */
-    protected void addDefaultButtons() {
+    protected JPanel createButtonPanel() {
 
-        buttonsPanel = new JPanel(new MigLayout("insets 5"));
+        JPanel buttonsPanel = new JPanel(new MigLayout("insets 5"));
 
         JButton hideButton = new JButton("Masquer ce message");
-        hideButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
+        hideButton.addActionListener((e) -> {
+            dispose();
+
         });
         buttonsPanel.add(hideButton, "align right");
 
-        contentPane.add(buttonsPanel, "align right, gapright 15px, wrap 15px,");
+        return buttonsPanel;
     }
 
+    /**
+     * Set message of panel
+     *
+     * @param message
+     */
     public void setMessage(String message) {
         this.message = "<html>" + message + "</html>";
     }
 
+    /**
+     * Set title of dialog
+     *
+     * @param title
+     */
     @Override
     public void setTitle(String title) {
         super.setTitle(title);
@@ -140,10 +148,18 @@ public class SimpleInformationDialog extends JDialog {
         }
     }
 
+    /**
+     * Return current panel where buttons are included
+     *
+     * @return
+     */
     protected JPanel getButtonsPanel() {
         return buttonsPanel;
     }
 
+    /**
+     * Revalidate and repaint
+     */
     public void refresh() {
         this.revalidate();
         this.repaint();

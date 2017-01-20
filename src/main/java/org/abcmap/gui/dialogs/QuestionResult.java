@@ -2,54 +2,86 @@ package org.abcmap.gui.dialogs;
 
 import org.abcmap.core.utils.Utils;
 
+/**
+ * Result returned by a confirmation dialog.
+ */
 public class QuestionResult {
 
-	public static final String CANCEL = "CANCEL";
-	public static final String YES = "YES";
-	public static final String NO = "NO";
+    public static final String CANCEL = "CANCEL";
+    public static final String YES = "YES";
+    public static final String NO = "NO";
 
-	private String returnVal;
+    /**
+     * Value returned by dialog
+     */
+    private String returnVal;
 
-	public QuestionResult() {
-		this.returnVal = null;
-	}
-	
-	public void setReturnVal(String returnVal) {
-		this.returnVal = returnVal;
-	}
+    public QuestionResult() {
+        this.returnVal = null;
+    }
 
-	public QuestionResult(String returnVal) {
-		this.returnVal = returnVal;
-	}
+    public QuestionResult(String returnVal) {
+        this.returnVal = returnVal;
+    }
 
-	public void update(QuestionResult result) {
-		this.returnVal = result.returnVal;
-	}
+    /**
+     * Set value returned by dialog
+     *
+     * @param returnVal
+     */
+    public void setReturnVal(String returnVal) {
+        this.returnVal = returnVal;
+    }
 
-	public String getReturnVal() {
-		return returnVal;
-	}
+    /**
+     * Update this result object from another result object
+     *
+     * @param result
+     */
+    public void update(QuestionResult result) {
+        this.returnVal = result.returnVal;
+    }
 
-	public boolean isAnswerYes() {
-		return Utils.safeEquals(returnVal, YES);
-	}
+    /**
+     * Return the result of the question
+     *
+     * @return
+     */
+    public String getReturnVal() {
+        return returnVal;
+    }
 
-	public boolean isAnswerNo() {
-		return Utils.safeEquals(returnVal, NO);
-	}
+    /**
+     * Return true if answer is YES
+     *
+     * @return
+     */
+    public boolean isAnswerYes() {
+        return Utils.safeEquals(returnVal, YES);
+    }
 
-	public boolean isAnswerCancel() {
-		return Utils.safeEquals(returnVal, CANCEL);
-	}
+    /**
+     * Return true if answer is NO
+     *
+     * @return
+     */
+    public boolean isAnswerNo() {
+        return Utils.safeEquals(returnVal, NO);
+    }
 
-	@Override
-	public String toString() {
+    /**
+     * Return true if the answer is CANCEL
+     *
+     * @return
+     */
+    public boolean isAnswerCancel() {
+        return Utils.safeEquals(returnVal, CANCEL);
+    }
 
-		Object[] values = new Object[] { returnVal, };
-		Object[] keys = new Object[] { "returnVal", };
-
-		return Utils.toString(this, keys, values);
-
-	}
-
+    @Override
+    public String toString() {
+        return "QuestionResult{" +
+                "returnVal='" + returnVal + '\'' +
+                '}';
+    }
 }
