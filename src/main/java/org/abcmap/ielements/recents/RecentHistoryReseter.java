@@ -26,7 +26,7 @@ public class RecentHistoryReseter implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent ev) {
 
         // reset profiles
         if (Mode.PROFILES.equals(mode)) {
@@ -38,12 +38,11 @@ public class RecentHistoryReseter implements ActionListener {
             recentsm.clearProjectHistory();
         }
 
-        // try write empty history
         try {
             recentsm.saveHistory();
         } catch (IOException e1) {
-            logger.debug(e1);
-            dialm.showErrorInBox("Erreur lors de la réinitialisation de l'historique.");
+            logger.error(e1);
+            dialm.showErrorInBox("Erreur lors de la réinitialisation de l'historique");
         }
 
     }

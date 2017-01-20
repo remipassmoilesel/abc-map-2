@@ -3,9 +3,7 @@ package org.abcmap.core.configuration;
 import com.labun.surf.Params;
 
 import javax.swing.filechooser.FileSystemView;
-import java.awt.*;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -42,6 +40,8 @@ public class ConfigurationConstants {
     public static final String BUG_REPORT_URL = WEBSITE_URL + "contact/?action=report";
     public static final String ASK_FORM_URL = WEBSITE_URL + "contact/?action=ask";
 
+    public static final String DISTANT_WMS_SERVERS_LIST_URL = "http://localhost/servers.json";
+
     /*
      * Print settings
      */
@@ -71,15 +71,19 @@ public class ConfigurationConstants {
      * Locale list of WMS servers which can be used to add WMS Layers
      */
     public static final String LOCAL_WMS_SERVER_LIST = "/servers.json";
-    public static final String DISTANT_WMS_SERVERS_LIST_URL = "http://localhost/servers.json";
+
 
     /*
      * Configuration profiles settings
      */
-
     public static final String PROFILE_EXTENSION = "xml";
     public static final Path DEFAULT_PROFILE_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), "default." + PROFILE_EXTENSION);
-    public static final Path CURRENT_PROFILE_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), ".current");
+    public static final Path CURRENT_PROFILE_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), ".current.xml");
+
+    /**
+     * Path where history  of projects and profiles is stored
+     */
+    public static final Path HISTORY_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), ".history.xml");
 
     public static final String PROJECT_EXTENSION = "abm";
 
@@ -99,7 +103,6 @@ public class ConfigurationConstants {
             new Params(4, 4, 0.0001f, 2, false, false, false, 1, false),
             new Params(4, 4, 0.00001f, 2, false, false, false, 1, false),
             new Params(4, 4, 0.000001f, 2, false, false, false, 1, false),};
-
 
 
 }

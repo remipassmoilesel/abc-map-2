@@ -10,7 +10,7 @@ public class CustomLogger {
     private final java.util.logging.Logger logger;
 
     /**
-     * Use LogManager.getLogger() instead.
+     * Do not use directly, use LogManager.getLogger() instead.
      */
     @Deprecated
     public CustomLogger(Class<?> owner) {
