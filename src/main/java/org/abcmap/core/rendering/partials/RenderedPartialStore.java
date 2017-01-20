@@ -79,7 +79,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
      * <p>
      * Each time a partial is created, an outline feature is reated too and stored in this store.
      */
-    private final FeatureStore outlineFeatureStore;
+    private FeatureStore outlineFeatureStore;
 
     /**
      * Datastore associated with feature store
@@ -131,10 +131,17 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
             // open data store and create a feature scheme
             datastore = SQLUtils.getGeotoolsDatastoreFromH2(databasePath);
-            datastore.createSchema(type);
 
-            // open a feature store
-            outlineFeatureStore = (FeatureStore) datastore.getFeatureSource(type.getTypeName());
+            // open an existing feature store or create a new one
+            try {
+                outlineFeatureStore = (FeatureStore) datastore.getFeatureSource(type.getTypeName());
+            } catch (IOException e) {
+                logger.debug(e);
+
+                // feature type does not exist in database, create it
+                datastore.createSchema(type);
+                outlineFeatureStore = (FeatureStore) datastore.getFeatureSource(type.getTypeName());
+            }
 
         } catch (IOException e) {
             throw new SQLException("Cannot create data store from: " + databasePath, e);
