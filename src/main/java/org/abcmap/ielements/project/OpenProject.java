@@ -31,19 +31,8 @@ public class OpenProject extends InteractionElement {
         try {
 
             // confirm project closing
-            if (projectm().isInitialized()) {
-                QuestionResult cc = dialm().showProjectClosingConfirmationDialog();
-
-                // user answer cancel, return
-                if (cc.isAnswerCancel() == true) {
-                    return;
-                }
-
-                // user answer yes, save project
-                else if (cc.isAnswerYes() == true){
-                    SaveProject sp = new SaveProject();
-                    sp.run();
-                }
+            if (requestConfirmationOfClosure() == false) {
+                return;
             }
 
             // browse projects to open
@@ -59,6 +48,50 @@ public class OpenProject extends InteractionElement {
         } finally {
             releaseOperationLock();
         }
+
+    }
+
+    /**
+     * Request confirmation of closure and propose to save project.
+     * <p>
+     * Return true if user accept to close project, false otherwise.
+     *
+     * @return
+     */
+    private boolean requestConfirmationOfClosure() {
+
+        // confirm project closing
+        if (projectm().isInitialized()) {
+            QuestionResult cc = dialm().showProjectClosingConfirmationDialog();
+
+            // user answer cancel, return
+            if (cc.isAnswerCancel() == true) {
+                return false;
+            }
+
+            // user answer yes, save project
+            else if (cc.isAnswerYes() == true) {
+                SaveProject sp = new SaveProject();
+                sp.run();
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Ask confirmation to user and open specified project
+     *
+     * @param projectToOpen
+     */
+    public void confirmCloseAndOpenProject(Path projectToOpen) {
+
+        // confirm project closing
+        if (requestConfirmationOfClosure() == false) {
+            return;
+        }
+
+        openProject(projectToOpen);
 
     }
 

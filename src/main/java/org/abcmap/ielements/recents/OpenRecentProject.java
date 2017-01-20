@@ -55,7 +55,7 @@ public class OpenRecentProject extends InteractionElement implements HasEventNot
             File activFile = fileSelectionPanel.getActiveFile();
             if (activFile != null) {
                 ThreadManager.runLater(() -> {
-                    openProject.openProject(activFile.toPath());
+                    openProject.confirmCloseAndOpenProject(activFile.toPath());
                 });
             }
 
