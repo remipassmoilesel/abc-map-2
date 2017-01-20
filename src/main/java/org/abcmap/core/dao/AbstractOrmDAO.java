@@ -141,7 +141,9 @@ public abstract class AbstractOrmDAO {
     }
 
     /**
-     * etrieve an id by its id
+     * Retrieve an entry by id
+     * <p>
+     * Return null if nothing is found
      *
      * @param e
      */
