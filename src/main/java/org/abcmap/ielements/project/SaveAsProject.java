@@ -1,6 +1,7 @@
 package org.abcmap.ielements.project;
 
 import org.abcmap.core.project.Project;
+import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
 import org.abcmap.gui.utils.GuiUtils;
@@ -8,6 +9,7 @@ import org.abcmap.ielements.InteractionElement;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class SaveAsProject extends InteractionElement {
 
@@ -47,6 +49,12 @@ public class SaveAsProject extends InteractionElement {
 
             Path finalPath = result.getFile().toPath();
 
+            // check extension
+            if (Utils.checkExtension(finalPath, "abm") == false) {
+                String newPath = finalPath.toAbsolutePath().toString() + ".abm";
+                finalPath = Paths.get(newPath);
+            }
+
             // save project
             project.setFinalPath(finalPath);
             try {
@@ -56,6 +64,7 @@ public class SaveAsProject extends InteractionElement {
                 try {
                     recentm().addCurrentProject();
                     recentm().saveHistory();
+                    recentm().fireHistoryChanged();
                 } catch (IOException e) {
                     logger.error(e);
                 }
