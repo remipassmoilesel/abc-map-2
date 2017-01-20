@@ -4,8 +4,8 @@ import org.abcmap.core.managers.Main;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.dialogs.QuestionResult;
 import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
-import org.abcmap.ielements.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.ielements.InteractionElement;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -31,18 +31,25 @@ public class OpenProject extends InteractionElement {
         try {
 
             // confirm project closing
-            if (Main.isDebugMode() == false && projectm().isInitialized()) {
+            if (projectm().isInitialized()) {
                 QuestionResult cc = dialm().showProjectClosingConfirmationDialog();
 
-                // user respond cancel or no
-                if (cc.isAnswerYes() == false) {
+                // user answer cancel, return
+                if (cc.isAnswerCancel() == true) {
                     return;
+                }
+
+                // user answer yes, save project
+                else if (cc.isAnswerYes() == true){
+                    SaveProject sp = new SaveProject();
+                    sp.run();
                 }
             }
 
+            // browse projects to open
             BrowseDialogResult result = dialm().browseProjectToOpenDialog();
 
-            // user canceled operation
+            // user cancel operation
             if (result.isActionCanceled()) {
                 return;
             }

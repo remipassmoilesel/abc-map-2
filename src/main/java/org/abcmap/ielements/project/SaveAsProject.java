@@ -3,23 +3,24 @@ package org.abcmap.ielements.project;
 import org.abcmap.core.project.Project;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
-import org.abcmap.ielements.InteractionElement;
 import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.ielements.InteractionElement;
 
-import java.awt.*;
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class SaveAsProject extends InteractionElement {
 
     public SaveAsProject() {
         this.label = "Enregistrer sous ...";
-        this.help = "Cliquez ici pour enregistrer le projet sous...";
+        this.help = "Cliquez ici pour enregistrer le projet à l'emplacement de votre choix.";
         this.menuIcon = GuiIcons.SMALLICON_SAVEAS;
         this.accelerator = shortcutm().SAVE_PROJECT_AS;
     }
 
     @Override
     public void run() {
+
         GuiUtils.throwIfOnEDT();
 
         Project project = getCurrentProjectOrShowMessage();
@@ -37,36 +38,34 @@ public class SaveAsProject extends InteractionElement {
             // projectm.cleanCurrentProject();
 
             // display browse dialog
-            Window parent = guim().getMainWindow();
-            BrowseDialogResult result = dialm().browseProjectToOpenDialog();
+            BrowseDialogResult result = dialm().browseProjectToSaveDialog();
 
-            // user cancel action
+            // if user cancel action, stop all
             if (result.isActionCanceled() == true) {
                 return;
             }
 
+            Path finalPath = result.getFile().toPath();
+
             // save project
-            boolean saved = false;
-            project.setFinalPath(result.getFile().toPath());
+            project.setFinalPath(finalPath);
             try {
                 projectm().saveProject();
-                saved = true;
-            } catch (IOException e) {
-                logger.error(e);
-                dialm().showErrorInBox("Erreur lors de l'enregistrement du projet");
-            }
 
-            // keep project in recent history
-            if (saved) {
+                // keep in recent history
                 try {
                     recentm().addCurrentProject();
                     recentm().saveHistory();
                 } catch (IOException e) {
                     logger.error(e);
                 }
-            }
 
-            dialm().showMessageInBox("Le projet a été enregistré");
+                dialm().showMessageInBox("Le projet a été enregistré");
+
+            } catch (IOException e) {
+                logger.error(e);
+                dialm().showErrorInBox("Erreur lors de l'enregistrement du projet");
+            }
 
         } finally {
             releaseOperationLock();

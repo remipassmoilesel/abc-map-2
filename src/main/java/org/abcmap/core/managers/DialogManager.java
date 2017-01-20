@@ -221,6 +221,20 @@ public class DialogManager extends ManagerTreeAccessUtil {
         return SimpleBrowseDialog.browseProjectToOpenAndWait(guim().getMainWindow());
     }
 
+    /**
+     * Show a browse dialog with a project file filter
+     *
+     * @return
+     */
+    public BrowseDialogResult browseProjectToSaveDialog() {
+        return SimpleBrowseDialog.browseProfileToSaveAndWait(guim().getMainWindow());
+    }
+
+    /**
+     * Show a dialog asking user if he want to save project before close it
+     *
+     * @return
+     */
     public QuestionResult showProjectClosingConfirmationDialog() {
         return ClosingConfirmationDialog.showProjectConfirmationAndWait(guim().getMainWindow());
     }

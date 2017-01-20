@@ -1,14 +1,14 @@
 package org.abcmap.core.project;
 
 import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.dao.LayoutDAO;
+import org.abcmap.core.dao.ProjectMetadataDAO;
+import org.abcmap.core.dao.StyleDAO;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.TempFilesManager;
-import org.abcmap.core.dao.LayerIndexDAO;
-import org.abcmap.core.dao.ProjectMetadataDAO;
-import org.abcmap.core.dao.StyleDAO;
 import org.abcmap.core.utils.ZipUtils;
 
 import java.io.IOException;
@@ -68,12 +68,17 @@ public class ProjectWriter {
 
     /**
      * Write a project at specified destination
+     * <p>
+     * If a previous file exist, it will be deleted
      *
      * @param project
      * @param destination
      * @throws IOException
      */
     public boolean export(Project project, Path destination) throws IOException {
+
+        // delete destination if exist
+        Files.deleteIfExists(destination);
 
         // write metadata into original project before dump
         writeMetadatas(project, project.getDatabasePath());

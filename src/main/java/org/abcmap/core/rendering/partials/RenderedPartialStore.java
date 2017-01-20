@@ -52,7 +52,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
 
     private static final CustomLogger logger = LogManager.getLogger(RenderedPartialStore.class);
 
-    private static final FilterFactory2 ff = FeatureUtils.getFilterFactory();
+    private final FilterFactory2 ff = FeatureUtils.getFilterFactory();
 
     /**
      * Precision used when search existing partials by area in database
@@ -107,6 +107,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
     private CoordinateReferenceSystem crs;
 
     private final EventNotificationManager notifm;
+
     private static long addedInDatabase = 0;
 
     public RenderedPartialStore(Path databasePath, CoordinateReferenceSystem system) throws SQLException {
@@ -136,7 +137,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
             outlineFeatureStore = (FeatureStore) datastore.getFeatureSource(type.getTypeName());
 
         } catch (IOException e) {
-            throw new SQLException("Cannot create datastore from: " + databasePath);
+            throw new SQLException("Cannot create data store from: " + databasePath, e);
         }
 
         this.notifm = new EventNotificationManager(this);
@@ -268,7 +269,7 @@ public class RenderedPartialStore implements HasEventNotificationManager {
             SimpleFeature feature = outlineFeatureBuilder.build(outline, serializable.getId(), part.getLayerId());
             outlineFeatureStore.addFeatures(FeatureUtils.asList(feature));
         } catch (IOException e) {
-            throw new SQLException("Unable to insert this partial outline: " + part + " / " + env);
+            throw new SQLException("Unable to insert this partial outline: " + part + " / " + env, e);
         }
 
         // add partial in loaded list

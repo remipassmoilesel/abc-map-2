@@ -25,9 +25,6 @@ public class SaveProject extends InteractionElement {
 
         try {
 
-            // show work in progress
-            dialm().showMessageInBox("Le projet est en cours d'enregistrement...");
-
             // TODO clean project
             // projectm.cleanCurrentProject();
 
@@ -41,8 +38,13 @@ public class SaveProject extends InteractionElement {
 
             // save project
             try {
+
+                // show work in progress
+                dialm().showMessageInBox("Le projet est en cours d'enregistrement...");
+
                 projectm().saveProject();
             }
+
             // error while writing project
             catch (IOException e) {
                 dialm().showProjectWritingError();
