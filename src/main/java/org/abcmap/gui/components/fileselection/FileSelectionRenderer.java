@@ -29,7 +29,7 @@ public class FileSelectionRenderer extends JLabel implements ListCellRenderer<Fi
 
         GuiUtils.throwIfNotOnEDT();
 
-        this.fileNotExistColor = new Color(55, 0, 0);
+        this.fileNotExistColor = new Color(123, 120, 122);
         this.fileExistColor = new Color(0, 0, 200);
 
         setOpaque(true);
