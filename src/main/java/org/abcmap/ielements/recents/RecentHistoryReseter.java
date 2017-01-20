@@ -40,6 +40,7 @@ public class RecentHistoryReseter implements ActionListener {
 
         try {
             recentsm.saveHistory();
+            recentsm.fireHistoryChanged();
         } catch (IOException e1) {
             logger.error(e1);
             dialm.showErrorInBox("Erreur lors de la réinitialisation de l'historique");

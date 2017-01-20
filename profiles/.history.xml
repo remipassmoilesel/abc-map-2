@@ -1,27 +1,15 @@
 <org.abcmap.core.managers.RecentManager_-HistoryContainer>
-  <projectHistory>
-    <string>/path/to/project/19</string>
-    <string>/path/to/project/17</string>
-    <string>/path/to/project/15</string>
-    <string>/path/to/project/13</string>
-    <string>/path/to/project/11</string>
-    <string>/path/to/project/9</string>
-    <string>/path/to/project/7</string>
-    <string>/path/to/project/5</string>
-    <string>/path/to/project/3</string>
-    <string>/path/to/project/1</string>
-    <string>/path/to/real/project</string>
-  </projectHistory>
+  <projectHistory/>
   <profileHistory>
-    <string>/path/to/profile/18</string>
-    <string>/path/to/profile/16</string>
-    <string>/path/to/profile/14</string>
-    <string>/path/to/profile/12</string>
-    <string>/path/to/profile/10</string>
-    <string>/path/to/profile/8</string>
-    <string>/path/to/profile/6</string>
-    <string>/path/to/profile/4</string>
-    <string>/path/to/profile/2</string>
-    <string>/path/to/profile/0</string>
+    <string>/path/to/profile_18</string>
+    <string>/path/to/profile_16</string>
+    <string>/path/to/profile_14</string>
+    <string>/path/to/profile_12</string>
+    <string>/path/to/profile_10</string>
+    <string>/path/to/profile_8</string>
+    <string>/path/to/profile_6</string>
+    <string>/path/to/profile_4</string>
+    <string>/path/to/profile_2</string>
+    <string>/path/to/profile_0</string>
   </profileHistory>
 </org.abcmap.core.managers.RecentManager_-HistoryContainer>

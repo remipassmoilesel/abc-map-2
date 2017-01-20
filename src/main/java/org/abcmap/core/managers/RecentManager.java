@@ -2,6 +2,7 @@ package org.abcmap.core.managers;
 
 import com.thoughtworks.xstream.XStream;
 import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.events.RecentManagerEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
@@ -65,6 +66,13 @@ public class RecentManager extends ManagerTreeAccessUtil implements HasEventNoti
         }
     }
 
+    /**
+     * Clear all history in memory.
+     * <p>
+     * Call saveHistory() to write it on disk after.
+     *
+     * @throws IOException
+     */
     public void clearAllHistory() throws IOException {
         clearProfileHistory();
         clearProjectHistory();
@@ -190,6 +198,13 @@ public class RecentManager extends ManagerTreeAccessUtil implements HasEventNoti
         return notifm;
     }
 
+    /**
+     * Fire an event meaning that history changed
+     */
+    public void fireHistoryChanged() {
+        notifm.fireEvent(new RecentManagerEvent(RecentManagerEvent.HISTORY_CHANGED));
+    }
+
     static class HistoryContainer implements Serializable {
 
         /**
@@ -206,17 +221,10 @@ public class RecentManager extends ManagerTreeAccessUtil implements HasEventNoti
             return projectHistory;
         }
 
-        public void setProjectHistory(ArrayList<String> projectHistory) {
-            this.projectHistory = projectHistory;
-        }
-
         public ArrayList<String> getProfileHistory() {
             return profileHistory;
         }
 
-        public void setProfileHistory(ArrayList<String> profileHistory) {
-            this.profileHistory = profileHistory;
-        }
     }
 
 }

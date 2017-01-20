@@ -57,9 +57,9 @@ public class RecentManagerTest extends ManagerTreeAccessUtil {
         int nbrOfPath = 20;
         for (int i = 0; i < nbrOfPath; i++) {
             if (i % 2 == 0) {
-                recentm().addProfilePath("/path/to/profile/" + i);
+                recentm().addProfilePath("/path/to/profile_" + i);
             } else {
-                recentm().addProjectPath("/path/to/project/" + i);
+                recentm().addProjectPath("/path/to/project_" + i);
             }
         }
 

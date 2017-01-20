@@ -1,15 +1,17 @@
 package org.abcmap.ielements.recents;
 
-import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.fileselection.FileSelectionPanel;
-import org.abcmap.ielements.InteractionElement;
 import org.abcmap.gui.utils.FormUpdater;
+import org.abcmap.ielements.InteractionElement;
+import org.abcmap.ielements.project.OpenProject;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.util.ArrayList;
 
 public class OpenRecentProject extends InteractionElement implements HasEventNotificationManager {
 
@@ -26,13 +28,9 @@ public class OpenRecentProject extends InteractionElement implements HasEventNot
     @Override
     protected Component createPrimaryGUI() {
 
-        JPanel panel = new JPanel(new MigLayout("insets 5"));
-
         this.fileSelectionPanel = new FileSelectionPanel();
         fileSelectionPanel.addActionButtonListener(new ProjectOpener());
         fileSelectionPanel.addResetButtonListener(new RecentHistoryReseter(Mode.PROJECTS));
-
-        panel.add(fileSelectionPanel, "width 98%!");
 
         this.fileViewUpdater = new FileViewUpdater();
 
@@ -41,51 +39,45 @@ public class OpenRecentProject extends InteractionElement implements HasEventNot
 
         fileViewUpdater.run();
 
-        return panel;
+        return fileSelectionPanel;
     }
 
+    /**
+     * Open project when user click on buttons
+     */
     private class ProjectOpener implements ActionListener {
 
-//        private OpenProject opener;
-
-        public ProjectOpener() {
-            // objet d'ouverture de projet unique
-//            this.opener = new OpenProject();
-
-        }
+        private OpenProject openProject = new OpenProject();
 
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            /*
-
             File activFile = fileSelectionPanel.getActiveFile();
             if (activFile != null) {
-                opener.openProject(activFile);
-                ThreadManager.runLater(opener);
+                ThreadManager.runLater(() -> {
+                    openProject.openProject(activFile.toPath());
+                });
             }
 
-            */
+            // no files selected
+            else {
+                dialm().showErrorInBox("Vous devez sélectionner un projet");
+            }
 
         }
 
     }
 
+    /**
+     * Update view when history change
+     */
     private class FileViewUpdater extends FormUpdater {
 
         @Override
         protected void updateFields() {
-
-            /*
-            // recuperer la liste des fichiers
-            ArrayList<File> files = recentsm.getProjectHistory();
-
-            // effacer les entrées precedentes
+            ArrayList<String> paths = recentm().getProjectHistory();
             fileSelectionPanel.clearFileList();
-
-            // ajouter les entrées actuelles
-            fileSelectionPanel.addFiles(files);
-            */
+            fileSelectionPanel.addPaths(paths);
         }
     }
 
