@@ -133,6 +133,8 @@ public class RecentManager extends ManagerTreeAccessUtil implements HasEventNoti
 
     /**
      * Add current project to recent history
+     * <p>
+     * Call fireHistoryChange() after to notify observers
      */
     public boolean addCurrentProject() {
 
@@ -140,7 +142,7 @@ public class RecentManager extends ManagerTreeAccessUtil implements HasEventNoti
             return false;
         }
 
-        add(projectm().getProject());
+        addProject(projectm().getProject());
 
         return true;
     }
@@ -152,7 +154,7 @@ public class RecentManager extends ManagerTreeAccessUtil implements HasEventNoti
      *
      * @param p
      */
-    public void add(Project p) {
+    public void addProject(Project p) {
 
         if (p.getFinalPath() == null) {
             throw new NullPointerException("Project must have a final path");

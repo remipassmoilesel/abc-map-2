@@ -1,5 +1,10 @@
 <org.abcmap.core.managers.RecentManager_-HistoryContainer>
-  <projectHistory/>
+  <projectHistory>
+    <string>/home/remipassmoilesel/adadada.abm</string>
+    <string>/home/remipassmoilesel/test</string>
+    <string>/home/remipassmoilesel/test6</string>
+    <string>/home/remipassmoilesel/test5.abm</string>
+  </projectHistory>
   <profileHistory>
     <string>/path/to/profile_18</string>
     <string>/path/to/profile_16</string>

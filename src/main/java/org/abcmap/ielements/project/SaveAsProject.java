@@ -63,8 +63,8 @@ public class SaveAsProject extends InteractionElement {
                 // keep in recent history
                 try {
                     recentm().addCurrentProject();
-                    recentm().saveHistory();
                     recentm().fireHistoryChanged();
+                    recentm().saveHistory();
                 } catch (IOException e) {
                     logger.error(e);
                 }

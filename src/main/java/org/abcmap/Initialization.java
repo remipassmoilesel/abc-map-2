@@ -93,7 +93,9 @@ public class Initialization {
 
                 try {
                     Main.getRecentManager().addCurrentProject();
+                    Main.getRecentManager().fireHistoryChanged();
                     Main.getRecentManager().saveHistory();
+
                 } catch (IOException e) {
                     logger.error(e);
                 }

@@ -93,6 +93,7 @@ public class OpenProject extends InteractionElement {
         if (opened) {
             try {
                 recentm().addCurrentProject();
+                recentm().fireHistoryChanged();
                 recentm().saveHistory();
             } catch (IOException e) {
                 logger.error(e);
