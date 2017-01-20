@@ -6,10 +6,7 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.dao.ProjectMetadataDAO;
 import org.abcmap.core.dao.StyleDAO;
-import org.abcmap.core.project.layers.AbmFeatureLayer;
-import org.abcmap.core.project.layers.LayerIndexEntry;
-import org.abcmap.core.project.layers.AbmLayerType;
-import org.abcmap.core.project.layers.AbmTileLayer;
+import org.abcmap.core.project.layers.*;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.ZipUtils;
 
@@ -80,13 +77,25 @@ public class ProjectReader {
 
             // layer contain geometries
             if (AbmLayerType.FEATURES.equals(entry.getType())) {
-                AbmFeatureLayer layer = new AbmFeatureLayer(entry, newProject, false);
+                AbmFeatureLayer layer = new AbmFeatureLayer(entry, newProject);
                 newProject.addLayer(layer);
             }
 
             // Layer contain tiles
             else if (AbmLayerType.TILES.equals(entry.getType())) {
-                AbmTileLayer layer = new AbmTileLayer(entry, newProject, false);
+                AbmTileLayer layer = new AbmTileLayer(entry, newProject);
+                newProject.addLayer(layer);
+            }
+
+            // Layer contain tiles
+            else if (AbmLayerType.WMS.equals(entry.getType())) {
+                AbmWMSLayer layer = new AbmWMSLayer(entry, null, null, newProject);
+                newProject.addLayer(layer);
+            }
+
+            // Layer contain tiles
+            else if (AbmLayerType.SHAPE_FILE.equals(entry.getType())) {
+                AbmShapeFileLayer layer = new AbmShapeFileLayer(entry, null, newProject);
                 newProject.addLayer(layer);
             }
 
@@ -98,7 +107,7 @@ public class ProjectReader {
 
         }
 
-        // check if ther is at least one layer
+        // check if there is at least one layer
         if (newProject.getLayersList().size() < 1) {
             throw new IOException("Invalid project, no layers found");
         }

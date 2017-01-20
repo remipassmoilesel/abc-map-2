@@ -65,7 +65,7 @@ public class DropFilesToolbar extends Toolbar {
         public MainWindowPainter() {
             textLines = new ArrayList<>();
             textLines.add("Déposez des ressources ici pour les importer");
-            textLines.add("(fichiers, URL, ...)");
+            textLines.add("(fichiers, adresses internet, ...)");
         }
 
         @Override

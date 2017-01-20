@@ -251,7 +251,7 @@ public class Project {
         // create a layer wrapper and store it
         AbmAbstractLayer layer = null;
         try {
-            layer = new AbmFeatureLayer(null, name, visible, zindex, this, true);
+            layer = new AbmFeatureLayer(null, name, visible, zindex, this);
         } catch (Exception e) {
             throw new IOException("Error while adding tile layer: ", e);
         }
@@ -270,11 +270,53 @@ public class Project {
     public AbmAbstractLayer addNewTileLayer(String name, boolean visible, int zindex) throws IOException {
         AbmTileLayer layer = null;
         try {
-            layer = new AbmTileLayer(null, name, visible, zindex, this, true);
+            layer = new AbmTileLayer(null, name, visible, zindex, this);
         } catch (Exception e) {
             throw new IOException("Error while adding tile layer: ", e);
         }
         return addLayer(layer);
+    }
+
+    /**
+     * Add a new shapefile layer and return it
+     *
+     * @param p
+     * @return
+     * @throws IOException
+     */
+    public AbmShapeFileLayer addNewShapeFileLayer(Path p) throws IOException {
+
+        // create a layer wrapper and store it
+        AbmAbstractLayer layer = null;
+        try {
+            layer = new AbmShapeFileLayer(null, p.getFileName().toString(), true, getHigherZindex(), p, this);
+        } catch (Exception e) {
+            throw new IOException("Error while adding shapefile layer: ", e);
+        }
+
+        return (AbmShapeFileLayer) addLayer(layer);
+    }
+
+    /**
+     * Add a new WMS layer and return it
+     *
+     * @param url
+     * @param layerName
+     * @return
+     * @throws IOException
+     */
+    public AbmWMSLayer addNewWMSLayer(String url, String layerName) throws IOException {
+
+        // create a layer wrapper and store it
+        AbmAbstractLayer layer = null;
+        try {
+            layer = new AbmWMSLayer("WMS layer", url, layerName, true, getHigherZindex(), this);
+        } catch (Exception e) {
+            throw new IOException("Error while adding wms layer: ", e);
+        }
+
+        return (AbmWMSLayer) addLayer(layer);
+
     }
 
     /**
@@ -773,33 +815,6 @@ public class Project {
     public int getHigherZindex() {
         ArrayList<AbmAbstractLayer> list = getLayersList();
         return list.get(list.size() - 1).getZindex();
-    }
-
-    public AbmShapeFileLayer addNewShapeFileLayer(Path p) throws IOException {
-
-        // create a layer wrapper and store it
-        AbmAbstractLayer layer = null;
-        try {
-            layer = new AbmShapeFileLayer(null, p.getFileName().toString(), true, getHigherZindex(), this, p);
-        } catch (Exception e) {
-            throw new IOException("Error while adding shapefile layer: ", e);
-        }
-
-        return (AbmShapeFileLayer) addLayer(layer);
-    }
-
-    public AbmWMSLayer addNewWMSLayer(String url, String layerName) throws IOException {
-
-        // create a layer wrapper and store it
-        AbmAbstractLayer layer = null;
-        try {
-            layer = new AbmWMSLayer("WMS layer", url, layerName, true, getHigherZindex(), this);
-        } catch (Exception e) {
-            throw new IOException("Error while adding wms layer: ", e);
-        }
-
-        return (AbmWMSLayer) addLayer(layer);
-
     }
 
     /**
