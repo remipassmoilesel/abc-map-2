@@ -1,9 +1,8 @@
 package org.abcmap.core.project.layers;
 
 import org.abcmap.core.project.Project;
-import org.abcmap.core.wms.WmsLayerEntry;
-import org.abcmap.core.wms.WmsException;
 import org.abcmap.core.wms.WMSDao;
+import org.abcmap.core.wms.WmsLayerEntry;
 import org.geotools.data.ows.Layer;
 import org.geotools.data.ows.WMSCapabilities;
 import org.geotools.data.wms.WMSUtils;
@@ -21,33 +20,57 @@ import java.util.List;
  */
 public class AbmWMSLayer extends AbmAbstractLayer {
 
+    /**
+     * Entry containing metadata about WMS ids
+     */
     private WmsLayerEntry wmsEntry;
-    private List<Layer> possibleLayers;
-    private WebMapServer wmswebMapServer;
 
     /**
-     * @param readableName
+     * List of WMS layers available on server
+     */
+    private List<Layer> possibleLayers;
+
+    /**
+     * WMS Server
+     */
+    private WebMapServer webMapServer;
+
+    public AbmWMSLayer(String readableName, String url, String wmsLayerName, boolean visible, int zindex, Project owner) throws IOException {
+        this(new LayerIndexEntry(null, readableName, visible, zindex, AbmLayerType.WMS), url, wmsLayerName, owner);
+    }
+
+    /**
+     * Create a new WMS layer.
+     *
+     * @param layerEntry
      * @param url
      * @param wmsLayerName
-     * @param visible
-     * @param zindex
      * @param owner
      * @throws IOException
      */
-    public AbmWMSLayer(String readableName, String url, String wmsLayerName, boolean visible, int zindex, Project owner) throws IOException, WmsException {
-        super(owner, new LayerIndexEntry(null, readableName, visible, zindex, AbmLayerType.WMS));
+    public AbmWMSLayer(LayerIndexEntry layerEntry, String url, String wmsLayerName, Project owner) throws IOException {
+        super(owner, layerEntry);
 
-        // create a wms entry
-        wmsEntry = new WmsLayerEntry(indexEntry.getLayerId(), url, wmsLayerName);
-
-        // create an entry in WMS index
         WMSDao dao = new WMSDao(project.getDatabasePath());
-        dao.create(wmsEntry);
-        dao.close();
 
-        this.wmswebMapServer = null;
+        // url is null, this should be an existing layer, search for existing entries
+        if (url == null) {
+            wmsEntry = (WmsLayerEntry) dao.readById(layerEntry.getLayerId());
+            if (wmsEntry == null) {
+                throw new IOException("Specified URL is null, and no WMS entry can be found. Specify an URL or use another layer ID");
+            }
+        }
+
+        // url is not null, this is a new layer, create entry and save it
+        else {
+            wmsEntry = new WmsLayerEntry(indexEntry.getLayerId(), url, wmsLayerName);
+            dao.create(wmsEntry);
+            dao.close();
+        }
+
+        this.webMapServer = null;
         try {
-            wmswebMapServer = new WebMapServer(new URL(wmsEntry.getUrl()));
+            webMapServer = new WebMapServer(new URL(wmsEntry.getUrl()));
         } catch (Exception e) {
             throw new IOException("Unable to create WMS layer", e);
         }
@@ -58,7 +81,7 @@ public class AbmWMSLayer extends AbmAbstractLayer {
     @Override
     public org.geotools.map.Layer buildGeotoolsLayer() {
 
-        WMSCapabilities capabilities = wmswebMapServer.getCapabilities();
+        WMSCapabilities capabilities = webMapServer.getCapabilities();
         List<Layer> namedLayers = Arrays.asList(WMSUtils.getNamedLayers(capabilities));
 
         Layer wmsLayer = null;
@@ -94,7 +117,7 @@ public class AbmWMSLayer extends AbmAbstractLayer {
         }
 
         // create layer
-        return new org.geotools.map.WMSLayer(wmswebMapServer, wmsLayer);
+        return new org.geotools.map.WMSLayer(webMapServer, wmsLayer);
 
     }
 
@@ -120,7 +143,7 @@ public class AbmWMSLayer extends AbmAbstractLayer {
     public ArrayList<String> getAvailableWMSNames() {
 
         if (possibleLayers == null) {
-            WMSCapabilities capabilities = wmswebMapServer.getCapabilities();
+            WMSCapabilities capabilities = webMapServer.getCapabilities();
             possibleLayers = Arrays.asList(WMSUtils.getNamedLayers(capabilities));
         }
 
