@@ -2,7 +2,7 @@ package org.abcmap.tests.core.project;
 
 import org.abcmap.TestUtils;
 import org.abcmap.core.dao.ProjectMetadataDAO;
-import org.abcmap.core.project.PMConstants;
+import org.abcmap.core.project.PMNames;
 import org.abcmap.core.project.ProjectMetadata;
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
@@ -36,10 +36,10 @@ public class ProjectMetadataDAOTest {
         Path db = tempfolder.resolve("metadatas.db");
 
         ProjectMetadata originalMtd = new ProjectMetadata();
-        originalMtd.updateValue(PMConstants.CREATED, "NEW VALUE");
+        originalMtd.updateValue(PMNames.CREATED, "NEW VALUE");
 
         assertTrue("Equality test", originalMtd.equals(originalMtd));
-        assertTrue("Constant name test", PMConstants.safeValueOf("SOMETHING_NEVER_FOUND_#######") == null);
+        assertTrue("Constant name test", PMNames.safeValueOf("SOMETHING_NEVER_FOUND_#######") == null);
 
         // creation test
         ProjectMetadataDAO dao = new ProjectMetadataDAO(db);

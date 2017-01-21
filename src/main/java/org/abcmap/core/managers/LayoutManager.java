@@ -2,7 +2,7 @@ package org.abcmap.core.managers;
 
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.project.PMConstants;
+import org.abcmap.core.project.PMNames;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layouts.LayoutManagerException;
 import org.abcmap.core.project.layouts.LayoutPaper;
@@ -105,7 +105,7 @@ public class LayoutManager extends ManagerTreeAccessUtil {
             PrinterJob prnJob = PrinterJob.getPrinterJob();
 
             // name print operation
-            String name = project.getMetadataContainer().getValue(PMConstants.TITLE);
+            String name = project.getMetadataContainer().getValue(PMNames.TITLE);
             if (name == null || name.isEmpty()) {
                 name = "Projet Abc-Map";
             }

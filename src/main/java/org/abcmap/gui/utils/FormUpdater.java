@@ -87,6 +87,8 @@ public class FormUpdater extends ManagerTreeAccessUtil implements EventListener,
     /**
      * This method should perform changes on form elements
      * <p>
+     * All override methods should call super();
+     * <p>
      * Do not call this method directly, prefer updateAllLater()
      */
     protected void updateFormFields() {

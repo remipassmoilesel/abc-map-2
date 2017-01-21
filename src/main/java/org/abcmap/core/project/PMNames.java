@@ -3,7 +3,7 @@ package org.abcmap.core.project;
 /**
  * Metadata peer names
  */
-public enum PMConstants {
+public enum PMNames {
 
     /**
      * Project title
@@ -40,9 +40,9 @@ public enum PMConstants {
      */
     LAYOUT_FRAME_COLOR_2;
 
-    public static PMConstants safeValueOf(String name) {
+    public static PMNames safeValueOf(String name) {
         try {
-            return PMConstants.valueOf(name);
+            return PMNames.valueOf(name);
         } catch (Exception e) {
             return null;
         }

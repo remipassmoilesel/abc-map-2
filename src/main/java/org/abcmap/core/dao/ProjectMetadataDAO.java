@@ -1,6 +1,5 @@
 package org.abcmap.core.dao;
 
-import org.abcmap.core.project.PMConstants;
 import org.abcmap.core.project.ProjectMetadata;
 import org.abcmap.core.project.ProjectMetadataPeer;
 

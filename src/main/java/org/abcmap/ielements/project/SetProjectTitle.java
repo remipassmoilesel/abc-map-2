@@ -2,7 +2,7 @@ package org.abcmap.ielements.project;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.ProjectEvent;
-import org.abcmap.core.project.PMConstants;
+import org.abcmap.core.project.PMNames;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.textfields.TextFieldDelayedAction;
 import org.abcmap.gui.utils.FormUpdater;
@@ -62,7 +62,7 @@ public class SetProjectTitle extends InteractionElement {
                 return;
             }
 
-            String projectTitle = projectm().getProject().getMetadataContainer().getValue(PMConstants.TITLE);
+            String projectTitle = projectm().getProject().getMetadataContainer().getValue(PMNames.TITLE);
             GuiUtils.changeTextWithoutFire(textField, projectTitle);
         }
 
@@ -82,13 +82,13 @@ public class SetProjectTitle extends InteractionElement {
             }
 
             // get title from project
-            String projectTitle = projectm().getProject().getMetadataContainer().getValue(PMConstants.TITLE);
+            String projectTitle = projectm().getProject().getMetadataContainer().getValue(PMNames.TITLE);
 
             // get input
             String fieldTitle = textField.getText();
 
             if (Utils.safeEquals(projectTitle, fieldTitle) == false) {
-                projectm().getProject().getMetadataContainer().updateValue(PMConstants.TITLE, fieldTitle);
+                projectm().getProject().getMetadataContainer().updateValue(PMNames.TITLE, fieldTitle);
                 projectm().fireMetadatasChanged();
             }
 

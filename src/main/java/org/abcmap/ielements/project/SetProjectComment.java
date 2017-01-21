@@ -2,7 +2,7 @@ package org.abcmap.ielements.project;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.ProjectEvent;
-import org.abcmap.core.project.PMConstants;
+import org.abcmap.core.project.PMNames;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.textfields.TextFieldDelayedAction;
 import org.abcmap.gui.utils.GuiUtils;
@@ -63,7 +63,7 @@ public class SetProjectComment extends InteractionElement {
                 return;
             }
 
-            String projectComment = projectm().getProject().getMetadataContainer().getValue(PMConstants.COMMENT);
+            String projectComment = projectm().getProject().getMetadataContainer().getValue(PMNames.COMMENT);
             GuiUtils.changeTextWithoutFire(textField, projectComment);
         }
 
@@ -83,13 +83,13 @@ public class SetProjectComment extends InteractionElement {
             }
 
             // get title from project
-            String projectComment = projectm().getProject().getMetadataContainer().getValue(PMConstants.COMMENT);
+            String projectComment = projectm().getProject().getMetadataContainer().getValue(PMNames.COMMENT);
 
             // get input
             String fieldComment = textField.getText();
 
             if (Utils.safeEquals(projectComment, fieldComment) == false) {
-                projectm().getProject().getMetadataContainer().updateValue(PMConstants.COMMENT, fieldComment);
+                projectm().getProject().getMetadataContainer().updateValue(PMNames.COMMENT, fieldComment);
                 projectm().fireMetadatasChanged();
             }
 

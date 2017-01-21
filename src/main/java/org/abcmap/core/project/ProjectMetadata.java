@@ -20,14 +20,14 @@ public class ProjectMetadata {
         metadataList = new HashMap<>();
 
         // default metadataList
-        metadataList.put(PMConstants.TITLE.toString(), "Project title");
-        metadataList.put(PMConstants.COMMENT.toString(), "Project comment");
-        metadataList.put(PMConstants.CREATED.toString(), (new Date()).toString());
-        metadataList.put(PMConstants.BG_COLOR.toString(), Utils.colorToString(Color.white));
-        metadataList.put(PMConstants.LAYOUT_FRAME_OPACITY.toString(), String.valueOf(0.6f));
-        metadataList.put(PMConstants.LAYOUT_FRAME_THICKNESS.toString(), String.valueOf(20));
-        metadataList.put(PMConstants.LAYOUT_FRAME_COLOR_1.toString(), Utils.colorToString(Color.blue));
-        metadataList.put(PMConstants.LAYOUT_FRAME_COLOR_2.toString(), Utils.colorToString(Color.red));
+        metadataList.put(PMNames.TITLE.toString(), "Project title");
+        metadataList.put(PMNames.COMMENT.toString(), "Project comment");
+        metadataList.put(PMNames.CREATED.toString(), (new Date()).toString());
+        metadataList.put(PMNames.BG_COLOR.toString(), Utils.colorToString(Color.white));
+        metadataList.put(PMNames.LAYOUT_FRAME_OPACITY.toString(), String.valueOf(0.6f));
+        metadataList.put(PMNames.LAYOUT_FRAME_THICKNESS.toString(), String.valueOf(20));
+        metadataList.put(PMNames.LAYOUT_FRAME_COLOR_1.toString(), Utils.colorToString(Color.blue));
+        metadataList.put(PMNames.LAYOUT_FRAME_COLOR_2.toString(), Utils.colorToString(Color.red));
 
     }
 
@@ -37,7 +37,7 @@ public class ProjectMetadata {
      * @param name
      * @param value
      */
-    public void updateValue(PMConstants name, String value) {
+    public void updateValue(PMNames name, String value) {
         metadataList.put(name.toString(), value);
     }
 
@@ -73,7 +73,7 @@ public class ProjectMetadata {
      * @param name
      * @return
      */
-    public String getValue(PMConstants name) {
+    public String getValue(PMNames name) {
         return metadataList.get(name.toString());
     }
 

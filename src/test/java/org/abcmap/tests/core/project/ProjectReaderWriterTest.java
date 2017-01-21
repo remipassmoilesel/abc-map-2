@@ -7,7 +7,7 @@ import org.abcmap.core.dao.LayerIndexDAO;
 import org.abcmap.core.draw.AbmDefaultFeatureType;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
-import org.abcmap.core.project.PMConstants;
+import org.abcmap.core.project.PMNames;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.ProjectReader;
 import org.abcmap.core.project.ProjectWriter;
@@ -58,7 +58,7 @@ public class ProjectReaderWriterTest {
         // test creation
         ProjectManager pman = Main.getProjectManager();
         Project newProject = pman.createNewProject();
-        newProject.getMetadataContainer().updateValue(PMConstants.TITLE, "New title of the death");
+        newProject.getMetadataContainer().updateValue(PMNames.TITLE, "New title of the death");
 
         assertTrue("Creation test", Files.isRegularFile(Paths.get(newProject.getDatabasePath().toAbsolutePath().toString() + ".data.db")));
 
