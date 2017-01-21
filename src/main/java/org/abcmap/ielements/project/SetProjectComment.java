@@ -44,7 +44,7 @@ public class SetProjectComment extends InteractionElement {
     private class ProjectListener extends FormUpdater {
 
         @Override
-        public void updateFields() {
+        public void updateFormFields() {
 
 			/*
 

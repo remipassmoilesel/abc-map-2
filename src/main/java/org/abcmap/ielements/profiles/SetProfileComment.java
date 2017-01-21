@@ -42,7 +42,7 @@ public class SetProfileComment extends InteractionElement {
     private class ProfileListener extends FormUpdater {
 
         @Override
-        public void updateFields() {
+        public void updateFormFields() {
 
             /*
             // projet non initialisé, retour

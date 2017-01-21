@@ -54,8 +54,8 @@ public abstract class AbstractSelectCropArea extends InteractionElement {
     private class TextFieldsUpdater extends FormUpdater {
 
         @Override
-        protected void updateFields() {
-            super.updateFields();
+        protected void updateFormFields() {
+            super.updateFormFields();
             /*
 
             // recuperer les nouvelles données

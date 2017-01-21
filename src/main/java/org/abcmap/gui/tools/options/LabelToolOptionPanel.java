@@ -152,8 +152,8 @@ public class LabelToolOptionPanel extends ToolOptionPanel {
     private class FormUpdater extends org.abcmap.gui.utils.FormUpdater {
 
         @Override
-        protected void updateFields() {
-            super.updateFields();
+        protected void updateFormFields() {
+            super.updateFormFields();
 
             /**
             // recuperer la premiere forme selectionnée

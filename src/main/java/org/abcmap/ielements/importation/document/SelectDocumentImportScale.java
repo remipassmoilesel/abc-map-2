@@ -86,7 +86,7 @@ public class SelectDocumentImportScale extends InteractionElement {
     private class Updater extends FormUpdater {
 
         @Override
-        protected void updateFields() {
+        protected void updateFormFields() {
             /*
             super.updateFields();
 

@@ -74,7 +74,7 @@ public class OpenRecentProject extends InteractionElement implements HasEventNot
     private class FileViewUpdater extends FormUpdater {
 
         @Override
-        protected void updateFields() {
+        protected void updateFormFields() {
             ArrayList<String> paths = recentm().getProjectHistory();
             fileSelectionPanel.clearFileList();
             fileSelectionPanel.addPaths(paths);

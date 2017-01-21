@@ -84,8 +84,8 @@ public class SelectedObjectPanel extends JPanel implements HasEventNotificationM
     private class SelectionViewUpdater extends FormUpdater {
 
         @Override
-        protected void updateFields() {
-            super.updateFields();
+        protected void updateFormFields() {
+            super.updateFormFields();
 
             LayerElement elmt = getFirstSelectedElement(filters);
 

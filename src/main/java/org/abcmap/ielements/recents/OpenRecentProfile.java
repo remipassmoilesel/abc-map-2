@@ -71,7 +71,7 @@ public class OpenRecentProfile extends InteractionElement {
 
     private class RecentManagerListener extends FormUpdater {
 
-        protected void updateFields() {
+        protected void updateFormFields() {
             /*
 
             // recuperer la liste des fichiers

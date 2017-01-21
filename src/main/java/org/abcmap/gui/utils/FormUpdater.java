@@ -25,7 +25,12 @@ public class FormUpdater extends ManagerTreeAccessUtil implements EventListener,
     /**
      * Event filter: block notifications by event type
      */
-    protected ArrayList<Class> eventFilters;
+    protected ArrayList<Class> eventClassFilter;
+
+    /**
+     * Event filter: block notifications by event name
+     */
+    protected ArrayList<String> eventNameFilter;
 
     /**
      * Tool filter: block notifications by active tool type
@@ -39,7 +44,8 @@ public class FormUpdater extends ManagerTreeAccessUtil implements EventListener,
 
     public FormUpdater() {
 
-        eventFilters = new ArrayList<>();
+        eventClassFilter = new ArrayList<>();
+        eventNameFilter = new ArrayList<>();
         toolFilters = new ArrayList<>();
 
         testProjectBeforeUpdate = false;
@@ -49,20 +55,45 @@ public class FormUpdater extends ManagerTreeAccessUtil implements EventListener,
     /**
      * Method called on EDT to perform form updates
      * <p>
-     * Warning: call this method directly will bypass filters, prefer use updateAllLater();
+     * This method perform update on current thread
      */
     @Override
     public void run() {
 
         GuiUtils.throwIfNotOnEDT();
 
-        if (testProjectBeforeUpdate) {
-            if (projectm().isInitialized() == false) {
-                return;
-            }
+        // check filters
+        if (checkFilters(null) == false) {
+            return;
         }
 
-        updateFields();
+        updateFormFields();
+    }
+
+    /**
+     * Update fields on EDT
+     * <p>
+     * This method perform update on EDT, but not on this thread
+     */
+    public void updateAllLater() {
+
+        if (checkFilters(null) == false) {
+            return;
+        }
+
+        SwingUtilities.invokeLater(this);
+    }
+
+    /**
+     * This method should perform changes on form elements
+     * <p>
+     * Do not call this method directly, prefer updateAllLater()
+     */
+    protected void updateFormFields() {
+
+        // no actions out of EDT
+        GuiUtils.throwIfNotOnEDT();
+
     }
 
     /**
@@ -93,41 +124,55 @@ public class FormUpdater extends ManagerTreeAccessUtil implements EventListener,
         return drawm().getFirstSelectedElement(filters);
     }
 
+
     /**
-     * Method to override to perform updates
+     * Check specified filters and return true if it pass
+     *
+     * @param event
+     * @return
      */
-    protected void updateFields() {
+    private boolean checkFilters(Event event) {
 
-        // no actions out of EDT
-        GuiUtils.throwIfNotOnEDT();
+        // check if project initialized
+        if (testProjectBeforeUpdate) {
+            if (projectm().isInitialized() == false) {
+                return false;
+            }
+        }
 
+        // filter by class if needed
+        if (event != null && eventClassFilter.size() > 0) {
+            if (eventClassFilter.contains(event.getClass()) == false) {
+                return false;
+            }
+        }
+
+        // filter by name if needed
+        if (event != null && eventNameFilter.size() > 0) {
+            if (eventNameFilter.contains(event.getName()) == false) {
+                return false;
+            }
+        }
+
+        // filter by tool enabled if needed
+        if (drawm().getCurrentTool() != null && toolFilters.size() > 0) {
+            if (toolFilters.contains(drawm().getCurrentTool().getClass()) == false) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
-    public void eventReceived(Event arg) {
+    public void eventReceived(Event event) {
 
-        // filter arguments if needed
-        if (eventFilters.size() > 0) {
-            if (eventFilters.contains(arg.getClass()) == false) {
-                return;
-            }
+        // check filters
+        if (checkFilters(event) == false) {
+            return;
         }
 
         updateAllLater();
-    }
-
-    /**
-     * Update fields on EDT
-     */
-    public void updateAllLater() {
-
-        if (toolFilters.size() > 0) {
-            if (toolFilters.contains(drawm().getCurrentTool().getClass()) == false) {
-                return;
-            }
-        }
-
-        SwingUtilities.invokeLater(this);
     }
 
     /**
@@ -145,8 +190,17 @@ public class FormUpdater extends ManagerTreeAccessUtil implements EventListener,
      *
      * @param filter
      */
-    public void addEventFilter(Class filter) {
-        eventFilters.add(filter);
+    public void addEventClassFilter(Class filter) {
+        eventClassFilter.add(filter);
+    }
+
+    /**
+     * Add an event name filter to block notifications
+     *
+     * @param name
+     */
+    public void addEventNameFilter(String name) {
+        eventNameFilter.add(name);
     }
 
     /**
@@ -158,10 +212,20 @@ public class FormUpdater extends ManagerTreeAccessUtil implements EventListener,
         toolFilters.add(filter);
     }
 
+    /**
+     * Utility used to update form components without firing events
+     * <p>
+     * Components are updated only if value if different than current value
+     *
+     * @param comp
+     * @param value
+     */
     protected void updateComponentWithoutFire(ColorButton comp, Color value) {
         if (Utils.safeEquals(comp.getColor(), value) == false) {
             comp.setColor(value);
         }
+        comp.revalidate();
+        comp.repaint();
     }
 
     /**

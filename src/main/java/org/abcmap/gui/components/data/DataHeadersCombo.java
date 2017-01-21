@@ -34,15 +34,15 @@ public class DataHeadersCombo extends JComboBox<String> implements HasEventNotif
         importm.getNotificationManager().addObserver(this);
 
         // first update
-        cbUpdater.updateFields();
+        cbUpdater.updateFormFields();
 
     }
 
     private class ComboUpdater extends FormUpdater {
 
         @Override
-        protected void updateFields() {
-            super.updateFields();
+        protected void updateFormFields() {
+            super.updateFormFields();
 
             // get values of combo
             List<String> currents = GuiUtils.getAllValuesFrom(DataHeadersCombo.this);

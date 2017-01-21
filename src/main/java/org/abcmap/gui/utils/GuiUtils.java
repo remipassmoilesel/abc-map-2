@@ -464,12 +464,12 @@ public class GuiUtils {
 
         throwIfNotOnEDT();
 
-        // modifier la valeur si necessaire
+        // change value only if it is necessary
         if (Utils.safeEquals(comp.getText(), value) == false) {
             comp.setText(value);
         }
 
-        // repeindre
+        // repaint
         comp.revalidate();
         comp.repaint();
 

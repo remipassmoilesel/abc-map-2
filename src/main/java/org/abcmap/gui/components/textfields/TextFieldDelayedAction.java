@@ -26,7 +26,7 @@ public class TextFieldDelayedAction {
     private ArrayList<Runnable> actions;
 
     /**
-     * Set to true to eecute actions on EDT
+     * Set to true to execute actions on EDT
      * <p>
      * By default, execute actions out of EDT
      */

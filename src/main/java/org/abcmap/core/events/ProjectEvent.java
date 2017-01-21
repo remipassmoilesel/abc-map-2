@@ -12,6 +12,9 @@ public class ProjectEvent extends Event {
 
     public static final String LAYOUTS_LIST_CHANGED = "LAYOUTS_CHANGED";
 
+    public static final String METADATA_CHANGED = "METADATA_CHANGED";
+
+
     public ProjectEvent(String name) {
         this(name, null);
     }

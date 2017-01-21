@@ -47,8 +47,8 @@ public class SelectCaptureArea extends InteractionElement {
 
     private class Updater extends FormUpdater {
         @Override
-        protected void updateFields() {
-            super.updateFields();
+        protected void updateFormFields() {
+            super.updateFormFields();
 
             /*
             // récuperer la configuration courante
