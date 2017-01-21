@@ -63,7 +63,8 @@ public class SetProjectTitle extends InteractionElement {
             }
 
             String projectTitle = projectm().getProject().getMetadataContainer().getValue(PMNames.TITLE);
-            GuiUtils.changeTextWithoutFire(textField, projectTitle);
+            updateComponentWithoutFire(textField, projectTitle);
+
         }
 
     }

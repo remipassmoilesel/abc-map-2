@@ -30,7 +30,7 @@ public class LaunchDirectoryImport extends InteractionElement {
         btnLaunch = new JButton("Lancer l'import");
         btnLaunch.addActionListener(this);
         btnLaunch.setActionCommand(START);
-        panel.add(btnLaunch);
+        panel.add(btnLaunch, "wrap");
 
         btnStop = new JButton("Arrêter l'import");
         btnStop.addActionListener(this);

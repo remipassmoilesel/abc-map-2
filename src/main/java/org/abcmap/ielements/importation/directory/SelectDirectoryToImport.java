@@ -1,7 +1,10 @@
 package org.abcmap.ielements.importation.directory;
 
 import net.miginfocom.swing.MigLayout;
+import org.abcmap.core.configuration.CFNames;
+import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.textfields.TextFieldDelayedAction;
+import org.abcmap.gui.utils.BrowseActionListener;
 import org.abcmap.gui.utils.FormUpdater;
 import org.abcmap.ielements.InteractionElement;
 
@@ -35,9 +38,10 @@ public class SelectDirectoryToImport extends InteractionElement {
         this.textFieldListener = new ImportManagerUpdater();
         TextFieldDelayedAction.delayedActionFor(txtPath, textFieldListener, false);
 
-        /*
         // listen user actions on button
-        btn.addActionListener(new BrowsePathActionListener(txtPath, false, true));
+        btn.addActionListener(new BrowseActionListener(txtPath, BrowseActionListener.Type.DIRECTORY_ONLY, ()->{
+            textFieldListener.run();
+        }));
 
         // listen profile changes
         textfieldUpdater = new TextFieldUpdater();
@@ -46,9 +50,7 @@ public class SelectDirectoryToImport extends InteractionElement {
         textfieldUpdater.run();
 
         return panel;
-        */
 
-        return null;
     }
 
     /**
@@ -59,31 +61,30 @@ public class SelectDirectoryToImport extends InteractionElement {
         @Override
         protected void updateFormFields() {
             super.updateFormFields();
-/*
-            configPath = configm().getConfiguration().DIRECTORY_IMPORT_PATH
 
-            GuiUtils.changeText(txtPath, configm.getDirectoryImportPath());
-            */
+            String configPath = configm().getConfiguration().getValue(CFNames.DIRECTORY_IMPORT_PATH);
+
+            // update component if needed
+            updateComponentWithoutFire(txtPath, configPath);
+
         }
 
     }
 
     /**
-     * Update import manager from text field
+     * Update import manager text field input
      */
     private class ImportManagerUpdater implements Runnable {
 
         @Override
         public void run() {
 
-            /*
             String path = txtPath.getText();
 
-            if (Utils.safeEquals(configm.getDirectoryImportPath(), path) == false) {
-                configm.setDirectoryImportPath(path);
+            if (Utils.safeEquals(configm().getConfiguration().getValue(CFNames.DIRECTORY_IMPORT_PATH), path) == false) {
+                configm().getConfiguration().updateValue(CFNames.DIRECTORY_IMPORT_PATH, path);
             }
 
-            */
         }
 
     }

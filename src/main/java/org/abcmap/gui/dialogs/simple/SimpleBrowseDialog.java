@@ -186,6 +186,10 @@ public class SimpleBrowseDialog {
         return browseFile(ConfigurationConstants.SYSTEM_HOME_PATH, parent, "Ouvrir", filter, false);
     }
 
+    public static BrowseDialogResult browseFileToOpen(Window parent) {
+        return browseFile(ConfigurationConstants.SYSTEM_HOME_PATH, parent, "Ouvrir", null, false);
+    }
+
     /**
      * Show a browse dialog to select directories
      *
@@ -213,6 +217,7 @@ public class SimpleBrowseDialog {
         return bdr;
 
     }
+
 
     /**
      * Show a browse dialog to select files
@@ -272,5 +277,6 @@ public class SimpleBrowseDialog {
         return bdr;
 
     }
+
 
 }

@@ -5,9 +5,8 @@ import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.project.PMNames;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.textfields.TextFieldDelayedAction;
-import org.abcmap.gui.utils.GuiUtils;
-import org.abcmap.ielements.InteractionElement;
 import org.abcmap.gui.utils.FormUpdater;
+import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
 import java.awt.*;
@@ -59,12 +58,14 @@ public class SetProjectComment extends InteractionElement {
         public void updateFormFields() {
 
             if (projectm().isInitialized() == false) {
-                GuiUtils.changeTextWithoutFire(textField, "");
+                updateComponentWithoutFire(textField, "");
                 return;
             }
 
             String projectComment = projectm().getProject().getMetadataContainer().getValue(PMNames.COMMENT);
-            GuiUtils.changeTextWithoutFire(textField, projectComment);
+
+            // update field if needed
+            updateComponentWithoutFire(textField, projectComment);
         }
 
     }

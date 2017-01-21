@@ -143,10 +143,6 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
 
     }
 
-    public String getDirectoryImportPath() {
-        return ".";
-    }
-
     public long getWindowHidingDelay() {
         return 0;
     }

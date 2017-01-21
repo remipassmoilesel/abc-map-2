@@ -1,5 +1,6 @@
 package org.abcmap.core.crop;
 
+import org.abcmap.core.configuration.CFNames;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.*;
 import org.abcmap.core.utils.Utils;
@@ -61,7 +62,7 @@ public class CropConfigurator {
             // configuration from directory
             if (CropConfigurator.FOR_DIRECTOY_IMPORT.equals(mode)) {
 
-                File dir = new File(configm.getDirectoryImportPath());
+                File dir = new File(configm.configm().getConfiguration().getValue(CFNames.DIRECTORY_IMPORT_PATH));
                 if (dir.isDirectory() == false) {
                     throw new IOException("Invalid directory: " + dir.getAbsolutePath());
                 }
