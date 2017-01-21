@@ -37,12 +37,12 @@ public class ProjectMetadataDAO extends AbstractOrmDAO {
 
         deleteAll();
 
-        HashMap<PMConstants, String> values = ctr.getAllValues();
-        Iterator<PMConstants> it = values.keySet().iterator();
+        HashMap<String, String> values = ctr.getAllValues();
+        Iterator<String> it = values.keySet().iterator();
 
         while (it.hasNext()) {
 
-            PMConstants name = it.next();
+            String name = it.next();
             String value = values.get(name);
 
             try {

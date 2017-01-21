@@ -12,7 +12,7 @@ public class ProjectMetadataPeer implements DataModel {
     private static final String VALUE_FIELD_NAME = "VALUE";
 
     @DatabaseField(id = true, columnName = NAME_FIELD_NAME)
-    private PMConstants name;
+    private String name;
 
     @DatabaseField(columnName = VALUE_FIELD_NAME)
     private String value;
@@ -21,15 +21,25 @@ public class ProjectMetadataPeer implements DataModel {
 
     }
 
-    public ProjectMetadataPeer(PMConstants name, String value) {
+    public ProjectMetadataPeer(String name, String value) {
         this.name = name;
         this.value = value;
     }
 
-    public PMConstants getName() {
+    /**
+     * Return name of metadata peer
+     *
+     * @return
+     */
+    public String getName() {
         return name;
     }
 
+    /**
+     * Return value of metadata peer
+     *
+     * @return
+     */
     public String getValue() {
         return value;
     }

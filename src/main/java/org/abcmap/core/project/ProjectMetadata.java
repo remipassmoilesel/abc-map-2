@@ -13,21 +13,21 @@ import java.util.Objects;
  */
 public class ProjectMetadata {
 
-    private HashMap<PMConstants, String> metadataList;
+    private HashMap<String, String> metadataList;
 
     public ProjectMetadata() {
 
         metadataList = new HashMap<>();
 
         // default metadataList
-        metadataList.put(PMConstants.TITLE, "Project title");
-        metadataList.put(PMConstants.COMMENT, "Project comment");
-        metadataList.put(PMConstants.CREATED, (new Date()).toString());
-        metadataList.put(PMConstants.BG_COLOR, Utils.colorToString(Color.white));
-        metadataList.put(PMConstants.LAYOUT_FRAME_OPACITY, String.valueOf(0.6f));
-        metadataList.put(PMConstants.LAYOUT_FRAME_THICKNESS, String.valueOf(20));
-        metadataList.put(PMConstants.LAYOUT_FRAME_COLOR_1, Utils.colorToString(Color.blue));
-        metadataList.put(PMConstants.LAYOUT_FRAME_COLOR_2, Utils.colorToString(Color.red));
+        metadataList.put(PMConstants.TITLE.toString(), "Project title");
+        metadataList.put(PMConstants.COMMENT.toString(), "Project comment");
+        metadataList.put(PMConstants.CREATED.toString(), (new Date()).toString());
+        metadataList.put(PMConstants.BG_COLOR.toString(), Utils.colorToString(Color.white));
+        metadataList.put(PMConstants.LAYOUT_FRAME_OPACITY.toString(), String.valueOf(0.6f));
+        metadataList.put(PMConstants.LAYOUT_FRAME_THICKNESS.toString(), String.valueOf(20));
+        metadataList.put(PMConstants.LAYOUT_FRAME_COLOR_1.toString(), Utils.colorToString(Color.blue));
+        metadataList.put(PMConstants.LAYOUT_FRAME_COLOR_2.toString(), Utils.colorToString(Color.red));
 
     }
 
@@ -38,7 +38,33 @@ public class ProjectMetadata {
      * @param value
      */
     public void updateValue(PMConstants name, String value) {
+        metadataList.put(name.toString(), value);
+    }
+
+    /**
+     * Update a single value
+     *
+     * @param name
+     * @param value
+     */
+    public void updateValue(String name, String value) {
         metadataList.put(name, value);
+    }
+
+    /**
+     * Add a custom value
+     * <p>
+     * If key exist, a runtime error is thrown
+     *
+     * @param name
+     * @param value
+     */
+    public void addValue(String name, String value) {
+
+        if (metadataList.get(name) != null) {
+            throw new IllegalArgumentException("Name already exist: " + name);
+        }
+        metadataList.put(name.toString(), value);
     }
 
     /**
@@ -48,12 +74,20 @@ public class ProjectMetadata {
      * @return
      */
     public String getValue(PMConstants name) {
-        return metadataList.get(name);
+        return metadataList.get(name.toString());
     }
 
-    public HashMap<PMConstants, String> getAllValues() {
-        return metadataList;
+    /**
+     * Return all values
+     * <p>
+     * Values are returned in a shallow copy of map
+     *
+     * @return
+     */
+    public HashMap<String, String> getAllValues() {
+        return new HashMap<>(metadataList);
     }
+
 
     @Override
     public boolean equals(Object o) {
