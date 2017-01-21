@@ -75,7 +75,7 @@ public class FormUpdater extends ManagerTreeAccessUtil implements EventListener,
      * <p>
      * This method perform update on EDT, but not on this thread
      */
-    public void updateAllLater() {
+    public final void updateAllLater() {
 
         if (checkFilters(null) == false) {
             return;

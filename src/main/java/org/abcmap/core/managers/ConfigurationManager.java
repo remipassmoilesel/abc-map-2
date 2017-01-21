@@ -93,11 +93,22 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
         }
     }
 
+    /**
+     * Load a configuration object and keep current configuration
+     *
+     * @param config
+     * @return
+     */
     private ConfigurationContainer loadConfiguration(ConfigurationContainer config) {
         this.currentConfiguration = config;
         return currentConfiguration;
     }
 
+    /**
+     * Get current configuration
+     *
+     * @return
+     */
     public ConfigurationContainer getConfiguration() {
         return currentConfiguration;
     }
@@ -120,6 +131,32 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
 
         return ConfigurationConstants.SURF_PARAMS[surfMode];
 
+    }
+
+
+    /**
+     * Get current SURF analyse mode
+     *
+     * @return
+     */
+    public int getSurfMode() {
+        return currentConfiguration.getInt(CFNames.IMPORT_SURF_MODE);
+    }
+
+    /**
+     * Set current SURF analyse mode
+     *
+     * @param surfMode
+     */
+    public void setSurfMode(int surfMode) {
+
+        // check interval
+        if (surfMode < 0 || surfMode > ConfigurationConstants.SURF_PARAMS.length) {
+            throw new IllegalArgumentException("Invalid SURF mode. It should be greater than 0 and less than "
+                    + ConfigurationConstants.SURF_PARAMS.length + ": " + surfMode);
+        }
+
+        currentConfiguration.updateValue(CFNames.IMPORT_SURF_MODE, surfMode);
     }
 
 
@@ -147,12 +184,6 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
         return 0;
     }
 
-    public int getSurfMode() {
-        return 0;
-    }
-
-    public void setSurfMode(int surfMode) {
-    }
 
     public boolean isSaveProfileWhenQuit() {
         return false;
