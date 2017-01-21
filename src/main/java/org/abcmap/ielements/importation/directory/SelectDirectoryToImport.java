@@ -2,6 +2,7 @@ package org.abcmap.ielements.importation.directory;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.gui.components.textfields.TextFieldDelayedAction;
 import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
@@ -11,7 +12,7 @@ public class SelectDirectoryToImport extends InteractionElement {
 
     private JTextField txtPath;
     private ImportManagerUpdater textFieldListener;
-    //	private TextFieldUpdater textfieldUpdater;
+    //private TextFieldUpdater textfieldUpdater;
     private Runnable memoryPanelUpdater;
 
     public SelectDirectoryToImport() {
@@ -22,30 +23,33 @@ public class SelectDirectoryToImport extends InteractionElement {
     @Override
     protected Component createPrimaryGUI() {
 
+        // create GUI
         this.txtPath = new JTextField();
-
-        this.textFieldListener = new ImportManagerUpdater();
-
-//        this.memoryPanelUpdater = new MemoryPanelUpdater();
-
-        //TextFieldDelayedAction.delayedActionFor(txtPath, memoryPanelUpdater, false);
-
-        //TextFieldDelayedAction.delayedActionFor(txtPath, textFieldListener, false);
-
         JPanel panel = new JPanel(new MigLayout("insets 0"));
-
-        panel.add(txtPath, "width 200px!, wrap");
+        panel.add(txtPath, "width 80%!, wrap");
 
         JButton btn = new JButton("Parcourir");
-//		btn.addActionListener(new BrowsePathActionListener(txtPath, false, true));
         panel.add(btn, "align right, " + wrap15());
+
+        this.textFieldListener = new ImportManagerUpdater();
         /*
+
+
+        this.memoryPanelUpdater = new MemoryPanelUpdater();
+
+        TextFieldDelayedAction.delayedActionFor(txtPath, memoryPanelUpdater, false);
+
+        TextFieldDelayedAction.delayedActionFor(txtPath, textFieldListener, false);
+
+
+        btn.addActionListener(new BrowsePathActionListener(txtPath, false, true));
+
+
         textfieldUpdater = new TextFieldUpdater();
-//		notifm.setDefaultUpdatableObject(textfieldUpdater);
+        notifm.setDefaultUpdatableObject(textfieldUpdater);
 		configm.getNotificationManager().addObserver(this);
 		importm.getNotificationManager().addObserver(this);
 		textfieldUpdater.run();
-		*/
 
         ThreadManager.runLater(new Runnable() {
             @Override
@@ -53,7 +57,7 @@ public class SelectDirectoryToImport extends InteractionElement {
                 //memoryPanelUpdater.run();
             }
         });
-
+        */
         return panel;
     }
 
