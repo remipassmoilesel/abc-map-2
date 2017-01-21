@@ -283,10 +283,19 @@ public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNot
     }
 
     /**
+     * Fire an event meaning that on or several layers changed
+     *
      * @param lay
      */
     public void fireLayerChanged(AbmAbstractLayer lay) {
         notifm.fireEvent(new ProjectEvent(ProjectEvent.LAYER_CHANGED, lay));
+    }
+
+    /**
+     * Fire an event meaning that metadata of project changed
+     */
+    public void fireMetadatasChanged() {
+        notifm.fireEvent(new ProjectEvent(ProjectEvent.METADATA_CHANGED, null));
     }
 
     /**
@@ -314,5 +323,6 @@ public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNot
     public EventNotificationManager getNotificationManager() {
         return notifm;
     }
+
 
 }
