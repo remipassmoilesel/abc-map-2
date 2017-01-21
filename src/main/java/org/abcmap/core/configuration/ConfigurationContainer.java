@@ -1,162 +1,207 @@
 package org.abcmap.core.configuration;
 
-import java.io.Serializable;
+import org.abcmap.core.robot.RobotCaptureMode;
 
-/**
- * Main configuration container.
- * <p>
- * Only use serializable objects.
- */
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Objects;
+
 public class ConfigurationContainer implements Serializable {
 
-    public static final String LANGUAGE = "fr";
+    private HashMap<String, String> metadataList;
+
+    public ConfigurationContainer() {
+
+        metadataList = new HashMap<>();
+
+        // default metadataList
+        metadataList.put(CFNames.LANGUAGE.toString(), "fr");
+        metadataList.put(CFNames.DEFAULT_LANGUAGE.toString(), ConfigurationConstants.DEFAULT_LANGUAGE);
+        metadataList.put(CFNames.HOME.toString(), ConfigurationConstants.SYSTEM_HOME_PATH);
+
+        metadataList.put(CFNames.PROFILE_TITLE.toString(), "New configuration profile");
+        metadataList.put(CFNames.PROFILE_COMMENT.toString(), "Profile comments");
+        metadataList.put(CFNames.PROFILE_PATH.toString(), ConfigurationConstants.DEFAULT_PROFILE_PATH.toString());
+        metadataList.put(CFNames.SAVE_PROFILE_WHEN_LEAVE.toString(), String.valueOf(true));
+
+        metadataList.put(CFNames.IMPORT_ENABLE_CROPPING.toString(), String.valueOf(true));
+        metadataList.put(CFNames.IMPORT_CROP_AREA_SELECTION_X.toString(), String.valueOf(50));
+        metadataList.put(CFNames.IMPORT_CROP_AREA_SELECTION_Y.toString(), String.valueOf(50));
+        metadataList.put(CFNames.IMPORT_CROP_AREA_SELECTION_W.toString(), String.valueOf(400));
+        metadataList.put(CFNames.IMPORT_CROP_AREA_SELECTION_H.toString(), String.valueOf(400));
+
+        metadataList.put(CFNames.WINDOW_HIDDING_DELAY_MS.toString(), String.valueOf(700));
+        metadataList.put(CFNames.IMPORT_MATCHING_POINTS_THRESHOLD.toString(), String.valueOf(20));
+        metadataList.put(CFNames.IMPORT_SURF_MODE.toString(), String.valueOf(2));
+
+        metadataList.put(CFNames.ALERT_NOW_IF_REFUSED_TILES.toString(), String.valueOf(true));
+
+        metadataList.put(CFNames.DIRECTORY_IMPORT_PATH.toString(), ConfigurationConstants.SYSTEM_HOME_PATH);
+        metadataList.put(CFNames.DOCUMENT_IMPORT_PATH.toString(), ConfigurationConstants.SYSTEM_HOME_PATH);
+        metadataList.put(CFNames.IMPORT_DOCUMENT_SCALE_FACTOR.toString(), String.valueOf(1f));
+
+        metadataList.put(CFNames.ROBOT_IMPORT_COVERING.toString(), String.valueOf(0.1f));
+        metadataList.put(CFNames.ROBOT_IMPORT_WIDTH.toString(), String.valueOf(5));
+        metadataList.put(CFNames.ROBOT_IMPORT_HEIGHT.toString(), String.valueOf(5));
+        metadataList.put(CFNames.ROBOT_IMPORT_MOVING_DELAY_MS.toString(), String.valueOf(1000));
+        metadataList.put(CFNames.ROBOT_IMPORT_CAPTURE_DELAY_MS.toString(), String.valueOf(2000));
+
+        metadataList.put(CFNames.ROBOT_IMPORT_MODE.toString(), RobotCaptureMode.START_FROM_MIDDLE.toString());
 
 
-	/*
-     * General settings
-	 */
-
-    public String DEFAULT_LANGUAGE = ConfigurationConstants.DEFAULT_LANGUAGE;
-
-    public String HOME = ConfigurationConstants.SYSTEM_HOME_PATH;
+    }
 
     /**
-     * Profile settings
+     * Update a single value
+     *
+     * @param name
+     * @param value
      */
-
-    public String PROFILE_TITLE = "New configuration profile";
-
-    public String PROFILE_COMMENT = "Comments";
-
-    public String PROFILE_PATH = ConfigurationConstants.DEFAULT_PROFILE_PATH.toString();
-
-    public Boolean SAVE_PROFILE_WHEN_LEAVE = true;
-
-
-    /*
-     * Import settings
-     */
-
-    public Boolean IMPORT_ENABLE_CROPPING = true;
-
-    public Integer IMPORT_CROP_AREA_SELECTION_X = 50;
-
-    public Integer IMPORT_CROP_AREA_SELECTION_Y = 50;
-
-    public Integer IMPORT_CROP_AREA_SELECTION_W = 400;
-
-    public Integer IMPORT_CROP_AREA_SELECTION_H = 400;
+    public void updateValue(CFNames name, String value) {
+        updateValue(name.toString(), value);
+    }
 
     /**
-     * Delay in milliseconds we have to wait before a window is considered as hidden
+     * Update a single value
+     *
+     * @param name
+     * @param value
      */
-    public Integer WINDOW_HIDDING_DELAY = 700;
+    public void updateValue(CFNames name, Integer value) {
+        updateValue(name.toString(), String.valueOf(value));
+    }
 
     /**
-     * Number of shapePoints necessary for assembling images,
+     * Update a single value
+     *
+     * @param name
+     * @param value
      */
-    public Integer IMPORT_MATCHING_POINTS_THRESHOLD = 20;
+    public void updateValue(String name, Integer value) {
+        updateValue(name, String.valueOf(value));
+    }
 
-    public Integer IMPORT_SURF_MODE = 2;
+    /**
+     * Update a single value
+     *
+     * @param name
+     * @param value
+     */
+    public void updateValue(String name, String value) {
 
-    public Boolean ALERT_NOW_IF_REFUSED_TILES = false;
+        if (metadataList.get(name) == null) {
+            throw new IllegalArgumentException("Specified name does not exist: " + name);
+        }
 
-    public String DIRECTORY_IMPORT_PATH = ConfigurationConstants.SYSTEM_HOME_PATH;
+        metadataList.put(name, value);
+    }
 
-    public String DOCUMENT_IMPORT_PATH = ConfigurationConstants.SYSTEM_HOME_PATH;
+    /**
+     * Add a custom value
+     * <p>
+     * If key exist, a runtime error is thrown
+     *
+     * @param name
+     * @param value
+     */
+    public void addValue(String name, String value) {
 
-    public Float IMPORT_DOCUMENT_SCALE_FACTOR = 1f;
+        if (metadataList.get(name) == null) {
+            throw new IllegalArgumentException("Specified name already exist: " + name);
+        }
 
-    public Float ROBOT_IMPORT_COVERING = 0.1f;
+        metadataList.put(name.toString(), value);
+    }
 
-    public Integer ROBOT_IMPORT_WIDTH = 5;
+    /**
+     * Get the corresponding metadata
+     *
+     * @param name
+     * @return
+     */
+    public String getValue(CFNames name) {
+        return metadataList.get(name.toString());
+    }
 
-    public Integer ROBOT_IMPORT_HEIGHT = 5;
+    /**
+     * Get corresponding value
+     *
+     * @param name
+     * @return
+     */
+    public Float getFloat(CFNames name) {
+        return getFloat(name.toString());
+    }
 
-    public Integer ROBOT_IMPORT_MOVING_DELAY = 1000;
+    /**
+     * Get corresponding value
+     *
+     * @param name
+     * @return
+     */
+    public Float getFloat(String name) {
+        try {
+            return Float.valueOf(metadataList.get(name));
+        } catch (Exception e) {
+            throw new IllegalStateException("Error while transforming value", e);
+        }
+    }
 
-    public Integer ROBOT_IMPORT_CAPTURE_DELAY = 2000;
+    /**
+     * Get corresponding value
+     *
+     * @param name
+     * @return
+     */
+    public Integer getInt(CFNames name) {
+        return getInt(name.toString());
+    }
 
-    public String ROBOT_IMPORT_MODE = "ROBOT_IMPORT_MODE";
+    /**
+     * Get corresponding value
+     *
+     * @param name
+     * @return
+     */
+    public Integer getInt(String name) {
+        try {
+            return Integer.valueOf(metadataList.get(name));
+        } catch (Exception e) {
+            throw new IllegalStateException("Error while transforming value", e);
+        }
+    }
+
+    /**
+     * Get the corresponding metadata
+     *
+     * @param name
+     * @return
+     */
+    public String getValue(String name) {
+        return metadataList.get(name);
+    }
+
+    /**
+     * Return all values
+     * <p>
+     * Values are returned in a shallow copy of map
+     *
+     * @return
+     */
+    public HashMap<String, String> getAllValues() {
+        return new HashMap<>(metadataList);
+    }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         ConfigurationContainer that = (ConfigurationContainer) o;
-
-        if (DEFAULT_LANGUAGE != null ? !DEFAULT_LANGUAGE.equals(that.DEFAULT_LANGUAGE) : that.DEFAULT_LANGUAGE != null)
-            return false;
-        if (HOME != null ? !HOME.equals(that.HOME) : that.HOME != null) return false;
-        if (PROFILE_TITLE != null ? !PROFILE_TITLE.equals(that.PROFILE_TITLE) : that.PROFILE_TITLE != null)
-            return false;
-        if (PROFILE_COMMENT != null ? !PROFILE_COMMENT.equals(that.PROFILE_COMMENT) : that.PROFILE_COMMENT != null)
-            return false;
-        if (PROFILE_PATH != null ? !PROFILE_PATH.equals(that.PROFILE_PATH) : that.PROFILE_PATH != null) return false;
-        if (SAVE_PROFILE_WHEN_LEAVE != null ? !SAVE_PROFILE_WHEN_LEAVE.equals(that.SAVE_PROFILE_WHEN_LEAVE) : that.SAVE_PROFILE_WHEN_LEAVE != null)
-            return false;
-        if (IMPORT_ENABLE_CROPPING != null ? !IMPORT_ENABLE_CROPPING.equals(that.IMPORT_ENABLE_CROPPING) : that.IMPORT_ENABLE_CROPPING != null)
-            return false;
-        if (IMPORT_CROP_AREA_SELECTION_X != null ? !IMPORT_CROP_AREA_SELECTION_X.equals(that.IMPORT_CROP_AREA_SELECTION_X) : that.IMPORT_CROP_AREA_SELECTION_X != null)
-            return false;
-        if (IMPORT_CROP_AREA_SELECTION_Y != null ? !IMPORT_CROP_AREA_SELECTION_Y.equals(that.IMPORT_CROP_AREA_SELECTION_Y) : that.IMPORT_CROP_AREA_SELECTION_Y != null)
-            return false;
-        if (IMPORT_CROP_AREA_SELECTION_W != null ? !IMPORT_CROP_AREA_SELECTION_W.equals(that.IMPORT_CROP_AREA_SELECTION_W) : that.IMPORT_CROP_AREA_SELECTION_W != null)
-            return false;
-        if (IMPORT_CROP_AREA_SELECTION_H != null ? !IMPORT_CROP_AREA_SELECTION_H.equals(that.IMPORT_CROP_AREA_SELECTION_H) : that.IMPORT_CROP_AREA_SELECTION_H != null)
-            return false;
-        if (WINDOW_HIDDING_DELAY != null ? !WINDOW_HIDDING_DELAY.equals(that.WINDOW_HIDDING_DELAY) : that.WINDOW_HIDDING_DELAY != null)
-            return false;
-        if (IMPORT_MATCHING_POINTS_THRESHOLD != null ? !IMPORT_MATCHING_POINTS_THRESHOLD.equals(that.IMPORT_MATCHING_POINTS_THRESHOLD) : that.IMPORT_MATCHING_POINTS_THRESHOLD != null)
-            return false;
-        if (IMPORT_SURF_MODE != null ? !IMPORT_SURF_MODE.equals(that.IMPORT_SURF_MODE) : that.IMPORT_SURF_MODE != null)
-            return false;
-        if (ALERT_NOW_IF_REFUSED_TILES != null ? !ALERT_NOW_IF_REFUSED_TILES.equals(that.ALERT_NOW_IF_REFUSED_TILES) : that.ALERT_NOW_IF_REFUSED_TILES != null)
-            return false;
-        if (DIRECTORY_IMPORT_PATH != null ? !DIRECTORY_IMPORT_PATH.equals(that.DIRECTORY_IMPORT_PATH) : that.DIRECTORY_IMPORT_PATH != null)
-            return false;
-        if (DOCUMENT_IMPORT_PATH != null ? !DOCUMENT_IMPORT_PATH.equals(that.DOCUMENT_IMPORT_PATH) : that.DOCUMENT_IMPORT_PATH != null)
-            return false;
-        if (IMPORT_DOCUMENT_SCALE_FACTOR != null ? !IMPORT_DOCUMENT_SCALE_FACTOR.equals(that.IMPORT_DOCUMENT_SCALE_FACTOR) : that.IMPORT_DOCUMENT_SCALE_FACTOR != null)
-            return false;
-        if (ROBOT_IMPORT_COVERING != null ? !ROBOT_IMPORT_COVERING.equals(that.ROBOT_IMPORT_COVERING) : that.ROBOT_IMPORT_COVERING != null)
-            return false;
-        if (ROBOT_IMPORT_WIDTH != null ? !ROBOT_IMPORT_WIDTH.equals(that.ROBOT_IMPORT_WIDTH) : that.ROBOT_IMPORT_WIDTH != null)
-            return false;
-        if (ROBOT_IMPORT_HEIGHT != null ? !ROBOT_IMPORT_HEIGHT.equals(that.ROBOT_IMPORT_HEIGHT) : that.ROBOT_IMPORT_HEIGHT != null)
-            return false;
-        if (ROBOT_IMPORT_MOVING_DELAY != null ? !ROBOT_IMPORT_MOVING_DELAY.equals(that.ROBOT_IMPORT_MOVING_DELAY) : that.ROBOT_IMPORT_MOVING_DELAY != null)
-            return false;
-        return ROBOT_IMPORT_CAPTURE_DELAY != null ? ROBOT_IMPORT_CAPTURE_DELAY.equals(that.ROBOT_IMPORT_CAPTURE_DELAY) : that.ROBOT_IMPORT_CAPTURE_DELAY == null;
-
+        return Objects.equals(metadataList, that.metadataList);
     }
 
     @Override
     public int hashCode() {
-        int result = DEFAULT_LANGUAGE != null ? DEFAULT_LANGUAGE.hashCode() : 0;
-        result = 31 * result + (HOME != null ? HOME.hashCode() : 0);
-        result = 31 * result + (PROFILE_TITLE != null ? PROFILE_TITLE.hashCode() : 0);
-        result = 31 * result + (PROFILE_COMMENT != null ? PROFILE_COMMENT.hashCode() : 0);
-        result = 31 * result + (PROFILE_PATH != null ? PROFILE_PATH.hashCode() : 0);
-        result = 31 * result + (SAVE_PROFILE_WHEN_LEAVE != null ? SAVE_PROFILE_WHEN_LEAVE.hashCode() : 0);
-        result = 31 * result + (IMPORT_ENABLE_CROPPING != null ? IMPORT_ENABLE_CROPPING.hashCode() : 0);
-        result = 31 * result + (IMPORT_CROP_AREA_SELECTION_X != null ? IMPORT_CROP_AREA_SELECTION_X.hashCode() : 0);
-        result = 31 * result + (IMPORT_CROP_AREA_SELECTION_Y != null ? IMPORT_CROP_AREA_SELECTION_Y.hashCode() : 0);
-        result = 31 * result + (IMPORT_CROP_AREA_SELECTION_W != null ? IMPORT_CROP_AREA_SELECTION_W.hashCode() : 0);
-        result = 31 * result + (IMPORT_CROP_AREA_SELECTION_H != null ? IMPORT_CROP_AREA_SELECTION_H.hashCode() : 0);
-        result = 31 * result + (WINDOW_HIDDING_DELAY != null ? WINDOW_HIDDING_DELAY.hashCode() : 0);
-        result = 31 * result + (IMPORT_MATCHING_POINTS_THRESHOLD != null ? IMPORT_MATCHING_POINTS_THRESHOLD.hashCode() : 0);
-        result = 31 * result + (IMPORT_SURF_MODE != null ? IMPORT_SURF_MODE.hashCode() : 0);
-        result = 31 * result + (ALERT_NOW_IF_REFUSED_TILES != null ? ALERT_NOW_IF_REFUSED_TILES.hashCode() : 0);
-        result = 31 * result + (DIRECTORY_IMPORT_PATH != null ? DIRECTORY_IMPORT_PATH.hashCode() : 0);
-        result = 31 * result + (DOCUMENT_IMPORT_PATH != null ? DOCUMENT_IMPORT_PATH.hashCode() : 0);
-        result = 31 * result + (IMPORT_DOCUMENT_SCALE_FACTOR != null ? IMPORT_DOCUMENT_SCALE_FACTOR.hashCode() : 0);
-        result = 31 * result + (ROBOT_IMPORT_COVERING != null ? ROBOT_IMPORT_COVERING.hashCode() : 0);
-        result = 31 * result + (ROBOT_IMPORT_WIDTH != null ? ROBOT_IMPORT_WIDTH.hashCode() : 0);
-        result = 31 * result + (ROBOT_IMPORT_HEIGHT != null ? ROBOT_IMPORT_HEIGHT.hashCode() : 0);
-        result = 31 * result + (ROBOT_IMPORT_MOVING_DELAY != null ? ROBOT_IMPORT_MOVING_DELAY.hashCode() : 0);
-        result = 31 * result + (ROBOT_IMPORT_CAPTURE_DELAY != null ? ROBOT_IMPORT_CAPTURE_DELAY.hashCode() : 0);
-        return result;
+        return Objects.hash(metadataList);
     }
 }

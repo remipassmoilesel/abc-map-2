@@ -2,13 +2,16 @@ package org.abcmap.core.managers;
 
 import com.labun.surf.Params;
 import com.thoughtworks.xstream.XStream;
+import org.abcmap.core.configuration.CFNames;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.configuration.ConfigurationContainer;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 
 import java.awt.*;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -35,7 +38,7 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
     private void initializeConfiguration() throws IOException {
 
         // check configuration directory
-        Path root = ConfigurationConstants.PROFILE_ROOT_PATH;
+        Path root = ConfigurationConstants.CONFIGURATION_ROOT_PATH;
         if (Files.isDirectory(root) == false) {
             Files.createDirectories(root);
         }
@@ -107,13 +110,15 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
      */
     public Params getSurfConfiguration() {
 
+        Integer surfMode = currentConfiguration.getInt(CFNames.IMPORT_SURF_MODE);
+
         // check if current parameter is valid
-        if (currentConfiguration.IMPORT_SURF_MODE < 0
-                || currentConfiguration.IMPORT_SURF_MODE > ConfigurationConstants.SURF_PARAMS.length - 1) {
-            currentConfiguration.IMPORT_SURF_MODE = 0;
+        if (surfMode < 0 || surfMode > ConfigurationConstants.SURF_PARAMS.length - 1) {
+            surfMode = 0;
+            currentConfiguration.updateValue(CFNames.IMPORT_SURF_MODE, surfMode);
         }
 
-        return ConfigurationConstants.SURF_PARAMS[currentConfiguration.IMPORT_SURF_MODE];
+        return ConfigurationConstants.SURF_PARAMS[surfMode];
 
     }
 
@@ -158,6 +163,6 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
     }
 
     public void saveCurrentProfile() throws IOException {
-        saveConfiguration(currentConfiguration, Paths.get(currentConfiguration.PROFILE_PATH));
+        saveConfiguration(currentConfiguration, Paths.get(currentConfiguration.getValue(CFNames.PROFILE_PATH)));
     }
 }

@@ -1,5 +1,6 @@
 package org.abcmap.ielements.ressources;
 
+import org.abcmap.core.configuration.CFNames;
 import org.abcmap.ielements.InteractionElement;
 
 import java.io.File;
@@ -15,7 +16,7 @@ public class ShowUserManual extends InteractionElement {
 
         this.displaySimplyInSearch = true;
 
-        manualFile = new File("./help/manual_" + configm().getConfiguration().LANGUAGE + ".pdf");
+        manualFile = new File("./help/manual_" + configm().getConfiguration().getValue(CFNames.LANGUAGE) + ".pdf");
 
     }
 

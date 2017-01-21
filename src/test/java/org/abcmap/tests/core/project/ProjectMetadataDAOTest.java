@@ -3,7 +3,7 @@ package org.abcmap.tests.core.project;
 import org.abcmap.TestUtils;
 import org.abcmap.core.dao.ProjectMetadataDAO;
 import org.abcmap.core.project.PMNames;
-import org.abcmap.core.project.ProjectMetadata;
+import org.abcmap.core.project.ProjectMetadataContainer;
 import org.apache.commons.io.FileUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -35,7 +35,7 @@ public class ProjectMetadataDAOTest {
 
         Path db = tempfolder.resolve("metadatas.db");
 
-        ProjectMetadata originalMtd = new ProjectMetadata();
+        ProjectMetadataContainer originalMtd = new ProjectMetadataContainer();
         originalMtd.updateValue(PMNames.CREATED, "NEW VALUE");
 
         assertTrue("Equality test", originalMtd.equals(originalMtd));
@@ -48,7 +48,7 @@ public class ProjectMetadataDAOTest {
         dao.writeMetadata(originalMtd);
 
         // reading test
-        ProjectMetadata readMtd = dao.readMetadata();
+        ProjectMetadataContainer readMtd = dao.readMetadata();
 
         // Critical values
         //System.out.println(readMtd.getValue(PMConstants.CREATED));

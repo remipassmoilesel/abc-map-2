@@ -53,7 +53,7 @@ public class ConfigurationConstants {
      */
     public static String SYSTEM_HOME_PATH = FileSystemView.getFileSystemView().getDefaultDirectory().getAbsolutePath();
     public static final Path SYMBOLS_DIR_PATH = Paths.get("./symbols");
-    public static final Path PROFILE_ROOT_PATH = Paths.get("./profiles");
+    public static final Path CONFIGURATION_ROOT_PATH = Paths.get("./config");
     public static final Path LOG_DIRECTORY = Paths.get("./log");
     public static final Path TEMP_FOLDER = Paths.get("./tmp");
     public static final Path HELP_DIR = Paths.get("./help");
@@ -77,13 +77,13 @@ public class ConfigurationConstants {
      * Configuration profiles settings
      */
     public static final String PROFILE_EXTENSION = "xml";
-    public static final Path DEFAULT_PROFILE_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), "default." + PROFILE_EXTENSION);
-    public static final Path CURRENT_PROFILE_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), ".current.xml");
+    public static final Path DEFAULT_PROFILE_PATH = Paths.get(ConfigurationConstants.CONFIGURATION_ROOT_PATH.toString(), "default." + PROFILE_EXTENSION);
+    public static final Path CURRENT_PROFILE_PATH = Paths.get(ConfigurationConstants.CONFIGURATION_ROOT_PATH.toString(), ".current.xml");
 
     /**
      * Path where history  of projects and profiles is stored
      */
-    public static final Path HISTORY_PATH = Paths.get(ConfigurationConstants.PROFILE_ROOT_PATH.toString(), ".history.xml");
+    public static final Path HISTORY_PATH = Paths.get(ConfigurationConstants.CONFIGURATION_ROOT_PATH.toString(), ".history.xml");
 
     public static final String PROJECT_EXTENSION = "abm";
 
@@ -95,7 +95,6 @@ public class ConfigurationConstants {
      * Upper case mandatory
      */
     public static final String SQL_TABLE_PREFIX = "ABM_";
-
 
     public static final Params[] SURF_PARAMS = new Params[]{
             new Params(4, 4, 0.01f, 2, false, false, false, 1, false),

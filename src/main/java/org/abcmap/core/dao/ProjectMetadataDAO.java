@@ -1,6 +1,6 @@
 package org.abcmap.core.dao;
 
-import org.abcmap.core.project.ProjectMetadata;
+import org.abcmap.core.project.ProjectMetadataContainer;
 import org.abcmap.core.project.ProjectMetadataPeer;
 
 import java.io.IOException;
@@ -19,9 +19,9 @@ public class ProjectMetadataDAO extends AbstractOrmDAO {
         super(dbPath, ProjectMetadataPeer.class);
     }
 
-    public ProjectMetadata readMetadata() {
+    public ProjectMetadataContainer readMetadata() {
 
-        ProjectMetadata ctr = new ProjectMetadata();
+        ProjectMetadataContainer ctr = new ProjectMetadataContainer();
 
         visit((Object o) -> {
             ProjectMetadataPeer p = (ProjectMetadataPeer) o;
@@ -32,7 +32,7 @@ public class ProjectMetadataDAO extends AbstractOrmDAO {
         return ctr;
     }
 
-    public void writeMetadata(ProjectMetadata ctr) throws IOException {
+    public void writeMetadata(ProjectMetadataContainer ctr) throws IOException {
 
         deleteAll();
 

@@ -89,7 +89,7 @@ public class Project {
     /**
      * Metadata about project
      */
-    private ProjectMetadata metadataContainer;
+    private ProjectMetadataContainer metadataContainer;
 
     /**
      * CRS of the whole project
@@ -113,7 +113,7 @@ public class Project {
 
         this.databasePath = databasePath;
         this.tempDirectory = databasePath.getParent();
-        this.metadataContainer = new ProjectMetadata();
+        this.metadataContainer = new ProjectMetadataContainer();
         this.mainLayersList = new ArrayList<>();
         this.layouts = new ArrayList<>();
         this.finalPath = null;
@@ -156,7 +156,7 @@ public class Project {
      *
      * @return
      */
-    public ProjectMetadata getMetadataContainer() {
+    public ProjectMetadataContainer getMetadataContainer() {
         return metadataContainer;
     }
 
@@ -165,7 +165,7 @@ public class Project {
      *
      * @return
      */
-    public void setMetadataContainer(ProjectMetadata metadata) {
+    public void setMetadataContainer(ProjectMetadataContainer metadata) {
         this.metadataContainer = metadata;
     }
 

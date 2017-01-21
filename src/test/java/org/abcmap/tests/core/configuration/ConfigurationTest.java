@@ -1,6 +1,7 @@
 package org.abcmap.tests.core.configuration;
 
 import org.abcmap.TestUtils;
+import org.abcmap.core.configuration.CFNames;
 import org.abcmap.core.configuration.ConfigurationContainer;
 import org.abcmap.core.managers.ConfigurationManager;
 import org.abcmap.core.managers.Main;
@@ -39,8 +40,8 @@ public class ConfigurationTest {
         ConfigurationContainer defaultConfiguration = new ConfigurationContainer();
 
         // change configuration
-        defaultConfiguration.DEFAULT_LANGUAGE = "bloubi";
-        defaultConfiguration.HOME = "/home/bloubiboy";
+        defaultConfiguration.updateValue(CFNames.DEFAULT_LANGUAGE, "bloubi");
+        defaultConfiguration.updateValue(CFNames.HOME, "/home/bloubi");
 
         // save configuration
         configm.saveConfiguration(defaultConfiguration, configurationPath);

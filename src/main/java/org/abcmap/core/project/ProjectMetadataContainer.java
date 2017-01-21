@@ -11,11 +11,11 @@ import java.util.Objects;
 /**
  * Project metadata container. All metadata names must be constants stored in PMContants enum.
  */
-public class ProjectMetadata {
+public class ProjectMetadataContainer {
 
     private HashMap<String, String> metadataList;
 
-    public ProjectMetadata() {
+    public ProjectMetadataContainer() {
 
         metadataList = new HashMap<>();
 
@@ -48,6 +48,11 @@ public class ProjectMetadata {
      * @param value
      */
     public void updateValue(String name, String value) {
+
+        if (metadataList.get(name) == null) {
+            throw new IllegalArgumentException("Specified name does not exist: " + name);
+        }
+
         metadataList.put(name, value);
     }
 
@@ -62,8 +67,9 @@ public class ProjectMetadata {
     public void addValue(String name, String value) {
 
         if (metadataList.get(name) != null) {
-            throw new IllegalArgumentException("Name already exist: " + name);
+            throw new IllegalArgumentException("Specified name already exist: " + name);
         }
+
         metadataList.put(name.toString(), value);
     }
 
@@ -74,6 +80,16 @@ public class ProjectMetadata {
      * @return
      */
     public String getValue(PMNames name) {
+        return metadataList.get(name.toString());
+    }
+
+    /**
+     * Get the corresponding metadata
+     *
+     * @param name
+     * @return
+     */
+    public String getValue(String name) {
         return metadataList.get(name.toString());
     }
 
@@ -93,7 +109,7 @@ public class ProjectMetadata {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ProjectMetadata that = (ProjectMetadata) o;
+        ProjectMetadataContainer that = (ProjectMetadataContainer) o;
         return Objects.equals(metadataList, that.metadataList);
     }
 

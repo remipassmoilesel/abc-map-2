@@ -1,6 +1,7 @@
 package org.abcmap.core.robot;
 
 
+import org.abcmap.core.configuration.CFNames;
 import org.abcmap.core.configuration.ConfigurationContainer;
 import org.abcmap.core.utils.Utils;
 
@@ -36,11 +37,11 @@ public class RobotConfiguration {
         this.name = name;
 
         ConfigurationContainer conf = new ConfigurationContainer();
-        this.covering = conf.ROBOT_IMPORT_COVERING;
-        this.movingDelay = conf.ROBOT_IMPORT_MOVING_DELAY;
-        this.captureDelay = conf.ROBOT_IMPORT_CAPTURE_DELAY;
-        this.hiddingDelay = conf.WINDOW_HIDDING_DELAY;
-        this.mode = RobotCaptureMode.safeValueOf(conf.ROBOT_IMPORT_MODE);
+        this.covering = conf.getFloat(CFNames.ROBOT_IMPORT_COVERING);
+        this.movingDelay = conf.getInt(CFNames.ROBOT_IMPORT_MOVING_DELAY_MS);
+        this.captureDelay = conf.getInt(CFNames.ROBOT_IMPORT_CAPTURE_DELAY_MS);
+        this.hiddingDelay = conf.getInt(CFNames.WINDOW_HIDDING_DELAY_MS);
+        this.mode = RobotCaptureMode.safeValueOf(conf.getValue(CFNames.ROBOT_IMPORT_MODE));
     }
 
     public RobotConfiguration(String name, float covering, int draggingDelay, int captureDelay,
