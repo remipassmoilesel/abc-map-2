@@ -15,6 +15,7 @@ import org.abcmap.core.project.backup.ProjectBackupInterval;
 import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.project.layers.AbmTileLayer;
+import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -236,26 +237,31 @@ public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNot
         else if (id.equals(FAKE_PROJECT_2)) {
 
             fakeProject.addNewShapeFileLayer(Paths.get("data/cinema/les_salles_de_cinemas_en_ile-de-france.shp"));
-            //fakeProject.addNewWMSLayer("http://ows.mundialis.de/services/service", null);
+            fakeProject.addNewWMSLayer("http://ows.mundialis.de/services/service", null);
             fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes/communes-20160119.shp"));
             //fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes-ed50/france-communes-ed50.shp"));
 
             // Uncomment to add generated random content
             fakeProject.setActiveLayer(0);
 
-            // populate feature layer with random features
-            int featureNumber = 10;
-            ReferencedEnvelope bounds = fakeProject.getLayersList().get(1).getBounds();
-            PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
-            LineBuilder builder = new LineBuilder((AbmFeatureLayer) fakeProject.getActiveLayer(),
-                    Main.getDrawManager().getActiveStyle(AbmDefaultFeatureType.LINE));
-            for (int i = 0; i < featureNumber; i++) {
-                builder.newLine(new Coordinate(rand.next(), rand.next()));
-                for (int j = 0; j < 5; j++) {
-                    builder.addPoint(new Coordinate(rand.next(), rand.next()));
-                }
-                builder.terminateLine(new Coordinate(rand.next(), rand.next()));
+            if (false) {
+                ThreadManager.runLater(() -> {
+                    // populate feature layer with random features
+                    int featureNumber = 10;
+                    ReferencedEnvelope bounds = fakeProject.getLayersList().get(1).getBounds();
+                    PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
+                    LineBuilder builder = new LineBuilder((AbmFeatureLayer) fakeProject.getActiveLayer(),
+                            Main.getDrawManager().getActiveStyle(AbmDefaultFeatureType.LINE));
+                    for (int i = 0; i < featureNumber; i++) {
+                        builder.newLine(new Coordinate(rand.next(), rand.next()));
+                        for (int j = 0; j < 5; j++) {
+                            builder.addPoint(new Coordinate(rand.next(), rand.next()));
+                        }
+                        builder.terminateLine(new Coordinate(rand.next(), rand.next()));
+                    }
+                });
             }
+
 
         }
 

@@ -8,6 +8,7 @@ import org.abcmap.core.utils.SQLUtils;
 import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.Layer;
@@ -54,6 +55,8 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
     public AbmFeatureLayer(LayerIndexEntry entry, Project owner) throws IOException {
         super(owner, entry);
 
+        setReadableType("Couche de dessin");
+
         JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(project.getDatabasePath());
 
         // open an existing feature store or create a new one
@@ -65,6 +68,7 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
             // create a simple feature type
             SimpleFeatureType type = AbmSimpleFeatureBuilder.getDefaultFeatureType(entry.getLayerId(), owner.getCrs());
             datastore.createSchema(type);
+
             this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource(entry.getLayerId());
         }
 
@@ -72,6 +76,15 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
         this.featureBuilder = FeatureUtils.getDefaultFeatureBuilder(entry.getLayerId(), owner.getCrs());
 
         buildInternalLayer();
+
+        addStartRectangle();
+    }
+
+    /**
+     * Add a first rectangle on empty layer, to prevent errors
+     */
+    private void addStartRectangle() {
+        addShape(JTS.toGeometry(new ReferencedEnvelope(-25.57984295771083, 28.51079979542488, 45.61156329232754, 72.48196247927211, project.getCrs())));
     }
 
     @Override
@@ -252,5 +265,4 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
     public AbmSimpleFeatureBuilder getFeatureBuilder() {
         return featureBuilder;
     }
-
 }

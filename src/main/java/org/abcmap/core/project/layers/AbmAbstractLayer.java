@@ -32,6 +32,7 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
     protected Layer internalLayer;
     protected LayerIndexEntry indexEntry;
     protected Style layerStyle;
+    protected String readableType;
 
     /**
      * Main constructor of a layer. Layers have to be created with Project.addNewFeatureLayer() instead of this constructor.
@@ -42,6 +43,7 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
         this.project = owner;
         this.indexEntry = entry;
         this.layerStyle = sf.createStyle();
+        this.readableType = "Couche sans nom";
     }
 
     /**
@@ -274,5 +276,24 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
         return indexEntry != null ? indexEntry.hashCode() : 0;
     }
 
+    /**
+     * Set a human readable name of this layer.
+     * <p>
+     * This name can appear on lists, information panels, ...
+     *
+     * @param readableType
+     */
+    protected void setReadableType(String readableType) {
+        this.readableType = readableType;
+    }
 
+    /**
+     * Get the human readable name of this layer.
+     * <p>
+     * This name can appear on lists, information panels, ...
+     *
+     */
+    public String getReadableType() {
+        return readableType;
+    }
 }

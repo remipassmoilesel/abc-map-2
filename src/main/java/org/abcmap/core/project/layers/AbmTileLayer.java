@@ -2,7 +2,6 @@ package org.abcmap.core.project.layers;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
-import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.tiles.TileContainer;
 import org.abcmap.core.tiles.TileFeatureBuilder;
@@ -26,7 +25,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.GridCoverageLayer;
-import org.geotools.map.Layer;
 import org.geotools.referencing.CRS;
 import org.geotools.styling.*;
 import org.geotools.styling.Stroke;
@@ -75,6 +73,8 @@ public class AbmTileLayer extends AbmAbstractLayer {
 
     public AbmTileLayer(LayerIndexEntry entry, Project owner) throws IOException {
         super(owner, entry);
+
+        setReadableType("Couche de tuiles");
 
         JDBCDataStore datastore = SQLUtils.getGeotoolsDatastoreFromH2(project.getDatabasePath());
 

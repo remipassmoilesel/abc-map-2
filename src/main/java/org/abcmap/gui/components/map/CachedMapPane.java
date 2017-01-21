@@ -189,6 +189,8 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        //logger.warning("currentWorldEnvelope: " + currentWorldEnvelope);
+
         // don't paint before all is ready
         if (firstTimeRender) {
             if (debugMode) {

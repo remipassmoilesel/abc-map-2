@@ -126,7 +126,7 @@ public class GuiBuilder {
         // east dock
         ArrayList<Object> eList = new ArrayList<>();
         eList.add(new DrawIndicatorWidget());
-        eList.add(new GroupLayersAndDimensions());
+        eList.add(new GroupLayers());
         eList.add(new GroupDrawingTools());
         eList.add(new GroupDrawingPalette());
         eList.add(new GroupObjectPosition());

@@ -35,6 +35,8 @@ public class AbmShapeFileLayer extends AbmAbstractLayer {
     public AbmShapeFileLayer(LayerIndexEntry entry, Path shapefilePath, Project owner) throws IOException {
         super(owner, entry);
 
+        setReadableType("Fichier de formes");
+
         ShapefileDao dao = new ShapefileDao(project.getDatabasePath());
 
         // path is null, this should be an existing layer

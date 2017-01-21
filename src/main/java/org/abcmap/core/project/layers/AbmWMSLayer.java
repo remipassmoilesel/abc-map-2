@@ -51,6 +51,8 @@ public class AbmWMSLayer extends AbmAbstractLayer {
     public AbmWMSLayer(LayerIndexEntry layerEntry, String url, String wmsLayerName, Project owner) throws IOException {
         super(owner, layerEntry);
 
+        setReadableType("Couche distante");
+
         WMSDao dao = new WMSDao(project.getDatabasePath());
 
         // url is null, this should be an existing layer, search for existing entries
@@ -163,4 +165,7 @@ public class AbmWMSLayer extends AbmAbstractLayer {
         return internalLayer.getBounds();
     }
 
+    public WmsLayerEntry getWmsEntry() {
+        return wmsEntry;
+    }
 }
