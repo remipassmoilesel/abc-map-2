@@ -1,27 +1,25 @@
-package org.abcmap.gui.iegroup.docks;
+package org.abcmap.iegroup.menubar;
 
-import org.abcmap.gui.GuiIcons;
 import org.abcmap.ielements.GroupOfInteractionElements;
+import org.abcmap.ielements.program.QuitProgram;
 import org.abcmap.ielements.project.*;
 import org.abcmap.ielements.recents.OpenRecentProject;
 
-public class GroupProject extends GroupOfInteractionElements {
+public class FileMenu extends GroupOfInteractionElements {
 
-    public GroupProject() {
-        label = "Projet";
-        blockIcon = GuiIcons.GROUP_PROJECT;
+    public FileMenu() {
+
+        label = "Fichier";
 
         addInteractionElement(new NewProject());
         addInteractionElement(new OpenProject());
         addInteractionElement(new OpenRecentProject());
         addInteractionElement(new SaveProject());
         addInteractionElement(new SaveAsProject());
-        addInteractionElement(new CloseProject());
 
         addSeparator();
-        addInteractionElement(new SetProjectTitle());
-        addInteractionElement(new SetProjectComment());
-
+        addInteractionElement(new CloseProject());
+        addInteractionElement(new QuitProgram());
     }
 
 }

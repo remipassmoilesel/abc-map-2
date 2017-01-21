@@ -1,4 +1,4 @@
-package org.abcmap.gui.iegroup.menubar;
+package org.abcmap.iegroup.menubar;
 
 import org.abcmap.core.managers.Main;
 import org.abcmap.ielements.InteractionElement;

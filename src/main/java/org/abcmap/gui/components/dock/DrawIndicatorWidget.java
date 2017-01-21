@@ -10,8 +10,8 @@ import org.abcmap.core.events.manager.Event;
 import org.abcmap.core.events.manager.EventListener;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.gui.components.color.ColorButton;
-import org.abcmap.gui.iegroup.docks.GroupDrawingPalette;
-import org.abcmap.gui.iegroup.docks.GroupDrawingTools;
+import org.abcmap.iegroup.docks.GroupDrawingPalette;
+import org.abcmap.iegroup.docks.GroupDrawingTools;
 import org.abcmap.gui.tools.containers.ToolContainer;
 
 import javax.swing.*;

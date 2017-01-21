@@ -3,7 +3,7 @@ package org.abcmap.gui.wizards;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.Main;
 import org.abcmap.ielements.GroupOfInteractionElements;
-import org.abcmap.gui.iegroup.docks.GroupWizard;
+import org.abcmap.iegroup.docks.GroupWizard;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.utils.HasDisplayableSpace;
 import org.abcmap.gui.windows.DetachedWindow;

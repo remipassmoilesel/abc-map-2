@@ -9,7 +9,7 @@ import org.abcmap.ielements.importation.robot.SelectRobotImportOptions;
 import org.abcmap.ielements.project.NewProject;
 import org.abcmap.ielements.project.OpenProject;
 import org.abcmap.ielements.ressources.GoToOpenStreetMap;
-import org.abcmap.gui.iegroup.docks.GroupImportation;
+import org.abcmap.iegroup.docks.GroupImportation;
 
 import java.util.ArrayList;
 import java.util.Arrays;

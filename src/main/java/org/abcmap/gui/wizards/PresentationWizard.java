@@ -2,10 +2,10 @@ package org.abcmap.gui.wizards;
 
 import org.abcmap.ielements.program.ShowAboutDialog;
 import org.abcmap.ielements.program.ShowSupportProjectDialog;
-import org.abcmap.gui.iegroup.docks.GroupDrawingTools;
-import org.abcmap.gui.iegroup.docks.GroupGeoreferencement;
-import org.abcmap.gui.iegroup.docks.GroupImportation;
-import org.abcmap.gui.iegroup.docks.GroupLayout;
+import org.abcmap.iegroup.docks.GroupDrawingTools;
+import org.abcmap.iegroup.docks.GroupGeoreferencement;
+import org.abcmap.iegroup.docks.GroupImportation;
+import org.abcmap.iegroup.docks.GroupLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;

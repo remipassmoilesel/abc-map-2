@@ -1,4 +1,4 @@
-package org.abcmap.gui.iegroup.docks;
+package org.abcmap.iegroup.docks;
 
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.ielements.GroupOfInteractionElements;

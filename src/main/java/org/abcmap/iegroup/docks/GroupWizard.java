@@ -1,4 +1,4 @@
-package org.abcmap.gui.iegroup.docks;
+package org.abcmap.iegroup.docks;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.gui.GuiIcons;

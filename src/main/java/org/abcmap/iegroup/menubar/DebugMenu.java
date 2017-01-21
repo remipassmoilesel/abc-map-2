@@ -1,4 +1,4 @@
-package org.abcmap.gui.iegroup.menubar;
+package org.abcmap.iegroup.menubar;
 
 import org.abcmap.ielements.GroupOfInteractionElements;
 import org.abcmap.ielements.debug.CreateFakeProject;
