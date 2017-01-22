@@ -3,11 +3,13 @@ package org.abcmap.core.events.manager;
 import org.abcmap.core.events.monitoringtool.NotificationHistoryElement;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.PrintUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Helper to send and receive notifications. Typically this utility is used for managers which have lot of observers.
@@ -41,6 +43,11 @@ public class EventNotificationManager {
     protected final ArrayList<EventNotificationManager> observers;
 
     /**
+     * A special pool is used it in order to prevent event blocking by too much load
+     */
+    private final ThreadPoolExecutor threadPool;
+
+    /**
      * List of listeners called when an event is received
      */
     protected ArrayList<EventListener> eventListeners;
@@ -66,10 +73,25 @@ public class EventNotificationManager {
         this.owner = owner;
         this.observers = new ArrayList<>(10);
         this.eventListeners = new ArrayList<>();
+        this.threadPool = (ThreadPoolExecutor) Executors.newFixedThreadPool(1, new ThreadFactory() {
+
+            public int executorTaskCount = 0;
+
+            @Override
+            public Thread newThread(Runnable r) {
+
+                executorTaskCount++;
+                Thread t = new Thread(r);
+                t.setName("Abm_events_1-" + executorTaskCount);
+                return t;
+            }
+        });
     }
 
     /**
      * Notify observers in a separated thread
+     * <p>
+     * A special pool is used here in order to prevent event blocking by too much load
      *
      * @param notif
      */
@@ -82,7 +104,7 @@ public class EventNotificationManager {
 
         // notify event in a separated thread
         EventReceivedNotifier noti = new EventReceivedNotifier(observers, notif);
-        ThreadManager.runLater(noti);
+        threadPool.submit(noti);
 
     }
 
