@@ -6,10 +6,13 @@ import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.project.layers.AbmShapeFileLayer;
 import org.abcmap.core.project.layers.AbmWMSLayer;
+import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.wms.WmsLayerEntry;
 import org.abcmap.gui.GuiCursor;
 import org.abcmap.gui.utils.FormUpdater;
 import org.abcmap.ielements.InteractionElement;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import javax.swing.*;
 import java.awt.*;
@@ -64,9 +67,18 @@ public class LayerInformationsPanel extends InteractionElement {
 
                 AbmAbstractLayer activeLayer = projectm().getProject().getActiveLayer();
 
-                System.out.println(activeLayer);
-
                 fields.add(new Object[]{"Type:", activeLayer.getReadableType()});
+
+                CoordinateReferenceSystem crs = activeLayer.getCrs();
+                final JTextField crsLabel = getTextFieldForElement("Waiting...");
+                fields.add(new Object[]{"CRS:", crsLabel});
+
+                // get crs name can be very slow, so display value later (and not on EDT)
+                ThreadManager.runLater(() -> {
+                    crsLabel.setText(GeoUtils.crsToString(crs, true));
+                    crsLabel.repaint();
+                    crsLabel.setCaretPosition(0);
+                });
 
                 // add repaint button
                 JButton redraw = new JButton("Redessiner cette couche");
@@ -126,7 +138,8 @@ public class LayerInformationsPanel extends InteractionElement {
 
                     // unknown type of value
                     else {
-                        throw new IllegalArgumentException("Unknown type: " + f[1]);
+                        informationPanel.add(new JLabel(), wrap);
+                        logger.error(new IllegalArgumentException("Unknown type for '" + f[0] + "': " + f[1]));
                     }
 
                 }

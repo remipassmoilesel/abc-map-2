@@ -33,6 +33,12 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
     protected LayerIndexEntry indexEntry;
     protected Style layerStyle;
     protected String readableType;
+    private CoordinateReferenceSystem crs;
+
+    /**
+     * If true, we should not try get CRS again, maybe CRS is null
+     */
+    private boolean crsIsNull;
 
     /**
      * Main constructor of a layer. Layers have to be created with Project.addNewFeatureLayer() instead of this constructor.
@@ -177,7 +183,16 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
      * @return
      */
     public CoordinateReferenceSystem getCrs() {
-        return getInternalLayer().getFeatureSource().getSchema().getCoordinateReferenceSystem();
+
+        // cache CRS to prevent too much compute
+        if (crs == null && crsIsNull == false) {
+            crs = getInternalLayer().getFeatureSource().getSchema().getCoordinateReferenceSystem();
+            if (crs == null) {
+                logger.error(new NullPointerException("Crs is null"));
+                crsIsNull = true;
+            }
+        }
+        return crs;
     }
 
     /**
@@ -291,7 +306,6 @@ public abstract class AbmAbstractLayer implements Comparable<AbmAbstractLayer> {
      * Get the human readable name of this layer.
      * <p>
      * This name can appear on lists, information panels, ...
-     *
      */
     public String getReadableType() {
         return readableType;

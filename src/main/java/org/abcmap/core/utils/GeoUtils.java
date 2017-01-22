@@ -27,7 +27,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.filter.FilterFactory2;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.ReferenceIdentifier;
 import org.opengis.referencing.crs.CRSAuthorityFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.style.ContrastMethod;
@@ -36,7 +35,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.Set;
 
 /**
  * Created by remipassmoilesel on 10/11/16.
@@ -330,11 +328,27 @@ public class GeoUtils {
      * Return a unique identifier for CRS that can be used to recreate a CRS with stringToCrs()
      * <p>
      * If specified CRS is null, using DefaultEngineeringCRS.GENERIC_2D;
+     * <p>
+     * /!\ This operation can take a LOOOONG time !
      *
      * @param crs
      * @return
      */
     public static String crsToString(CoordinateReferenceSystem crs) {
+        return crsToString(crs, false);
+    }
+
+    /**
+     * Return a unique identifier for CRS that can be used to recreate a CRS with stringToCrs()
+     * <p>
+     * If specified CRS is null, using DefaultEngineeringCRS.GENERIC_2D;
+     * <p>
+     * /!\ This operation can take a LOOOONG time !
+     *
+     * @param crs
+     * @return
+     */
+    public static String crsToString(CoordinateReferenceSystem crs, boolean completeButSlowScan) {
 
         if (crs == null) {
             logger.warning("Crs is null: " + crs);
@@ -345,12 +359,17 @@ public class GeoUtils {
         int index = knownCrs.indexOf(crs);
         if (index > -1) {
             return knownCrsNames.get(index);
-        }
-
-        else {
+        } else {
             try {
-                return CRS.lookupIdentifier(crs, true);
-            } catch (FactoryException e) {
+                // If second parameter is set to true, search can be very looooow
+                // String lookup = CRS.lookupIdentifier(crs, true);
+                String lookup = CRS.lookupIdentifier(crs, completeButSlowScan);
+                if (lookup != null) {
+                    return lookup;
+                } else {
+                    throw new NullPointerException("Lookup identifier for CRS failed, id is null");
+                }
+            } catch (Exception e) {
                 logger.error(e);
             }
         }

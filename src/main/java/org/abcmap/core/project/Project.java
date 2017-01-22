@@ -14,6 +14,7 @@ import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
+import org.geotools.referencing.CRS;
 import org.geotools.swing.JMapFrame;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -195,7 +196,7 @@ public class Project {
         for (AbmAbstractLayer lay : getLayersList()) {
             ReferencedEnvelope bounds = lay.getInternalLayer().getBounds();
 
-            if(bounds.getCoordinateReferenceSystem() == null){
+            if (bounds.getCoordinateReferenceSystem() == null) {
                 bounds = new ReferencedEnvelope(bounds, getCrs());
             }
             try {

@@ -628,7 +628,7 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
         public void componentMoved(ComponentEvent e) {
             // refresh map if needed
             // TODO Do not refresh map, just refresh envelope, to prevent uneeded flickering
-            refreshMap();
+            // refreshMap();
         }
 
         @Override
