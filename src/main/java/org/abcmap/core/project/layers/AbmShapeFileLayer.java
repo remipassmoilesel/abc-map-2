@@ -12,7 +12,9 @@ import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
+import org.geotools.referencing.operation.projection.ProjectionException;
 import org.geotools.styling.Rule;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.*;
 import java.io.IOException;
@@ -28,11 +30,11 @@ public class AbmShapeFileLayer extends AbmAbstractLayer {
 
     private SimpleFeatureStore featureStore;
 
-    public AbmShapeFileLayer(String layerId, String title, boolean visible, int zindex, Path shapeFile, Project owner) throws IOException {
+    public AbmShapeFileLayer(String layerId, String title, boolean visible, int zindex, Path shapeFile, Project owner) throws IOException, ProjectionException {
         this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.SHAPE_FILE), shapeFile, owner);
     }
 
-    public AbmShapeFileLayer(LayerIndexEntry entry, Path shapefilePath, Project owner) throws IOException {
+    public AbmShapeFileLayer(LayerIndexEntry entry, Path shapefilePath, Project owner) throws IOException, ProjectionException {
         super(owner, entry);
 
         setReadableType("Fichier de formes");
@@ -59,6 +61,12 @@ public class AbmShapeFileLayer extends AbmAbstractLayer {
         // retrieve a shape file and add it to a map content
         FileDataStore datastore = FileDataStoreFinder.getDataStore(shapefilePath.toFile());
         this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource();
+
+        // check if CRS is not null
+        CoordinateReferenceSystem crs = featureStore.getSchema().getCoordinateReferenceSystem();
+        if (crs == null) {
+            throw new ProjectionException("CRS of shapefile is null");
+        }
 
         // add random color style
         // TODO: detect type of feature and make corresponding style

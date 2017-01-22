@@ -126,6 +126,7 @@ public class AddShapefileLayer extends InteractionElement {
             } catch (IOException e) {
                 logger.error(e);
                 dialm().showErrorInBox("Impossible d'ouvrir: " + shapefilePath.getFileName());
+                return;
             }
 
             // delete cache and show changes

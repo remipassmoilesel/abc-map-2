@@ -191,52 +191,21 @@ public class Project {
      */
     public ReferencedEnvelope getMaximumBounds() {
 
-        double minx = 0.0d;
-        double miny = 0.0d;
-        double maxx = 0.0d;
-        double maxy = 0.0d;
-        boolean firstLoop = true;
-
+        ReferencedEnvelope finalBounds = new ReferencedEnvelope(getCrs());
         for (AbmAbstractLayer lay : getLayersList()) {
-
             ReferencedEnvelope bounds = lay.getInternalLayer().getBounds();
 
-            // transform bounds if necessary
-            if (bounds.getCoordinateReferenceSystem() != getCrs()) {
-                try {
-                    bounds = bounds.transform(getCrs(), true);
-                } catch (TransformException | FactoryException e) {
-                    logger.error(e);
-                }
+            if(bounds.getCoordinateReferenceSystem() == null){
+                bounds = new ReferencedEnvelope(bounds, getCrs());
             }
-
-            if (firstLoop) {
-
-                minx = bounds.getMinX();
-                miny = bounds.getMinY();
-                maxx = bounds.getMaxX();
-                maxy = bounds.getMaxY();
-
-                firstLoop = false;
-                continue;
+            try {
+                finalBounds.include(bounds.transform(finalBounds.getCoordinateReferenceSystem(), true));
+            } catch (TransformException | FactoryException e) {
+                logger.error(e);
             }
-
-            if (bounds.getMinX() < minx) {
-                minx = bounds.getMinX();
-            }
-            if (bounds.getMinY() < miny) {
-                miny = bounds.getMinY();
-            }
-            if (bounds.getMaxX() > maxx) {
-                maxx = bounds.getMaxX();
-            }
-            if (bounds.getMaxY() > maxy) {
-                maxy = bounds.getMaxY();
-            }
-
         }
 
-        return new ReferencedEnvelope(minx, maxx, miny, maxy, getCrs());
+        return finalBounds;
     }
 
     /**

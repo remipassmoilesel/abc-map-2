@@ -9,6 +9,7 @@ import org.abcmap.core.dao.StyleDAO;
 import org.abcmap.core.project.layers.*;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.ZipUtils;
+import org.geotools.referencing.operation.projection.ProjectionException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -95,7 +96,12 @@ public class ProjectReader {
 
             // Layer contain tiles
             else if (AbmLayerType.SHAPE_FILE.equals(entry.getType())) {
-                AbmShapeFileLayer layer = new AbmShapeFileLayer(entry, null, newProject);
+                AbmShapeFileLayer layer = null;
+                try {
+                    layer = new AbmShapeFileLayer(entry, null, newProject);
+                } catch (ProjectionException e) {
+                    logger.error(e);
+                }
                 newProject.addLayer(layer);
             }
 
