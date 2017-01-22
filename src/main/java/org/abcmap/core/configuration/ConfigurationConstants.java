@@ -48,11 +48,13 @@ public class ConfigurationConstants {
     public static final Float JAVA_RESOLUTION = 72f;
     public static final Integer DEFAULT_PRINT_RESOLUTION = 300;
 
+
     /*
      * Main paths of software
      */
     public static String SYSTEM_HOME_PATH = FileSystemView.getFileSystemView().getDefaultDirectory().getAbsolutePath();
     public static final Path SYMBOLS_DIR_PATH = Paths.get("./symbols");
+    public static final Path DATA_DIR_PATH = Paths.get("./data");
     public static final Path CONFIGURATION_ROOT_PATH = Paths.get("./config");
     public static final Path LOG_DIRECTORY = Paths.get("./log");
     public static final Path TEMP_FOLDER = Paths.get("./tmp");

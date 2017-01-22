@@ -6,9 +6,9 @@ import org.abcmap.core.shapefile.ShapefileDao;
 import org.abcmap.core.shapefile.ShapefileLayerEntry;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.Utils;
+import org.geotools.data.FeatureSource;
 import org.geotools.data.FileDataStore;
 import org.geotools.data.FileDataStoreFinder;
-import org.geotools.data.simple.SimpleFeatureStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.FeatureLayer;
 import org.geotools.map.Layer;
@@ -21,20 +21,20 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class AbmShapeFileLayer extends AbmAbstractLayer {
+public class AbmShapefileLayer extends AbmAbstractLayer {
 
     /**
      * Contain information about shapefile to display
      */
     private ShapefileLayerEntry shapefileEntry;
 
-    private SimpleFeatureStore featureStore;
+    private FeatureSource featureSource;
 
-    public AbmShapeFileLayer(String layerId, String title, boolean visible, int zindex, Path shapeFile, Project owner) throws IOException, ProjectionException {
+    public AbmShapefileLayer(String layerId, String title, boolean visible, int zindex, Path shapeFile, Project owner) throws IOException, ProjectionException {
         this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.SHAPE_FILE), shapeFile, owner);
     }
 
-    public AbmShapeFileLayer(LayerIndexEntry entry, Path shapefilePath, Project owner) throws IOException, ProjectionException {
+    public AbmShapefileLayer(LayerIndexEntry entry, Path shapefilePath, Project owner) throws IOException, ProjectionException {
         super(owner, entry);
 
         setReadableType("Fichier de formes");
@@ -60,10 +60,10 @@ public class AbmShapeFileLayer extends AbmAbstractLayer {
 
         // retrieve a shape file and add it to a map content
         FileDataStore datastore = FileDataStoreFinder.getDataStore(shapefilePath.toFile());
-        this.featureStore = (SimpleFeatureStore) datastore.getFeatureSource();
+        this.featureSource = datastore.getFeatureSource();
 
         // check if CRS is not null
-        CoordinateReferenceSystem crs = featureStore.getSchema().getCoordinateReferenceSystem();
+        CoordinateReferenceSystem crs = featureSource.getSchema().getCoordinateReferenceSystem();
         if (crs == null) {
             throw new ProjectionException("CRS of shapefile is null");
         }
@@ -71,12 +71,14 @@ public class AbmShapeFileLayer extends AbmAbstractLayer {
         // add random color style
         // TODO: detect type of feature and make corresponding style
         Color color = Utils.randColor();
+
         Rule rule1 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.LINE, color, null, 0.5f);
         Rule rule2 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.POINT, color, null, 0.5f);
         Rule rule3 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.POLYGON, color, null, 0.5f);
         layerStyle.featureTypeStyles().add(sf.createFeatureTypeStyle(new Rule[]{rule1, rule2, rule3}));
 
         buildInternalLayer();
+
     }
 
     @Override
@@ -88,13 +90,13 @@ public class AbmShapeFileLayer extends AbmAbstractLayer {
         }
 
         // create internal layer
-        this.internalLayer = new FeatureLayer(featureStore, layerStyle);
+        this.internalLayer = new FeatureLayer(featureSource, layerStyle);
 
     }
 
     @Override
     public Layer buildGeotoolsLayer() {
-        return new org.geotools.map.FeatureLayer(featureStore, layerStyle);
+        return new org.geotools.map.FeatureLayer(featureSource, layerStyle);
     }
 
     @Override
@@ -102,7 +104,11 @@ public class AbmShapeFileLayer extends AbmAbstractLayer {
         return internalLayer.getBounds();
     }
 
-    public SimpleFeatureStore getFeatureStore() {
-        return featureStore;
+    public FeatureSource getFeatureSource() {
+        return featureSource;
+    }
+
+    public ShapefileLayerEntry getShapefileEntry() {
+        return  shapefileEntry;
     }
 }

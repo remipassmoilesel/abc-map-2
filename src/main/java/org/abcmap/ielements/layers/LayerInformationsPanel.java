@@ -4,7 +4,7 @@ import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbmAbstractLayer;
-import org.abcmap.core.project.layers.AbmShapeFileLayer;
+import org.abcmap.core.project.layers.AbmShapefileLayer;
 import org.abcmap.core.project.layers.AbmWMSLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.GeoUtils;
@@ -61,6 +61,9 @@ public class LayerInformationsPanel extends InteractionElement {
 
             informationPanel.removeAll();
 
+            String wrap = "width 60%!, wrap 10px";
+            String buttonCentered = "span, width 80%, align center, wrap 10px";
+
             if (projectm().isInitialized() == true) {
 
                 ArrayList<Object[]> fields = new ArrayList<>();
@@ -86,13 +89,23 @@ public class LayerInformationsPanel extends InteractionElement {
                     Project project = projectm().getProject();
                     project.deleteCacheForLayer(project.getActiveLayer().getId(), null);
                 });
-                informationPanel.add(redraw, "span, width 80%, align center, wrap 10px");
+                informationPanel.add(redraw, buttonCentered);
 
-                // layer is a shapefile layer
-                if (activeLayer instanceof AbmShapeFileLayer) {
+                //
+                // layer is a shape file layer
+                //
+                if (activeLayer instanceof AbmShapefileLayer) {
 
                     fields.add(new Object[]{"Taille:", "256mo"});
                     fields.add(new Object[]{"Formes:", "polygones"});
+
+                    JButton buttonReproject = new JButton("Ouvrir une version reprojetée");
+                    fields.add(new Object[]{buttonReproject});
+                    buttonReproject.addActionListener((ev) -> {
+                        ThreadManager.runLater(() -> {
+                            mapm().openReprojectedShapefile((AbmShapefileLayer) activeLayer, true);
+                        });
+                    });
 
                     JButton buttonForeground = new JButton("Couleur");
                     fields.add(new Object[]{"Trait:", buttonForeground});
@@ -119,26 +132,37 @@ public class LayerInformationsPanel extends InteractionElement {
 
                 for (Object[] f : fields) {
 
-                    // add name
-                    informationPanel.add(getTextFieldForElement((String) f[0]), "width 30%!");
+                    if (f[0] instanceof String) {
+                        // add name
+                        informationPanel.add(getTextFieldForElement((String) f[0]), "width 30%!");
 
-                    String wrap = "width 60%!, wrap 10";
+                        // add value
+                        // value is a string, display a text field
+                        if (f[1] instanceof String) {
+                            JTextField field = getTextFieldForElement((String) f[1]);
+                            informationPanel.add(field, wrap);
+                        }
 
-                    // add value
-                    // value is a string, display a text field
-                    if (f[1] instanceof String) {
-                        JTextField field = getTextFieldForElement((String) f[1]);
-                        informationPanel.add(field, wrap);
+                        // value is already a component, add it as is
+                        else if (f[1] instanceof Component) {
+                            informationPanel.add((Component) f[1], wrap);
+                        }
+
+                        // unknown type of value
+                        else {
+                            informationPanel.add(new JLabel(), wrap);
+                            logger.error(new IllegalArgumentException("Unknown type for '" + f[0] + "': " + f[1]));
+                        }
                     }
 
-                    // value is already a component, add it as is
-                    else if (f[1] instanceof Component) {
-                        informationPanel.add((Component) f[1], wrap);
+
+                    // insert a component on both column
+                    else if (f[0] instanceof Component) {
+                        informationPanel.add((Component) f[0], buttonCentered);
                     }
 
-                    // unknown type of value
+                    // type not found
                     else {
-                        informationPanel.add(new JLabel(), wrap);
                         logger.error(new IllegalArgumentException("Unknown type for '" + f[0] + "': " + f[1]));
                     }
 

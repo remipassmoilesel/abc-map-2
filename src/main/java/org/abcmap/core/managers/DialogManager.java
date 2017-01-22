@@ -1,15 +1,14 @@
 package org.abcmap.core.managers;
 
 import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.project.layers.AbmShapefileLayer;
+import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.GuiColors;
 import org.abcmap.gui.components.messagebox.MessageBoxManager;
 import org.abcmap.gui.dialogs.ClosingConfirmationDialog;
 import org.abcmap.gui.dialogs.QuestionResult;
 import org.abcmap.gui.dialogs.SupportProjectDialog;
-import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
-import org.abcmap.gui.dialogs.simple.InformationTextFieldDialog;
-import org.abcmap.gui.dialogs.simple.SimpleBrowseDialog;
-import org.abcmap.gui.dialogs.simple.SimpleErrorDialog;
+import org.abcmap.gui.dialogs.simple.*;
 import org.abcmap.gui.utils.GuiUtils;
 
 import javax.swing.*;
@@ -237,5 +236,39 @@ public class DialogManager extends ManagerTreeAccessUtil {
      */
     public QuestionResult showProjectClosingConfirmationDialog() {
         return ClosingConfirmationDialog.showProjectConfirmationAndWait(guim().getMainWindow());
+    }
+
+    public void showReprojectShapeFileDialog(AbmShapefileLayer layer, Runnable reprojectLayer, Runnable openAsIs, Runnable operationCanceled) {
+
+        QuestionResult result = SimpleQuestionDialog.askQuestion(guim().getMainWindow(), "Reprojection", "Voulez vous ouvrir une copie " +
+                        "de cette couche reprojetée ? Cela peut résoudre des problèmes d'affichage.",
+                "Ouvrir une copie reprojetée", "Ouvrir tel quel", "Annuler");
+
+        Runnable toRun;
+        if (result.isAnswerYes() == true) {
+            toRun = reprojectLayer;
+        } else if (result.isAnswerNo() == true) {
+            toRun = openAsIs;
+        } else {
+            toRun = operationCanceled;
+        }
+
+        try {
+            ThreadManager.runLater(toRun);
+        } catch (Exception e) {
+            logger.error(e);
+        }
+    }
+
+    public void showReprojectShapeFileDialogAndWait(AbmShapefileLayer layer, Runnable reprojectLayer, Runnable openAsIs, Runnable operationCanceled) {
+
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                showReprojectShapeFileDialog(layer, reprojectLayer, openAsIs, operationCanceled);
+            });
+        } catch (InterruptedException | InvocationTargetException e) {
+            logger.error(e);
+        }
+
     }
 }

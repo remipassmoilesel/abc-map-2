@@ -21,7 +21,7 @@ public class SimpleQuestionDialog extends SimpleInformationDialog {
     private static final CustomLogger logger = LogManager.getLogger(SimpleQuestionDialog.class);
 
     public static QuestionResult askQuestion(Window parent, String message) {
-        return askQuestion(parent, "Question", message);
+        return askQuestion(parent, "Question", message, null, null, null);
     }
 
     /**
@@ -33,11 +33,24 @@ public class SimpleQuestionDialog extends SimpleInformationDialog {
      * @return
      */
     public static QuestionResult askQuestion(Window parent, String title,
-                                             String message) {
+                                             String message, String buttonYesText, String buttonNoText, String buttonCancelText) {
 
         GuiUtils.throwIfNotOnEDT();
 
         SimpleQuestionDialog sd = new SimpleQuestionDialog(parent);
+
+        if (buttonYesText != null) {
+            sd.setYesText(buttonYesText);
+        }
+
+        if (buttonNoText != null) {
+            sd.setNoText(buttonNoText);
+        }
+
+        if (buttonCancelText != null) {
+            sd.setCancelText(buttonCancelText);
+        }
+
         sd.setTitle(title);
         sd.setMessage(message);
         sd.reconstruct();
@@ -54,14 +67,14 @@ public class SimpleQuestionDialog extends SimpleInformationDialog {
      * @param message
      * @return
      */
-    public static QuestionResult askQuestionAndWait(final Window parent,
-                                                    String title, final String message) {
+    public static QuestionResult askQuestionAndWait(final Window parent, String title,
+                                                    String message, String buttonYesText, String buttonNoText, String buttonCancelText) {
 
         final QuestionResult[] result = new QuestionResult[1];
 
         try {
             SwingUtilities.invokeAndWait(() -> {
-                result[0] = askQuestion(parent, message);
+                result[0] = askQuestion(parent, title, message, buttonYesText, buttonNoText, buttonCancelText);
             });
         } catch (InvocationTargetException | InterruptedException e) {
             logger.error(e);

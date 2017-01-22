@@ -1,7 +1,7 @@
 package org.abcmap.ielements.importation;
 
 import net.miginfocom.swing.MigLayout;
-import org.abcmap.core.project.layers.AbmShapeFileLayer;
+import org.abcmap.core.project.layers.AbmShapefileLayer;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.utils.GuiUtils;
@@ -120,7 +120,7 @@ public class AddShapefileLayer extends InteractionElement {
             }
 
             // open shape file
-            AbmShapeFileLayer layer = null;
+            AbmShapefileLayer layer = null;
             try {
                 layer = projectm().getProject().addNewShapeFileLayer(shapefilePath);
             } catch (IOException e) {

@@ -14,7 +14,6 @@ import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.Layer;
 import org.geotools.map.MapContent;
-import org.geotools.referencing.CRS;
 import org.geotools.swing.JMapFrame;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -254,17 +253,17 @@ public class Project {
      * @return
      * @throws IOException
      */
-    public AbmShapeFileLayer addNewShapeFileLayer(Path p) throws IOException {
+    public AbmShapefileLayer addNewShapeFileLayer(Path p) throws IOException {
 
         // create a layer wrapper and store it
         AbmAbstractLayer layer = null;
         try {
-            layer = new AbmShapeFileLayer(null, p.getFileName().toString(), true, getHigherZindex(), p, this);
+            layer = new AbmShapefileLayer(null, p.getFileName().toString(), true, getHigherZindex(), p, this);
         } catch (Exception e) {
             throw new IOException("Error while adding shapefile layer: ", e);
         }
 
-        return (AbmShapeFileLayer) addLayer(layer);
+        return (AbmShapefileLayer) addLayer(layer);
     }
 
     /**

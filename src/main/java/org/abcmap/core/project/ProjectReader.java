@@ -96,9 +96,9 @@ public class ProjectReader {
 
             // Layer contain tiles
             else if (AbmLayerType.SHAPE_FILE.equals(entry.getType())) {
-                AbmShapeFileLayer layer = null;
+                AbmShapefileLayer layer = null;
                 try {
-                    layer = new AbmShapeFileLayer(entry, null, newProject);
+                    layer = new AbmShapefileLayer(entry, null, newProject);
                 } catch (ProjectionException e) {
                     logger.error(e);
                 }

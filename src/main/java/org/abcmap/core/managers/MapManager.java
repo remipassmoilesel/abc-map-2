@@ -1,27 +1,48 @@
 package org.abcmap.core.managers;
 
+import com.vividsolutions.jts.geom.Geometry;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.events.MapManagerEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layers.AbmShapefileLayer;
 import org.abcmap.core.utils.Utils;
-import org.abcmap.core.wms.WmsServerCredentials;
 import org.abcmap.core.wms.ServerConstantsJson;
+import org.abcmap.core.wms.WmsServerCredentials;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.abcmap.gui.utils.GuiUtils;
 import org.apache.commons.io.IOUtils;
+import org.geotools.data.*;
+import org.geotools.data.shapefile.ShapefileDataStoreFactory;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureIterator;
+import org.geotools.data.simple.SimpleFeatureSource;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -177,10 +198,10 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
 
         // update list with elements which are not already in list
         int updates = 0;
-        for(WmsServerCredentials server : distantList){
-            if(listOfWmsServers.contains(server) == false){
+        for (WmsServerCredentials server : distantList) {
+            if (listOfWmsServers.contains(server) == false) {
                 listOfWmsServers.add(server);
-                updates ++;
+                updates++;
             }
         }
 
@@ -188,6 +209,153 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
         notifm.fireEvent(new MapManagerEvent(MapManagerEvent.PREDEFINED_WMS_LIST_CHANGED));
 
         return updates;
+    }
+
+    /**
+     * Copy and reproject a shape file in data folder
+     * <p>
+     * And then add it in project. If "replace" is set to true, reprojected
+     * <p>
+     * layer will replace the previous shape file layer
+     *
+     * @param layer
+     */
+    public void openReprojectedShapefile(AbmShapefileLayer layer, boolean replace) {
+
+        dialm().showReprojectShapeFileDialogAndWait(layer,
+
+                // user want reproject
+                () -> {
+
+                    dialm().showMessageInBox("Début de reprojection, cette opération peut prendre un moment...");
+
+                    CoordinateReferenceSystem worldCrs = projectm().getProject().getCrs();
+                    Path source = Paths.get(layer.getShapefileEntry().getPath());
+                    Path destination = ConfigurationConstants.DATA_DIR_PATH.resolve(source.getFileName());
+                    try {
+
+                        if (Files.isDirectory(destination)) {
+                            destination = Paths.get(destination.toAbsolutePath() + "_" + System.currentTimeMillis());
+                        }
+
+                        Files.createDirectories(destination);
+
+                        destination = destination.resolve(source.getFileName());
+                        reprojectShapeFile(source, worldCrs, destination);
+
+                        Project project = projectm().getProject();
+                        if (replace == true) {
+                            project.removeLayer(layer);
+                        }
+
+                        AbmShapefileLayer newLayer = project.addNewShapeFileLayer(destination);
+                        project.setActiveLayer(newLayer);
+
+                        projectm().fireLayerListChanged();
+
+                    } catch (IOException e) {
+                        logger.error(e);
+                        dialm().showErrorInBox("Erreur lors de la reprojection");
+                        return;
+                    }
+
+
+                    dialm().showMessageInBox("Fin de la reprojection");
+                },
+
+                // user want to add layer as is
+                () -> {
+
+                    Path source = Paths.get(layer.getShapefileEntry().getPath());
+
+                    Project project = projectm().getProject();
+                    AbmShapefileLayer newLayer = null;
+                    try {
+                        newLayer = project.addNewShapeFileLayer(source);
+                        project.setActiveLayer(newLayer);
+                        projectm().fireLayerListChanged();
+                    } catch (IOException e) {
+                        logger.error(e);
+                    }
+
+                },
+
+                //user decline
+                () -> {
+                    dialm().showMessageInBox("Ouverture en cours...");
+                });
+
+    }
+
+    /**
+     * Reproject a shapefile and save it in a new place
+     *
+     * @param source
+     * @param worldCRS
+     * @param destination
+     * @throws IOException
+     */
+    public void reprojectShapeFile(Path source, CoordinateReferenceSystem worldCRS, Path destination) throws IOException {
+
+        GuiUtils.throwIfOnEDT();
+
+        FileDataStore store = FileDataStoreFinder.getDataStore(source.toFile());
+        SimpleFeatureSource featureSource = store.getFeatureSource();
+
+        SimpleFeatureType schema = featureSource.getSchema();
+        if (source.toAbsolutePath().equals(destination.toAbsolutePath())) {
+            throw new IOException("Cannot replace files: " + destination + " > " + source);
+        }
+
+        CoordinateReferenceSystem dataCRS = schema.getCoordinateReferenceSystem();
+        boolean lenient = true; // allow for some error due to different datums
+        MathTransform transform = null;
+        try {
+            transform = CRS.findMathTransform(dataCRS, worldCRS, lenient);
+        } catch (FactoryException e) {
+            throw new IOException(e);
+        }
+
+        SimpleFeatureCollection featureCollection = featureSource.getFeatures();
+
+        DataStoreFactorySpi factory = new ShapefileDataStoreFactory();
+
+        // create a new shapefile
+        Map<String, Serializable> create = new HashMap<>();
+        create.put("url", destination.toFile().toURI().toURL());
+        create.put("create spatial index", Boolean.TRUE);
+        DataStore dataStore = factory.createNewDataStore(create);
+        SimpleFeatureType featureType = SimpleFeatureTypeBuilder.retype(schema, worldCRS);
+        dataStore.createSchema(featureType);
+
+        // reproject
+        Transaction transaction = new DefaultTransaction("Reproject");
+        FeatureWriter<SimpleFeatureType, SimpleFeature> writer =
+                dataStore.getFeatureWriterAppend(featureType.getTypeName(), transaction);
+        SimpleFeatureIterator iterator = featureCollection.features();
+        try {
+            while (iterator.hasNext()) {
+                // copy the contents of each feature and transform the geometry
+                SimpleFeature feature = iterator.next();
+                SimpleFeature copy = writer.next();
+                copy.setAttributes(feature.getAttributes());
+
+                Geometry geometry = (Geometry) feature.getDefaultGeometry();
+                Geometry geometry2 = JTS.transform(geometry, transform);
+
+                copy.setDefaultGeometry(geometry2);
+                writer.write();
+            }
+            transaction.commit();
+
+        } catch (Exception e) {
+            transaction.rollback();
+            throw new IOException(e);
+        } finally {
+            writer.close();
+            iterator.close();
+            transaction.close();
+        }
     }
 
     /**
