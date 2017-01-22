@@ -207,7 +207,15 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
                 int h = part.getRenderedHeight();
 
                 // draw partial with transparency
-                g2dT.drawImage(part.getImage(), x, y, w, h, null);
+                try {
+                    g2dT.drawImage(part.getImage(), x, y, w, h, null);
+                } catch (Exception e) {
+
+                    logger.error(e);
+
+                    // sometimes image is not valid, regenerate it
+                    part.setOutdated(true);
+                }
 
                 if (debugMode) {
 
