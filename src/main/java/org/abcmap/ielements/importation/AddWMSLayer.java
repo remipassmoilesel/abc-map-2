@@ -3,7 +3,7 @@ package org.abcmap.ielements.importation;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.project.layers.AbmWMSLayer;
 import org.abcmap.core.threads.ThreadManager;
-import org.abcmap.core.wms.WmsServerCredentials;
+import org.abcmap.core.resources.WmsResource;
 import org.abcmap.gui.components.PredefinedWmsServerRenderer;
 import org.abcmap.gui.dialogs.WMSSelectionDialog;
 import org.abcmap.gui.utils.GuiUtils;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 public class AddWMSLayer extends InteractionElement {
 
-    private ArrayList<WmsServerCredentials> predefinedServers;
+    private ArrayList<WmsResource> predefinedServers;
     /**
      * Text field where user can enter a custom WMS url
      */
@@ -29,13 +29,13 @@ public class AddWMSLayer extends InteractionElement {
     /**
      * Combo box where user can select a predefined WMS server
      */
-    private JComboBox<WmsServerCredentials> selectWmsServer;
-    private DefaultComboBoxModel<WmsServerCredentials> wmsServerSelectModel;
+    private JComboBox<WmsResource> selectWmsServer;
+    private DefaultComboBoxModel<WmsResource> wmsServerSelectModel;
 
     /**
      * Label which indicate to user that he have to select a server in combo list
      */
-    private final WmsServerCredentials defaultFakeWmsServer;
+    private final WmsResource defaultFakeWmsServer;
 
     public AddWMSLayer() {
 
@@ -50,7 +50,7 @@ public class AddWMSLayer extends InteractionElement {
         predefinedServers = new ArrayList<>();
 
         // create fake element showing to user "Please select ..."
-        defaultFakeWmsServer = new WmsServerCredentials("Sélectionnez un serveur", "http://no-where.com");
+        defaultFakeWmsServer = new WmsResource("Sélectionnez un serveur", "http://no-where.com");
 
         // listen changes on list of WMS servers
         notifm.addEventListener((ev) -> {
@@ -71,7 +71,7 @@ public class AddWMSLayer extends InteractionElement {
 
         GuiUtils.throwIfNotOnEDT();
 
-        ArrayList<WmsServerCredentials> newList = mapm().getListOfPredefinedWmsServers();
+        ArrayList<WmsResource> newList = mapm().getListOfPredefinedWmsServers();
 
         // clear previous combo model and add fake element
         wmsServerSelectModel.removeAllElements();
@@ -81,7 +81,7 @@ public class AddWMSLayer extends InteractionElement {
         predefinedServers.clear();
 
         predefinedServers.addAll(newList);
-        for (WmsServerCredentials server : predefinedServers) {
+        for (WmsResource server : predefinedServers) {
             wmsServerSelectModel.addElement(server);
         }
 
@@ -100,7 +100,7 @@ public class AddWMSLayer extends InteractionElement {
 
         // when a server is selected, display URL in text field
         selectWmsServer.addActionListener((ev) -> {
-            WmsServerCredentials server = (WmsServerCredentials) selectWmsServer.getSelectedItem();
+            WmsResource server = (WmsResource) selectWmsServer.getSelectedItem();
             if (server != null) {
                 if (defaultFakeWmsServer.equals(server)) {
                     GuiUtils.changeTextWithoutFire(wmsTextField, "");
@@ -132,7 +132,7 @@ public class AddWMSLayer extends InteractionElement {
         validBtn.addActionListener((event) -> {
 
             // get combo value
-            WmsServerCredentials server = (WmsServerCredentials) selectWmsServer.getSelectedItem();
+            WmsResource server = (WmsResource) selectWmsServer.getSelectedItem();
 
             if (server == null) {
                 dialm().showErrorInBox("Veuillez sélectionnez un serveur ou saisir une adresse valide");
@@ -149,7 +149,7 @@ public class AddWMSLayer extends InteractionElement {
                     return;
                 }
 
-                server = new WmsServerCredentials("Custom server", url);
+                server = new WmsResource("Custom server", url);
             }
 
             // open WMS layer

@@ -1,8 +1,8 @@
-package org.abcmap.tests.core.wms;
+package org.abcmap.tests.core.resources;
 
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.ManagerTreeAccessUtil;
-import org.abcmap.core.wms.WmsServerCredentials;
+import org.abcmap.core.resources.WmsResource;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Try to load locale list of WMS servers
  */
-public class LocaleListOfWMSServersTest extends ManagerTreeAccessUtil {
+public class ListDistantRepoResourcesTest extends ManagerTreeAccessUtil {
 
     @BeforeClass
     public static void beforeClass() throws IOException {
@@ -30,11 +30,11 @@ public class LocaleListOfWMSServersTest extends ManagerTreeAccessUtil {
 
         //System.out.println(mapm().getListOfPredefinedWmsServers());
 
-        ArrayList<WmsServerCredentials> localeList = mapm().getLocaleListOfPredefinedWmsServers();
+        ArrayList<WmsResource> localeList = mapm().getLocaleListOfPredefinedWmsServers();
         assertTrue("Locale list of WMS servers test 1", localeList != null);
         assertTrue("Locale list of WMS servers test 2", localeList.size() > 1);
 
-        for (WmsServerCredentials server : localeList) {
+        for (WmsResource server : localeList) {
             assertTrue("Locale list of WMS servers test: " + server, server.getName() != null);
             assertTrue("Locale list of WMS servers test: " + server, server.getUrl() != null);
         }
@@ -49,7 +49,7 @@ public class LocaleListOfWMSServersTest extends ManagerTreeAccessUtil {
         // Test distant list
         //
 
-        ArrayList<WmsServerCredentials> distantList = mapm().getDistantListOfPredefinedWmsServers();
+        ArrayList<WmsResource> distantList = mapm().getDistantListOfPredefinedWmsServers();
         assertTrue("Distant list of WMS servers test: " + distantList.size(), distantList.size() > 0);
 
     }

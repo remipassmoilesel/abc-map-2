@@ -40,7 +40,8 @@ public class ConfigurationConstants {
     public static final String BUG_REPORT_URL = WEBSITE_URL + "contact/?action=report";
     public static final String ASK_FORM_URL = WEBSITE_URL + "contact/?action=ask";
 
-    public static final String DISTANT_WMS_SERVERS_LIST_URL = "http://localhost/servers.json";
+    public static final String DISTANT_RESOURCE_INDEX = "https://master.dl.sourceforge.net/project/abcmap2-datarepo/";
+    public static final String DEFAULT_INDEX_NAME = "index.json";
 
     /*
      * Print settings

@@ -1,6 +1,6 @@
 package org.abcmap.gui.components;
 
-import org.abcmap.core.wms.WmsServerCredentials;
+import org.abcmap.core.resources.WmsResource;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,7 +8,7 @@ import java.awt.*;
 /**
  * Render WMS servers in JComboBox
  */
-public class PredefinedWmsServerRenderer extends JLabel implements ListCellRenderer<WmsServerCredentials> {
+public class PredefinedWmsServerRenderer extends JLabel implements ListCellRenderer<WmsResource> {
 
     public PredefinedWmsServerRenderer() {
         super();
@@ -18,7 +18,7 @@ public class PredefinedWmsServerRenderer extends JLabel implements ListCellRende
     }
 
     @Override
-    public Component getListCellRendererComponent(JList<? extends WmsServerCredentials> list, WmsServerCredentials server,
+    public Component getListCellRendererComponent(JList<? extends WmsResource> list, WmsResource server,
                                                   int index, boolean isSelected, boolean cellHasFocus) {
 
         // show server name

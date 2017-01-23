@@ -1,12 +1,16 @@
-[
-  {
-    "type": "wms",
-    "name": "lizardtech.com",
-    "url": "http://wms.lizardtech.com/lizardtech/iserv/ows"
-  },
-  {
-    "type": "wms",
-    "name": "mundialis.de",
-    "url": "http://ows.mundialis.de/services/service"
-  }
-]
+{
+  "name": "Serveurs",
+  "description_fr": "Liste locale de serveurs WMS",
+  "content": [
+    {
+      "type": "wms",
+      "name": "lizardtech.com",
+      "url": "http://wms.lizardtech.com/lizardtech/iserv/ows"
+    },
+    {
+      "type": "wms",
+      "name": "mundialis.de",
+      "url": "http://ows.mundialis.de/services/service"
+    }
+  ]
+}
