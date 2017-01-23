@@ -8,7 +8,9 @@ import org.abcmap.core.events.manager.HasEventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbmShapefileLayer;
-import org.abcmap.core.resources.*;
+import org.abcmap.core.resources.DistantResource;
+import org.abcmap.core.resources.DistantResourceReader;
+import org.abcmap.core.resources.WmsResource;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.components.map.CachedMapPane;
 import org.abcmap.gui.utils.GuiUtils;
@@ -40,6 +42,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 
 /**
@@ -65,7 +68,6 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
         String indexContent = Utils.getHttpResourceAsString(getIndexUrlForRepo(repoUrl), 2000);
         return DistantResourceReader.parseResourceIndex(indexContent, repoUrl);
     }
-
 
 
     /**
@@ -355,6 +357,26 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
             writer.close();
             iterator.close();
             transaction.close();
+        }
+    }
+
+    /**
+     * Impprt specified resources in project
+     *
+     * @param selectedResources
+     * @param updates
+     */
+    public void importResources(ArrayList<DistantResource> selectedResources, Consumer<Object[]> updates) {
+        for (DistantResource res : selectedResources) {
+            try {
+                res.importIn(projectm().getProject(), (objects) -> {
+                    if (updates != null) {
+                        updates.accept(objects);
+                    }
+                });
+            } catch (Exception e) {
+                logger.error(e);
+            }
         }
     }
 

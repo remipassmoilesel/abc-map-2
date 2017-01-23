@@ -14,7 +14,7 @@ import java.util.ArrayList;
  */
 public class DistantResourceReader {
 
-    private static final CustomLogger logger = LogManager.getLogger(MapManager.class);
+    private static final CustomLogger logger = LogManager.getLogger(DistantResourceReader.class);
 
     /**
      * Parse a JSON string as a resource index
@@ -73,9 +73,9 @@ public class DistantResourceReader {
 
                         String path = res.getString(DistantResourceConstants.path);
 
-                        String size = "-";
+                        Double size = 0d;
                         if (res.keySet().contains(DistantResourceConstants.size)) {
-                            size = (String) res.get(DistantResourceConstants.size);
+                            size = res.getDouble(DistantResourceConstants.size);
                         }
 
                         ShapefileResource shapefileRes = new ShapefileResource(name, baseUrl, path);

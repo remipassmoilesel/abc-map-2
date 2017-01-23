@@ -3,6 +3,7 @@ package org.abcmap.core.project;
 import org.abcmap.core.draw.AbmDefaultFeatureType;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
+import org.abcmap.core.managers.Main;
 import org.abcmap.core.project.layers.*;
 import org.abcmap.core.project.layouts.LayoutSheet;
 import org.abcmap.core.rendering.partials.RenderedPartialStore;
@@ -824,4 +825,35 @@ public class Project {
     public void setFirstLayerActive() {
         setActiveLayer(0);
     }
+
+    /**
+     * Fire an event meaning that layouts sheets changed
+     */
+    public void fireLayoutListChanged() {
+        Main.getProjectManager().fireLayoutListChanged();
+    }
+
+    /**
+     * Fire an event meaning that layers list changed
+     */
+    public void fireLayerListChanged() {
+        Main.getProjectManager().fireLayerListChanged();
+    }
+
+    /**
+     * Fire an event meaning that on or several layers changed
+     *
+     * @param lay
+     */
+    public void fireLayerChanged(AbmAbstractLayer lay) {
+        Main.getProjectManager().fireLayerChanged(lay);
+    }
+
+    /**
+     * Fire an event meaning that metadata of project changed
+     */
+    public void fireMetadatasChanged() {
+        Main.getProjectManager().fireMetadatasChanged();
+    }
+
 }

@@ -109,11 +109,6 @@ public class ZipUtils {
 
                 Files.createDirectories(f.getParent());
 
-                System.out.println();
-                System.out.println("uncompress(){");
-                System.out.println(f);
-                System.out.println(f.getParent());
-
                 OutputStream out = Files.newOutputStream(f);
                 IOUtils.copy(in, out);
                 out.close();
