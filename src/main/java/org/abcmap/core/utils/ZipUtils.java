@@ -102,13 +102,24 @@ public class ZipUtils {
 
         while (entry != null) {
             Path f = destinationDirectory.resolve(entry.getName());
+            if(entry.isDirectory()){
+                Files.createDirectories(f);
+            }
+            else {
 
-            Files.createDirectories(f.getParent());
+                Files.createDirectories(f.getParent());
 
-            OutputStream out = Files.newOutputStream(f);
-            IOUtils.copy(in, out);
-            out.close();
-            result.add(f);
+                System.out.println();
+                System.out.println("uncompress(){");
+                System.out.println(f);
+                System.out.println(f.getParent());
+
+                OutputStream out = Files.newOutputStream(f);
+                IOUtils.copy(in, out);
+                out.close();
+                result.add(f);
+            }
+
             entry = in.getNextZipEntry();
         }
         in.close();

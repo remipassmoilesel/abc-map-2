@@ -1,9 +1,26 @@
 package org.abcmap.core.resources;
 
+import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.project.Project;
+import org.abcmap.core.project.layers.AbmShapefileLayer;
+import org.abcmap.core.utils.ZipUtils;
+import org.apache.commons.io.FileUtils;
+import org.geotools.referencing.operation.projection.ProjectionException;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.function.Consumer;
 
 /**
- * Predefined WMS server, which can be loaded from locale server list or distant.
+ *
  */
 public class ShapefileResource extends DistantResource {
 
@@ -26,6 +43,64 @@ public class ShapefileResource extends DistantResource {
         this.name = name;
         this.baseUrl = baseUrl;
         this.resourcePath = resourcePath;
+    }
+
+    public AbmShapefileLayer getDistantLayer(Project p, Consumer<Path> updates, int periodMs) throws URISyntaxException, IOException, ProjectionException {
+
+        // resolve url of distant shape file
+        URI url = new URI(baseUrl);
+        url = url.resolve(resourcePath);
+        String fileName = Paths.get(resourcePath).getFileName().toString();
+
+        // create directories
+        Path destinationDirectory = ConfigurationConstants.DATA_DIR_PATH.resolve(fileName);
+        if (Files.isDirectory(destinationDirectory)) {
+            destinationDirectory = Paths.get(destinationDirectory.toAbsolutePath() + "_" + System.currentTimeMillis());
+        }
+
+        Files.createDirectories(destinationDirectory);
+
+        // create file, and add a timer to watch download
+        final Path destinationFile = destinationDirectory.resolve(fileName);
+
+        Timer t = new Timer("", true);
+        Path finalDestinationDirectory = destinationDirectory;
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                updates.accept(finalDestinationDirectory);
+            }
+        }, 0, periodMs);
+
+        try {
+
+            // download file
+            FileUtils.copyURLToFile(url.toURL(), destinationFile.toFile(), 2000, 2000);
+
+            // unzip file
+            List<Path> uncompressed = ZipUtils.uncompress(destinationFile, destinationDirectory);
+
+            if(uncompressed.size() < 1){
+                throw new IOException("Downloaded archive is empty: " + destinationDirectory);
+            }
+
+            for (Path file : uncompressed) {
+                if (file.getFileName().toString().endsWith(".shp")) {
+
+                    // create layer and return it
+                    return new AbmShapefileLayer(null, file.getFileName().toString(), true, p.getHigherZindex(), file, p);
+
+                }
+            }
+
+            throw new IOException("No shapefiles found in: " + destinationDirectory);
+
+        } finally {
+            // cancel timer
+            t.cancel();
+        }
+
+
     }
 
     public String getSize() {

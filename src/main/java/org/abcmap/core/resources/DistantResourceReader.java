@@ -89,12 +89,13 @@ public class DistantResourceReader {
                     }
                 }
             } catch (Exception e) {
-                throw new IOException("Error while parsing JSON", e);
+                logger.error(new IOException("Error while parsing JSON", e));
             }
         }
 
         return result;
 
     }
+
 
 }

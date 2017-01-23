@@ -23,8 +23,6 @@ import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
@@ -90,7 +88,7 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
      */
     public ArrayList<WmsResource> getDistantListOfPredefinedWmsServers() throws IOException {
 
-        ArrayList<DistantResource> resources = getResourceIndexFromRepo(ConfigurationConstants.DISTANT_RESOURCE_INDEX);
+        ArrayList<DistantResource> resources = getMainResourceIndex();
         ArrayList<WmsResource> result = new ArrayList<>();
         for (DistantResource r : resources) {
             if (r instanceof WmsResource) {
@@ -99,6 +97,10 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
         }
 
         return result;
+    }
+
+    public ArrayList<DistantResource> getMainResourceIndex() throws IOException {
+        return getResourceIndexFromRepo(ConfigurationConstants.DISTANT_RESOURCE_INDEX);
     }
 
     public String getIndexUrlForRepo(String repoUrl) {

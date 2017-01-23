@@ -60,6 +60,11 @@ public class AbmShapefileLayer extends AbmAbstractLayer {
 
         // retrieve a shape file and add it to a map content
         FileDataStore datastore = FileDataStoreFinder.getDataStore(shapefilePath.toFile());
+
+        if (datastore == null) {
+            throw new IOException("No datastore found for this file: " + shapefilePath);
+        }
+
         this.featureSource = datastore.getFeatureSource();
 
         // check if CRS is not null
@@ -109,6 +114,6 @@ public class AbmShapefileLayer extends AbmAbstractLayer {
     }
 
     public ShapefileLayerEntry getShapefileEntry() {
-        return  shapefileEntry;
+        return shapefileEntry;
     }
 }
