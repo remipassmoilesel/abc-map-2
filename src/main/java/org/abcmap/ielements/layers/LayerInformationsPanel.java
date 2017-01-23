@@ -96,8 +96,11 @@ public class LayerInformationsPanel extends InteractionElement {
                 //
                 if (activeLayer instanceof AbmShapefileLayer) {
 
+                    AbmShapefileLayer shapeLayer = (AbmShapefileLayer) activeLayer;
+
                     fields.add(new Object[]{"Taille:", "256mo"});
                     fields.add(new Object[]{"Formes:", "polygones"});
+                    fields.add(new Object[]{"Chemin:", shapeLayer.getShapefileEntry().getPath()});
 
                     JButton buttonReproject = new JButton("Ouvrir une version reprojetée");
                     fields.add(new Object[]{buttonReproject});
