@@ -3,11 +3,7 @@ package org.abcmap.ielements.importation;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.resources.DistantResource;
-import org.abcmap.core.resources.ShapefileResource;
 import org.abcmap.core.threads.ThreadManager;
-import org.abcmap.gui.GuiCursor;
-import org.abcmap.gui.HtmlLabel;
-import org.abcmap.gui.components.buttons.HtmlCheckbox;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.InteractionElement;
 
@@ -33,33 +29,33 @@ public class AddDataFromCatalog extends InteractionElement {
         this.displaySimplyInSearch = false;
     }
 
+
     @Override
     protected Component createPrimaryGUI() {
-
 
         JPanel contentPane = new JPanel(new MigLayout("insets 0, gap 5px"));
         GuiUtils.addLabel("Ressources: ", contentPane, "wrap");
 
         // add search text field
         searchTextField = new JTextField();
-        contentPane.add(searchTextField, "width 90%!, wrap");
+        contentPane.add(searchTextField, "width 98%!, wrap");
         searchTextField.addCaretListener((event) -> {
             filterResourceList(searchTextField.getText());
         });
 
-        listPane = new JPanel(new MigLayout("insets 3"));
+        listPane = new JPanel(new MigLayout("insets 2"));
         JScrollPane scroll = new JScrollPane(listPane);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.getVerticalScrollBar().setUnitIncrement(ConfigurationConstants.SCROLLBAR_UNIT_INCREMENT);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        contentPane.add(scroll, "height 200px, width 98%!, wrap");
+        contentPane.add(scroll, "height 200px!, width 98%!, wrap");
 
         // button refresh list
         JButton buttonRefresh = new JButton("Rafraichir");
         contentPane.add(buttonRefresh, "wrap");
 
         buttonRefresh.addActionListener((event) -> {
-            ThreadManager.runLater(()->{
+            ThreadManager.runLater(() -> {
                 refreshResourceListLater();
             });
         });
@@ -78,7 +74,7 @@ public class AddDataFromCatalog extends InteractionElement {
 
                 setAllElementsSelected(false);
 
-                mapm().importResources(resources, (objects)->{
+                mapm().importResources(resources, (objects) -> {
                     System.out.println();
                     System.out.println(objects);
                     System.out.println(objects[0]);
@@ -91,7 +87,7 @@ public class AddDataFromCatalog extends InteractionElement {
 
         });
 
-        ThreadManager.runLater(()->{
+        ThreadManager.runLater(() -> {
             refreshResourceListLater();
         });
 
@@ -130,7 +126,7 @@ public class AddDataFromCatalog extends InteractionElement {
             // add elements to panel, on EDT
             SwingUtilities.invokeLater(() -> {
                 for (DistantResource res : new ArrayList<>(index)) {
-                    listPane.add(new DistantResourceGUI(res), "width 98%!, wrap");
+                    listPane.add(new DistantResourceGUI(res), "width 97%!, wrap");
                 }
 
                 listPane.revalidate();
@@ -153,6 +149,7 @@ public class AddDataFromCatalog extends InteractionElement {
                 DistantResourceGUI resGui = (DistantResourceGUI) p;
 
                 resGui.setSelected(val);
+                resGui.revalidate();
                 resGui.repaint();
             }
         }
@@ -179,59 +176,5 @@ public class AddDataFromCatalog extends InteractionElement {
         return result;
     }
 
-    /**
-     * Show a resource in main list
-     */
-    private class DistantResourceGUI extends JPanel {
 
-        private final DistantResource resource;
-        private final HtmlCheckbox chkSelected;
-
-        public DistantResourceGUI(DistantResource res) {
-            super(new MigLayout("insets 3, gap 3"));
-
-            setCursor(GuiCursor.HAND_CURSOR);
-            this.resource = res;
-
-            chkSelected = new HtmlCheckbox("<b>" + res.getName() + "</b>");
-
-            add(chkSelected, "width 98%!, wrap");
-            add(new HtmlLabel(res.getDescription()), "gapleft 10px!, width 98%!, wrap");
-
-            if (res instanceof ShapefileResource) {
-                add(new HtmlLabel("Taille: " + ((ShapefileResource) res).getSize() + "mo"), "gapleft 10px!, width 98%!");
-            }
-
-        }
-
-        /**
-         * Get resource associated with this element
-         *
-         * @return
-         */
-        public DistantResource getResource() {
-            return resource;
-        }
-
-        /**
-         * Set this element selected
-         *
-         * @param selected
-         */
-        public void setSelected(boolean selected) {
-            chkSelected.setSelected(selected);
-            revalidate();
-            repaint();
-        }
-
-        /**
-         * Return true if this element is selected
-         *
-         * @return
-         */
-        public boolean isSelected() {
-            return chkSelected.isSelected();
-        }
-
-    }
 }

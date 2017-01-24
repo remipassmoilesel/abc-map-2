@@ -3,24 +3,22 @@ package org.abcmap.core.resources;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.Project;
-import org.abcmap.core.project.layers.AbmWMSLayer;
 import org.abcmap.gui.utils.GuiUtils;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
  * Predefined WMS server, which can be loaded from locale server list or distant.
  */
-public class WmsResource extends DistantResource {
+public class DistantRepository extends DistantResource {
 
-    private static final CustomLogger logger = LogManager.getLogger(WmsResource.class);
+    private static final CustomLogger logger = LogManager.getLogger(DistantRepository.class);
 
     private String url;
 
-    public WmsResource(String name, String url) {
+    public DistantRepository(String name, String url) {
         super(name, "");
         this.name = name;
         this.url = url;
@@ -31,16 +29,12 @@ public class WmsResource extends DistantResource {
 
         GuiUtils.throwIfOnEDT();
 
-        // try to open wms layer
-        AbmWMSLayer layer = p.addNewWMSLayer(url, null);
-        p.addLayer(layer);
-
-        p.fireLayerListChanged();
+        throw new IllegalStateException("Impossible to import a repository in a project: " + this);
 
     }
 
     /**
-     * URL of WMS server, which can be used to create a WMS layer
+     * URL of repository
      *
      * @return
      */
@@ -49,7 +43,7 @@ public class WmsResource extends DistantResource {
     }
 
     /**
-     * URL of WMS server, which can be used to create a WMS layer
+     * URL of repository
      *
      * @param url
      */
@@ -58,24 +52,24 @@ public class WmsResource extends DistantResource {
     }
 
     @Override
-    public String toString() {
-        return "WmsResource{" +
-                "name='" + name + '\'' +
-                ", url='" + url + '\'' +
-                '}';
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        WmsResource that = (WmsResource) o;
+        DistantRepository that = (DistantRepository) o;
         return Objects.equals(url, that.url);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), url);
+    }
+
+    @Override
+    public String toString() {
+        return "DistantRepository{" +
+                "name='" + name + '\'' +
+                ", url='" + url + '\'' +
+                '}';
     }
 }
