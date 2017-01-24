@@ -212,6 +212,15 @@ public class DialogManager extends ManagerTreeAccessUtil {
     }
 
     /**
+     * Display a dialog to confirm profile closing
+     *
+     * @return
+     */
+    public QuestionResult showProfileClosingConfirmationDialog() {
+        return ClosingConfirmationDialog.showProfileConfirmationAndWait(guim().getMainWindow());
+    }
+
+    /**
      * Show a browse dialog with project file filter
      *
      * @return
@@ -226,6 +235,15 @@ public class DialogManager extends ManagerTreeAccessUtil {
      * @return
      */
     public BrowseDialogResult browseProjectToSaveDialog() {
+        return SimpleBrowseDialog.browseProjectToSaveAndWait(guim().getMainWindow());
+    }
+
+    /**
+     * Show a browse dialog with a profile file filter
+     *
+     * @return
+     */
+    public BrowseDialogResult browseProfileToSaveDialog() {
         return SimpleBrowseDialog.browseProfileToSaveAndWait(guim().getMainWindow());
     }
 
@@ -271,4 +289,6 @@ public class DialogManager extends ManagerTreeAccessUtil {
         }
 
     }
+
+
 }

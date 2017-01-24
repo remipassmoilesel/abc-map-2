@@ -5,6 +5,7 @@ import com.thoughtworks.xstream.XStream;
 import org.abcmap.core.configuration.CFNames;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.configuration.ConfigurationContainer;
+import org.abcmap.core.events.ConfigurationEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
 
@@ -26,15 +27,19 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
     private ConfigurationContainer currentConfiguration;
 
     public ConfigurationManager() throws IOException {
-        // load default configuration
-        this.currentConfiguration = new ConfigurationContainer();
-        this.xmlSerializer = new XStream();
 
+        this.xmlSerializer = new XStream();
+        this.currentConfiguration = new ConfigurationContainer();
         this.notifm = new EventNotificationManager(ConfigurationManager.this);
 
         initializeConfiguration();
     }
 
+    /**
+     * Initialize configuration at launch
+     *
+     * @throws IOException
+     */
     private void initializeConfiguration() throws IOException {
 
         // check configuration directory
@@ -49,17 +54,26 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
             saveConfiguration(new ConfigurationContainer(), defaultProfile);
         }
 
-        // check current profile
+        // check if current profile exist and load it
         Path currentProfile = ConfigurationConstants.CURRENT_PROFILE_PATH;
         if (Files.isRegularFile(currentProfile) == true) {
             loadConfiguration(currentProfile);
-        } else {
+        }
+
+        // or create a new one
+        else {
             ConfigurationContainer config = new ConfigurationContainer();
             saveConfiguration(config, currentProfile);
             loadConfiguration(config);
         }
 
+    }
 
+    /**
+     * Reset current configuration
+     */
+    public void resetConfiguration() {
+        loadConfiguration(new ConfigurationContainer());
     }
 
     /**
@@ -77,6 +91,10 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
             writer.close();
         }
 
+    }
+
+    public void saveCurrentConfiguration(Path selectedPath) throws IOException {
+        saveConfiguration(currentConfiguration, selectedPath);
     }
 
     /**
@@ -159,6 +177,13 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
         currentConfiguration.updateValue(CFNames.IMPORT_SURF_MODE, surfMode);
     }
 
+    /**
+     * Fire an event menaing that configuration changed
+     */
+    public void fireConfigurationUpdated() {
+        notifm.fireEvent(new ConfigurationEvent(ConfigurationEvent.CONFIGURATION_UPDATED));
+    }
+
 
     public Rectangle getCropRectangle() {
         return new Rectangle();
@@ -192,4 +217,7 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
     public void saveCurrentProfile() throws IOException {
         saveConfiguration(currentConfiguration, Paths.get(currentConfiguration.getValue(CFNames.PROFILE_PATH)));
     }
+
+
+
 }
