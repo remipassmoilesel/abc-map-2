@@ -24,12 +24,12 @@ class DistantResourceGUI extends JPanel {
 
         GuiUtils.throwIfNotOnEDT();
 
-        setCursor(GuiCursor.HAND_CURSOR);
         this.resource = res;
 
         // name as a checkbox
         chkSelected = new HtmlCheckbox("<b>" + res.getName() + "</b>");
         chkSelected.setToolTipText(res.getName());
+        chkSelected.setCursor(GuiCursor.HAND_CURSOR);
         add(chkSelected, "width 98%!, wrap");
 
         // optional information

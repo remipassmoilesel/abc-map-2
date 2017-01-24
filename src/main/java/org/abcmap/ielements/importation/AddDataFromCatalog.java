@@ -38,18 +38,18 @@ public class AddDataFromCatalog extends InteractionElement {
     @Override
     protected Component createPrimaryGUI() {
 
-        JPanel contentPane = new JPanel(new MigLayout("insets 0, gap 5px"));
+        JPanel contentPane = new JPanel(new MigLayout("insets 0, gap 0"));
         GuiUtils.addLabel("Ressources: ", contentPane, "wrap");
 
         // add search text field
         // TODO: add text field as filter
-//        searchTextField = new JTextField();
-//        contentPane.add(searchTextField, "width 98%!, wrap");
-//        searchTextField.addCaretListener((event) -> {
-//            filterResourceList(searchTextField.getText());
-//        });
+        //searchTextField = new JTextField();
+        //contentPane.add(searchTextField, "width 98%!, wrap");
+        //searchTextField.addCaretListener((event) -> {
+        //    filterResourceList(searchTextField.getText());
+        //});
 
-        listPane = new JPanel(new MigLayout("insets 2"));
+        listPane = new JPanel(new MigLayout("insets 0"));
         JScrollPane scroll = new JScrollPane(listPane);
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.getVerticalScrollBar().setUnitIncrement(ConfigurationConstants.SCROLLBAR_UNIT_INCREMENT);
@@ -63,7 +63,7 @@ public class AddDataFromCatalog extends InteractionElement {
 
         // button import resources
         JButton buttonValid = new JButton("Importer");
-        contentPane.add(buttonValid, "wrap");
+        contentPane.add(buttonValid, "wrap 10px");
         buttonValid.addActionListener(new ButtonActionListener(ButtonActionListener.IMPORT));
 
         // update label information
@@ -100,16 +100,16 @@ public class AddDataFromCatalog extends InteractionElement {
                 // refresh list
                 if (REFRESH.equals(mode)) {
 
-                    if (getOperationLock() == false) {
-                        return;
-                    }
-
                     setUpdateLabelText("Mise à jour en cours...");
                     refreshResourceListLater();
                 }
 
                 // import resources
                 else if (IMPORT.equals(mode)) {
+
+                    //TODO
+                    //TODO Display information to user when total resources size is over 100 mo
+                    //TODO
 
                     ArrayList<DistantResource> resources = getSelectedResources();
 
