@@ -1,6 +1,10 @@
 package org.abcmap.ielements.profiles;
 
+import org.abcmap.core.configuration.CFNames;
+import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.InteractionElement;
+
+import java.io.IOException;
 
 public class SaveProfile extends InteractionElement {
 
@@ -13,28 +17,35 @@ public class SaveProfile extends InteractionElement {
     @Override
     public void run() {
 
-        /*
-        // pas de lancement dans l'EDT
+        // no run on EDT
         GuiUtils.throwIfOnEDT();
 
-        // chemin d'enregistrement du profil
-        String path = configm.getConfiguration().PROFILE_PATH;
-
-        // le profil n'a jamais ete sauvegarde > commande enregistrer sous
-        if (path.equals("")) {
-            new SaveAsProfile().run();
+        if (getOperationLock() == false) {
             return;
         }
 
-        // le profil a deja ete enregistre
         try {
-            configm.saveProfile();
 
-            guim.showMessageInBox("Le profil a été enregistré");
-        } catch (IOException e) {
-            guim.showProfileWritingError();
-            Log.error(e);
+            // get configuration path
+            String path = configm().getConfiguration().getValue(CFNames.PROFILE_PATH);
+
+            // path is empty, profile was never saved
+            if (path.equals("")) {
+                new SaveAsProfile().run();
+                return;
+            }
+
+            // otherwise save profile at specified location
+            try {
+                configm().saveCurrentProfile();
+                dialm().showMessageInBox("Le profil a été enregistré");
+            } catch (IOException e) {
+                logger.error(e);
+                dialm().showProfileWritingError();
+            }
+        } finally {
+            releaseOperationLock();
         }
-        */
     }
+
 }
