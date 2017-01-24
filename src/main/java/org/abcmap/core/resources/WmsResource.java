@@ -7,7 +7,6 @@ import org.abcmap.core.project.layers.AbmWMSLayer;
 import org.abcmap.gui.utils.GuiUtils;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -27,9 +26,18 @@ public class WmsResource extends DistantResource {
     }
 
     @Override
-    public void importIn(Project p, Consumer<Object[]> update) throws IOException {
+    public void importIn(Project p, Consumer<DistantResourceProgressEvent> progressListener) throws IOException {
 
         GuiUtils.throwIfOnEDT();
+
+        // inform of progress
+        DistantResourceProgressEvent updateRes = new DistantResourceProgressEvent(this);
+        updateRes.setStatus(DistantResourceProgressEvent.PREPARING);
+        try {
+            progressListener.accept(updateRes);
+        } catch (Exception e) {
+            logger.error(e);
+        }
 
         // try to open wms layer
         AbmWMSLayer layer = p.addNewWMSLayer(url, null);

@@ -2,7 +2,6 @@ package org.abcmap.core.resources;
 
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.MapManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -80,7 +79,7 @@ public class DistantResourceReader {
 
                         ShapefileResource shapefileRes = new ShapefileResource(name, baseUrl, path);
                         shapefileRes.setDescription(description);
-                        shapefileRes.setSize(size);
+                        shapefileRes.setZippedSize(size);
                         shapefileRes.setBaseUrl(baseUrl);
 
                         result.add(shapefileRes);

@@ -3,14 +3,18 @@ package org.abcmap.ielements.importation;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.resources.DistantResource;
+import org.abcmap.core.resources.DistantResourceProgressEvent;
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Created by remipassmoilesel on 13/01/17.
@@ -20,6 +24,7 @@ public class AddDataFromCatalog extends InteractionElement {
     private JPanel listPane;
     private ArrayList<DistantResource> index;
     private JTextField searchTextField;
+    private JLabel updateLabel;
 
     public AddDataFromCatalog() {
 
@@ -37,11 +42,12 @@ public class AddDataFromCatalog extends InteractionElement {
         GuiUtils.addLabel("Ressources: ", contentPane, "wrap");
 
         // add search text field
-        searchTextField = new JTextField();
-        contentPane.add(searchTextField, "width 98%!, wrap");
-        searchTextField.addCaretListener((event) -> {
-            filterResourceList(searchTextField.getText());
-        });
+        // TODO: add text field as filter
+//        searchTextField = new JTextField();
+//        contentPane.add(searchTextField, "width 98%!, wrap");
+//        searchTextField.addCaretListener((event) -> {
+//            filterResourceList(searchTextField.getText());
+//        });
 
         listPane = new JPanel(new MigLayout("insets 2"));
         JScrollPane scroll = new JScrollPane(listPane);
@@ -53,46 +59,125 @@ public class AddDataFromCatalog extends InteractionElement {
         // button refresh list
         JButton buttonRefresh = new JButton("Rafraichir");
         contentPane.add(buttonRefresh, "wrap");
-
-        buttonRefresh.addActionListener((event) -> {
-            ThreadManager.runLater(() -> {
-                refreshResourceListLater();
-            });
-        });
+        buttonRefresh.addActionListener(new ButtonActionListener(ButtonActionListener.REFRESH));
 
         // button import resources
         JButton buttonValid = new JButton("Importer");
         contentPane.add(buttonValid, "wrap");
-        buttonValid.addActionListener((event) -> {
-            ThreadManager.runLater(() -> {
-                ArrayList<DistantResource> resources = getSelectedResources();
+        buttonValid.addActionListener(new ButtonActionListener(ButtonActionListener.IMPORT));
 
-                if (resources.size() < 1) {
-                    dialm().showErrorInBox("Vous devez sélectionner une ressource");
-                    return;
-                }
+        // update label information
+        this.updateLabel = new JLabel();
+        contentPane.add(updateLabel, "width 98%");
 
-                setAllElementsSelected(false);
-
-                mapm().importResources(resources, (objects) -> {
-                    System.out.println();
-                    System.out.println(objects);
-                    System.out.println(objects[0]);
-                    System.out.println(objects[1]);
-                    System.out.println(objects[2]);
-                });
-                dialm().showMessageInBox("Fin de l'import");
-
-            });
-
-        });
-
+        // first refresh
         ThreadManager.runLater(() -> {
             refreshResourceListLater();
         });
 
         return contentPane;
 
+    }
+
+    private class ButtonActionListener implements ActionListener, Runnable {
+
+        public static final String IMPORT = "IMPORT";
+        public static final String REFRESH = "REFRESH";
+        private final String mode;
+
+        ButtonActionListener(String mode) {
+            this.mode = mode;
+        }
+
+        @Override
+        public void run() {
+            if (getOperationLock() == false) {
+                return;
+            }
+
+            try {
+
+                // refresh list
+                if (REFRESH.equals(mode)) {
+
+                    if (getOperationLock() == false) {
+                        return;
+                    }
+
+                    setUpdateLabelText("Mise à jour en cours...");
+                    refreshResourceListLater();
+                }
+
+                // import resources
+                else if (IMPORT.equals(mode)) {
+
+                    ArrayList<DistantResource> resources = getSelectedResources();
+
+                    if (resources.size() < 1) {
+                        dialm().showErrorInBox("Vous devez sélectionner une ressource");
+                        return;
+                    }
+
+                    setAllElementsSelected(false);
+
+                    mapm().importResources(resources, (event) -> {
+
+                        int resId = resources.indexOf(event.getResource()) + 1;
+
+                        // resource is preparing
+                        if(DistantResourceProgressEvent.PREPARING.equals(event.getStatus())){
+                            setUpdateLabelText("Res. " + resId + " en préparation...");
+                            return;
+                        }
+
+                        // resource is being uncompressed
+                        if(DistantResourceProgressEvent.UNCOMPRESSING.equals(event.getStatus())){
+                            setUpdateLabelText("Res. " + resId + " en décompression...");
+                            return;
+                        }
+
+                        // resource is downloading
+                        else if(DistantResourceProgressEvent.DOWNLOADING.equals(event.getStatus())) {
+
+                            double percent = -1;
+                            try {
+                                percent = Math.round(event.getDownloadedSize() / event.getFinalSize() * 100);
+                            } catch (Exception e) {
+                                logger.error(e);
+                            }
+
+                            if(percent < 0){
+                                percent = 0;
+                            }
+                            else if(percent > 99){
+                                percent = 99;
+                            }
+
+                            setUpdateLabelText("Res. " + resId + " en téléchargement: " + percent + " %");
+                        }
+                    });
+
+                    // end of import
+                    dialm().showMessageInBox("Fin de l'import");
+                    setUpdateLabelText("");
+                }
+
+            } finally {
+                setUpdateLabelText("");
+                releaseOperationLock();
+            }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ThreadManager.runLater(this);
+        }
+    }
+
+    private void setUpdateLabelText(String text) {
+        SwingUtilities.invokeLater(() -> {
+            updateLabel.setText(text);
+        });
     }
 
     /**

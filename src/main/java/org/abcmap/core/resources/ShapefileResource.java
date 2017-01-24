@@ -44,7 +44,7 @@ public class ShapefileResource extends DistantResource {
     /**
      * Size of archive to download in mo
      */
-    protected Double size;
+    protected Double zippedSize;
 
     public ShapefileResource(String name, String baseUrl, String resourcePath) {
         super(name, "");
@@ -53,12 +53,12 @@ public class ShapefileResource extends DistantResource {
         this.resourcePath = resourcePath;
     }
 
-    public void importIn(Project p, Consumer<Object[]> update) throws IOException {
-        p.addLayer(getDistantLayer(p, update, 700));
+    public void importIn(Project p, Consumer<DistantResourceProgressEvent> progressListener) throws IOException {
+        p.addLayer(getDistantLayer(p, progressListener, 700));
         p.fireLayerListChanged();
     }
 
-    public AbmShapefileLayer getDistantLayer(Project p, Consumer<Object[]> updates, int updatePeriodMs) throws IOException {
+    public AbmShapefileLayer getDistantLayer(Project p, Consumer<DistantResourceProgressEvent> progressListener, int updatePeriodMs) throws IOException {
 
         GuiUtils.throwIfOnEDT();
 
@@ -80,9 +80,13 @@ public class ShapefileResource extends DistantResource {
 
         Files.createDirectories(destinationDirectory);
 
-        // create file, and add a timer to watch download
+        // create file, empty first
         final Path destinationFile = destinationDirectory.resolve(fileName);
 
+        // object which will be transmitted at each update
+        final DistantResourceProgressEvent updateEvent = new DistantResourceProgressEvent(this);
+
+        // if specified, create a timer to watch download and preparation
         Timer updateTimer = null;
         if (updatePeriodMs > -1) {
             updateTimer = new Timer("", true);
@@ -91,6 +95,7 @@ public class ShapefileResource extends DistantResource {
                 @Override
                 public void run() {
 
+                    // transmit size of directory while downloading
                     double dirSize = -1;
                     try {
                         dirSize = (double) Files.size(destinationFile) / 1024 / 1024;
@@ -98,20 +103,22 @@ public class ShapefileResource extends DistantResource {
                         logger.error(e);
                     }
 
-                    updates.accept(new Object[]{
-                            finalDestinationDirectory,
-                            dirSize,
-                            getSize()
-                    });
+                    updateEvent.setFinalSize(getZippedSize());
+                    updateEvent.setDownloadedSize(dirSize);
 
+                    progressListener.accept(updateEvent);
 
                 }
             }, 0, updatePeriodMs);
         }
         try {
 
+            updateEvent.setStatus(DistantResourceProgressEvent.DOWNLOADING);
+
             // download file
             FileUtils.copyURLToFile(url.toURL(), destinationFile.toFile(), 2000, 2000);
+
+            updateEvent.setStatus(DistantResourceProgressEvent.UNCOMPRESSING);
 
             // unzip file
             List<Path> uncompressed = ZipUtils.uncompress(destinationFile, destinationDirectory);
@@ -119,6 +126,8 @@ public class ShapefileResource extends DistantResource {
             if (uncompressed.size() < 1) {
                 throw new IOException("Downloaded archive is empty: " + destinationDirectory);
             }
+
+            updateEvent.setStatus(DistantResourceProgressEvent.PREPARING);
 
             for (Path file : uncompressed) {
                 if (file.getFileName().toString().endsWith(".shp")) {
@@ -146,12 +155,12 @@ public class ShapefileResource extends DistantResource {
 
     }
 
-    public Double getSize() {
-        return size;
+    public Double getZippedSize() {
+        return zippedSize;
     }
 
-    public void setSize(Double size) {
-        this.size = size;
+    public void setZippedSize(Double zippedSize) {
+        this.zippedSize = zippedSize;
     }
 
     public String getBaseUrl() {
@@ -186,7 +195,7 @@ public class ShapefileResource extends DistantResource {
         return "ShapefileResource{" +
                 "baseUrl='" + baseUrl + '\'' +
                 ", resourcePath='" + resourcePath + '\'' +
-                ", size='" + size + '\'' +
+                ", size='" + zippedSize + '\'' +
                 '}';
     }
 
@@ -198,11 +207,11 @@ public class ShapefileResource extends DistantResource {
         ShapefileResource that = (ShapefileResource) o;
         return Objects.equals(baseUrl, that.baseUrl) &&
                 Objects.equals(resourcePath, that.resourcePath) &&
-                Objects.equals(size, that.size);
+                Objects.equals(zippedSize, that.zippedSize);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), baseUrl, resourcePath, size);
+        return Objects.hash(super.hashCode(), baseUrl, resourcePath, zippedSize);
     }
 }

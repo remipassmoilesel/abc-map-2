@@ -9,6 +9,7 @@ import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbmShapefileLayer;
 import org.abcmap.core.resources.DistantResource;
+import org.abcmap.core.resources.DistantResourceProgressEvent;
 import org.abcmap.core.resources.DistantResourceReader;
 import org.abcmap.core.resources.WmsResource;
 import org.abcmap.core.utils.Utils;
@@ -366,12 +367,12 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
      * @param selectedResources
      * @param updates
      */
-    public void importResources(ArrayList<DistantResource> selectedResources, Consumer<Object[]> updates) {
+    public void importResources(ArrayList<DistantResource> selectedResources, Consumer<DistantResourceProgressEvent> updates) {
         for (DistantResource res : selectedResources) {
             try {
-                res.importIn(projectm().getProject(), (objects) -> {
+                res.importIn(projectm().getProject(), (event) -> {
                     if (updates != null) {
-                        updates.accept(objects);
+                        updates.accept(event);
                     }
                 });
             } catch (Exception e) {

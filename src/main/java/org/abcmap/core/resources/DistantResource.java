@@ -11,7 +11,6 @@ import java.util.function.Consumer;
  */
 public abstract class DistantResource {
 
-
     /**
      * Human readable name of resource
      *
@@ -33,10 +32,10 @@ public abstract class DistantResource {
      * Import this resource in specified project. This method may add layers, or something else ...
      *
      * @param p
-     * @param update
+     * @param progressListener
      * @throws IOException
      */
-    public abstract void importIn(Project p, Consumer<Object[]> update) throws IOException;
+    public abstract void importIn(Project p, Consumer<DistantResourceProgressEvent> progressListener) throws IOException;
 
     /**
      * Get name and identifier of resource.

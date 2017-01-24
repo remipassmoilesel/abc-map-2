@@ -25,7 +25,7 @@ public class DistantRepository extends DistantResource {
     }
 
     @Override
-    public void importIn(Project p, Consumer<Object[]> update) throws IOException {
+    public void importIn(Project p, Consumer<DistantResourceProgressEvent> progressListener) throws IOException {
 
         GuiUtils.throwIfOnEDT();
 

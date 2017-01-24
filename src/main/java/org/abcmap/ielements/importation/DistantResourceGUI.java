@@ -42,7 +42,7 @@ class DistantResourceGUI extends JPanel {
 
         // shapefile size
         if (res instanceof ShapefileResource) {
-            add(new HtmlLabel("Taille: " + ((ShapefileResource) res).getSize() + "mo"), "gapleft 10px!, width 98%!");
+            add(new HtmlLabel("Taille: " + ((ShapefileResource) res).getZippedSize() + "mo"), "gapleft 10px!, width 98%!");
         }
 
         // wms url
