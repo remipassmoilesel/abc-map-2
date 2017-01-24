@@ -1,5 +1,8 @@
 package org.abcmap.ielements.profiles;
 
+import org.abcmap.core.configuration.CFNames;
+import org.abcmap.gui.dialogs.QuestionResult;
+import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.InteractionElement;
 
 public class CreateNewProfile extends InteractionElement {
@@ -12,36 +15,42 @@ public class CreateNewProfile extends InteractionElement {
     @Override
     public void run() {
 
-		/*
-        // pas de lancement dans l'EDT
-		GuiUtils.throwIfOnEDT();
+        // no operations on EDT
+        GuiUtils.throwIfOnEDT();
 
-		// pas de verification en mode debugage
-		if (MainManager.isDebugMode() == false) {
+        if (getOperationLock() == false) {
+            return;
+        }
 
-			QuestionResult result = ClosingConfirmationDialog
-					.showProfileConfirmationAndWait(guim.getMainWindow());
+        try {
+            QuestionResult result = dialm().showProfileClosingConfirmationDialog();
 
-			// l'action a ete annulée
-			if (result.isAnswerCancel())
-				return;
+            // user cancel operation
+            if (result.isAnswerCancel()) {
+                return;
+            }
 
-			// l'utilisateur souhaite enregistrer
-			if (result.isAnswerYes()) {
-				new SaveProfile().run();
-			}
+            // user want to save
+            if (result.isAnswerYes()) {
+                new SaveProfile().run();
+            }
 
-		}
+            // reset configuration
+            configm().resetConfiguration();
 
-		// raz du profil courant
-		configm.resetConfiguration();
+            // reset profile path
+            configm().getConfiguration().updateValue(CFNames.PROFILE_PATH, "");
 
-		// raz du chemin du profil
-		configm.getConfiguration().PROFILE_PATH = "";
+            // fire an event
+            configm().fireConfigurationUpdated();
 
-		// sauvegarder sous
-		new SaveAsProfile().run();
+            // save profile
+            new SaveAsProfile().run();
 
-		*/
+            dialm().showMessageInBox("Un nouveau profil a été créé");
+
+        } finally {
+            releaseOperationLock();
+        }
     }
 }
