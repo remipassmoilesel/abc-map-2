@@ -1,5 +1,6 @@
 package org.abcmap.ielements.project;
 
+import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.GuiIcons;
@@ -50,8 +51,9 @@ public class SaveAsProject extends InteractionElement {
             Path finalPath = result.getFile().toPath();
 
             // check extension
-            if (Utils.checkExtension(finalPath, "abm") == false) {
-                String newPath = finalPath.toAbsolutePath().toString() + ".abm";
+            String ext = ConfigurationConstants.PROJECT_EXTENSION;
+            if (Utils.checkExtension(finalPath, ext) == false) {
+                String newPath = finalPath.toAbsolutePath().toString() + "." + ext;
                 finalPath = Paths.get(newPath);
             }
 
