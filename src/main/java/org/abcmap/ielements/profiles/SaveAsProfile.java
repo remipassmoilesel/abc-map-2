@@ -1,6 +1,15 @@
 package org.abcmap.ielements.profiles;
 
+import org.abcmap.core.configuration.CFNames;
+import org.abcmap.core.configuration.ConfigurationConstants;
+import org.abcmap.core.utils.Utils;
+import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
+import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.InteractionElement;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class SaveAsProfile extends InteractionElement {
 
@@ -12,49 +21,53 @@ public class SaveAsProfile extends InteractionElement {
     @Override
     public void run() {
 
-		/*
-        // pas de lancement dans l'EDT
-		GuiUtils.throwIfOnEDT();
+        // no operations on EDT
+        GuiUtils.throwIfOnEDT();
 
-		// eviter les appels intempestifs
-		if (threadAccess.askAccess() == false) {
-			return;
-		}
+        if (getOperationLock() == false) {
+            return;
+        }
 
-		// threadAccess.releaseAccess();
+        try {
 
-		// Boite parcourir de sauvegarde
-		Window parent = guim.getMainWindow();
-		BrowseDialogResult result = SimpleBrowseDialog
-				.browseProfileToSaveAndWait(parent);
+            BrowseDialogResult result = dialm().browseProfileToSaveDialog();
 
-		// l'action a ete annulée
-		if (result.isActionCanceled()) {
-			threadAccess.releaseAccess();
-			return;
-		}
+            // action was canceled
+            if (result.isActionCanceled()) {
+                return;
+            }
 
-		try {
+            try {
 
-			File file = result.getFile();
+                // save profile at specified path
+                Path selectedPath = result.getPath();
 
-			// enregistrement du profil
-			configm.saveProfile(file.getAbsolutePath(), true);
+                // check extension
+                String ext = ConfigurationConstants.PROFILE_EXTENSION;
+                if (Utils.checkExtension(selectedPath, ext) == false) {
+                    String newPath = selectedPath.toAbsolutePath().toString() + "." + ext;
+                    selectedPath = Paths.get(newPath);
+                }
 
-			// conservation dans les rcents
-			recentsm.addProfile(file);
-			recentsm.saveHistory();
+                configm().saveCurrentConfiguration(selectedPath);
 
-			guim.showMessageInBox("Le profil a été enregistré");
+                // save path
+                configm().getConfiguration().updateValue(CFNames.PROFILE_PATH, selectedPath.toString());
 
-		} catch (IOException e) {
-			guim.showProfileWritingError();
-			Log.error(e);
-		}
+                // save profile in recents profiles
+                recentm().addProfilePath(selectedPath.toAbsolutePath().toString());
+                recentm().saveHistory();
 
-		threadAccess.releaseAccess();
+                dialm().showMessageInBox("Le profil a été enregistré");
 
-		*/
+            } catch (IOException e) {
+                dialm().showProfileWritingError();
+                logger.error(e);
+            }
+
+        } finally {
+            releaseOperationLock();
+        }
 
     }
 }
