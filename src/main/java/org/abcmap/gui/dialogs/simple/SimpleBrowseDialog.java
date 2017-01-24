@@ -69,6 +69,16 @@ public class SimpleBrowseDialog {
     }
 
     /**
+     * Open a dialog to browse path where save project
+     *
+     * @param parent
+     * @return
+     */
+    public static BrowseDialogResult browseProjectToSaveAndWait(Window parent) {
+        return browseFileToSave(parent, BrowseFileFilter.PROJECTS_FILEFILTER);
+    }
+
+    /**
      * Open a dialog to browse project to open
      *
      * @param parent
