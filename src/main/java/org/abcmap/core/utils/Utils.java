@@ -462,19 +462,28 @@ public class Utils {
      * Write a jpeg picture with maximum quality
      *
      * @param image
+     * @param destination
+     * @throws FileNotFoundException
+     * @throws IOException
+     */
+    public static void writeImage(BufferedImage image, Path destination) throws IOException {
+        writeImage(image, destination.toFile());
+    }
+
+    /**
+     * Write a jpeg picture with maximum quality
+     *
+     * @param image
      * @param file
      * @throws FileNotFoundException
      * @throws IOException
      */
-    public static void writeImage(BufferedImage image, File file)
-            throws FileNotFoundException, IOException {
+    public static void writeImage(BufferedImage image, File file) throws IOException {
 
-        Iterator iter = ImageIO.getImageWritersByFormatName("jpeg");
+        // do not use a JPG writer, because some free JVM do not have a JPEG writer
+        Iterator iter = ImageIO.getImageWritersByFormatName("png");
         ImageWriter writer = (ImageWriter) iter.next();
         ImageWriteParam iwp = writer.getDefaultWriteParam();
-        iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-
-        iwp.setCompressionQuality(1f);
 
         FileImageOutputStream output = null;
 
