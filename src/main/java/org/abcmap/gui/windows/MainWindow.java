@@ -113,16 +113,28 @@ public class MainWindow extends AbstractCustomWindow implements HasEventNotifica
                 // project closed, empty center
                 if (ProjectEvent.isCloseProjectEvent(notif)) {
                     SwingUtilities.invokeLater(() -> {
-                        setWindowMode(MainWindowMode.EMPTY);
-                        logger.debug("Window mode updated");
+                        try {
+                            setWindowMode(MainWindowMode.EMPTY);
+                            logger.debug("Window mode updated");
+                        }
+                        // sometimes theses methods are called too late on database closing
+                        catch (Exception e) {
+                            logger.debug(e);
+                        }
                     });
                 }
 
                 // new project, show map and reset display
                 else if (ProjectEvent.isNewProjectLoadedEvent(notif)) {
                     SwingUtilities.invokeLater(() -> {
-                        setWindowMode(MainWindowMode.SHOW_MAP);
-                        logger.debug("Window mode updated");
+                        try {
+                            setWindowMode(MainWindowMode.SHOW_MAP);
+                            logger.debug("Window mode updated");
+                        }
+                        // sometimes theses methods are called too late on database closing
+                        catch (Exception e) {
+                            logger.debug(e);
+                        }
                     });
                 }
             } catch (Exception e) {
