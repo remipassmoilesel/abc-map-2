@@ -37,7 +37,7 @@ public class SaveProfile extends InteractionElement {
 
             // otherwise save profile at specified location
             try {
-                configm().saveCurrentProfile();
+                configm().saveCurrentConfiguration();
                 dialm().showMessageInBox("Le profil a été enregistré");
             } catch (IOException e) {
                 logger.error(e);

@@ -69,7 +69,7 @@ public class QuitProgram extends InteractionElement {
             // save configuration
             if (configm().isSaveProfileWhenQuit()) {
                 try {
-                    configm().saveCurrentProfile();
+                    configm().saveCurrentConfiguration();
                 } catch (IOException e) {
                     logger.error(e);
                 }
