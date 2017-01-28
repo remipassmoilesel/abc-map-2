@@ -23,6 +23,7 @@ import org.opengis.referencing.operation.TransformException;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -39,6 +40,11 @@ import java.util.Objects;
 public class Project {
 
     private static final CustomLogger logger = LogManager.getLogger(Project.class);
+
+    /**
+     * Default CRS used in projects
+     */
+    public static CoordinateReferenceSystem DEFAULT_CRS = GeoUtils.WGS_84;
 
     /**
      * Temp directory, where is located database
@@ -110,7 +116,7 @@ public class Project {
     public Project(Path databasePath) throws IOException {
 
         // default system
-        this.crs = GeoUtils.WGS_84;
+        this.crs = DEFAULT_CRS;
 
         this.databasePath = databasePath;
         this.tempDirectory = databasePath.getParent();
@@ -460,34 +466,10 @@ public class Project {
     }
 
     /**
-     * Informations used: styleLibrary finalPath mainLayersList metadataContainer crs layouts
-     *
-     * @param o
-     * @return
+     * Return true if specified layer belong to project
      */
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Project project = (Project) o;
-        return Objects.equals(styleLibrary, project.styleLibrary) &&
-                Objects.equals(layouts, project.layouts) &&
-                Objects.equals(finalPath, project.finalPath) &&
-                Objects.equals(mainLayersList, project.mainLayersList) &&
-                Objects.equals(metadataContainer, project.metadataContainer) &&
-                Objects.equals(crs, project.crs);
-    }
-
-    /**
-     * Informations used: styleLibrary finalPath mainLayersList metadataContainer crs layouts
-     *
-     * @return
-     */
-    @Override
-    public int hashCode() {
-        return Objects.hash(styleLibrary, layouts, finalPath, mainLayersList, metadataContainer, crs);
+    public boolean isLayerBelongToProject(AbmAbstractLayer layer) {
+        return getLayersList().indexOf(layer) != -1;
     }
 
     /**
@@ -569,6 +551,30 @@ public class Project {
             frame.setVisible(true);
 
         });
+
+    }
+
+    /**
+     * Show a project for debug purposes
+     */
+    public void showForDebugAndWait(boolean includeTileOutlines) {
+
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+
+                // Create a JMapFrame with a menu to choose the display style for the
+                JMapFrame frame = new JMapFrame(buildGlobalMapContent(includeTileOutlines));
+                frame.setSize(800, 600);
+                frame.enableStatusBar(true);
+                frame.enableTool(JMapFrame.Tool.ZOOM, JMapFrame.Tool.PAN, JMapFrame.Tool.RESET);
+                frame.enableToolBar(true);
+                frame.enableLayerTable(true);
+                frame.setVisible(true);
+
+            });
+        } catch (InterruptedException | InvocationTargetException e) {
+            logger.error(e);
+        }
 
     }
 
@@ -854,6 +860,35 @@ public class Project {
      */
     public void fireMetadatasChanged() {
         Main.getProjectManager().fireMetadatasChanged();
+    }
+
+    /**
+     * Informations used: styleLibrary finalPath mainLayersList metadataContainer crs layouts
+     *
+     * @param o
+     * @return
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Project project = (Project) o;
+        return Objects.equals(styleLibrary, project.styleLibrary) &&
+                Objects.equals(layouts, project.layouts) &&
+                Objects.equals(finalPath, project.finalPath) &&
+                Objects.equals(mainLayersList, project.mainLayersList) &&
+                Objects.equals(metadataContainer, project.metadataContainer) &&
+                Objects.equals(crs, project.crs);
+    }
+
+    /**
+     * Informations used: styleLibrary finalPath mainLayersList metadataContainer crs layouts
+     *
+     * @return
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(styleLibrary, layouts, finalPath, mainLayersList, metadataContainer, crs);
     }
 
 }
