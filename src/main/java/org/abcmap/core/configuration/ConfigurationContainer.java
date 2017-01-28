@@ -9,6 +9,7 @@ import java.util.Objects;
 public class ConfigurationContainer implements Serializable {
 
     private HashMap<String, String> metadataList;
+    private CFNames anInt;
 
     public ConfigurationContainer() {
 
@@ -172,6 +173,30 @@ public class ConfigurationContainer implements Serializable {
     }
 
     /**
+     * Get corresponding value
+     *
+     * @param name
+     * @return
+     */
+    public Boolean getBoolean(CFNames name) {
+        return getBoolean(name.toString());
+    }
+
+    /**
+     * Get corresponding value
+     *
+     * @param name
+     * @return
+     */
+    public Boolean getBoolean(String name) {
+        try {
+            return Boolean.valueOf(metadataList.get(name));
+        } catch (Exception e) {
+            throw new IllegalStateException("Error while transforming value", e);
+        }
+    }
+
+    /**
      * Get the corresponding metadata
      *
      * @param name
@@ -204,4 +229,6 @@ public class ConfigurationContainer implements Serializable {
     public int hashCode() {
         return Objects.hash(metadataList);
     }
+
+
 }
