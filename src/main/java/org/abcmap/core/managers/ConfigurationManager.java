@@ -184,9 +184,45 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
         notifm.fireEvent(new ConfigurationEvent(ConfigurationEvent.CONFIGURATION_UPDATED));
     }
 
+    /**
+     * Save current configuration
+     *
+     * @throws IOException
+     */
+    public void saveCurrentConfiguration() throws IOException {
+        saveConfiguration(currentConfiguration, ConfigurationConstants.CURRENT_PROFILE_PATH);
+        saveConfiguration(currentConfiguration, Paths.get(currentConfiguration.getValue(CFNames.PROFILE_PATH)));
+    }
 
+    /**
+     * Return current rectangle used to crop images
+     *
+     * @return
+     */
     public Rectangle getCropRectangle() {
-        return new Rectangle();
+        return new Rectangle(
+                currentConfiguration.getInt(CFNames.IMPORT_CROP_AREA_SELECTION_X),
+                currentConfiguration.getInt(CFNames.IMPORT_CROP_AREA_SELECTION_Y),
+                currentConfiguration.getInt(CFNames.IMPORT_CROP_AREA_SELECTION_W),
+                currentConfiguration.getInt(CFNames.IMPORT_CROP_AREA_SELECTION_H)
+        );
+    }
+
+    /**
+     * Set current rectangle to use for crop
+     *
+     * @param rectangle
+     */
+    public void setCropRectangle(Rectangle rectangle) {
+        currentConfiguration.updateValue(CFNames.IMPORT_CROP_AREA_SELECTION_X, rectangle.x);
+        currentConfiguration.updateValue(CFNames.IMPORT_CROP_AREA_SELECTION_Y, rectangle.y);
+        currentConfiguration.updateValue(CFNames.IMPORT_CROP_AREA_SELECTION_W, rectangle.width);
+        currentConfiguration.updateValue(CFNames.IMPORT_CROP_AREA_SELECTION_H, rectangle.height);
+    }
+
+    public boolean isCroppingEnabled() {
+
+        return currentConfiguration.getBoolean(CFNames.IMPORT_ENABLE_CROPPING);
     }
 
     @Override
@@ -194,12 +230,6 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
         return notifm;
     }
 
-    public void setCropRectangle(Rectangle cropRectangle) {
-    }
-
-    public boolean isCroppingEnabled() {
-        return true;
-    }
 
     public void setCroppingEnabled(boolean croppingEnabled) {
 
@@ -213,11 +243,5 @@ public class ConfigurationManager extends ManagerTreeAccessUtil implements HasEv
     public boolean isSaveProfileWhenQuit() {
         return false;
     }
-
-    public void saveCurrentProfile() throws IOException {
-        saveConfiguration(currentConfiguration, Paths.get(currentConfiguration.getValue(CFNames.PROFILE_PATH)));
-    }
-
-
 
 }
