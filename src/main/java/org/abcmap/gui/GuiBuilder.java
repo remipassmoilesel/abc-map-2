@@ -113,7 +113,6 @@ public class GuiBuilder {
         wList.add(new SearchWidget());
         wList.add(new GroupWizard());
         wList.add(new GroupProject());
-        wList.add(new GroupConfigProfile());
         wList.add(new GroupImportation());
         wList.add(new GroupGeoreferencement());
         wList.add(new GroupLayout());

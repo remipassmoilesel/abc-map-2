@@ -1,15 +1,23 @@
-package org.abcmap.core.tileanalyser;
+package org.abcmap.core.tileanalyse;
 
 import com.labun.surf.InterestPoint;
 import com.labun.surf.Matcher;
 import com.labun.surf.Params;
-import com.vividsolutions.jts.geom.Coordinate;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.tiles.TileContainer;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.renderer.lite.RendererUtilities;
 
+import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Return a list of IDs/Coordinates allowing to assemble images
@@ -18,10 +26,35 @@ import java.util.List;
  */
 public class TileComposer {
 
+    private static final CustomLogger logger = LogManager.getLogger(TileComposer.class);
+
+    /**
+     * Object used to store and read interest points
+     */
     private final InterestPointStorage iptsDao;
+
+    /**
+     * Number of common points between to images to reach,
+     * <p>
+     * to consider images are matching
+     */
     private int pointThreshold;
+
+    /**
+     * SURF algorithm configuration
+     */
     private Params surfConfig;
+
+    /**
+     * Unique ID of SURF configuration
+     * <p>
+     * SURF configurations need to match
+     */
     private int surfConfigId;
+
+    /**
+     * Object used to create a factory
+     */
     private InterestPointFactory iptsFactory;
 
     /**
@@ -38,6 +71,11 @@ public class TileComposer {
         this.iptsFactory = new InterestPointFactory(surfConfig);
         this.iptsDao = new InterestPointStorage(interestPointDatabase);
 
+
+        System.out.println("iptsDao");
+        System.out.println(iptsDao);
+        System.out.println(interestPointDatabase);
+
         this.distanceTolerance = 0.3;
     }
 
@@ -50,7 +88,7 @@ public class TileComposer {
      * @throws IOException
      * @throws TileAnalyseException
      */
-    public synchronized Coordinate process(TileContainer tileToMove, TileSource source) throws IOException, TileAnalyseException {
+    public synchronized ReferencedEnvelope process(TileContainer tileToMove, TileSource source) throws IOException, TileAnalyseException {
 
         // reset source to iterate last tiles before
         source.reset();
@@ -62,13 +100,15 @@ public class TileComposer {
             throw new TileAnalyseException("No tiles found in source");
         }
 
-        // reference interest point of tile to insert
-        InterestPoint insertedTileIP = null;
-        // reference interest point of reference tile
+        // reference to interest point of tile to move
+        InterestPoint tileToMoveIP = null;
+        // reference to interest point of reference tile, the tile around
         InterestPoint referenceTileIP = null;
 
         // reference tile
         TileContainer referenceTile = null;
+
+        double minDist = Double.MAX_VALUE;
 
         // else search image with enough common points
         searchReferenceTile:
@@ -87,10 +127,10 @@ public class TileComposer {
                 InterestPoint ip2 = commonPoints.get(ip1);
 
                 int matching = 0;
-                int i = 0;
                 for (InterestPoint ipTest1 : commonPoints.keySet()) {
                     InterestPoint ipTest2 = commonPoints.get(ipTest1);
 
+                    // compute distance between points
                     double dX1 = Math.abs(ipTest1.x - ip1.x);
                     double dY1 = Math.abs(ipTest1.y - ip1.y);
                     double dX2 = Math.abs(ipTest2.x - ip2.x);
@@ -98,6 +138,12 @@ public class TileComposer {
 
                     // if distance between points is < than 0.5, count as matching
                     double ttDist = Math.abs((dX1 + dY1) - (dX2 + dY2));
+
+                    if (ttDist < minDist) {
+                        minDist = ttDist;
+                    }
+
+                    // if distance between points is < than threshold, count as matching
                     if (ttDist < distanceTolerance) {
                         matching++;
                         if (matching >= pointThreshold) {
@@ -107,14 +153,13 @@ public class TileComposer {
                             //System.out.println("index: " + i);
 
                             referenceTile = currentCtr;
-                            insertedTileIP = ip1;
+                            tileToMoveIP = ip1;
                             referenceTileIP = ip2;
 
                             break searchReferenceTile;
                         }
                     }
 
-                    i++;
                 }
 
 
@@ -126,30 +171,69 @@ public class TileComposer {
 
         // no reference image have be found
         if (referenceTile == null) {
-            throw new TileAnalyseException("Image cannot be assembled");
+            throw new TileAnalyseException("Image cannot be assembled, no corresponding tiles have been found. Minimum distance: " + minDist);
         }
 
-        // position BLC on map of tile
-        Coordinate refTilePosition = referenceTile.getPosition();
+        Rectangle referenceTileImageRect = new Rectangle(0, 0, referenceTile.getImage().getWidth(), referenceTile.getImage().getHeight());
+        Rectangle tileToMoveImageRect = new Rectangle(0, 0, tileToMove.getImage().getWidth(), tileToMove.getImage().getHeight());
 
-        // height of reference tile
-        int referenceTileHeight = referenceTile.getImage().getHeight();
+        System.out.println();
+        System.out.println("referenceTileImageRect");
+        System.out.println(referenceTileImageRect);
+        System.out.println("tileToMoveImageRect");
+        System.out.println(tileToMoveImageRect);
 
-        // position BLC of reference interest point on tile
-        Coordinate relativeRefIP = new Coordinate(referenceTileIP.x, referenceTileHeight - referenceTileIP.y);
+        //
+        // compute positions (1) of tile to move in source tile coordinate system (ULC and pixel units)
+        //
+        Point2D tileToMoveULC = new Point2D.Double(
+                referenceTileIP.x - tileToMoveIP.x,
+                referenceTileIP.y - tileToMoveIP.y);
+        Point2D tileToMoveBRC = new Point2D.Double(
+                tileToMoveULC.getX() + tileToMoveImageRect.getWidth(),
+                tileToMoveULC.getY() + tileToMoveImageRect.getHeight());
 
-        // absolute position of reference point
-        Coordinate absoluteRefPoint = new Coordinate(refTilePosition.x + relativeRefIP.x, refTilePosition.y + relativeRefIP.y);
+        System.out.println("tileToMoveULC");
+        System.out.println(tileToMoveULC);
+        System.out.println("tileToMoveBRC");
+        System.out.println(tileToMoveBRC);
 
-        // position BLC of interest point of tile to insert
-        int insertedTileHeight = tileToMove.getImage().getHeight();
-        Coordinate blcInsertedTileInterestPoint = new Coordinate(insertedTileIP.x, insertedTileHeight - insertedTileIP.y);
+        // create a screen to world transform (2) to transform points from source tile coordinate system to world coordinate system
+        AffineTransform referenceTileTransform = RendererUtilities.worldToScreenTransform(referenceTile.getArea(), referenceTileImageRect);
 
-        Coordinate result = new Coordinate(absoluteRefPoint.x - blcInsertedTileInterestPoint.x,
-                absoluteRefPoint.y - blcInsertedTileInterestPoint.y);
+        System.out.println("referenceTileTransform");
+        System.out.println(referenceTileTransform);
+
+        try {
+            referenceTileTransform.invert();
+        } catch (NoninvertibleTransformException e) {
+            throw new TileAnalyseException("Unable to transform point from image coordinate space to world coordinate space");
+        }
+
+        System.out.println("referenceTileTransform");
+        System.out.println(referenceTileTransform);
+
+        // Transform positions (1) with transform (2)
+        Point2D tileToMoveBLC = referenceTileTransform.transform(tileToMoveULC, null);
+        Point2D tileToMoveURC = referenceTileTransform.transform(tileToMoveBRC, null);
+
+        System.out.println("tileToMoveBLC");
+        System.out.println(tileToMoveBLC);
+        System.out.println("tileToMoveURC");
+        System.out.println(tileToMoveURC);
+
+        // create a new envelope and return it
+        ReferencedEnvelope result = new ReferencedEnvelope(
+                tileToMoveBLC.getX(), tileToMoveURC.getX(),
+                tileToMoveBLC.getY(), tileToMoveURC.getY(),
+                referenceTile.getArea().getCoordinateReferenceSystem());
+
+        System.out.println("result");
+        System.out.println(result);
+        System.out.println(result.getWidth());
+        System.out.println(result.getHeight());
 
         return result;
-
     }
 
     /**

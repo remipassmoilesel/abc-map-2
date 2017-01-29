@@ -5,5 +5,11 @@
     <string>/home/remipassmoilesel/test8.abm</string>
     <string>/home/remipassmoilesel/projet.abm</string>
   </projectHistory>
-  <profileHistory/>
+  <profileHistory>
+    <string>/home/remipassmoilesel/test2.xml</string>
+    <string>/home/remipassmoilesel/test.xml</string>
+    <string>/home/remipassmoilesel/testxml</string>
+    <string>/home/remipassmoilesel/test2</string>
+    <string>/home/remipassmoilesel/profile1.xml</string>
+  </profileHistory>
 </org.abcmap.core.managers.RecentManager_-HistoryContainer>

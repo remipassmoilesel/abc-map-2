@@ -16,6 +16,7 @@ import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.project.layers.AbmTileLayer;
 import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -210,7 +211,7 @@ public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNot
             }
 
             BufferedImage img = ImageIO.read(res);
-            tileLayer.addTile(img, new Coordinate(45.60443, 4.082794));
+            tileLayer.addTile(img, new ReferencedEnvelope(45.60443, 4.082794, 4, 5, null));
             tileLayer.refreshCoverage();
 
             // move layer tile under other layers
@@ -237,7 +238,7 @@ public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNot
         else if (id.equals(FAKE_PROJECT_2)) {
 
             fakeProject.addNewShapeFileLayer(Paths.get("data/cinemas-ile-de-france/les_salles_de_cinemas_en_ile-de-france.shp"));
-            fakeProject.addNewWMSLayer("http://ows.mundialis.de/services/service", null);
+            fakeProject.addNewWMSLayer(GeoUtils.MUNDIALIS_WMS_URL, null);
             fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes/communes-20160119.shp"));
             //fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes-ed50/france-communes-ed50.shp"));
 

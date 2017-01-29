@@ -1,6 +1,6 @@
 package org.abcmap.core.tiles;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 
 import java.awt.image.BufferedImage;
 import java.util.Objects;
@@ -16,11 +16,26 @@ import java.util.Objects;
  */
 public class TileContainer {
 
-    private Coordinate position;
+    /**
+     * Area this tile fill on the world
+     */
+    private ReferencedEnvelope area;
+
+    /**
+     * Image of tile
+     */
     private BufferedImage image;
+
+    /**
+     * Unique id of tile
+     */
     private String tileId;
 
-    public TileContainer(String tileId, BufferedImage image, Coordinate position) {
+    public TileContainer(BufferedImage image, ReferencedEnvelope area) {
+        this(null, image, area);
+    }
+
+    public TileContainer(String tileId, BufferedImage image, ReferencedEnvelope area) {
 
         if (tileId == null) {
             this.tileId = TileStorage.generateTileId();
@@ -29,7 +44,7 @@ public class TileContainer {
         }
 
         this.image = image;
-        this.position = position;
+        this.area = area;
     }
 
     /**
@@ -41,6 +56,11 @@ public class TileContainer {
         return image;
     }
 
+    /**
+     * Set image of tile
+     *
+     * @param image
+     */
     public void setImage(BufferedImage image) {
         this.image = image;
     }
@@ -54,35 +74,31 @@ public class TileContainer {
         return tileId;
     }
 
+    /**
+     * Set unique id of tile
+     *
+     * @param tileId
+     */
     public void setTileId(String tileId) {
         this.tileId = tileId;
     }
 
     /**
-     * Get position of bottom left corner of tile on map
+     * Get area covered by this tile on world
      *
      * @return
      */
-    public Coordinate getPosition() {
-        return position;
+    public ReferencedEnvelope getArea() {
+        return area;
     }
 
     /**
-     * Set position of bottom left corner of tile on map
+     * Set area covered by this tile on world
      *
-     * @return
+     * @param area
      */
-    public void setPosition(Coordinate position) {
-        this.position = position;
-    }
-
-    @Override
-    public String toString() {
-        return "TileContainer{" +
-                "position=" + position +
-                ", image=" + image +
-                ", tileId='" + tileId + '\'' +
-                '}';
+    public void setArea(ReferencedEnvelope area) {
+        this.area = area;
     }
 
     @Override
@@ -90,13 +106,23 @@ public class TileContainer {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TileContainer that = (TileContainer) o;
-        return Objects.equals(position, that.position) &&
+        return Objects.equals(area, that.area) &&
                 Objects.equals(image, that.image) &&
                 Objects.equals(tileId, that.tileId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(position, image, tileId);
+        return Objects.hash(area, image, tileId);
     }
+
+    @Override
+    public String toString() {
+        return "TileContainer{" +
+                "area=" + area +
+                ", image=" + image +
+                ", tileId='" + tileId + '\'' +
+                '}';
+    }
+
 }

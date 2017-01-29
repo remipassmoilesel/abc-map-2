@@ -232,7 +232,7 @@ public class SQLUtils {
 
     public static Connection getH2Connection(Path databasePath) throws SQLException {
         if (currentH2Pool == null) {
-            currentH2Pool = new HashMap<String, JdbcConnectionPool>();
+            currentH2Pool = new HashMap<>();
         }
 
         String key = databasePath.toAbsolutePath().toString();
@@ -285,7 +285,8 @@ public class SQLUtils {
     }
 
     public static String getJdbcUrlForH2(Path databasePath) {
-        //System.err.println(databasePath);
+        // TODO: close database on VM exit ?
+        // return "jdbc:h2:file:" + databasePath.toAbsolutePath().toString() + ";DB_CLOSE_ON_EXIT=FALSE";
         return "jdbc:h2:file:" + databasePath.toAbsolutePath().toString();
     }
 }

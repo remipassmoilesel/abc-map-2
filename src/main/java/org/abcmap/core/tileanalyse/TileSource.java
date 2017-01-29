@@ -1,4 +1,4 @@
-package org.abcmap.core.tileanalyser;
+package org.abcmap.core.tileanalyse;
 
 import org.abcmap.core.tiles.TileContainer;
 

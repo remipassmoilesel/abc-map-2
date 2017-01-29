@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -48,7 +49,7 @@ public class TempFilesManager {
 
         // prefix is mandatory
         if (prefix == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("Prefix is mandatory");
         }
 
         if (suffix == null) {
@@ -122,5 +123,20 @@ public class TempFilesManager {
      */
     public void deleteTempFile(Path tempPath) throws IOException {
         Utils.deleteDirectories(tempPath.toFile());
+    }
+
+    /**
+     * Return the list of files from current temporary folder
+     *
+     * @return
+     */
+    public ArrayList<Path> getTemporaryFilesFromCurrentProject() {
+
+        ArrayList<Path> results = new ArrayList<>();
+        for (Path p : Main.getProjectManager().getProject().getTempDirectory()) {
+            results.add(p);
+        }
+
+        return results;
     }
 }

@@ -57,6 +57,28 @@ public class TileStorageQueries {
     }
 
     /**
+     * Create the master table where are stored references to coverages
+     *
+     * @param conn
+     * @throws SQLException
+     */
+    public static PreparedStatement updateCoverageParameters(Connection conn) throws SQLException {
+
+        String req = "UPDATE " + MASTER_TABLE_NAME + " SET "
+                + RES_X_FIELD_NAME + "=?, "
+                + RES_Y_FIELD_NAME + "=?, "
+                + MIN_X_FIELD_NAME + "=?, "
+                + MIN_Y_FIELD_NAME + "=?, "
+                + MAX_X_FIELD_NAME + "=?, "
+                + MAX_Y_FIELD_NAME + "=? "
+                + "WHERE " + COVERAGE_NAME_FIELD_NAME + " =?; ";
+
+        //System.out.println(req);
+
+        return conn.prepareStatement(req);
+    }
+
+    /**
      * Insert a tuple in a tile data table
      *
      * @param conn
@@ -240,7 +262,6 @@ public class TileStorageQueries {
 
     }
 
-
     public static PreparedStatement selectLastTiles(Connection conn, String dataTn, String spaTn) throws SQLException {
 
         String dtid = dataTn + "." + TILE_ID_FIELD_NAME;
@@ -248,12 +269,16 @@ public class TileStorageQueries {
         String dtdt = dataTn + "." + TILE_DATA_FIELD_NAME;
         String spminx = spaTn + "." + MIN_X_FIELD_NAME;
         String spminy = spaTn + "." + MIN_Y_FIELD_NAME;
+        String spmaxx = spaTn + "." + MAX_X_FIELD_NAME;
+        String spmaxy = spaTn + "." + MAX_Y_FIELD_NAME;
 
         String req = "SELECT " +
                 dtid + ", " +
                 dtdt + ", " +
                 spminx + ", " +
-                spminy + " " +
+                spminy + ", " +
+                spmaxx + ", " +
+                spmaxy + " " +
                 " FROM " + dataTn + "," + spaTn +
                 " WHERE " + dtid + " = " + spid +
                 " ORDER BY " + dtid + " DESC LIMIT ?,?;";

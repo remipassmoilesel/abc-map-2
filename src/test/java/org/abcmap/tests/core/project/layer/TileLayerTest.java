@@ -1,11 +1,11 @@
 package org.abcmap.tests.core.project.layer;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbmTileLayer;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opengis.referencing.FactoryException;
@@ -55,7 +55,7 @@ public class TileLayerTest {
             }
 
             // add tiles twice
-            ids.add(layer.addTile(p, new Coordinate(x, y)));
+            ids.add(layer.addTile(p, new ReferencedEnvelope(x, x + 10, y, y + 10, null)));
 
             x += 500;
             tileNumber++;

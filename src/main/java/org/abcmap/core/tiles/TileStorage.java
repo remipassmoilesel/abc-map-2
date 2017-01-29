@@ -1,10 +1,10 @@
 package org.abcmap.core.tiles;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.abcmap.core.project.Project;
+import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.referencing.crs.DefaultEngineeringCRS;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -53,7 +53,6 @@ public class TileStorage {
         this.databasePath = p;
         this.coverages = new HashMap<>();
     }
-
 
     /**
      * Initialize storage, by creating necessary tables, etc ...
@@ -116,10 +115,10 @@ public class TileStorage {
      *
      * @param coverageName
      * @param imagePath
-     * @param position
+     * @param area
      * @throws IOException
      */
-    public String addTile(String coverageName, Path imagePath, Coordinate position) throws IOException {
+    public String addTile(String coverageName, Path imagePath, ReferencedEnvelope area) throws IOException {
 
         BufferedImage bimg = ImageIO.read(imagePath.toFile());
 
@@ -127,7 +126,7 @@ public class TileStorage {
             throw new IllegalStateException("Unsupported image format");
         }
 
-        return addTile(coverageName, bimg, position);
+        return addTile(coverageName, bimg, area);
 
     }
 
@@ -136,12 +135,12 @@ public class TileStorage {
      *
      * @param coverageName
      * @param bimg
-     * @param position
+     * @param area
      * @return
      * @throws IOException
      */
-    public String addTile(String coverageName, BufferedImage bimg, Coordinate position) throws IOException {
-        return addTile(coverageName, bimg, position, null);
+    public String addTile(String coverageName, BufferedImage bimg, ReferencedEnvelope area) throws IOException {
+        return addTile(coverageName, bimg, area, null);
     }
 
     /**
@@ -161,23 +160,20 @@ public class TileStorage {
      *
      * @param coverageName
      * @param bimg
-     * @param position
+     * @param area
      * @param tileId
      * @return
      * @throws IOException
      */
-    public String addTile(String coverageName, BufferedImage bimg, Coordinate position, String tileId) throws IOException {
+    public String addTile(String coverageName, BufferedImage bimg, ReferencedEnvelope area, String tileId) throws IOException {
 
-        // retrieve informations about coverage
+        // retrieve information about coverage
         TileCoverageEntry coverageEntry = checkCoverageAndReturnEntry(coverageName);
 
         // get width and height if necessary
         if (tileId == null) {
             tileId = generateTileId();
         }
-
-        Integer finalWidth = bimg.getWidth();
-        Integer finalHeight = bimg.getHeight();
 
         try {
             String finalTileId = tileId;
@@ -193,10 +189,10 @@ public class TileStorage {
                 PreparedStatement spatialStat = TileStorageQueries.insertIntoSpatialTable(conn, coverageEntry.getSpatialTableName());
 
                 spatialStat.setString(1, finalTileId);
-                spatialStat.setDouble(2, position.x);
-                spatialStat.setDouble(3, position.y);
-                spatialStat.setDouble(4, position.x + finalWidth);
-                spatialStat.setDouble(5, position.y + finalHeight);
+                spatialStat.setDouble(2, area.getMinX());
+                spatialStat.setDouble(3, area.getMinY());
+                spatialStat.setDouble(4, area.getMaxX());
+                spatialStat.setDouble(5, area.getMaxY());
                 spatialStat.execute();
                 spatialStat.close();
 
@@ -261,7 +257,7 @@ public class TileStorage {
             String finalCoverageName = coverageName;
             SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
 
-                // create master table
+                // insert entry into master table
                 PreparedStatement masterEntryStat = TileStorageQueries.insertIntoMasterTable(conn);
                 masterEntryStat.setString(1, finalCoverageName);
                 masterEntryStat.setString(2, entry.getDataTableName());
@@ -318,6 +314,7 @@ public class TileStorage {
         countStat.close();
 
         // if no tiles are present, or just one, insert fake
+        // TODO: insert fake tile when one tile in database ?
         if (count < 2) {
 
             BufferedImage bimg = ImageIO.read(TileStorage.class.getResourceAsStream("/tiles/transparent_tile.png"));
@@ -511,6 +508,15 @@ public class TileStorage {
         }
     }
 
+    /**
+     * Return tiles from database but by selecting them from the end of table
+     *
+     * @param coverageName
+     * @param offset
+     * @param number
+     * @return
+     * @throws IOException
+     */
     public ArrayList<TileContainer> getLastTiles(String coverageName, int offset, int number) throws IOException {
 
         // check if coverage exist
@@ -531,11 +537,15 @@ public class TileStorage {
                 while (rs.next()) {
                     String id = rs.getString(1);
                     byte[] bytes = rs.getBytes(2);
-                    double x = rs.getDouble(3);
-                    double y = rs.getDouble(4);
+                    double minx = rs.getDouble(3);
+                    double miny = rs.getDouble(4);
+                    double maxx = rs.getDouble(5);
+                    double maxy = rs.getDouble(6);
 
                     BufferedImage img = Utils.bytesToImage(bytes);
-                    results.add(new TileContainer(id, img, new Coordinate(x, y)));
+
+                    // TODO: check coordinate system or use an empty/generic crs ?
+                    results.add(new TileContainer(id, img, new ReferencedEnvelope(minx, maxx, miny, maxy, GeoUtils.GENERIC_2D)));
                 }
 
                 return results;
@@ -555,7 +565,43 @@ public class TileStorage {
      * @return
      * @throws Exception
      */
-    public ReferencedEnvelope computeCoverageBounds(String coverageName) throws Exception {
+    public ReferencedEnvelope computeCoverageBounds(String coverageName) throws IOException {
+
+        ReferencedEnvelope result = new ReferencedEnvelope(Project.DEFAULT_CRS);
+
+        // check if coverage exist
+        TileCoverageEntry entry = checkCoverageAndReturnEntry(coverageName);
+
+        try {
+            SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
+
+                PreparedStatement selectStat = TileStorageQueries.selectAllSpatialEntries(conn, entry.getSpatialTableName());
+                ResultSet rs = selectStat.executeQuery();
+
+                while (rs.next()) {
+                    double minx = rs.getDouble(1);
+                    double miny = rs.getDouble(2);
+                    double maxx = rs.getDouble(3);
+                    double maxy = rs.getDouble(4);
+
+                    ReferencedEnvelope toInclude = new ReferencedEnvelope(minx, maxx, miny, maxy, Project.DEFAULT_CRS);
+                    result.include(toInclude);
+                }
+
+                return null;
+            });
+        } catch (Exception e) {
+            throw new IOException("Error while computing dimensions", e);
+        }
+
+        System.out.println("result");
+        System.out.println(result);
+
+        return result;
+    }
+
+
+    public void setCoverageParameters(String coverageName, double minx, double maxx, double miny, double maxy, double resx, double resy) throws IOException {
 
         // check if coverage exist
         TileCoverageEntry entry = checkCoverageAndReturnEntry(coverageName);
@@ -564,39 +610,24 @@ public class TileStorage {
         try {
             SQLUtils.processTransaction(getDatabaseConnection(), (conn) -> {
 
-                PreparedStatement selectStat = TileStorageQueries.selectAllSpatialEntries(conn, entry.getSpatialTableName());
-                ResultSet rs = selectStat.executeQuery();
+                PreparedStatement updateStat = TileStorageQueries.updateCoverageParameters(conn);
+                updateStat.setDouble(1, resx);
+                updateStat.setDouble(2, resy);
+                updateStat.setDouble(3, minx);
+                updateStat.setDouble(4, miny);
+                updateStat.setDouble(5, maxx);
+                updateStat.setDouble(6, maxy);
+                updateStat.setString(7, coverageName);
 
-                boolean firstLoop = true;
+                int result = updateStat.executeUpdate();
 
-                while (rs.next()) {
-                    double minx = rs.getDouble(1);
-                    double miny = rs.getDouble(2);
-                    double maxx = rs.getDouble(3);
-                    double maxy = rs.getDouble(4);
-
-                    if (minx < d[0] || firstLoop) {
-                        d[0] = minx;
-                    }
-                    if (miny < d[1] || firstLoop) {
-                        d[1] = miny;
-                    }
-                    if (maxx > d[2] || firstLoop) {
-                        d[2] = maxx;
-                    }
-                    if (maxy > d[3] || firstLoop) {
-                        d[3] = maxy;
-                    }
-
-                    firstLoop = false;
-                }
+                System.out.println("result");
+                System.out.println(result);
 
                 return null;
             });
         } catch (Exception e) {
-            throw new Exception("Error while computing dimensions", e);
+            throw new IOException(e);
         }
-
-        return new ReferencedEnvelope(d[0], d[2], d[1], d[3], DefaultEngineeringCRS.GENERIC_2D);
     }
 }

@@ -1,6 +1,5 @@
 package org.abcmap.core.project.layers;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.tiles.TileContainer;
@@ -21,6 +20,7 @@ import org.geotools.gce.imagemosaic.jdbc.ImageMosaicJDBCFormat;
 import org.geotools.gce.imagemosaic.jdbc.ImageMosaicJDBCReader;
 import org.geotools.gce.imagemosaic.jdbc.SpatialExtension;
 import org.geotools.geometry.GeneralEnvelope;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.map.FeatureLayer;
@@ -48,7 +48,8 @@ import java.util.List;
  * - The effective coverage layer, with tiles
  * - A feature layer with outlines to do geometric researches
  * <p>
- * // TODO: move outlines to feature store ?
+ * <p>
+ * For now, display is disturbed when using dimensions different than pixel dimensions. Work in progress !
  */
 public class AbmTileLayer extends AbmAbstractLayer {
 
@@ -65,7 +66,6 @@ public class AbmTileLayer extends AbmAbstractLayer {
     private final String coverageName;
     private final FeatureLayer outlineLayer;
     private final Style outlineStyle;
-    private FeatureTypeStyle outlineFeatureType;
 
     public AbmTileLayer(String layerId, String title, boolean visible, int zindex, Project owner) throws IOException {
         this(new LayerIndexEntry(layerId, title, visible, zindex, AbmLayerType.TILES), owner);
@@ -114,7 +114,8 @@ public class AbmTileLayer extends AbmAbstractLayer {
     @Override
     public org.geotools.map.Layer buildGeotoolsLayer() throws IOException {
 
-        String crsCode = GeoUtils.crsToString(project.getCrs());
+        //String crsCode = GeoUtils.crsToString(project.getCrs());
+        String crsCode = GeoUtils.crsToString(GeoUtils.GENERIC_2D);
 
         // retrieve appropriate configuration for JDBC mosaic plugin
         Config config = getConfiguration(project.getDatabasePath(), coverageName, crsCode);
@@ -126,19 +127,13 @@ public class AbmTileLayer extends AbmAbstractLayer {
         // setup coverage dimensions
         ParameterValue<GridGeometry2D> gg = AbstractGridFormat.READ_GRIDGEOMETRY2D.createValue();
 
+        // TODO: get width and height from general envelope below ?
         ReferencedEnvelope bounds = getBounds();
-
-        double x1 = bounds.getMinX();
-        double y1 = bounds.getMinY();
-
-        double x2 = bounds.getMaxX();
-        double y2 = bounds.getMaxY();
 
         double width = bounds.getWidth();
         double height = bounds.getHeight();
 
-        // this object must be set with the lower left corner position and upper tight corner position, x > y order
-        GeneralEnvelope envelope = new GeneralEnvelope(new double[]{x1, y1}, new double[]{x2, y2});
+        GeneralEnvelope envelope = reader.getOriginalEnvelope();
 
         try {
             envelope.setCoordinateReferenceSystem(CRS.decode(crsCode));
@@ -157,7 +152,11 @@ public class AbmTileLayer extends AbmAbstractLayer {
         GeneralParameterValue[] params = new GeneralParameterValue[]{gg, outTransp};
         GridCoverage2D coverage = reader.read(params);
 
-        // create a Geotools coverage layer and store it
+        if (coverage == null) {
+            throw new NullPointerException("Unable to read coverage with specified params: " + coverageName + " / " + params);
+        }
+
+        // create a geotools coverage layer
         return new GridCoverageLayer(coverage, GeoUtils.getDefaultRGBRasterStyle(coverage));
     }
 
@@ -178,9 +177,9 @@ public class AbmTileLayer extends AbmAbstractLayer {
      * To see changes, call refreshCoverage()
      *
      * @param imagePath
-     * @param position
+     * @param area
      */
-    public String addTile(Path imagePath, Coordinate position) {
+    public String addTile(Path imagePath, ReferencedEnvelope area) {
 
         BufferedImage img = null;
         try {
@@ -190,7 +189,7 @@ public class AbmTileLayer extends AbmAbstractLayer {
             return null;
         }
 
-        return addTile(img, position);
+        return addTile(img, area);
     }
 
     /**
@@ -203,7 +202,7 @@ public class AbmTileLayer extends AbmAbstractLayer {
      * @param container
      */
     public String addTile(TileContainer container) {
-        return addTile(container.getImage(), container.getPosition());
+        return addTile(container.getImage(), container.getArea());
     }
 
     /**
@@ -214,25 +213,17 @@ public class AbmTileLayer extends AbmAbstractLayer {
      * To see changes, call refreshCoverage()
      *
      * @param image
-     * @param position
+     * @param area
      */
-    public String addTile(BufferedImage image, Coordinate position) {
+    public String addTile(BufferedImage image, ReferencedEnvelope area) {
 
         try {
 
             // add tile to tile storage
-            String tileId = tileStorage.addTile(coverageName, image, position);
+            String tileId = tileStorage.addTile(coverageName, image, area);
 
             // create outline shape
-            int width = image.getWidth();
-            int height = image.getHeight();
-            Polygon outline = geom.createPolygon(new Coordinate[]{
-                    position,
-                    new Coordinate(position.x + width, position.y),
-                    new Coordinate(position.x + width, position.y + height),
-                    new Coordinate(position.x, position.y + height),
-                    position
-            });
+            Polygon outline = JTS.toGeometry(area);
 
             // add outline to feature layer
             featureStore.addFeatures(FeatureUtils.asList(featureBuilder.build(outline, tileId)));
@@ -314,6 +305,8 @@ public class AbmTileLayer extends AbmAbstractLayer {
         config.setTileMaxYAttribute(TileStorageQueries.MAX_Y_FIELD_NAME);
         config.setTileTableNameAtribute(TileStorageQueries.TILE_TABLE_NAME_FIELD_NAME);
         config.setSpatialTableNameAtribute(TileStorageQueries.SPATIAL_TABLE_NAME_FIELD_NAME);
+        config.setResXAttribute(TileStorageQueries.RES_X_FIELD_NAME);
+        config.setResYAttribute(TileStorageQueries.RES_Y_FIELD_NAME);
 
         // tile table
         config.setBlobAttributeNameInTileTable(TileStorageQueries.TILE_DATA_FIELD_NAME);
@@ -325,8 +318,6 @@ public class AbmTileLayer extends AbmAbstractLayer {
         config.setMinYAttribute(TileStorageQueries.MIN_Y_FIELD_NAME);
         config.setMaxXAttribute(TileStorageQueries.MAX_X_FIELD_NAME);
         config.setMaxYAttribute(TileStorageQueries.MAX_Y_FIELD_NAME);
-        config.setResXAttribute(TileStorageQueries.RES_X_FIELD_NAME);
-        config.setResYAttribute(TileStorageQueries.RES_Y_FIELD_NAME);
 
         config.validateConfig();
 
@@ -346,8 +337,9 @@ public class AbmTileLayer extends AbmAbstractLayer {
     public ReferencedEnvelope getBounds() {
 
         try {
+            // TODO: use bounds from layer ?
             return tileStorage.computeCoverageBounds(coverageName);
-        } catch (Exception e) {
+        } catch (IOException e) {
             logger.error(e);
         }
 

@@ -3,6 +3,7 @@ package org.abcmap.core.crop;
 import org.abcmap.core.configuration.CFNames;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.*;
+import org.abcmap.core.resources.MapImportException;
 import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.utils.GuiUtils;
 
@@ -100,7 +101,11 @@ public class CropConfigurator {
 
             // configuration on screen
             else if (CropConfigurator.FOR_SCREEN_IMPORT.equals(mode)) {
-                bg = importm.catchScreen(visibleFrames, false);
+                try {
+                    bg = importm.catchScreen(visibleFrames, false);
+                } catch (MapImportException e) {
+                    e.printStackTrace();
+                }
             }
 
             // unknown mode

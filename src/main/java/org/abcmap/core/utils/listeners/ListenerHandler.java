@@ -55,7 +55,7 @@ public class ListenerHandler<T> implements Iterable<T> {
 
 //        // import events
 //        else if (e instanceof ImportEvent && listener instanceof ImportEventListener) {
-//            ((ImportEventListener) listener).importEventHapened((ImportEvent) e);
+//            ((ImportEventListener) listener).eventHappend((ImportEvent) e);
 //        }
 
         // action listeners

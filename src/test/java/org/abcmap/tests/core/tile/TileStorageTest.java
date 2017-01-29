@@ -1,6 +1,5 @@
 package org.abcmap.tests.core.tile;
 
-import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.TestUtils;
 import org.abcmap.core.tiles.TileContainer;
 import org.abcmap.core.tiles.TileCoverageEntry;
@@ -8,6 +7,7 @@ import org.abcmap.core.tiles.TileStorage;
 import org.abcmap.core.tiles.TileStorageQueries;
 import org.abcmap.core.utils.SQLUtils;
 import org.abcmap.core.utils.Utils;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -78,8 +78,8 @@ public class TileStorageTest {
                 continue;
             }
 
-            // tiles ared added twice
-            ids.add(storage.addTile(coverageName, p, new Coordinate(x, y)));
+            // add tile
+            ids.add(storage.addTile(coverageName, p, new ReferencedEnvelope(x,  x + 10,y, y + 10, null)));
 
             BufferedImage img = ImageIO.read(p.toFile());
             imgs.add(img);

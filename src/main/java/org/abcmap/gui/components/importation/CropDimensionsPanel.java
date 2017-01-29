@@ -29,7 +29,7 @@ public class CropDimensionsPanel extends JPanel {
     private Mode mode;
     private IntegerTextField[] allTextFields;
     private TextFieldEnablerAL textFieldEnabler;
-    private CropActivationAL listener;
+    private CropActivationAL cropActivationListener;
     private ImportManager importm;
     private ConfigurationManager confm;
 
@@ -222,14 +222,14 @@ public class CropDimensionsPanel extends JPanel {
         }
     }
 
-    public void activateCroppingListener(boolean value) {
+    public void enableCropActivationListener(boolean value) {
 
         if (value) {
-            listener = new CropActivationAL();
-            chkActivateCropping.addActionListener(listener);
+            cropActivationListener = new CropActivationAL();
+            chkActivateCropping.addActionListener(cropActivationListener);
         } else {
-            if (listener != null) {
-                chkActivateCropping.removeActionListener(listener);
+            if (cropActivationListener != null) {
+                chkActivateCropping.removeActionListener(cropActivationListener);
             }
         }
 

@@ -1,4 +1,4 @@
-package org.abcmap.core.tileanalyser;
+package org.abcmap.core.tileanalyse;
 
 /**
  * Created by remipassmoilesel on 22/11/16.

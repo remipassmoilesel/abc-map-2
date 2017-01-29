@@ -10,6 +10,7 @@ import org.abcmap.core.rendering.RenderingException;
 import org.abcmap.core.rendering.partials.RenderedPartialFactory;
 import org.abcmap.core.rendering.partials.RenderedPartialQueryResult;
 import org.abcmap.gui.components.map.CachedMapPane;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.map.MapContent;
 import org.geotools.referencing.crs.DefaultEngineeringCRS;
 import org.junit.BeforeClass;
@@ -64,7 +65,8 @@ public class PartialFactoryTest {
             BufferedImage img = ImageIO.read(PartialFactoryTest.class.getResourceAsStream(imgPath));
             TestCase.assertTrue("Image reading: " + imgPath, img != null);
 
-            layer.addTile(img, positions.get(i));
+            Coordinate pos = positions.get(i);
+            layer.addTile(img, new ReferencedEnvelope(pos.x, pos.x + 10, pos.y, pos.y + 10, null));
         }
 
         // try to get partials

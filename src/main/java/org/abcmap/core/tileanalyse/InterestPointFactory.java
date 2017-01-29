@@ -1,4 +1,4 @@
-package org.abcmap.core.tileanalyser;
+package org.abcmap.core.tileanalyse;
 
 import com.labun.surf.IntegralImage;
 import com.labun.surf.InterestPoint;

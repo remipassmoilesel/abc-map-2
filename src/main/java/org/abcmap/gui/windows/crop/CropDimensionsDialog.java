@@ -67,7 +67,7 @@ public class CropDimensionsDialog extends JDialog {
         cropPanel = new CropDimensionsPanel(CropDimensionsPanel.Mode.WITH_CLOSE_WINDOW_BUTTON);
 
         // close and validate actions
-        cropPanel.activateCroppingListener(true);
+        cropPanel.enableCropActivationListener(true);
         cropPanel.getBtnCloseWindow().addActionListener(new CloseListener());
 
         GuiUtils.addLabel("Valeurs de recadrage: ", this, "wrap", GuiStyle.SIMPLE_BLOCK_ITEM_LABEL);

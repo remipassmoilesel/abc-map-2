@@ -60,6 +60,8 @@ public class GeoUtils {
      */
     public static final ArrayList<CoordinateReferenceSystem> knownCrs = new ArrayList<>();
 
+    public static final String MUNDIALIS_WMS_URL = "http://ows.mundialis.de/services/service";
+
     /**
      * Main CRS factory used in software. This factory should be used in every decode operation.
      * <p>
@@ -67,6 +69,7 @@ public class GeoUtils {
      */
     private static final CRSAuthorityFactory crsFactory;
     public static final CustomLogger logger = LogManager.getLogger(GeoUtils.class);
+
 
     static {
 
