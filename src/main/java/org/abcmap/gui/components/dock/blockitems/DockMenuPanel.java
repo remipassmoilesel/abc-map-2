@@ -3,6 +3,7 @@ package org.abcmap.gui.components.dock.blockitems;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.gui.GuiStyle;
 import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.ielements.IEGSeparator;
 import org.abcmap.ielements.InteractionElement;
 
 import javax.swing.*;
@@ -71,6 +72,11 @@ public class DockMenuPanel extends JPanel {
             // add a swing components
             if (o instanceof Component) {
                 addComponent((Component) o);
+            }
+
+            //  add a separator
+            else if (o instanceof IEGSeparator) {
+                addComponent(new DockSeparator());
             }
 
             //  add an interaction element
