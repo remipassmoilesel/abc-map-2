@@ -1,6 +1,8 @@
 package org.abcmap.core.utils;
 
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.managers.LogManager;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.sql.SqlUtil;
@@ -19,7 +21,8 @@ import java.util.Map;
  */
 public class SQLUtils {
 
-    private static HashMap<String, JdbcConnectionPool> currentH2Pool;
+    private static final CustomLogger logger = LogManager.getLogger(SQLUtils.class);
+    private static HashMap<String, JdbcConnectionPool> currentH2Pools;
 
     /**
      * Get informations about tables
@@ -28,32 +31,26 @@ public class SQLUtils {
      *
      * @param connection
      */
-    public static void showSqliteTableInformations(Connection connection) {
+    public static void showSqliteTableInformations(Connection connection) throws SQLException {
 
         String request = "SELECT * FROM sqlite_master;";
 
-        try {
+        try (Statement stmt = connection.createStatement()) {
 
-            Statement stmt = connection.createStatement();
+            try (ResultSet results = stmt.executeQuery(request)) {
+                ResultSetMetaData resultsMtdt = results.getMetaData();
 
-            ResultSet results = stmt.executeQuery(request);
-            ResultSetMetaData resultsMtdt = results.getMetaData();
+                int j = 0;
+                while (results.next()) {
+                    System.out.println("## " + j);
+                    for (int i = 1; i <= resultsMtdt.getColumnCount(); i++) {
+                        Object obj = results.getObject(i);
+                        System.out.println("    " + i + ": " + resultsMtdt.getColumnName(i) + "\t:\t " + obj);
+                    }
 
-            int j = 0;
-            while (results.next()) {
-                System.out.println("## " + j);
-                for (int i = 1; i <= resultsMtdt.getColumnCount(); i++) {
-                    Object obj = results.getObject(i);
-                    System.out.println("    " + i + ": " + resultsMtdt.getColumnName(i) + "\t:\t " + obj);
+                    j++;
                 }
-
-                j++;
             }
-
-            results.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
 
     }
@@ -71,27 +68,27 @@ public class SQLUtils {
 
         String request = "SELECT * FROM sqlite_master;";
 
-        Statement stmt = connection.createStatement();
+        try (Statement stmt = connection.createStatement()) {
 
-        ResultSet results = stmt.executeQuery(request);
-        //ResultSetMetaData resultsMtdt = results.getMetaData();
+            ResultSet results = stmt.executeQuery(request);
+            //ResultSetMetaData resultsMtdt = results.getMetaData();
 
-        ArrayList<String> tables = new ArrayList<>();
+            ArrayList<String> tables = new ArrayList<>();
 
-        while (results.next()) {
+            while (results.next()) {
 
-            Object obj = results.getObject(1);
-            if (obj != null && obj instanceof String) {
-                String type = obj.toString();
-                if (type.indexOf("table") != -1) {
-                    tables.add(results.getObject(2).toString());
+                Object obj = results.getObject(1);
+                if (obj != null && obj instanceof String) {
+                    String type = obj.toString();
+                    if (type.indexOf("table") != -1) {
+                        tables.add(results.getObject(2).toString());
+                    }
                 }
             }
+
+            return tables;
         }
 
-        results.close();
-
-        return tables;
     }
 
     /**
@@ -118,7 +115,7 @@ public class SQLUtils {
      * @return
      * @throws IOException
      */
-    public static JDBCDataStore getDatastoreFromGeopackage(Path geopackage) throws IOException {
+    public static JDBCDataStore getGeotoolsDatastoreFromGeopackage(Path geopackage) throws IOException {
 
         Map<String, String> params = new HashMap();
         params.put("dbtype", "geopkg");
@@ -230,23 +227,38 @@ public class SQLUtils {
         return tables;
     }
 
+    /**
+     * Return a H2 connection from an internal pool
+     *
+     * @param databasePath
+     * @return
+     * @throws SQLException
+     */
     public static Connection getH2Connection(Path databasePath) throws SQLException {
-        if (currentH2Pool == null) {
-            currentH2Pool = new HashMap<>();
+
+        if (currentH2Pools == null) {
+            currentH2Pools = new HashMap<>();
         }
 
         String key = databasePath.toAbsolutePath().toString();
-        if (currentH2Pool.get(key) == null) {
-            currentH2Pool.put(key, JdbcConnectionPool.create(getJdbcUrlForH2(databasePath), "", ""));
+        if (currentH2Pools.get(key) == null) {
+            currentH2Pools.put(key, JdbcConnectionPool.create(getJdbcUrlForH2(databasePath), "", ""));
         }
 
-        return currentH2Pool.get(key).getConnection();
+        return currentH2Pools.get(key).getConnection();
     }
 
+    /**
+     * Shutdown a H2 database
+     *
+     * @param databasePath
+     * @throws SQLException
+     */
     public static void shutdownH2Database(Path databasePath) throws SQLException {
-        Connection conn = getH2Connection(databasePath);
-        PreparedStatement stat = conn.prepareStatement("SHUTDOWN");
-        stat.execute();
+        try (Connection conn = getH2Connection(databasePath);
+             PreparedStatement stat = conn.prepareStatement("SHUTDOWN")) {
+            stat.execute();
+        }
     }
 
     /**
@@ -257,25 +269,30 @@ public class SQLUtils {
      */
     public static void printH2DatabaseVersion(Connection conn) throws SQLException {
 
-        PreparedStatement stat = conn.prepareStatement("SELECT H2VERSION() FROM DUAL");
-        ResultSet res = stat.executeQuery();
+        try (PreparedStatement stat = conn.prepareStatement("SELECT H2VERSION() FROM DUAL")) {
+            ResultSet res = stat.executeQuery();
 
-        System.out.println();
-        System.out.println("H2 Database version: ");
-        while (res.next()) {
-            System.out.println(res.getObject(1));
+            System.out.println();
+            System.out.println("H2 Database version: ");
+            while (res.next()) {
+                System.out.println(res.getObject(1));
+            }
         }
     }
 
+    /**
+     * Return a ORM lite connection pool
+     *
+     * @param database
+     * @return
+     * @throws SQLException
+     */
     public static JdbcPooledConnectionSource getH2OrmliteConnectionPool(Path database) throws SQLException {
 
         String databaseUrl = getJdbcUrlForH2(database);
 
         JdbcPooledConnectionSource connectionSource = new JdbcPooledConnectionSource(databaseUrl);
         connectionSource.setMaxConnectionAgeMillis(Long.MAX_VALUE);
-        // TODO: this is a test value to observe eventual changes on rendering issue
-        // Attribute a value > 1 cause multiple connection check, which do not affect finally
-        // rendering process time.
         connectionSource.setCheckConnectionsEveryMillis(-1);
         connectionSource.setTestBeforeGet(false);
 
