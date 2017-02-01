@@ -7,7 +7,7 @@ import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GraphicsConsumer;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.windows.MainWindow;
-import org.abcmap.ielements.importation.AddShapefileLayer;
+import org.abcmap.ielements.importation.geo.AddShapefileLayer;
 import org.abcmap.ielements.importation.AddWMSLayer;
 
 import javax.swing.*;

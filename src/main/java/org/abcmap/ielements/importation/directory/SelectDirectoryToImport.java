@@ -39,7 +39,7 @@ public class SelectDirectoryToImport extends InteractionElement {
         TextFieldDelayedAction.delayedActionFor(txtPath, textFieldListener, false);
 
         // listen user actions on button
-        btn.addActionListener(new BrowseActionListener(txtPath, BrowseActionListener.Type.DIRECTORY_ONLY, ()->{
+        btn.addActionListener(new BrowseActionListener(BrowseActionListener.Type.DIRECTORY_ONLY, txtPath, null, ()->{
             textFieldListener.run();
         }));
 

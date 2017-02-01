@@ -2,6 +2,7 @@ package org.abcmap.gui.utils;
 
 import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.dialogs.simple.BrowseDialogResult;
+import org.abcmap.gui.dialogs.simple.SimpleFileFilter;
 import org.abcmap.gui.dialogs.simple.SimpleBrowseDialog;
 
 import javax.swing.*;
@@ -17,12 +18,29 @@ import java.awt.event.ActionListener;
  */
 public class BrowseActionListener implements ActionListener {
 
-    private final Runnable toRunOnSelection;
-
     public enum Type {
+        /**
+         * Browse dialog will show only files
+         */
         FILES_ONLY,
+
+        /**
+         * Browse dialog will show only directories
+         */
         DIRECTORY_ONLY,
     }
+
+
+    /**
+     * Runnable called when one file or directory is selected
+     */
+    private final Runnable toRunOnSelection;
+
+    /**
+     * File filter used to display files or not
+     */
+    private final SimpleFileFilter fileFilter;
+
 
     /**
      * Component to update
@@ -38,9 +56,10 @@ public class BrowseActionListener implements ActionListener {
      * @param componentToUpdate
      * @param type
      */
-    public BrowseActionListener(JTextComponent componentToUpdate, Type type, Runnable toRunOnSelection) {
+    public BrowseActionListener(Type type, JTextComponent componentToUpdate, SimpleFileFilter filter, Runnable toRunOnSelection) {
 
         this.type = type;
+        this.fileFilter = filter;
         this.toRunOnSelection = toRunOnSelection;
         this.componentToUpdate = componentToUpdate;
 
@@ -57,7 +76,7 @@ public class BrowseActionListener implements ActionListener {
         if (Type.DIRECTORY_ONLY.equals(type)) {
             bdr = SimpleBrowseDialog.browseDirectory(parent);
         } else {
-            bdr = SimpleBrowseDialog.browseFileToOpen(parent);
+            bdr = SimpleBrowseDialog.browseFileToOpen(parent, fileFilter);
         }
 
         // check if user did not cancel action

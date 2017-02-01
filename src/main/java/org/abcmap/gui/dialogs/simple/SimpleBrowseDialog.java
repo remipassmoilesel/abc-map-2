@@ -65,7 +65,7 @@ public class SimpleBrowseDialog {
      * @return
      */
     public static BrowseDialogResult browseProjectToSave(Window parent) {
-        return browseFileToSave(parent, BrowseFileFilter.PROJECTS_FILEFILTER);
+        return browseFileToSave(parent, SimpleFileFilter.PROJECTS_FILEFILTER);
     }
 
     /**
@@ -75,7 +75,7 @@ public class SimpleBrowseDialog {
      * @return
      */
     public static BrowseDialogResult browseProjectToSaveAndWait(Window parent) {
-        return browseFileToSave(parent, BrowseFileFilter.PROJECTS_FILEFILTER);
+        return browseFileToSave(parent, SimpleFileFilter.PROJECTS_FILEFILTER);
     }
 
     /**
@@ -85,7 +85,7 @@ public class SimpleBrowseDialog {
      * @return
      */
     public static BrowseDialogResult browseProjectToOpen(Window parent) {
-        return browseFileToOpen(parent, BrowseFileFilter.PROJECTS_FILEFILTER);
+        return browseFileToOpen(parent, SimpleFileFilter.PROJECTS_FILEFILTER);
     }
 
     /**
@@ -120,7 +120,7 @@ public class SimpleBrowseDialog {
      * @return
      */
     public static BrowseDialogResult browseProfileToSave(Window parent) {
-        return browseFileToSave(parent, BrowseFileFilter.PROFILES_FILEFILTER);
+        return browseFileToSave(parent, SimpleFileFilter.PROFILES_FILEFILTER);
     }
 
     /**
@@ -155,7 +155,7 @@ public class SimpleBrowseDialog {
      * @return
      */
     public static BrowseDialogResult browseProfileToOpen(Window parent) {
-        return browseFileToOpen(parent, BrowseFileFilter.PROFILES_FILEFILTER);
+        return browseFileToOpen(parent, SimpleFileFilter.PROFILES_FILEFILTER);
     }
 
     /**
@@ -188,16 +188,23 @@ public class SimpleBrowseDialog {
      * @param parent
      * @return
      */
-    private static BrowseDialogResult browseFileToSave(Window parent, BrowseFileFilter filter) {
+    private static BrowseDialogResult browseFileToSave(Window parent, SimpleFileFilter filter) {
         return browseFile(ConfigurationConstants.SYSTEM_HOME_PATH, parent, "Enregistrer", filter, true);
     }
 
-    private static BrowseDialogResult browseFileToOpen(Window parent, BrowseFileFilter filter) {
+    /**
+     * Open a dialog to browse a files matching  specified file filter
+     *
+     * @param parent
+     * @param filter
+     * @return
+     */
+    public static BrowseDialogResult browseFileToOpen(Window parent, SimpleFileFilter filter) {
         return browseFile(ConfigurationConstants.SYSTEM_HOME_PATH, parent, "Ouvrir", filter, false);
     }
 
     public static BrowseDialogResult browseFileToOpen(Window parent) {
-        return browseFile(ConfigurationConstants.SYSTEM_HOME_PATH, parent, "Ouvrir", null, false);
+        return browseFileToOpen(parent, null);
     }
 
     /**
@@ -242,7 +249,7 @@ public class SimpleBrowseDialog {
     private static BrowseDialogResult browseFile(String currentDirectoryPath,
                                                  Window parent,
                                                  String approveButtonText,
-                                                 BrowseFileFilter filter,
+                                                 SimpleFileFilter filter,
                                                  boolean confirmOverwriting) {
 
         GuiUtils.throwIfNotOnEDT();
@@ -254,7 +261,7 @@ public class SimpleBrowseDialog {
 
         // add a filter if provided
         if (filter != null) {
-            fc.addChoosableFileFilter(filter);
+            fc.setFileFilter(filter);
         }
 
         int returnVal;
@@ -266,7 +273,7 @@ public class SimpleBrowseDialog {
 
             // user answer yes
             if (JFileChooser.APPROVE_OPTION == returnVal) {
-                
+
                 // confirm overwriting if needed
                 if (confirmOverwriting && fc.getSelectedFile().isFile()) {
                     QuestionResult result = SimpleQuestionDialog.askQuestion(parent, "Le fichier existe déjà, voulez vous l'écraser ?");
