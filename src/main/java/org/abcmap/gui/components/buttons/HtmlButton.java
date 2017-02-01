@@ -26,7 +26,7 @@ public class HtmlButton extends JButton {
      */
     @Override
     public void setText(String htmlText) {
-        super.setText("<html>" + htmlText + "</html>");
+        super.setText("<html><center>" + htmlText + "</center></html>");
     }
 
     public void setStyle(GuiStyle style) {
