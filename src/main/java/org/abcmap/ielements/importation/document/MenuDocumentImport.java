@@ -1,19 +1,13 @@
 package org.abcmap.ielements.importation.document;
 
 import org.abcmap.ielements.GroupOfInteractionElements;
-import org.abcmap.ielements.importation.AddShapefileLayer;
 
-public class MenuImportFromDocument extends GroupOfInteractionElements {
+public class MenuDocumentImport extends GroupOfInteractionElements {
 
-    public MenuImportFromDocument() {
+    public MenuDocumentImport() {
 
         this.label = "Importer un document...";
         this.help = "...";
-
-        // add a shapefile
-        addInteractionElement(new AddShapefileLayer());
-
-        addSeparator();
 
         // select document
         addInteractionElement(new SelectDocumentImportPath());
