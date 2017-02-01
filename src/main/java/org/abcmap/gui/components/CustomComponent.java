@@ -14,7 +14,8 @@ import java.awt.event.MouseEvent;
 
 /**
  * Simple focusable component. Should be used as a JPanel.
- * JButton is extended here to facilitate keyboard use/focus.
+ * <p>
+ * JButton is extended here instead of JPanel to facilitate keyboard use/focus.
  */
 public class CustomComponent extends JButton {
 
@@ -44,20 +45,40 @@ public class CustomComponent extends JButton {
     @Override
     protected void paintComponent(Graphics g) {
 
-        // repeindre selon le focus de l'element
+        // paint background relative to focus status
         painter.draw(g, this, isFocused());
 
     }
 
-    public boolean isFocused() {
+    /**
+     * eturn true if element is presently focused
+     *
+     * @return
+     */
+    private boolean isFocused() {
         return focused;
     }
 
-    public void setFocused(boolean hovered) {
+    /**
+     * Set element focused. Call repaint() after
+     *
+     * @param hovered
+     */
+    private void setFocused(boolean hovered) {
         this.focused = hovered;
     }
 
+    /**
+     * Change focus state relative to user interactions
+     */
     private class CustomMouseAdapter extends MouseAdapter implements FocusListener {
+
+        @Override
+        public void mousePressed(MouseEvent mouseEvent) {
+            // disable focus on click to prevent weird display
+            setFocused(false);
+            repaint();
+        }
 
         @Override
         public void mouseEntered(MouseEvent e) {
@@ -86,7 +107,7 @@ public class CustomComponent extends JButton {
     }
 
     /**
-     * This component should not be used as a button
+     * This component should NOT be used as a button
      */
     @Deprecated
     @Override
@@ -95,7 +116,7 @@ public class CustomComponent extends JButton {
     }
 
     /**
-     * This component should not be used as a button
+     * This component should NOT be used as a button
      */
     @Deprecated
     @Override

@@ -212,6 +212,13 @@ public class SimpleBlockItem extends JPanel implements HasExpandableHelp {
             FocusListener {
 
         @Override
+        public void mousePressed(MouseEvent mouseEvent) {
+            // remove focus on click to prevent weird display
+            setFocused(false);
+            repaint();
+        }
+
+        @Override
         public void focusGained(FocusEvent e) {
             setFocused(true);
             repaint();
