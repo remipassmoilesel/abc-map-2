@@ -5,6 +5,7 @@ import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.resources.DistantResource;
 import org.abcmap.core.resources.DistantResourceProgressEvent;
 import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.gui.components.buttons.HtmlButton;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.ielements.InteractionElement;
 
@@ -14,7 +15,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by remipassmoilesel on 13/01/17.
@@ -54,21 +54,25 @@ public class AddDataFromCatalog extends InteractionElement {
         scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scroll.getVerticalScrollBar().setUnitIncrement(ConfigurationConstants.SCROLLBAR_UNIT_INCREMENT);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        contentPane.add(scroll, "height 200px!, width 98%!, wrap");
+        contentPane.add(scroll, "height 300px!, width 98%!, wrap");
+
+        JPanel buttonPanel = new JPanel(new MigLayout("fillx"));
 
         // button refresh list
-        JButton buttonRefresh = new JButton("Rafraichir");
-        contentPane.add(buttonRefresh, "wrap");
+        JButton buttonRefresh = new HtmlButton("Rafraichir la liste");
+        buttonPanel.add(buttonRefresh, "align center, wrap");
         buttonRefresh.addActionListener(new ButtonActionListener(ButtonActionListener.REFRESH));
 
         // button import resources
-        JButton buttonValid = new JButton("Importer");
-        contentPane.add(buttonValid, "wrap 10px");
+        JButton buttonValid = new HtmlButton("Importer les ressources sélectionnées");
+        buttonPanel.add(buttonValid, "align center, wrap");
         buttonValid.addActionListener(new ButtonActionListener(ButtonActionListener.IMPORT));
+
+        contentPane.add(buttonPanel, "width 98%!, wrap");
 
         // update label information
         this.updateLabel = new JLabel();
-        contentPane.add(updateLabel, "width 98%");
+        contentPane.add(updateLabel, "width 98%!");
 
         // first refresh
         ThreadManager.runLater(() -> {
@@ -125,19 +129,19 @@ public class AddDataFromCatalog extends InteractionElement {
                         int resId = resources.indexOf(event.getResource()) + 1;
 
                         // resource is preparing
-                        if(DistantResourceProgressEvent.PREPARING.equals(event.getStatus())){
+                        if (DistantResourceProgressEvent.PREPARING.equals(event.getStatus())) {
                             setUpdateLabelText("Res. " + resId + " en préparation...");
                             return;
                         }
 
                         // resource is being uncompressed
-                        if(DistantResourceProgressEvent.UNCOMPRESSING.equals(event.getStatus())){
+                        if (DistantResourceProgressEvent.UNCOMPRESSING.equals(event.getStatus())) {
                             setUpdateLabelText("Res. " + resId + " en décompression...");
                             return;
                         }
 
                         // resource is downloading
-                        else if(DistantResourceProgressEvent.DOWNLOADING.equals(event.getStatus())) {
+                        else if (DistantResourceProgressEvent.DOWNLOADING.equals(event.getStatus())) {
 
                             double percent = -1;
                             try {
@@ -146,10 +150,9 @@ public class AddDataFromCatalog extends InteractionElement {
                                 logger.error(e);
                             }
 
-                            if(percent < 0){
+                            if (percent < 0) {
                                 percent = 0;
-                            }
-                            else if(percent > 99){
+                            } else if (percent > 99) {
                                 percent = 99;
                             }
 
