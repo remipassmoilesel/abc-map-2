@@ -11,48 +11,48 @@ import java.util.Objects;
 public class GpxPoint {
 
     private String date;
-    private long lat;
-    private long lon;
-    private long ele;
+    private double lat;
+    private double lon;
+    private double ele;
 
     public GpxPoint(BigDecimal lat, BigDecimal lon, BigDecimal ele) {
-        this.lat = lat.longValue();
-        this.lon = lon.longValue();
-        this.ele = ele.longValue();
+        this.lat = lat.doubleValue();
+        this.lon = lon.doubleValue();
+        this.ele = ele.doubleValue();
     }
 
     public GpxPoint(BigDecimal lat, BigDecimal lon, BigDecimal ele, String date) {
-        this.lat = lat.longValue();
-        this.lon = lon.longValue();
-        this.ele = ele.longValue();
+        this.lat = lat.doubleValue();
+        this.lon = lon.doubleValue();
+        this.ele = ele.doubleValue();
         this.date = date;
     }
 
-    public Coordinate getCoordinate() {
-        return new Coordinate(lat, lon);
+    public Coordinate getCoordinatePoint() {
+        return new Coordinate(lon, lat);
     }
 
-    public long getLat() {
+    public double getLat() {
         return lat;
     }
 
-    public void setLat(long lat) {
+    public void setLat(double lat) {
         this.lat = lat;
     }
 
-    public long getLon() {
+    public double getLon() {
         return lon;
     }
 
-    public void setLon(long lon) {
+    public void setLon(double lon) {
         this.lon = lon;
     }
 
-    public long getEle() {
+    public double getEle() {
         return ele;
     }
 
-    public void setEle(long ele) {
+    public void setEle(double ele) {
         this.ele = ele;
     }
 

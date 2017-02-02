@@ -13,7 +13,6 @@ import javax.xml.bind.Unmarshaller;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,15 +42,25 @@ public class GpxParser {
 
     /**
      * Source from where GPX data is parsed
+     * <p>
+     * If this source is null, gpxSourcePath will be used
      */
     private InputStream gpxSource;
+
+    /**
+     * Path of a gpx file used as a source
+     * <p>
+     * This path is used only if gpxSource is null
+     */
+    private Path gpxSourcePath;
 
     /**
      * Produced raw document after parsing
      */
     private Object document;
 
-    public GpxParser() throws GpxParsingException {
+
+    public GpxParser() {
 
         marshallers = new HashMap<>();
         unmarshallers = new HashMap<>();
@@ -66,7 +75,7 @@ public class GpxParser {
             }
 
         } catch (Exception e) {
-            throw new GpxParsingException(e);
+            throw new IllegalStateException(e);
         }
 
     }
@@ -165,7 +174,8 @@ public class GpxParser {
      * @throws IOException
      */
     public void setGpxSource(Path p) throws IOException {
-        setGpxSource(Files.newInputStream(p));
+        gpxSourcePath = p;
+        gpxSource = null;
     }
 
     /**
@@ -180,6 +190,8 @@ public class GpxParser {
 
     /**
      * Set the GPX source as a stream. This stream will be read to parse GPX data.
+     * <p>
+     * This stream must support marks. File streams do not support marks, so use setGpxSource(File) instead
      *
      * @param stream
      * @throws IOException
@@ -191,6 +203,7 @@ public class GpxParser {
         }
 
         this.gpxSource = stream;
+        this.gpxSourcePath = null;
 
         // prepare future resets
         gpxSource.mark(1);
@@ -202,7 +215,7 @@ public class GpxParser {
      * @throws GpxParsingException
      */
     private void testSource() throws GpxParsingException {
-        if (gpxSource == null) {
+        if (gpxSource == null && gpxSourcePath == null) {
             throw new GpxParsingException("Source is null");
         }
     }
@@ -240,9 +253,22 @@ public class GpxParser {
 
         // parse document and return it
         try {
-            gpxSource.reset();
-            Gpx gpxDocument = (Gpx) unmarshallers.get(GPX_V1).unmarshal(gpxSource);
+
+            Gpx gpxDocument;
+
+            // source is a stream
+            if (gpxSource != null) {
+                gpxSource.reset();
+                gpxDocument = (Gpx) unmarshallers.get(GPX_V1).unmarshal(gpxSource);
+            }
+
+            // source is a file
+            else {
+                gpxDocument = (Gpx) unmarshallers.get(GPX_V1).unmarshal(gpxSourcePath.toFile());
+            }
+
             return gpxDocument;
+
         } catch (Exception e) {
             throw new GpxParsingException(e);
         }
@@ -261,8 +287,19 @@ public class GpxParser {
 
         // parse document and return it
         try {
-            gpxSource.reset();
-            JAXBElement element = (JAXBElement) unmarshallers.get(GPX_V1_1).unmarshal(gpxSource);
+
+            JAXBElement element;
+            // source is a stream
+            if (gpxSource != null) {
+                gpxSource.reset();
+                element = (JAXBElement) unmarshallers.get(GPX_V1_1).unmarshal(gpxSource);
+            }
+
+            // source is a file
+            else {
+                element = (JAXBElement) unmarshallers.get(GPX_V1_1).unmarshal(gpxSourcePath.toFile());
+            }
+
             return (GpxType) element.getValue();
         } catch (Exception e) {
             throw new GpxParsingException(e);
