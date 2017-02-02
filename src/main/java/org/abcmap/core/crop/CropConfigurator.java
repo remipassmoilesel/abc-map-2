@@ -72,7 +72,7 @@ public class CropConfigurator {
                 File img = null;
                 for (File f : dir.listFiles()) {
                     String ext = Utils.getExtension(f.getAbsolutePath());
-                    if (importm.isValidExtensionsForTile(ext)) {
+                    if (importm.isExtensionValidForTile(ext)) {
                         img = f;
                         break;
                     }

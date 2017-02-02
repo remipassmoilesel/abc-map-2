@@ -47,9 +47,20 @@ public class ImportManager extends ManagerTreeAccessUtil implements HasEventNoti
     private CropConfigurator cropConfigurator;
 
     /**
-     * List of valid extensions for import
+     * List of valid file extensions which can be used to create tiles
      */
-    private static ArrayList<String> validExtensionsForTiles;
+    private ArrayList<String> validExtensionsForTiles;
+
+    /**
+     * List of valid file extensions which can be used as a shapefile
+     */
+    private ArrayList<String> validExtensionsForShapefiles;
+
+    /**
+     * List of valid file extensions which can be used as GPX data
+     */
+    private ArrayList<String> validExtensionsForGpxData;
+
 
     private ClipboardManager clipboardm;
     private EventNotificationManager notifm;
@@ -62,6 +73,23 @@ public class ImportManager extends ManagerTreeAccessUtil implements HasEventNoti
 
         validExtensionsForTiles = new ArrayList<>();
         validExtensionsForTiles.addAll(Arrays.asList(Utils.getAllImageSupportedFormats()));
+
+        validExtensionsForShapefiles = new ArrayList<>();
+        validExtensionsForShapefiles.addAll(Arrays.asList(
+                "shp",
+                "shx",
+                "dbf",
+                "shx",
+                "sbn",
+                "prj",
+                "atx",
+                "qix"
+        ));
+
+        validExtensionsForGpxData = new ArrayList<>();
+        validExtensionsForGpxData.addAll(Arrays.asList(
+                "gpx"
+        ));
 
         currentDataImportHeaders = new ArrayList<>();
 
@@ -132,12 +160,50 @@ public class ImportManager extends ManagerTreeAccessUtil implements HasEventNoti
      * @param ext
      * @return
      */
-    public boolean isValidExtensionsForTile(String ext) {
-        return validExtensionsForTiles.contains(ext.toLowerCase());
+    public boolean isExtensionValidForTile(String ext) {
+        return validExtensionsForTiles.contains(ext.toLowerCase().trim());
     }
 
     /**
-     * Import specified resources in project
+     * Return a list of file extensions which should be accepted as a valid part of shapefile
+     *
+     * @return
+     */
+    public ArrayList<String> getValidExtensionsForShapefiles() {
+        return validExtensionsForShapefiles;
+    }
+
+    /**
+     * Return true if this extension should be accepted as a valid part of shapefile
+     *
+     * @param ext
+     * @return
+     */
+    public boolean isExtensionValidForShapefile(String ext) {
+        return validExtensionsForShapefiles.contains(ext.toLowerCase().trim());
+    }
+
+    /**
+     * Return a list of file extensions which should be accepted as valid GPX data
+     *
+     * @return
+     */
+    public ArrayList<String> getValidExtensionsForGpxData() {
+        return validExtensionsForGpxData;
+    }
+
+    /**
+     * Return true if this extension should be accepted as valid GPX data
+     *
+     * @param ext
+     * @return
+     */
+    public boolean isExtensionValidForGpxData(String ext) {
+        return validExtensionsForGpxData.contains(ext.toLowerCase().trim());
+    }
+
+    /**
+     * Import specified distant resources in project
      *
      * @param selectedResources
      * @param updates
@@ -442,7 +508,7 @@ public class ImportManager extends ManagerTreeAccessUtil implements HasEventNoti
             File f = Paths.get(directory.getAbsolutePath(), s).toFile();
             String ext = Utils.getExtension(f.getPath()).toLowerCase();
 
-            if (f.isFile() && isValidExtensionsForTile(ext)) {
+            if (f.isFile() && isExtensionValidForTile(ext)) {
                 files.add(f);
             }
 
@@ -551,4 +617,6 @@ public class ImportManager extends ManagerTreeAccessUtil implements HasEventNoti
     public ArrayList<String> getDataImportCurrentHeaders() {
         return new ArrayList<>(currentDataImportHeaders);
     }
+
+
 }

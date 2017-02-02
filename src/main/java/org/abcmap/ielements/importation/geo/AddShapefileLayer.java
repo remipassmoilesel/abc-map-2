@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by remipassmoilesel on 13/01/17.
@@ -30,28 +28,11 @@ public class AddShapefileLayer extends InteractionElement {
      */
     private JTextField shapefileTextField;
 
-    /**
-     * List of component of shapefiles
-     */
-    private ArrayList<String> shapefilePossibleExtensions;
-
     public AddShapefileLayer() {
 
         this.label = "Ajouter un fichier de formes";
         this.help = "Ajoutez ici un fichier de forme (.shp) au projet courant. Vous pouvez spécifier le chemin d'un fichier SHP ou d'un dossier. " +
                 "Attention: le fichier de forme ne sera pas importé, vous devrez faire en sorte qu'il reste toujours accessible au même chemin.";
-
-        // all in lower case
-        this.shapefilePossibleExtensions = new ArrayList<>(Arrays.asList(
-                "shp",
-                "shx",
-                "dbf",
-                "shx",
-                "sbn",
-                "prj",
-                "atx",
-                "qix"
-        ));
 
         this.displaySimplyInSearch = false;
     }
@@ -71,7 +52,7 @@ public class AddShapefileLayer extends InteractionElement {
         JButton buttonBrowse = new HtmlButton("Parcourir");
         panel.add(buttonBrowse, "wrap");
 
-        SimpleFileFilter shapefileFilter = new SimpleFileFilter(shapefilePossibleExtensions, "*.shp .shx ...");
+        SimpleFileFilter shapefileFilter = new SimpleFileFilter(importm().getValidExtensionsForShapefiles(), "*.shp .shx ...");
         BrowseActionListener browseListener = new BrowseActionListener(BrowseActionListener.Type.FILES_ONLY, shapefileTextField, shapefileFilter, null);
         buttonBrowse.addActionListener(browseListener);
 
@@ -129,7 +110,7 @@ public class AddShapefileLayer extends InteractionElement {
         }
 
         // path is a one of shape file component, try to get shape file path
-        else if (shapefilePossibleExtensions.contains(extension)) {
+        else if (importm().isExtensionValidForShapefile(extension)) {
             String shapefileStr = providedPathStr.substring(0, providedPathStr.length() - extension.length()) + "shp";
             shapefilePath = Paths.get(shapefileStr);
         }
