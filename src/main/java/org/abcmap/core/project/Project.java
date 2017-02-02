@@ -307,6 +307,11 @@ public class Project {
             throw new NullPointerException("Layer is null");
         }
 
+        // prevent if already present
+        if (mainLayersList.contains(layer) == true) {
+            throw new IllegalArgumentException("Layer is already present: " + layer);
+        }
+
         mainLayersList.add(layer);
         return layer;
     }
