@@ -153,6 +153,12 @@
             <version>4.5.2</version>
         </dependency>
 
+        <!-- CSV -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.2</version>
+        </dependency>
 
     </dependencies>
 

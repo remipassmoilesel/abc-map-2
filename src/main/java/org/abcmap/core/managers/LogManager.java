@@ -21,7 +21,7 @@ public class LogManager {
     // private static final CustomLogger logger = LogManager.getLogger(Project.class);
 
     private static LogManager instance;
-    private static final Level DEFAULT_LOG_LEVEL = Level.INFO;
+    private static final Level DEFAULT_LOG_LEVEL = Level.WARNING;
     private static Path LOG_ROOT = ConfigurationConstants.LOG_DIRECTORY;
 
     /**

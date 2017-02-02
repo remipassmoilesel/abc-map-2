@@ -35,6 +35,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by remipassmoilesel on 10/11/16.
@@ -60,6 +62,9 @@ public class GeoUtils {
      */
     public static final ArrayList<CoordinateReferenceSystem> knownCrs = new ArrayList<>();
 
+    /**
+     * URL of Mundialis server, a free WMS server
+     */
     public static final String MUNDIALIS_WMS_URL = "http://ows.mundialis.de/services/service";
 
     /**
@@ -69,7 +74,6 @@ public class GeoUtils {
      */
     private static final CRSAuthorityFactory crsFactory;
     public static final CustomLogger logger = LogManager.getLogger(GeoUtils.class);
-
 
     static {
 
@@ -99,6 +103,21 @@ public class GeoUtils {
 
     private static final FilterFactory2 ff = FeatureUtils.getFilterFactory();
     private static final StyleFactory sf = FeatureUtils.getStyleFactory();
+
+    /**
+     * Pattern used to parse decimal degrees strings
+     */
+    private static final Pattern decimalDegreesPattern = Pattern.compile("^(-?\\d+[\\.,]?\\d*)°?$");
+
+    /**
+     * Pattern used to parse degrees / decimal minutes strings
+     */
+    private static final Pattern dmdPattern = Pattern.compile("^(-?\\d+)°(\\d+[\\.,]?\\d*)'?$");
+
+    /**
+     * Pattern used to parse degrees / minutes / second strings
+     */
+    private static final Pattern dmsPattern = Pattern.compile("^(-?\\d+)°(\\d+)'(\\d+[\\.,]?\\d*)\"?$");
 
     /**
      * Return a JTS geometry factory
@@ -465,5 +484,65 @@ public class GeoUtils {
         DefaultFeatureCollection dfc = new DefaultFeatureCollection();
         dfc.addAll(features);
         return dfc.getBounds();
+    }
+
+    /**
+     * Try to parse two strings in one coordinate object
+     *
+     * @param latitude
+     * @param longitude
+     * @return
+     */
+    public static Coordinate stringToCoordinate(String latitude, String longitude) {
+
+        // remove all white characters
+        latitude = latitude.replaceAll("\\s+", "");
+        longitude = longitude.replaceAll("\\s+", "");
+
+        // first case: there is a '.' or ',' in string, but no ' or "
+        // -> decimal degrees coordinates
+        Matcher mtLat = decimalDegreesPattern.matcher(latitude);
+        Matcher mtLng = decimalDegreesPattern.matcher(longitude);
+        if (mtLat.find() && mtLng.find()) {
+            double dLat = Double.valueOf(mtLat.group(1));
+            double dLng = Double.valueOf(mtLng.group(1));
+            return new Coordinate(dLng, dLat);
+        }
+
+        // case 2: there are '°' and "'"  chars,
+        // -> degrees and decimal minutes
+        mtLat = dmdPattern.matcher(latitude);
+        mtLng = dmdPattern.matcher(longitude);
+        if (mtLat.find() && mtLng.find()) {
+
+            double dLat = Double.valueOf(mtLat.group(1));
+            dLat += Double.valueOf(mtLat.group(2)) / 60;
+
+            double dLng = Double.valueOf(mtLng.group(1));
+            dLng += Double.valueOf(mtLng.group(2)) / 60;
+
+            return new Coordinate(dLng, dLat);
+
+        }
+
+        // last case: ° ' and " are present, DMS coordinates
+        mtLat = dmsPattern.matcher(latitude);
+        mtLng = dmsPattern.matcher(longitude);
+        if (mtLat.find() && mtLng.find()) {
+
+            double dLat = Double.valueOf(mtLat.group(1));
+            dLat += Double.valueOf(mtLat.group(2)) / 60;
+            dLat += Double.valueOf(mtLat.group(3)) / 3600;
+
+            double dLng = Double.valueOf(mtLng.group(1));
+            dLng += Double.valueOf(mtLng.group(2)) / 60;
+            dLng += Double.valueOf(mtLng.group(3)) / 3600;
+
+            return new Coordinate(dLng, dLat);
+
+        }
+
+        // nothing found
+        return null;
     }
 }

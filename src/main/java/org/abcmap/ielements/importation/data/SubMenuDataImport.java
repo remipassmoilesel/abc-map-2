@@ -7,7 +7,7 @@ public class SubMenuDataImport extends DockMenuPanel {
     public SubMenuDataImport() {
         super();
 
-        addMenuElement(new SelectDataToImport());
+        addMenuElement(new SelectSpreadsheetToImport());
 
         addMenuElement(new CreateDataFile());
 

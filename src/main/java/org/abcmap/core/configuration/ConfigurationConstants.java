@@ -1,6 +1,7 @@
 package org.abcmap.core.configuration;
 
 import com.labun.surf.Params;
+import org.apache.commons.csv.CSVFormat;
 
 import javax.swing.filechooser.FileSystemView;
 import java.nio.charset.Charset;
@@ -12,7 +13,7 @@ import java.nio.file.Paths;
  */
 public class ConfigurationConstants {
 
-    private ConfigurationConstants(){
+    private ConfigurationConstants() {
 
     }
 
@@ -110,5 +111,8 @@ public class ConfigurationConstants {
             new Params(4, 4, 0.00001f, 2, false, false, false, 1, false),
             new Params(4, 4, 0.000001f, 2, false, false, false, 1, false),};
 
-
+    /**
+     * Default CSV format used to parse data files
+     */
+    public static CSVFormat DEFAULT_CSV_FORMAT = CSVFormat.EXCEL;
 }

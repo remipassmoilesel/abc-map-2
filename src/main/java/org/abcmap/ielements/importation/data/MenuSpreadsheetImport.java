@@ -9,7 +9,7 @@ public class MenuSpreadsheetImport extends GroupOfInteractionElements {
         this.help = "...";
 
         // path of list
-        addInteractionElement(new SelectDataToImport());
+        addInteractionElement(new SelectSpreadsheetToImport());
 
         // open an example
         addInteractionElement(new CreateDataFile());

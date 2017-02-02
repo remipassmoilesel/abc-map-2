@@ -1,9 +1,9 @@
 package org.abcmap.tests.core.gpx;
 
 import com.google.common.io.Resources;
-import org.abcmap.core.gpx.GpxParser;
-import org.abcmap.core.gpx.GpxParsingException;
-import org.abcmap.core.gpx.GpxPointsList;
+import org.abcmap.core.importation.gpx.GpxParser;
+import org.abcmap.core.importation.gpx.GpxParsingException;
+import org.abcmap.core.importation.gpx.GpxPointsList;
 import org.junit.Assert;
 import org.junit.Test;
 

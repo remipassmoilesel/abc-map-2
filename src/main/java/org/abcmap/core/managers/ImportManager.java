@@ -61,6 +61,10 @@ public class ImportManager extends ManagerTreeAccessUtil implements HasEventNoti
      */
     private ArrayList<String> validExtensionsForGpxData;
 
+    /**
+     * List of valid file extensions which can be used as spreadsheets
+     */
+    private ArrayList<String> validExtensionsForSpreadsheet;
 
     private ClipboardManager clipboardm;
     private EventNotificationManager notifm;
@@ -76,19 +80,17 @@ public class ImportManager extends ManagerTreeAccessUtil implements HasEventNoti
 
         validExtensionsForShapefiles = new ArrayList<>();
         validExtensionsForShapefiles.addAll(Arrays.asList(
-                "shp",
-                "shx",
-                "dbf",
-                "shx",
-                "sbn",
-                "prj",
-                "atx",
-                "qix"
+                "shp", "shx", "dbf", "shx", "sbn", "prj", "atx", "qix"
         ));
 
         validExtensionsForGpxData = new ArrayList<>();
         validExtensionsForGpxData.addAll(Arrays.asList(
                 "gpx"
+        ));
+
+        validExtensionsForSpreadsheet = new ArrayList<>();
+        validExtensionsForSpreadsheet.addAll(Arrays.asList(
+                "csv", "xls"
         ));
 
         currentDataImportHeaders = new ArrayList<>();
@@ -181,6 +183,25 @@ public class ImportManager extends ManagerTreeAccessUtil implements HasEventNoti
      */
     public boolean isExtensionValidForShapefile(String ext) {
         return validExtensionsForShapefiles.contains(ext.toLowerCase().trim());
+    }
+
+    /**
+     * Return a list of file extensions which should be accepted as a valid part of shapefile
+     *
+     * @return
+     */
+    public ArrayList<String> getValidExtensionsForSpreadsheets() {
+        return validExtensionsForSpreadsheet;
+    }
+
+    /**
+     * Return true if this extension should be accepted as a valid part of shapefile
+     *
+     * @param ext
+     * @return
+     */
+    public boolean isExtensionValidForSpreadsheet(String ext) {
+        return validExtensionsForSpreadsheet.contains(ext.toLowerCase().trim());
     }
 
     /**
