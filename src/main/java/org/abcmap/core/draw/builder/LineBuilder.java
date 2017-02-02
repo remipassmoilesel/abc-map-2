@@ -2,7 +2,7 @@ package org.abcmap.core.draw.builder;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.styles.StyleContainer;
 
@@ -16,7 +16,7 @@ public class LineBuilder extends AbstractLineBuilder {
 
         // remove background color from style
         if (style.getBackground() != null) {
-            this.style = drawm.getStyle(AbmDefaultFeatureType.LINE, style.getForeground(), null, style.getThick());
+            this.style = drawm.getStyle(AbmGeometryType.LINE, style.getForeground(), null, style.getThick());
         }
     }
 

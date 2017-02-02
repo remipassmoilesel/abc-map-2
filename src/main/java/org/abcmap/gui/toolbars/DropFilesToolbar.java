@@ -3,12 +3,13 @@ package org.abcmap.gui.toolbars;
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.*;
+import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GraphicsConsumer;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.windows.MainWindow;
-import org.abcmap.ielements.importation.geo.AddShapefileLayer;
 import org.abcmap.ielements.importation.AddWMSLayer;
+import org.abcmap.ielements.importation.geo.AddShapefileLayer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -150,8 +151,11 @@ public class DropFilesToolbar extends Toolbar {
                     java.util.List<File> transferData = (java.util.List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                     if (transferData != null && transferData.size() > 0) {
 
+                        // open shape file in another thread
                         AddShapefileLayer anshapefile = new AddShapefileLayer();
-                        anshapefile.openLayer(transferData.get(0).getAbsolutePath());
+                        ThreadManager.runLater(() -> {
+                            anshapefile.openLayer(transferData.get(0).getAbsolutePath());
+                        });
 
                         dtde.dropComplete(true);
                     }

@@ -4,7 +4,7 @@ import com.j256.ormlite.field.DatabaseField;
 import com.j256.ormlite.table.DatabaseTable;
 import org.abcmap.core.configuration.ConfigurationConstants;
 import org.abcmap.core.dao.DataModel;
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.LogManager;
@@ -46,7 +46,7 @@ public class StyleContainer implements DataModel {
     private int thick;
 
     @DatabaseField(columnName = GEOMETRY_NAME_FIELD_NAME)
-    private String geometryName;
+    private String geometryTypeName;
 
     private Rule rule;
 
@@ -54,11 +54,11 @@ public class StyleContainer implements DataModel {
 
     }
 
-    public StyleContainer(AbmDefaultFeatureType type, Color foreground, Color background, int thick) {
+    public StyleContainer(AbmGeometryType type, Color foreground, Color background, int thick) {
         this.foreground = Utils.colorToString(foreground);
         this.background = Utils.colorToString(background);
         this.thick = thick;
-        this.geometryName = type.toString();
+        this.geometryTypeName = type.toString();
         generateId();
     }
 
@@ -66,7 +66,7 @@ public class StyleContainer implements DataModel {
         this.foreground = other.foreground;
         this.background = other.background;
         this.thick = other.thick;
-        this.geometryName = other.geometryName;
+        this.geometryTypeName = other.geometryTypeName;
         generateId();
     }
 
@@ -111,12 +111,12 @@ public class StyleContainer implements DataModel {
         return thick;
     }
 
-    public String getGeometryName() {
-        return geometryName;
+    public String getGeometryTypeName() {
+        return geometryTypeName;
     }
 
-    public void setGeometryName(String geometryName) {
-        this.geometryName = geometryName;
+    public void setGeometryTypeName(String geometryTypeName) {
+        this.geometryTypeName = geometryTypeName;
     }
 
     /**
@@ -168,7 +168,7 @@ public class StyleContainer implements DataModel {
      */
     public static Rule generateRule(StyleContainer container) {
 
-        AbmDefaultFeatureType type = AbmDefaultFeatureType.valueOf(container.getGeometryName());
+        AbmGeometryType type = AbmGeometryType.valueOf(container.getGeometryTypeName());
         Rule rule = FeatureUtils.createRuleFor(type, container.getForeground(), container.getBackground(), container.getThick());
 
         // apply on specified id

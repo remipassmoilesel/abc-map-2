@@ -179,6 +179,10 @@ public class CachedRenderingEngine implements HasEventNotificationManager {
 
         for (AbmAbstractLayer lay : project.getLayersList()) {
 
+            if(lay.isVisible() == false){
+                continue;
+            }
+
             RenderedPartialQueryResult partialCtr = currentPartials.get(lay.getId());
 
             // list of layer changed before refreshMap called

@@ -87,7 +87,6 @@ public class CachedMapPane extends JPanel implements HasEventNotificationManager
      */
     private StreamingRenderer memoryLayerRenderer;
 
-
     /**
      * If set to true, panel will ask to current tool to paint if needed
      */

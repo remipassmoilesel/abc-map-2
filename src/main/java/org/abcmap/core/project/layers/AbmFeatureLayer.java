@@ -126,6 +126,24 @@ public class AbmFeatureLayer extends AbmAbstractLayer {
     }
 
     /**
+     * Add a feature list to the layer. Can be used to write modifications on feature.
+     *
+     * @param features
+     * @return
+     */
+    public List<SimpleFeature> addFeatures(List<SimpleFeature> features) {
+
+        try {
+            featureStore.addFeatures(FeatureUtils.asFeatureCollection(features));
+            return features;
+        } catch (IOException e) {
+            logger.error(e);
+            throw new LayerIOException(e);
+        }
+
+    }
+
+    /**
      * Add a feature to the layer. Can be used to write modifications on feature.
      *
      * @param feature

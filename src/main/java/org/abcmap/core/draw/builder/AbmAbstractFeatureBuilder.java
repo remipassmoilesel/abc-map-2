@@ -17,9 +17,6 @@ import java.awt.geom.AffineTransform;
 /**
  * Abstract class that allow to build shape and add it to a specified layer
  * <p>
- * Shape builders are temporary objects, associated with one layer and current project.
- * Each time you to draw something, you should create a new draw builder.
- * <p>
  * Shapes are inserted in layer at end of drawing, if drawing is confirmed.
  * <p>
  * Temporary shapes (before confirmation) can be displayed with graphics by using draw() method

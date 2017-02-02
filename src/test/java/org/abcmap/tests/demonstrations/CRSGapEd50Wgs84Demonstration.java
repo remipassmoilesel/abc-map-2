@@ -1,6 +1,6 @@
 package org.abcmap.tests.demonstrations;
 
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.utils.FeatureUtils;
 import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.core.utils.Utils;
@@ -45,7 +45,7 @@ public class CRSGapEd50Wgs84Demonstration {
         FileDataStore datastore1 = FileDataStoreFinder.getDataStore(shapeFileWgs84.toFile());
         SimpleFeatureStore featureStore1 = (SimpleFeatureStore) datastore1.getFeatureSource();
 
-        Rule rule = FeatureUtils.createRuleFor(AbmDefaultFeatureType.LINE, Utils.randColor(), null, 0.5f);
+        Rule rule = FeatureUtils.createRuleFor(AbmGeometryType.LINE, Utils.randColor(), null, 0.5f);
         Style style = sf.createStyle();
         style.featureTypeStyles().add(sf.createFeatureTypeStyle(new Rule[]{rule}));
 
@@ -55,7 +55,7 @@ public class CRSGapEd50Wgs84Demonstration {
         FileDataStore datastore2 = FileDataStoreFinder.getDataStore(shapeFileEd50.toFile());
         SimpleFeatureStore featureStore2 = (SimpleFeatureStore) datastore2.getFeatureSource();
 
-        Rule rule2 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.LINE, Utils.randColor(), null, 0.5f);
+        Rule rule2 = FeatureUtils.createRuleFor(AbmGeometryType.LINE, Utils.randColor(), null, 0.5f);
         Style style2 = sf.createStyle();
         style.featureTypeStyles().add(sf.createFeatureTypeStyle(new Rule[]{rule2}));
 

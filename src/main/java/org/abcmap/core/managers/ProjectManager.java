@@ -2,7 +2,7 @@ package org.abcmap.core.managers;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import org.abcmap.core.configuration.ConfigurationConstants;
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.draw.builder.LineBuilder;
 import org.abcmap.core.events.ProjectEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
@@ -16,7 +16,6 @@ import org.abcmap.core.project.layers.AbmAbstractLayer;
 import org.abcmap.core.project.layers.AbmFeatureLayer;
 import org.abcmap.core.project.layers.AbmTileLayer;
 import org.abcmap.core.threads.ThreadManager;
-import org.abcmap.core.utils.GeoUtils;
 import org.abcmap.gui.utils.GuiUtils;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 
@@ -224,7 +223,7 @@ public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNot
             ReferencedEnvelope bounds = tileLayer.getBounds();
             PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
             LineBuilder builder = new LineBuilder((AbmFeatureLayer) fakeProject.getActiveLayer(),
-                    Main.getDrawManager().getActiveStyle(AbmDefaultFeatureType.LINE));
+                    Main.getDrawManager().getActiveStyle(AbmGeometryType.LINE));
             for (int i = 0; i < featureNumber; i++) {
                 builder.newLine(new Coordinate(rand.next(), rand.next()));
                 for (int j = 0; j < 5; j++) {
@@ -238,7 +237,7 @@ public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNot
         else if (id.equals(FAKE_PROJECT_2)) {
 
             fakeProject.addNewShapeFileLayer(Paths.get("data/cinemas-ile-de-france/les_salles_de_cinemas_en_ile-de-france.shp"));
-            fakeProject.addNewWMSLayer(GeoUtils.MUNDIALIS_WMS_URL, null);
+            //fakeProject.addNewWMSLayer(GeoUtils.MUNDIALIS_WMS_URL, null);
             fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes/communes-20160119.shp"));
             //fakeProject.addNewShapeFileLayer(Paths.get("data/france-communes-ed50/france-communes-ed50.shp"));
 
@@ -252,7 +251,7 @@ public class ProjectManager extends ManagerTreeAccessUtil implements HasEventNot
                     ReferencedEnvelope bounds = fakeProject.getLayersList().get(1).getBounds();
                     PrimitiveIterator.OfDouble rand = new Random().doubles(bounds.getMinX(), bounds.getMaxX()).iterator();
                     LineBuilder builder = new LineBuilder((AbmFeatureLayer) fakeProject.getActiveLayer(),
-                            Main.getDrawManager().getActiveStyle(AbmDefaultFeatureType.LINE));
+                            Main.getDrawManager().getActiveStyle(AbmGeometryType.LINE));
                     for (int i = 0; i < featureNumber; i++) {
                         builder.newLine(new Coordinate(rand.next(), rand.next()));
                         for (int j = 0; j < 5; j++) {

@@ -1,6 +1,6 @@
 package org.abcmap.core.project.layers;
 
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.shapefile.ShapefileDao;
 import org.abcmap.core.shapefile.ShapefileLayerEntry;
@@ -77,9 +77,9 @@ public class AbmShapefileLayer extends AbmAbstractLayer {
         // TODO: detect type of feature and make corresponding style
         Color color = Utils.randColor();
 
-        Rule rule1 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.LINE, color, null, 0.5f);
-        Rule rule2 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.POINT, color, null, 0.5f);
-        Rule rule3 = FeatureUtils.createRuleFor(AbmDefaultFeatureType.POLYGON, color, null, 0.5f);
+        Rule rule1 = FeatureUtils.createRuleFor(AbmGeometryType.LINE, color, null, 0.5f);
+        Rule rule2 = FeatureUtils.createRuleFor(AbmGeometryType.POINT, color, null, 0.5f);
+        Rule rule3 = FeatureUtils.createRuleFor(AbmGeometryType.POLYGON, color, null, 0.5f);
         layerStyle.featureTypeStyles().add(sf.createFeatureTypeStyle(new Rule[]{rule1, rule2, rule3}));
 
         buildInternalLayer();

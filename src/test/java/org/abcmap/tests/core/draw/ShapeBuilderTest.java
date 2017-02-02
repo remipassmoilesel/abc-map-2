@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.draw.builder.LineBuilder;
 import org.abcmap.core.draw.builder.PointBuilder;
 import org.abcmap.core.draw.builder.PolygonBuilder;
@@ -44,7 +44,7 @@ public class ShapeBuilderTest {
         AbmFeatureLayer activeLayer = (AbmFeatureLayer) project.getActiveLayer();
 
         // test point building
-        PointBuilder pointB = new PointBuilder(activeLayer, project.getStyle(AbmDefaultFeatureType.LINE, Color.black, Color.white, 5));
+        PointBuilder pointB = new PointBuilder(activeLayer, project.getStyle(AbmGeometryType.LINE, Color.black, Color.white, 5));
 
         for (int i = 100; i < 120; i++) {
             SimpleFeature pt = pointB.addPoint(new Coordinate(i, i));

@@ -4,7 +4,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import org.abcmap.TestUtils;
 import org.abcmap.core.dao.LayerIndexDAO;
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.managers.Main;
 import org.abcmap.core.managers.ProjectManager;
 import org.abcmap.core.project.PMNames;
@@ -64,7 +64,7 @@ public class ProjectReaderWriterTest {
 
         // add styles
         for (int i = 1; i < 10; i++) {
-            newProject.getStyle(AbmDefaultFeatureType.LINE, TestUtils.getRandomColor(), TestUtils.getRandomColor(), i);
+            newProject.getStyle(AbmGeometryType.LINE, TestUtils.getRandomColor(), TestUtils.getRandomColor(), i);
         }
 
         // add layers

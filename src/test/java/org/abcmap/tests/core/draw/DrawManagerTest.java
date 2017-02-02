@@ -2,7 +2,7 @@ package org.abcmap.tests.core.draw;
 
 
 import org.abcmap.TestUtils;
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.draw.DrawManagerException;
 import org.abcmap.core.draw.builder.LineBuilder;
 import org.abcmap.core.draw.builder.PointBuilder;
@@ -99,7 +99,7 @@ public class DrawManagerTest {
         // this style have to be already created, and must not change style count
         dm.setActiveForeground(Color.red);
         dm.setActiveBackground(Color.black);
-        dm.getActiveStyle(AbmDefaultFeatureType.LINE);
+        dm.getActiveStyle(AbmGeometryType.LINE);
 
         // test number of draw
         assertTrue("Shape number test", shapeCount[0] == pointNumber + lineNumber + polygonNumber);

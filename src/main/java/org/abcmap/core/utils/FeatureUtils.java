@@ -1,6 +1,6 @@
 package org.abcmap.core.utils;
 
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.draw.builder.AbmSimpleFeatureBuilder;
 import org.abcmap.core.styles.StyleContainer;
 import org.abcmap.core.tiles.TileFeatureBuilder;
@@ -21,9 +21,8 @@ import org.opengis.filter.identity.Identifier;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import java.awt.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
+import java.util.List;
 
 public class FeatureUtils {
 
@@ -64,19 +63,29 @@ public class FeatureUtils {
     }
 
     /**
-     * Return a list of features
+     * Return a list of features which can be added to a feature store
      *
      * @param features
      * @return
      */
     public static FeatureCollection asList(SimpleFeature... features) {
+        return asFeatureCollection(Arrays.asList(features));
+    }
+
+    /**
+     * Return a list of features which can be added to a feature store
+     *
+     * @param features
+     * @return
+     */
+    public static FeatureCollection asFeatureCollection(List<SimpleFeature> features) {
         DefaultFeatureCollection coll = new DefaultFeatureCollection();
-        for (SimpleFeature f :
-                features) {
+        for (SimpleFeature f : features) {
             coll.add(f);
         }
         return coll;
     }
+
 
     /**
      * Return a style factory
@@ -190,7 +199,7 @@ public class FeatureUtils {
      * @param thick
      * @return
      */
-    public static Style createStyleFor(AbmDefaultFeatureType type, Color foreground, Color background, double thick) {
+    public static Style createStyleFor(AbmGeometryType type, Color foreground, Color background, double thick) {
 
         Rule r = createRuleFor(type, foreground, background, thick);
 
@@ -212,7 +221,7 @@ public class FeatureUtils {
      * @param type
      * @return
      */
-    public static Rule createRuleFor(AbmDefaultFeatureType type, Color foreground, Color background, double thick) {
+    public static Rule createRuleFor(AbmGeometryType type, Color foreground, Color background, double thick) {
 
         // create stroke and optional fill
         Stroke stroke = sf.stroke(ff.literal(foreground), null, null, null, null, null, null);
@@ -222,7 +231,7 @@ public class FeatureUtils {
         }
 
         // create rule for points
-        if (AbmDefaultFeatureType.POINT.equals(type)) {
+        if (AbmGeometryType.POINT.equals(type)) {
 
             // create point symbolizer
             Mark mark = sf.getCircleMark();
@@ -242,7 +251,7 @@ public class FeatureUtils {
         }
 
         // create rule for lines
-        else if (AbmDefaultFeatureType.LINE.equals(type)) {
+        else if (AbmGeometryType.LINE.equals(type)) {
             LineSymbolizer lineSym = sf.createLineSymbolizer(stroke, null);
             Rule r = sf.createRule();
             r.symbolizers().add(lineSym);
@@ -250,7 +259,7 @@ public class FeatureUtils {
         }
 
         // create rule for polygon
-        else if (AbmDefaultFeatureType.POLYGON.equals(type)) {
+        else if (AbmGeometryType.POLYGON.equals(type)) {
 
             // create polygon symbolizer
             PolygonSymbolizer polygonSym = sf.createPolygonSymbolizer(stroke, fill, null);

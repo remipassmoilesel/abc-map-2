@@ -1,6 +1,6 @@
 package org.abcmap.core.managers;
 
-import org.abcmap.core.draw.AbmDefaultFeatureType;
+import org.abcmap.core.draw.AbmGeometryType;
 import org.abcmap.core.draw.DrawManagerException;
 import org.abcmap.core.draw.LayerElement;
 import org.abcmap.core.draw.builder.LineBuilder;
@@ -67,7 +67,7 @@ public class DrawManager extends ManagerTreeAccessUtil implements HasEventNotifi
 
         AbmFeatureLayer layer = getActiveFeatureLayerOrThrow();
 
-        LineBuilder builder = new LineBuilder(layer, getActiveStyle(AbmDefaultFeatureType.LINE));
+        LineBuilder builder = new LineBuilder(layer, getActiveStyle(AbmGeometryType.LINE));
         return builder;
 
     }
@@ -80,7 +80,7 @@ public class DrawManager extends ManagerTreeAccessUtil implements HasEventNotifi
     public PolygonBuilder getPolygonBuilder() {
         AbmFeatureLayer layer = getActiveFeatureLayerOrThrow();
 
-        PolygonBuilder builder = new PolygonBuilder(layer, getActiveStyle(AbmDefaultFeatureType.POLYGON));
+        PolygonBuilder builder = new PolygonBuilder(layer, getActiveStyle(AbmGeometryType.POLYGON));
         return builder;
     }
 
@@ -92,7 +92,7 @@ public class DrawManager extends ManagerTreeAccessUtil implements HasEventNotifi
     public PointBuilder getPointBuilder() {
         AbmFeatureLayer layer = getActiveFeatureLayerOrThrow();
 
-        PointBuilder builder = new PointBuilder(layer, getActiveStyle(AbmDefaultFeatureType.POINT));
+        PointBuilder builder = new PointBuilder(layer, getActiveStyle(AbmGeometryType.POINT));
         return builder;
     }
 
@@ -107,7 +107,7 @@ public class DrawManager extends ManagerTreeAccessUtil implements HasEventNotifi
      *
      * @return
      */
-    public StyleContainer getActiveStyle(AbmDefaultFeatureType type) {
+    public StyleContainer getActiveStyle(AbmGeometryType type) {
         return getStyle(type, activeForeground, activeBackground, activeThick);
     }
 
@@ -122,7 +122,7 @@ public class DrawManager extends ManagerTreeAccessUtil implements HasEventNotifi
      *
      * @return
      */
-    public StyleContainer getStyle(AbmDefaultFeatureType type, Color fg, Color bg, int thick) {
+    public StyleContainer getStyle(AbmGeometryType type, Color fg, Color bg, int thick) {
 
         if (projectm().isInitialized() == false) {
             throw new IllegalStateException("Project not initialized");
