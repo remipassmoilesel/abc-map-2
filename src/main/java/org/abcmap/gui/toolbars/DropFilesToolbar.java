@@ -181,7 +181,9 @@ public class DropFilesToolbar extends Toolbar {
                         }
 
                         AddWMSLayer anwms = new AddWMSLayer();
-                        anwms.openLayer(transferData, null);
+                        ThreadManager.runLater(()->{
+                            anwms.openLayer(transferData, null);
+                        });
 
                         dtde.dropComplete(true);
                     }

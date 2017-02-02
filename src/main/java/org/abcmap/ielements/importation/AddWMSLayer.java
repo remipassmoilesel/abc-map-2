@@ -2,8 +2,8 @@ package org.abcmap.ielements.importation;
 
 import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.project.layers.AbmWMSLayer;
-import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.core.resources.WmsResource;
+import org.abcmap.core.threads.ThreadManager;
 import org.abcmap.gui.components.PredefinedWmsServerRenderer;
 import org.abcmap.gui.dialogs.WMSSelectionDialog;
 import org.abcmap.gui.utils.GuiUtils;
@@ -153,7 +153,11 @@ public class AddWMSLayer extends InteractionElement {
             }
 
             // open WMS layer
-            openLayer(server.getUrl(), null);
+            WmsResource finalServer = server;
+            ThreadManager.runLater(() -> {
+                openLayer(finalServer.getUrl(), null);
+            });
+
         });
 
         // search servers online button
@@ -187,65 +191,65 @@ public class AddWMSLayer extends InteractionElement {
      */
     public void openLayer(String url, String layerName) {
 
-        ThreadManager.runLater(() -> {
+        GuiUtils.throwIfOnEDT();
 
-            // check url
-            if (url.isEmpty() == true || url.matches("^https?://.+") == false) {
-                dialm().showErrorInBox("Adresse invalide: " + url);
-                return;
-            }
+        // check url
+        if (url.isEmpty() == true || url.matches("^https?://.+") == false) {
+            dialm().showErrorInBox("Adresse invalide: " + url);
+            return;
+        }
 
-            // try to open wms layer
-            AbmWMSLayer layer;
-            try {
-                layer = projectm().getProject().addNewWMSLayer(url, layerName);
-            } catch (IOException e) {
-                logger.error(e);
-                dialm().showErrorInBox("Impossible d'ouvrir cette ressource");
-                return;
-            }
+        // try to open wms layer
+        AbmWMSLayer layer;
+        try {
+            layer = projectm().getProject().addNewWMSLayer(url, layerName);
+        } catch (IOException e) {
+            logger.error(e);
+            dialm().showErrorInBox("Impossible d'ouvrir cette ressource");
+            return;
+        }
 
-            // let user select layer name
-            final String[] choosenLayerName = new String[]{null};
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        WMSSelectionDialog dialog = new WMSSelectionDialog(layer.getAvailableWMSNames());
-                        dialog.setSelectedValue(layerName);
-                        dialog.setVisible(true);
-                        choosenLayerName[0] = dialog.getSelectedValue();
-                    }
-                });
-            } catch (InterruptedException | InvocationTargetException e) {
-                logger.error(e);
-            }
-
-            // change readable name if needed
-            if (layer.getName() == null || layer.getName().isEmpty()) {
-                layer.setName(layerName);
-            }
-
-            // change internal layer
-            layer.changeWmsName(choosenLayerName[0]);
-
-            // delete cache and show changes
-            mapm().mainmap.deleteCache(layer.getId(), null);
-            mapm().mainmap.refresh();
-
-            projectm().fireLayerListChanged();
-
-            // empty text field
-            SwingUtilities.invokeLater(() -> {
-
-                if (wmsTextField != null) {
-                    GuiUtils.changeTextWithoutFire(wmsTextField, "");
+        // let user select layer name
+        final String[] choosenLayerName = new String[]{null};
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                @Override
+                public void run() {
+                    WMSSelectionDialog dialog = new WMSSelectionDialog(layer.getAvailableWMSNames());
+                    dialog.setSelectedValue(layerName);
+                    dialog.setVisible(true);
+                    choosenLayerName[0] = dialog.getSelectedValue();
                 }
-
             });
+        } catch (InterruptedException | InvocationTargetException e) {
+            logger.error(e);
+        }
 
-            dialm().showMessageInBox("La couche a été ajoutée au projet: " + url);
+        // change readable name if needed
+        if (layer.getName() == null || layer.getName().isEmpty()) {
+            layer.setName(layerName);
+        }
+
+        // change internal layer
+        layer.changeWmsName(choosenLayerName[0]);
+
+        // delete cache and show changes
+        mapm().mainmap.deleteCache(layer.getId(), null);
+        mapm().mainmap.refresh();
+
+        projectm().fireLayerListChanged();
+
+        // empty text field
+        SwingUtilities.invokeLater(() -> {
+
+            if (wmsTextField != null) {
+                GuiUtils.changeTextWithoutFire(wmsTextField, "");
+            }
+
         });
+
+        dialm().showMessageInBox("La couche a été ajoutée au projet: " + url);
+
 
     }
 }
