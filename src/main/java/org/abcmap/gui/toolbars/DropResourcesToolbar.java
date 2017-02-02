@@ -4,11 +4,13 @@ import net.miginfocom.swing.MigLayout;
 import org.abcmap.core.log.CustomLogger;
 import org.abcmap.core.managers.*;
 import org.abcmap.core.threads.ThreadManager;
+import org.abcmap.core.utils.Utils;
 import org.abcmap.gui.GuiIcons;
 import org.abcmap.gui.utils.GraphicsConsumer;
 import org.abcmap.gui.utils.GuiUtils;
 import org.abcmap.gui.windows.MainWindow;
 import org.abcmap.ielements.importation.AddWMSLayer;
+import org.abcmap.ielements.importation.geo.AddGpxData;
 import org.abcmap.ielements.importation.geo.AddShapefileLayer;
 
 import javax.swing.*;
@@ -31,6 +33,7 @@ public class DropResourcesToolbar extends Toolbar {
     private final DropTarget dropTarget;
     private final DialogManager dialm;
     private final ProjectManager projectm;
+    private final ImportManager importm;
     private Rectangle rectangleToHighlight;
 
     public DropResourcesToolbar() {
@@ -38,6 +41,7 @@ public class DropResourcesToolbar extends Toolbar {
         this.guim = Main.getGuiManager();
         this.dialm = Main.getDialogManager();
         this.projectm = Main.getProjectManager();
+        this.importm = Main.getImportManager();
 
         setLayout(new MigLayout("insets 6, gap 6"));
 
@@ -151,11 +155,36 @@ public class DropResourcesToolbar extends Toolbar {
                     java.util.List<File> transferData = (java.util.List<File>) transferable.getTransferData(DataFlavor.javaFileListFlavor);
                     if (transferData != null && transferData.size() > 0) {
 
-                        // open shape file in another thread
-                        AddShapefileLayer anshapefile = new AddShapefileLayer();
-                        ThreadManager.runLater(() -> {
-                            anshapefile.openLayer(transferData.get(0).getAbsolutePath());
-                        });
+                        // check if file is a GPX file
+                        for (File f : transferData) {
+
+                            String extension = Utils.getExtension(f);
+
+                            // file can be a shapefile, import it and stop  search
+                            if (importm.isExtensionValidForShapefile(extension)) {
+                                AddShapefileLayer anshapefile = new AddShapefileLayer();
+                                ThreadManager.runLater(() -> {
+                                    anshapefile.openLayer(transferData.get(0).getAbsolutePath());
+                                });
+                                break;
+                            }
+
+                            // file is a GPX data file, import it and stop search
+                            else if (importm.isExtensionValidForGpxData(extension)) {
+                                AddGpxData anshapefile = new AddGpxData();
+                                ThreadManager.runLater(() -> {
+                                    anshapefile.addGpxTracks(transferData.get(0).getAbsolutePath(), null);
+                                });
+
+                                break;
+                            }
+
+                            // unknown type
+                            else {
+                                logger.warning("Unknown dropped file: " + f);
+                            }
+
+                        }
 
                         dtde.dropComplete(true);
                     }
@@ -181,7 +210,7 @@ public class DropResourcesToolbar extends Toolbar {
                         }
 
                         AddWMSLayer anwms = new AddWMSLayer();
-                        ThreadManager.runLater(()->{
+                        ThreadManager.runLater(() -> {
                             anwms.openLayer(transferData, null);
                         });
 

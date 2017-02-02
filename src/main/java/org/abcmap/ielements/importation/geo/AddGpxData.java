@@ -28,7 +28,7 @@ import java.util.Arrays;
 /**
  * Created by remipassmoilesel on 13/01/17.
  */
-public class AddGpxFile extends InteractionElement {
+public class AddGpxData extends InteractionElement {
 
     /**
      * Text field where user specify path of files
@@ -60,7 +60,7 @@ public class AddGpxFile extends InteractionElement {
      */
     private String pleaseSelectFileElement = "Choisissez un fichier...";
 
-    public AddGpxFile() {
+    public AddGpxData() {
 
         this.label = "Ajouter une trace GPS";
         this.help = "...";
@@ -165,6 +165,8 @@ public class AddGpxFile extends InteractionElement {
      * @param providedPathStr
      */
     public void addGpxTracks(String providedPathStr, int[] trackIndexes) {
+
+        GuiUtils.throwIfOnEDT();
 
         // check current project
         Project project = getCurrentProjectOrShowMessage();

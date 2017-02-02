@@ -13,7 +13,7 @@ public class MenuGeoDataImport extends GroupOfInteractionElements {
         addInteractionElement(new AddShapefileLayer());
 
         // add a GPX file
-        addInteractionElement(new AddGpxFile());
+        addInteractionElement(new AddGpxData());
 
     }
 
