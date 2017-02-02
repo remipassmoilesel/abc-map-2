@@ -1,10 +1,14 @@
 package org.abcmap.core.managers;
 
 import com.labun.surf.Params;
+import org.abcmap.core.cancel.UndoableOperationWrapper;
 import org.abcmap.core.crop.CropConfigurator;
 import org.abcmap.core.events.ImportManagerEvent;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.events.manager.HasEventNotificationManager;
+import org.abcmap.core.log.CustomLogger;
+import org.abcmap.core.resources.DistantResource;
+import org.abcmap.core.resources.DistantResourceProgressEvent;
 import org.abcmap.core.resources.MapImportException;
 import org.abcmap.core.robot.ScreenCatcher;
 import org.abcmap.core.tileanalyse.TileFactory;
@@ -18,13 +22,20 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 /**
  * Created by remipassmoilesel on 08/12/16.
  */
 public class ImportManager extends ManagerTreeAccessUtil implements HasEventNotificationManager {
 
+    private static final CustomLogger logger = LogManager.getLogger(UndoableOperationWrapper.class);
+
+    /**
+     * Factory used to create tiles when user catch screen manually
+     */
     private TileFactory manualImporter;
+
     /**
      * Current data headers
      */
@@ -124,6 +135,27 @@ public class ImportManager extends ManagerTreeAccessUtil implements HasEventNoti
     public boolean isValidExtensionsForTile(String ext) {
         return validExtensionsForTiles.contains(ext.toLowerCase());
     }
+
+    /**
+     * Import specified resources in project
+     *
+     * @param selectedResources
+     * @param updates
+     */
+    public void importDistantResources(ArrayList<DistantResource> selectedResources, Consumer<DistantResourceProgressEvent> updates) {
+        for (DistantResource res : selectedResources) {
+            try {
+                res.importIn(projectm().getProject(), (event) -> {
+                    if (updates != null) {
+                        updates.accept(event);
+                    }
+                });
+            } catch (Exception e) {
+                logger.error(e);
+            }
+        }
+    }
+
 
     /**
      * Return true if we are currently importing

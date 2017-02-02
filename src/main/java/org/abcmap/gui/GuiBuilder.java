@@ -3,7 +3,7 @@ package org.abcmap.gui;
 import org.abcmap.core.managers.GuiManager;
 import org.abcmap.core.managers.Main;
 import org.abcmap.gui.components.dock.*;
-import org.abcmap.gui.toolbars.DropFilesToolbar;
+import org.abcmap.gui.toolbars.DropResourcesToolbar;
 import org.abcmap.ielements.importation.manual.MenuImportManualCapture;
 import org.abcmap.ielements.importation.robot.MenuRobotImport;
 import org.abcmap.ielements.toolbar.DisplayToolbar;
@@ -97,7 +97,7 @@ public class GuiBuilder {
         // add filler
         tbs.addFiller();
 
-        tbs.addToolbar(new DropFilesToolbar(), "align right");
+        tbs.addToolbar(new DropResourcesToolbar(), "align right");
 
         //tbs.addToolbar(new SearchToolbar());
 

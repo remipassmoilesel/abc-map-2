@@ -124,7 +124,7 @@ public class AddDataFromCatalog extends InteractionElement {
 
                     setAllElementsSelected(false);
 
-                    mapm().importResources(resources, (event) -> {
+                    importm().importDistantResources(resources, (event) -> {
 
                         int resId = resources.indexOf(event.getResource()) + 1;
 

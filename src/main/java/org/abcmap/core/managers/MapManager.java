@@ -362,26 +362,6 @@ public class MapManager extends ManagerTreeAccessUtil implements HasEventNotific
     }
 
     /**
-     * Impprt specified resources in project
-     *
-     * @param selectedResources
-     * @param updates
-     */
-    public void importResources(ArrayList<DistantResource> selectedResources, Consumer<DistantResourceProgressEvent> updates) {
-        for (DistantResource res : selectedResources) {
-            try {
-                res.importIn(projectm().getProject(), (event) -> {
-                    if (updates != null) {
-                        updates.accept(event);
-                    }
-                });
-            } catch (Exception e) {
-                logger.error(e);
-            }
-        }
-    }
-
-    /**
      * Sub name space grouping method working on main map only
      * <p>
      * All methods here should work without throwing exceptions

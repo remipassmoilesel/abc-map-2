@@ -22,9 +22,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.TooManyListenersException;
 
-public class DropFilesToolbar extends Toolbar {
+public class DropResourcesToolbar extends Toolbar {
 
-    private static final CustomLogger logger = LogManager.getLogger(DropFilesToolbar.class);
+    private static final CustomLogger logger = LogManager.getLogger(DropResourcesToolbar.class);
 
     private final MainWindowPainter mainWindowPainter;
     private final GuiManager guim;
@@ -33,7 +33,7 @@ public class DropFilesToolbar extends Toolbar {
     private final ProjectManager projectm;
     private Rectangle rectangleToHighlight;
 
-    public DropFilesToolbar() {
+    public DropResourcesToolbar() {
 
         this.guim = Main.getGuiManager();
         this.dialm = Main.getDialogManager();
