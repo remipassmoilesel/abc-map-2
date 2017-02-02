@@ -54,7 +54,7 @@ public class LogManager {
 
         // get the root logger
         java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
-        
+
         // set default log level
         rootLogger.setLevel(DEFAULT_LOG_LEVEL);
 

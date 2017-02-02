@@ -20,20 +20,22 @@ public class LaunchError {
 
     private static final CustomLogger logger = LogManager.getLogger(LaunchError.class);
 
-    /**
-     * Only static methods here
-     */
-    private LaunchError() {
-    }
-
     private static final String MESSAGE_FR = "Erreur lors du lancement d'Abc-Map. Le logiciel n'a pas pu s'initialiser correctement. " +
             "Veuillez consulter l'aide en ligne pour plus d'informations: " + ConfigurationConstants.WEBSITE_URL;
 
     private static final String MESSAGE_EN = "Error while launching Abc-Map. The software could not initialize properly. Please consult " +
             "the online help for more information: " + ConfigurationConstants.WEBSITE_URL;
 
-    private static void showConsoleError() {
+    /**
+     * Only static methods here
+     */
+    private LaunchError() {
+    }
 
+    /**
+     * Show a text error in console
+     */
+    private static void showConsoleError() {
         System.err.println("");
         System.err.println(MESSAGE_EN);
         System.err.println("");
@@ -128,14 +130,14 @@ public class LaunchError {
             });
 
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.error(e);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
 
         if (cause != null) {
-            System.err.println("Caused by: " + cause.getClass().getName() + " " + cause.getMessage());
-            cause.printStackTrace();
+            logger.error("Caused by: " + cause.getClass().getName() + " " + cause.getMessage());
+            logger.error(cause);
         }
 
         // exit program

@@ -3,16 +3,12 @@ package org.abcmap;
 import com.j256.ormlite.logger.LocalLog;
 import org.abcmap.core.events.manager.EventNotificationManager;
 import org.abcmap.core.log.CustomLogger;
-import org.abcmap.core.managers.GuiManager;
-import org.abcmap.core.managers.LogManager;
-import org.abcmap.core.managers.Main;
-import org.abcmap.core.managers.ProjectManager;
+import org.abcmap.core.managers.*;
 import org.abcmap.gui.GuiColors;
 import org.abcmap.gui.tools.containers.ToolLibrary;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -25,6 +21,10 @@ public class Initialization {
 
     private static final String DEV_MODE_ARG = "--dev-mode";
     private static final String CREATE_FAKE_ARG = "--create-fake-project";
+
+    private Initialization(){
+
+    }
 
     public static void doInit(String[] args) throws Exception {
 
@@ -81,6 +81,7 @@ public class Initialization {
         });
 
         ProjectManager pman = Main.getProjectManager();
+        RecentManager rman = Main.getRecentManager();
 
         // open specified project
         if (projectToOpen != null) {
@@ -89,14 +90,9 @@ public class Initialization {
 
                 pman.openProject(projectToOpen);
 
-                try {
-                    Main.getRecentManager().addCurrentProject();
-                    Main.getRecentManager().fireHistoryChanged();
-                    Main.getRecentManager().saveHistory();
-
-                } catch (IOException e) {
-                    logger.error(e);
-                }
+                rman.addCurrentProject();
+                rman.saveHistory();
+                rman.fireHistoryChanged();
 
             } catch (IOException e) {
                 logger.error(e);

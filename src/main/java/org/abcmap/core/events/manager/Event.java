@@ -7,7 +7,7 @@ import org.abcmap.core.utils.Utils;
  */
 public class Event {
 
-    public static Integer instances = 0;
+    private static Integer instances = 0;
 
     private final Object value;
     private final String name;
