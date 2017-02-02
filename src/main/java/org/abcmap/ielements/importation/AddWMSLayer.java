@@ -61,7 +61,10 @@ public class AddWMSLayer extends InteractionElement {
         mapm().getNotificationManager().addObserver(this);
 
         // first update
-        updateListOfWmsServers();
+        SwingUtilities.invokeLater(()->{
+            updateListOfWmsServers();
+        });
+
     }
 
     /**

@@ -5,6 +5,7 @@ import org.abcmap.core.managers.LogManager;
 import org.abcmap.core.project.Project;
 import org.abcmap.core.project.layers.AbmWMSLayer;
 import org.abcmap.gui.utils.GuiUtils;
+import org.abcmap.ielements.importation.AddWMSLayer;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -40,10 +41,8 @@ public class WmsResource extends DistantResource {
         }
 
         // try to open wms layer
-        AbmWMSLayer layer = p.addNewWMSLayer(url, null);
-        p.addLayer(layer);
-
-        p.fireLayerListChanged();
+        AddWMSLayer awmslayer = new AddWMSLayer();
+        awmslayer.openLayer(url, null);
 
     }
 
