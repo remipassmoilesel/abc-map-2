@@ -43,7 +43,7 @@ public class TestUtils {
         if (Main.isInitialized() == false) {
             try {
                 Initialization.doInit(new String[]{});
-            } catch (InvocationTargetException | InterruptedException e) {
+            } catch (Exception e) {
 
                 // TODO: enable log from here
                 e.printStackTrace();

@@ -54,15 +54,7 @@ public class LogManager {
 
         // get the root logger
         java.util.logging.Logger rootLogger = java.util.logging.Logger.getLogger("");
-        Handler[] handlers = rootLogger.getHandlers();
-
-        // remove console logging if not in debug mode
-        if (Main.isDebugMode() == false) {
-            if (handlers[0] instanceof ConsoleHandler) {
-                rootLogger.removeHandler(handlers[0]);
-            }
-        }
-
+        
         // set default log level
         rootLogger.setLevel(DEFAULT_LOG_LEVEL);
 

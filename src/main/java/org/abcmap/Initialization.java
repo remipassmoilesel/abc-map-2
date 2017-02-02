@@ -26,7 +26,7 @@ public class Initialization {
     private static final String DEV_MODE_ARG = "--dev-mode";
     private static final String CREATE_FAKE_ARG = "--create-fake-project";
 
-    public static void doInit(String[] args) throws IOException, InvocationTargetException, InterruptedException {
+    public static void doInit(String[] args) throws Exception {
 
         // parse arguments
         boolean devMode = false;
@@ -39,19 +39,19 @@ public class Initialization {
                 // debug mode
                 if (DEV_MODE_ARG.equalsIgnoreCase(str)) {
                     devMode = true;
-                    System.out.println("Dev mode enabled");
+                    logger.warning("Dev mode enabled");
                 }
 
                 // create fake project
                 else if (str.indexOf(CREATE_FAKE_ARG) != -1) {
                     createFake = str;
-                    System.out.println("Fake project will be created: " + str);
+                    logger.warning("A fake project will be created: " + str);
                 }
 
                 // open project
                 else {
                     projectToOpen = Paths.get(str);
-                    System.out.println("Project will be open: " + str);
+                    logger.warning("Project will be open: " + str);
                 }
             }
         }
@@ -67,8 +67,6 @@ public class Initialization {
         try {
             Main.init();
         } catch (Exception e) {
-            // TODO: enable log from here
-            e.printStackTrace();
             logger.error(e);
             LaunchError.showErrorAndDie();
         }

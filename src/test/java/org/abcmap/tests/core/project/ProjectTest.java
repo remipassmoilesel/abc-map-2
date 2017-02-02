@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 public class ProjectTest {
 
     @Test
-    public void test() throws IOException, InvocationTargetException, InterruptedException {
+    public void test() throws Exception {
 
         // initialize managers
         Initialization.doInit(null);
