@@ -22,6 +22,10 @@ https://github.com/remipassmoilesel/Abc-map
 	$ maven compile
 	$ maven exec:exec
 
+## Status
+
+[15/02/2017] Development will be interrupted this summer and will resume this fall.
+
 ## Screenshots
 
 ![Capture d'écran](screenshots/2016-03-28_12-45-50.png)
